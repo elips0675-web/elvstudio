@@ -1,0 +1,14 @@
+{
+  "name": "elv-studio-landing",
+  "private": true,
+  "type": "module",
+  "description": "Тема elv-studio и плагин Elv Kit для October CMS: гейты и выгрузка демо-версии",
+  "scripts": {
+    "check": "node tools/gate.mjs",
+    "check:urls": "node tools/check-urls.mjs",
+    "check:seo": "node tools/check-seo.mjs",
+    "check:headers": "node tools/check-headers.mjs",
+    "check:budget": "node tools/check-budget.mjs",
+    "check:orphans": "node tools/check-orphans.mjs"
+  }
+}

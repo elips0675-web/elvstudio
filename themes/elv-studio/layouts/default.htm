@@ -7,7 +7,7 @@ description = "Основной макет: шапка, подвал, инлай
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
     : elv_seo_title(this.page) %}
 {% set seo_description = seo_product
-    ? (seo_product.tagline ?: seo_product.description)
+    ? (seo_product.description ?: seo_product.tagline)
     : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
 <!DOCTYPE html>
 <html lang="ru">

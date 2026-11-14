@@ -110,7 +110,7 @@ class Chat
             return static::reply(
                 'Модуль Booking ведёт слоты по услугам и защищает от двойной брони через UNIQUE(service_code, date, time) и lockForUpdate.' . static::servicesText(),
                 ['Сколько стоит Booking?', 'Что входит в Kit?', 'Написать нам'],
-                static::link('Тарифы и модули', '#pricing')
+                static::link('Тарифы и модули', '/pricing/')
             );
         }
 
@@ -118,7 +118,7 @@ class Chat
             return static::reply(
                 'Модуль Shop оформляет заказ на товар и тариф, принимает оплату и выдаёт ZIP по токену. Заказы и статусы видны в админке.',
                 ['Сколько стоит Shop?', 'Как оплатить?', 'Какие модули есть?'],
-                static::link('Тарифы', '#pricing')
+                static::link('Тарифы', '/pricing/')
             );
         }
 
@@ -126,7 +126,7 @@ class Chat
             return static::reply(
                 'Блог входит в Elv Kit: статьи, категории, теги, RSS и sitemap. Тексты правятся в админке, SEO-поля — у каждой статьи.',
                 ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам'],
-                static::link('Блог на сайте', '#blog')
+                static::link('Блог на сайте', '/blog/')
             );
         }
 
@@ -151,27 +151,28 @@ class Chat
         if (static::has($text, ['seo', 'сио', 'метрик', 'sitemap', 'llms', 'индекс', 'google', 'яндекс'])) {
             return static::reply(
                 'SEO-контур: canonical, Open Graph, JSON-LD (Organization, SoftwareApplication, FAQPage, BlogPosting), sitemap.xml, robots.txt, llms.txt и RSS.',
-                ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам']
+                ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам'],
+                static::link('Документация', '/docs/')
             );
         }
 
         if (static::has($text, ['цена', 'стоим', 'сколько', 'тариф', 'прайс', 'бюджет', 'дорого', 'price'])) {
             if (static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog'])) {
-                return static::reply(static::modulePriceText($text), ['Что входит в Kit?', 'Какие модули есть?', 'Как оплатить?'], static::link('Модули', '#modules'));
+                return static::reply(static::modulePriceText($text), ['Что входит в Kit?', 'Какие модули есть?', 'Как оплатить?'], static::link('Модули', '/modules/'));
             }
 
-            return static::reply(static::plansText(), ['Что входит в Kit?', 'Какие модули есть?', 'Как оплатить?'], static::link('Сравнить тарифы', '#pricing'));
+            return static::reply(static::plansText(), ['Что входит в Kit?', 'Какие модули есть?', 'Как оплатить?'], static::link('Сравнить тарифы', '/pricing/'));
         }
 
         if (static::has($text, ['модул', 'плагин', 'booking', 'shop', 'feedback'])) {
-            return static::reply(static::modulesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Модули', '#modules'));
+            return static::reply(static::modulesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Модули', '/modules/'));
         }
 
         if (static::has($text, ['входит', 'включ', 'состав', 'получ', 'функци', 'возможност'])) {
             return static::reply(
                 "В Elv Kit входит:\n- " . implode("\n- ", Catalog::includes()),
                 ['Сколько стоит?', 'Какие модули есть?', 'Как установить?'],
-                static::link('Что входит', '#features')
+                static::link('Что входит', '/kit/')
             );
         }
 
@@ -197,9 +198,9 @@ class Chat
         ];
     }
 
-    protected static function link(string $label, string $anchor): array
+    protected static function link(string $label, string $path): array
     {
-        return ['label' => $label, 'url' => url('/') . $anchor];
+        return ['label' => $label, 'url' => url($path)];
     }
 
     protected static function normalize(string $text): string

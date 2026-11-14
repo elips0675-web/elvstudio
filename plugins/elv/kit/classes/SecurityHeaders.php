@@ -26,7 +26,17 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        if ($request->is('admin', 'admin/*', 'modules/*', 'system/*', 'combine/*')) {
+        if ($request->is(
+            'admin', 'admin/*',
+            'modules/system', 'modules/system/*',
+            'modules/backend', 'modules/backend/*',
+            'modules/cms', 'modules/cms/*',
+            'modules/editor', 'modules/editor/*',
+            'modules/media', 'modules/media/*',
+            'modules/tailor', 'modules/tailor/*',
+            'modules/dashboard', 'modules/dashboard/*',
+            'system/*', 'combine/*'
+        )) {
             return $response;
         }
 
@@ -53,6 +63,8 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+        header_remove('X-Powered-By');
+        $response->headers->remove('X-Powered-By');
 
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

@@ -3,56 +3,28 @@
 Только открытые пункты. Сделанное — в `Что сделано.txt`.
 Приоритет: P0 — без этого сайт не работает, P1 — витрина и SEO, P2 — прод.
 
-## P0 — сайт целиком
+## P1 — проверки, которые нельзя сделать внутри репозитория
 
-- [ ] Страницы темы (сейчас в `themes/elv-studio/pages/` только `index.htm`):
-      `kit.htm` (`/kit/`), `modules.htm` (`/modules/`), `module.htm` (`/modules/:slug/`),
-      `pricing.htm`, `demo.htm`, `docs.htm`, `blog.htm` (`/blog/`),
-      `blog-post.htm` (`/blog/:slug/`), `order.htm`, `order-success.htm`
-      (`/order/success/:number/`), `booking.htm`, `feedback.htm`, `contacts.htm`,
-      `terms.htm`, `privacy.htm`, `sitemap.htm`, `404.htm`.
-      Пока их нет, `'kit'|page` и подобные возвращают `null` → пустые `href`.
-- [ ] Партиал подписки (`partials/subscribe.htm`) и форма подписки на блог.
-- [ ] `404.htm` + проверить, что неизвестный адрес отдаёт 404 с макетом.
-- [ ] Пройти все страницы вручную: заголовки, крошки, пустые состояния.
+- [ ] JSON-LD прогнать через Google Rich Results и Яндекс.Вебмастер:
+      Organization, WebSite, SoftwareApplication, Product, FAQPage, BlogPosting,
+      BreadcrumbList. Локальный гейт проверяет только валидность JSON.
+- [ ] Открыть сайт на реальном телефоне (360 px) и в Firefox/Safari:
+      проверка была в headless-iframe (361/800/860/1024) и Lighthouse.
+- [ ] `check:console`-аналог: консольные ошибки на всех страницах в живом
+      браузере (сейчас смотрятся точечно, автоматического гейта нет).
 
-## P0 — проверка после страниц
+## P1 — контент
 
-- [ ] `php artisan elv:kit:demo` идемпотентен: повторный запуск не плодит дубли.
-- [ ] Отправка форм: заказ (JSON + обычный POST), бронь (гонка за слот → 409),
-      обратная связь, подписка (double opt-in письмо в `storage/logs`).
-- [ ] `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/rss.xml` — 200 и валидное тело.
-- [ ] `GET /download/{token}` до и после оплаты (до — отказ, после — ZIP).
-- [ ] CSP: страница не содержит инлайн-стилей без nonce, консоль без ошибок.
-- [ ] `node`-гейты (по образцу `D:\October CMS\tools`): `check-urls`, `check-seo`,
-      `check-headers`, `check-budget`, `check-orphans`.
-
-## P1 — витрина и SEO
-
-- [ ] `themes/elv-studio/assets/img/og-default.png` 1200×630: `Seo::image()`
-      ссылается на файл, которого нет (favicon.svg создан в Stage 2).
-- [ ] Проверить JSON-LD через Rich Results: Organization, WebSite, SoftwareApplication,
-      FAQPage, BlogPosting, BreadcrumbList.
-- [ ] `llms.txt` и `robots.txt` сверить с реальными адресами после появления страниц.
-- [ ] Замер Lighthouse: `/` — Stage 3, после виджета (mobile **100**, desktop **100**,
-      a11y/best-practices/SEO **100**); осталось повторить на `/kit/`, `/pricing/`,
-      `/blog/`, когда страницы появятся.
-- [ ] Чат: ответы собраны по каталогу и настройкам, ссылки пока ведут на якоря главной
-      (`#pricing`, `#modules`, `#features`, `#blog`); после появления `/docs/`, `/kit/`,
-      `/pricing/` перевести ссылки на страницы и дополнить базу знаний.
-- [ ] Решить, нужен ли фильтр грубых слов (`Classes\TextFilter`) в формах заказа, брони
-      и обратной связи: сейчас он стоит только в чате.
-- [ ] Проверить чат и меню на реальном телефоне (360 px) и в Firefox/Safari:
-      замеры были только headless (412 px).
-- [ ] Проверить адаптив 360/768/1024 и бургер-меню на телефоне.
-- [ ] Тексты: убрать «рыбные» формулировки, сверить цены/состав тарифов с `Catalog`.
-
-## P1 — контент в админке
-
-- [ ] Создать 3–5 статей блога с обложками и SEO-полями (демо-статьи уже есть).
-- [ ] Проверить редактор статей (richeditor), сохранение тела и `reading_time`.
-- [ ] Настроить `Settings` плагина: заменить демо-контакты (`email`/`telegram` из
-      `elv:kit:demo`), добавить телефон/WhatsApp, проверить переключатель чата.
+- [ ] Довести статьи до 5: сейчас 3 демо-статьи (`why-october-cms`,
+      `booking-without-race`, `seo-for-google-ai`) с обложками и SEO-полями.
+- [ ] Проверить редактор статей (richeditor) в админке: сохранение тела,
+      `reading_time`, обложка, теги.
+- [ ] Настройки плагина (`Elv Kit`): добавить телефон и WhatsApp к демо-контактам
+      (`sales@elv-studio.by`, `https://t.me/elvstudio` заданы), проверить
+      переключатель чата.
+- [ ] Решить судьбу фильтра грубых слов в формах заказа/брони/обратной связи:
+      сейчас `Classes\TextFilter` работает только в чате (сознательно не
+      включён в формы, чтобы не резать легитимные тексты).
 
 ## P2 — прод
 
@@ -69,4 +41,7 @@
 - `QUEUE_CONNECTION=sync`, `MAIL_MAILER=log` — письма пишутся в лог, не отправляются.
 - Оплата в демо-контуре: без ключей `PaymentManager` работает в mock-режиме.
 - `modules/` и `vendor/` не в репозитории — ставятся `composer install`.
+- Vercel-демо (`elvstudio.vercel.app`) — статический снимок `demo-static/`:
+  формы, чат и оплата там отключены (PHP на Vercel не исполняется);
+  пересобрать: `php tools/export-static.php --origin=https://elvstudio.vercel.app`.
 - `D:\Elv Landing` — рабочая копия; живой библиотечный сайт `D:\October CMS` не трогаем.
