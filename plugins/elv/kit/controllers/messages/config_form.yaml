@@ -1,0 +1,4 @@
+name: Сообщение
+modelClass: Elv\Kit\Models\Message
+form: $/elv/kit/models/message/fields.yaml
+defaultRedirect: elv/kit/messages

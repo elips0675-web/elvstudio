@@ -1,0 +1,14 @@
+title: Статьи
+list: $/elv/kit/models/post/columns.yaml
+modelClass: Elv\Kit\Models\Post
+recordUrl: elv/kit/posts/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Статей пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Заголовок'

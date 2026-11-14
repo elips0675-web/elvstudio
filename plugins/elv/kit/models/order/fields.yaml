@@ -1,0 +1,77 @@
+fields:
+    id:
+        label: '#'
+        disabled: true
+        span: left
+    order_no:
+        label: 'Номер заказа'
+        disabled: true
+        span: right
+    created_at:
+        label: 'Создан'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: left
+    plan_label:
+        label: 'Тариф'
+        disabled: true
+        span: right
+    product_name:
+        label: 'Товар'
+        disabled: true
+        span: left
+    amount_label:
+        label: 'Сумма'
+        disabled: true
+        span: right
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: left
+        options:
+            new: 'Новый'
+            pending: 'Ожидает оплаты'
+            paid: 'Оплачен'
+            cancelled: 'Отменён'
+            refunded: 'Возврат'
+    payment_provider:
+        label: 'Платёжный провайдер'
+        disabled: true
+        span: right
+    customer_name:
+        label: 'Имя'
+        span: left
+    email:
+        label: 'E-mail'
+        span: right
+    phone:
+        label: 'Телефон'
+        span: left
+    company:
+        label: 'Компания'
+        span: right
+    comment:
+        label: 'Комментарий'
+        type: textarea
+        size: small
+    payment_id:
+        label: 'ID платежа'
+        disabled: true
+        span: left
+    download_token:
+        label: 'Токен выдачи'
+        disabled: true
+        span: right
+    paid_at:
+        label: 'Оплачен'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: left
+    delivered_at:
+        label: 'Выдан'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right

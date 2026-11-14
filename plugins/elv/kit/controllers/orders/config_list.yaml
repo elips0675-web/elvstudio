@@ -1,0 +1,14 @@
+title: Заказы
+list: $/elv/kit/models/order/columns.yaml
+modelClass: Elv\Kit\Models\Order
+recordUrl: elv/kit/orders/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Заказов пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Номер, товар или e-mail'

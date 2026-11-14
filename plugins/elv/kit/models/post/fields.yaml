@@ -1,0 +1,54 @@
+fields:
+    title:
+        label: 'Заголовок'
+        span: left
+    slug:
+        label: 'Слаг'
+        span: right
+        comment: 'Попадает в /blog/{slug}/.'
+    category:
+        label: 'Категория'
+        type: relation
+        nameFrom: name
+        span: left
+    author:
+        label: 'Автор'
+        span: right
+    excerpt:
+        label: 'Краткое описание'
+        type: textarea
+        size: small
+    body:
+        label: 'Текст статьи'
+        type: richeditor
+        size: huge
+    tags:
+        label: 'Теги (JSON-массив)'
+        type: textarea
+        size: small
+        comment: '["October CMS", "SEO"]'
+    cover:
+        label: 'Иконка обложки'
+        span: left
+        comment: 'Имя из Classes\Icons: graph, calendar, spark.'
+    reading_time:
+        label: 'Время чтения, мин'
+        type: number
+        span: right
+    published_at:
+        label: 'Дата публикации'
+        type: datepicker
+        mode: datetime
+        span: left
+    is_published:
+        label: 'Опубликована'
+        type: switch
+        span: right
+    seo_title:
+        label: 'SEO title'
+        span: left
+    seo_description:
+        label: 'SEO description'
+        type: textarea
+        size: small
+        span: right

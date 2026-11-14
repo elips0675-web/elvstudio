@@ -1,0 +1,63 @@
+description = "Основной макет: шапка, подвал, инлайн CSS и JS, SEO-разметка"
+==
+{% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param('slug')) : null %}
+{% set seo_product = this.page.id == 'module' ? elv_product(this.param('slug')) : null %}
+{% set seo_noindex = this.page.id in ['404', 'order-success'] %}
+{% set seo_title = seo_product
+    ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
+    : elv_seo_title(this.page) %}
+{% set seo_description = seo_product
+    ? (seo_product.tagline ?: seo_product.description)
+    : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    {% if seo_noindex %}
+        <meta name="robots" content="noindex, nofollow">
+    {% else %}
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    {% endif %}
+    <link rel="canonical" href="{{ elv_canonical() }}">
+    <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
+
+    <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
+    <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">
+    <meta property="og:title" content="{{ seo_title }}">
+    <meta property="og:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta property="og:url" content="{{ elv_canonical() }}">
+    <meta property="og:image" content="{{ elv_og_image() }}">
+    <meta property="og:locale" content="ru_RU">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ seo_title }}">
+    <meta name="twitter:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta name="twitter:image" content="{{ elv_og_image() }}">
+
+    <link rel="icon" href="{{ 'assets/img/favicon.svg'|theme }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ 'assets/img/favicon.svg'|theme }}">
+
+    <script type="application/ld+json" nonce="{{ elv_csp_nonce() }}">{{ elv_jsonld(this.page)|raw }}</script>
+
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_css('assets/css/styles.css')|raw }}</style>
+</head>
+<body>
+<a class="skip-link" href="#main">К содержимому</a>
+
+{% partial 'header' %}
+
+{% page %}
+
+{% partial 'footer' %}
+
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
+{% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
+    {% partial 'analytics' %}
+{% endif %}
+</body>
+</html>

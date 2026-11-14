@@ -1,0 +1,4 @@
+name: Товар
+modelClass: Elv\Kit\Models\Product
+form: $/elv/kit/models/product/fields.yaml
+defaultRedirect: elv/kit/products

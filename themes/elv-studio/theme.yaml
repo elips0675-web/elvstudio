@@ -1,0 +1,16 @@
+name: 'Elv Studio'
+code: elv-studio
+description: 'Лендинг Elv Kit: тема и модули для October CMS. CSS и JS инлайн, системные шрифты, ноль внешних запросов.'
+author: 'Elv Studio'
+homepage: 'https://elv-studio.by'
+form:
+    fields:
+        meta_title:
+            label: 'Заголовок для главной'
+            commentAbove: 'Используется, если у страницы не задан свой SEO-заголовок.'
+            type: text
+            span: left
+        meta_description:
+            label: 'Описание для главной'
+            type: textarea
+            size: small

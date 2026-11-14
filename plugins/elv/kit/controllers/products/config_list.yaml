@@ -1,0 +1,14 @@
+title: Товары
+list: $/elv/kit/models/product/columns.yaml
+modelClass: Elv\Kit\Models\Product
+recordUrl: elv/kit/products/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Товаров пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Название или слаг'

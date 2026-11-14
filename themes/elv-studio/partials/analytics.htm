@@ -1,0 +1,67 @@
+{% set ga = elv_setting('analytics_google') %}
+{% set metrika = elv_setting('analytics_yandex') %}
+<script nonce="{{ elv_csp_nonce() }}">
+(function () {
+    'use strict';
+    var nonce = '{{ elv_csp_nonce() }}';
+    var loaded = false;
+
+    function inject(src, onload) {
+        var script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.nonce = nonce;
+        if (onload) {
+            script.addEventListener('load', onload);
+        }
+        document.head.appendChild(script);
+    }
+
+    function inline(code) {
+        var script = document.createElement('script');
+        script.nonce = nonce;
+        script.textContent = code;
+        document.head.appendChild(script);
+    }
+
+    function load() {
+        if (loaded) {
+            return;
+        }
+        loaded = true;
+
+        {% if ga %}
+        inject('https://www.googletagmanager.com/gtag/js?id={{ ga|e('js') }}');
+        inline("window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ ga|e('js') }}');");
+        {% endif %}
+
+        {% if metrika %}
+        (function (m, e, t, r, i, k, a) {
+            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+            m[i].l = 1 * new Date();
+            for (var j = 0; j < document.scripts.length; j++) {
+                if (document.scripts[j].src === r) { return; }
+            }
+            k = e.createElement(t);
+            a = e.getElementsByTagName(t)[0];
+            k.async = 1;
+            k.src = r;
+            k.nonce = nonce;
+            a.parentNode.insertBefore(k, a);
+        })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+        ym({{ metrika|e('js') }}, 'init', {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: {{ elv_setting('metrika_webvisor') ? 'true' : 'false' }}
+        });
+        {% endif %}
+    }
+
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (event) {
+        window.addEventListener(event, load, { once: true, passive: true });
+    });
+
+    window.setTimeout(load, 12000);
+})();
+</script>

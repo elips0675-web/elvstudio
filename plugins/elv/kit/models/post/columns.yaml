@@ -1,0 +1,22 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    title:
+        label: 'Заголовок'
+        searchable: true
+    category:
+        label: 'Категория'
+        relation: category
+        select: name
+    published_at:
+        label: 'Публикация'
+        type: datetime
+        sortable: true
+    is_published:
+        label: 'Опубликована'
+        type: switch
+    reading_time:
+        label: 'Мин.'
+        type: number

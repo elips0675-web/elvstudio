@@ -1,0 +1,15 @@
+fields:
+    name:
+        label: 'Название'
+        span: left
+    slug:
+        label: 'Слаг'
+        span: right
+    description:
+        label: 'Описание'
+        type: textarea
+        size: small
+    sort_order:
+        label: 'Порядок'
+        type: number
+        span: left

@@ -1,0 +1,14 @@
+title: Категории блога
+list: $/elv/kit/models/category/columns.yaml
+modelClass: Elv\Kit\Models\Category
+recordUrl: elv/kit/categories/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Категорий пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Название'

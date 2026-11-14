@@ -1,0 +1,54 @@
+fields:
+    id:
+        label: '#'
+        disabled: true
+        span: left
+    service:
+        label: 'Услуга'
+        disabled: true
+        span: right
+    date:
+        label: 'Дата'
+        type: datepicker
+        mode: date
+        disabled: true
+        span: left
+    time:
+        label: 'Время'
+        disabled: true
+        span: right
+    person:
+        label: 'Имя'
+        span: left
+    phone:
+        label: 'Телефон'
+        span: right
+    email:
+        label: 'E-mail'
+        span: left
+    price:
+        label: 'Стоимость'
+        disabled: true
+        span: right
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: left
+        options:
+            new: 'Новая'
+            confirmed: 'Подтверждена'
+            cancelled: 'Отменена'
+    comment:
+        label: 'Комментарий'
+        type: textarea
+        size: small
+    source:
+        label: 'Источник'
+        disabled: true
+        span: left
+    created_at:
+        label: 'Создана'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right

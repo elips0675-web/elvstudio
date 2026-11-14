@@ -1,0 +1,21 @@
+<h1 style="font:600 20px/1.35 Arial, sans-serif; margin:0 0 12px">Заказ оплачен</h1>
+<p style="font:14px/1.55 Arial, sans-serif; margin:0 0 16px">
+    {{ order.name }}, спасибо. Доступ к Elv Kit открыт, ссылка на архив ниже.
+</p>
+<table cellpadding="0" cellspacing="0" style="font:14px/1.6 Arial, sans-serif; margin:0 0 16px">
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Заказ</td><td>{{ order.number }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Продукт</td><td>{{ order.product }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Лицензия</td><td>{{ order.plan }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Сумма</td><td>{{ order.amount }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Ключ</td><td><b>{{ license.key }}</b></td></tr>
+</table>
+<p style="margin:0 0 16px">
+    <a href="{{ download }}" style="display:inline-block; padding:12px 22px; background:#1c5cf0; color:#fff; font:600 14px/1 Arial, sans-serif; text-decoration:none; border-radius:8px">Скачать Elv Kit</a>
+</p>
+<p style="font:13px/1.55 Arial, sans-serif; margin:0 0 8px">
+    Ключ активируется на {{ license.limit }} домен(ов). Установка: распакуйте архив, выполните
+    <code>php artisan october:migrate</code>, включите тему и запустите <code>php artisan elv:kit:demo</code>.
+</p>
+<p style="font:12px/1.5 Arial, sans-serif; margin:16px 0 0; color:#7a8494">
+    Ссылка на скачивание персональная. Если она попала не к вам — напишите в ответ на письмо.
+</p>

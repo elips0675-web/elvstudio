@@ -1,0 +1,106 @@
+# Зависимости
+/vendor
+/vendor_drm
+/node_modules
+/modules/system/node_modules
+/bootstrap/cache
+/bootstrap/compiled.php
+/bootstrap/cache/*.php
+composer.phar
+
+# Окружение и секреты
+/.local
+.env
+.env.*.php
+.env.php
+auth.json
+!.env.example
+*.key
+*.pem
+.auth/
+sftp-config.json
+.ftpconfig
+selenium.php
+
+# Хранилище October: логи, кеш, сессии, загруженные файлы
+/storage/app/*
+!/storage/app/public
+!/storage/app/public/.gitignore
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
+/storage/framework/*.php
+/storage/logs/*
+/storage/temp/*
+/storage/debugbar/*
+!/storage/**/.gitignore
+
+# Собранные и сгенерированные файлы
+/public/storage
+/public/vendor
+/public/modules
+/plugins/*/*/vendor
+*.min.css
+!public/**/*.min.css
+!/themes/*/assets/vendor/*.min.css
+/database/database.sqlite
+_ide_helper.php
+.phpstorm.meta.php
+
+# Бэкапы и дампы
+*.sql
+*.sql.gz
+*.bundle
+/backup
+
+# Инструменты и отчёты
+/.idea
+/.vscode
+/.claude
+/.vite
+nbproject
+.DS_Store
+Thumbs.db
+*.log
+php_errors.log
+php-errors.log
+nginx-error.log
+nginx-access.log
+nginx-ssl.access.log
+nginx-ssl.error.log
+package-lock.json
+/playwright-report
+/test-results
+/coverage
+/.phpunit.result.cache
+.phpunit.cache
+/modules
+
+# Демо-тема и демо-плагин October: скелет ставит их для примера,
+# проект их не использует и удаляет на этапе 4 (пункт M16).
+/themes/demo
+/plugins/october/demo
+
+# Черновики владельца: не коммитятся (AGENTS.md, раздел 7) — в них чужие
+# оценки и внутренние заметки. Шаблоны, а не точные имена: новый такой файл
+# не должен пачкать `git status`.
+/Архитектура*.html
+/Продажа шаблона*.txt
+/Оценка*.html
+/Оценка*.txt
+/Что взять из WPShop*.html
+/конструктор страниц*.html
+/Как монетизировать*.html
+/October CMS для лендинга*.html
+/Laravel + Filament*.txt
+/«Стучалка» установок*.html
+/Как сделать стучалку*.html
+/Монетизация сборки на October CMS*.html
+/Бренд Elv шаблон функционал*.txt
+/Доступ к товару*.txt
+/на October CMS процесс оплаты*.txt
+/Промт*.txt
+/Промты*.txt
+/Улучшение шаблона*.txt
+/Что сделать*.txt

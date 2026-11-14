@@ -1,0 +1,29 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    name:
+        label: 'Название'
+        searchable: true
+    slug:
+        label: 'Слаг'
+        searchable: true
+    kind:
+        label: 'Тип'
+        type: selectable
+        select: kind
+        options:
+            kit: 'Kit'
+            module: 'Модуль'
+    price_label:
+        label: 'Цена'
+        type: text
+        select: price_label
+    is_active:
+        label: 'Активен'
+        type: switch
+    sort_order:
+        label: 'Порядок'
+        type: number
+        sortable: true

@@ -1,0 +1,340 @@
+<?php namespace Elv\Kit;
+
+use Elv\Kit\Classes\Blog;
+use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\Faq;
+use Elv\Kit\Classes\Icons;
+use Elv\Kit\Classes\LicenseService;
+use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\SecurityHeaders;
+use Elv\Kit\Classes\Seo;
+use Elv\Kit\Classes\Slots;
+use Elv\Kit\Models\Post;
+use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Settings;
+use System\Classes\PluginBase;
+
+/**
+ * Plugin — точка входа Elv Kit.
+ *
+ * Плагин не подменяет CMS-компоненты: страницы и партиалы темы вызывают
+ * markup-функции, поэтому HTML остаётся статическим и кэшируемым.
+ */
+class Plugin extends PluginBase
+{
+    public function pluginDetails()
+    {
+        return [
+            'name' => 'Elv Kit',
+            'description' => 'Модульный конструктор сайтов на October CMS: каталог, блог, заказы, брони и обратная связь.',
+            'author' => 'Elv Studio',
+            'icon' => 'icon-cubes',
+            'homepage' => 'https://elv-studio.by',
+        ];
+    }
+
+    public function register()
+    {
+        $this->registerConsoleCommand('elv.kit.demo', \Elv\Kit\Console\DemoCommand::class);
+        $this->registerConsoleCommand('elv.kit.reset', \Elv\Kit\Console\ResetCommand::class);
+        $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
+    }
+
+    public function registerSettings()
+    {
+        return [
+            'settings' => [
+                'label' => 'Elv Kit',
+                'description' => 'Магазин, платежи, лицензии, почта и SEO.',
+                'category' => 'Elv Kit',
+                'icon' => 'icon-cogs',
+                'class' => Settings::class,
+                'order' => 500,
+                'keywords' => 'elv kit shop payments seo',
+                'permissions' => ['elv.kit.settings'],
+            ],
+        ];
+    }
+
+    public function registerPermissions()
+    {
+        return [
+            'elv.kit.settings' => [
+                'label' => 'Настройки Elv Kit',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.orders' => [
+                'label' => 'Заказы',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.bookings' => [
+                'label' => 'Брони',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.messages' => [
+                'label' => 'Сообщения обратной связи',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.subscribers' => [
+                'label' => 'Подписчики',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.catalog' => [
+                'label' => 'Каталог: товары и категории',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.blog' => [
+                'label' => 'Блог',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.licenses' => [
+                'label' => 'Лицензии',
+                'tab' => 'Elv Kit',
+            ],
+        ];
+    }
+
+    public function registerNavigation()
+    {
+        return [
+            'kit' => [
+                'label' => 'Elv Kit',
+                'url' => \Backend::url('elv/kit/orders'),
+                'icon' => 'icon-cubes',
+                'order' => 410,
+                'permissions' => ['elv.kit.orders'],
+                'sideMenu' => [
+                    'orders' => [
+                        'label' => 'Заказы',
+                        'icon' => 'icon-shopping-cart',
+                        'url' => \Backend::url('elv/kit/orders'),
+                        'permissions' => ['elv.kit.orders'],
+                    ],
+                    'bookings' => [
+                        'label' => 'Брони',
+                        'icon' => 'icon-calendar-check-o',
+                        'url' => \Backend::url('elv/kit/bookings'),
+                        'permissions' => ['elv.kit.bookings'],
+                    ],
+                    'messages' => [
+                        'label' => 'Сообщения',
+                        'icon' => 'icon-envelope',
+                        'url' => \Backend::url('elv/kit/messages'),
+                        'permissions' => ['elv.kit.messages'],
+                    ],
+                    'subscribers' => [
+                        'label' => 'Подписчики',
+                        'icon' => 'icon-users',
+                        'url' => \Backend::url('elv/kit/subscribers'),
+                        'permissions' => ['elv.kit.subscribers'],
+                    ],
+                    'products' => [
+                        'label' => 'Товары',
+                        'icon' => 'icon-cube',
+                        'url' => \Backend::url('elv/kit/products'),
+                        'permissions' => ['elv.kit.catalog'],
+                    ],
+                    'categories' => [
+                        'label' => 'Категории блога',
+                        'icon' => 'icon-tags',
+                        'url' => \Backend::url('elv/kit/categories'),
+                        'permissions' => ['elv.kit.catalog'],
+                    ],
+                    'posts' => [
+                        'label' => 'Статьи',
+                        'icon' => 'icon-pencil',
+                        'url' => \Backend::url('elv/kit/posts'),
+                        'permissions' => ['elv.kit.blog'],
+                    ],
+                    'licenses' => [
+                        'label' => 'Лицензии',
+                        'icon' => 'icon-key',
+                        'url' => \Backend::url('elv/kit/licenses'),
+                        'permissions' => ['elv.kit.licenses'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public function registerSchedule($schedule)
+    {
+        $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
+        $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
+    }
+
+    public function boot()
+    {
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->app
+            ->make(\Illuminate\Contracts\Http\Kernel::class)
+            ->pushMiddleware(SecurityHeaders::class);
+    }
+
+    public function registerMarkupTags()
+    {
+        return [
+            'functions' => [
+                'elv_setting' => function ($key, $default = null) {
+                    return Settings::get((string) $key, $default);
+                },
+                'elv_money' => function ($cents, $currency = null) {
+                    return Money::format((int) $cents, $currency);
+                },
+                'elv_base' => function () {
+                    return Seo::base();
+                },
+                'elv_kit' => function () {
+                    return Catalog::kit();
+                },
+                'elv_modules' => function () {
+                    return Catalog::modules();
+                },
+                'elv_product' => function ($slug) {
+                    return Catalog::find((string) $slug);
+                },
+                'elv_plans' => function ($product = null) {
+                    return Catalog::plans($product instanceof Product ? $product : null);
+                },
+                'elv_compare' => function () {
+                    return Catalog::comparison();
+                },
+                'elv_includes' => function () {
+                    return Catalog::includes();
+                },
+                'elv_excludes' => function () {
+                    return Catalog::excludes();
+                },
+                'elv_anatomy' => function () {
+                    return Catalog::anatomy();
+                },
+                'elv_scenarios' => function () {
+                    return Catalog::scenarios();
+                },
+                'elv_changelog' => function () {
+                    return Catalog::changelog();
+                },
+                'elv_posts' => function ($limit = 6) {
+                    return Post::query()->published()->with('category')->limit((int) $limit)->get();
+                },
+                'elv_post' => function ($slug) {
+                    return Blog::find((string) $slug);
+                },
+                'elv_categories' => function () {
+                    return Blog::categories();
+                },
+                'elv_tags' => function () {
+                    return Blog::tags();
+                },
+                'elv_faq' => function () {
+                    return Faq::items();
+                },
+                'elv_icon' => function ($name, $class = '') {
+                    return Icons::svg((string) $name, (string) $class);
+                },
+                'elv_canonical' => function () {
+                    return Seo::canonical();
+                },
+                'elv_jsonld' => function ($page = null) {
+                    return Seo::jsonld($page);
+                },
+                'elv_seo_title' => function ($page = null) {
+                    return Seo::title($page);
+                },
+                'elv_seo_description' => function ($page = null) {
+                    return Seo::description($page);
+                },
+                'elv_og_image' => function ($page = null) {
+                    return Seo::image($page);
+                },
+                'elv_csp_nonce' => function () {
+                    return SecurityHeaders::nonce();
+                },
+                'elv_csrf' => function () {
+                    return csrf_field();
+                },
+                'elv_license_stats' => function ($product = '') {
+                    return (new LicenseService())->stats((string) $product);
+                },
+                'elv_slots' => function ($serviceCode = '', $days = 14) {
+                    return Slots::days((string) $serviceCode, (int) $days);
+                },
+                'elv_booking_services' => function () {
+                    return Slots::services();
+                },
+                'elv_year' => function () {
+                    return date('Y');
+                },
+                'elv_css' => function ($relative) {
+                    return Assets::css((string) $relative);
+                },
+                'elv_js' => function ($relative) {
+                    return Assets::js((string) $relative);
+                },
+                'elv_blog' => function ($perPage = 9) {
+                    return Blog::paginate([
+                        'category' => request()->query('category'),
+                        'tag' => request()->query('tag'),
+                        'q' => request()->query('q'),
+                    ], (int) $perPage);
+                },
+                'elv_use_post' => function ($slug) {
+                    $post = Blog::find((string) $slug);
+                    Seo::setPost($post);
+
+                    return $post;
+                },
+                'elv_order' => function ($number) {
+                    return \Elv\Kit\Models\Order::query()
+                        ->where('order_no', (string) $number)
+                        ->first();
+                },
+                'elv_flash' => function ($key) {
+                    return session()->get((string) $key);
+                },
+                'elv_errors' => function () {
+                    return (array) session()->get('elv_errors', []);
+                },
+                'elv_old' => function ($key, $default = '') {
+                    return old((string) $key, $default);
+                },
+                'elv_cover_icon' => function ($cover) {
+                    return Icons::svg((string) ($cover ?: 'file'));
+                },
+                'elv_not_found' => function () {
+                    abort(404);
+                },
+                'elv_query' => function ($key, $default = null) {
+                    $value = request()->query((string) $key, $default);
+
+                    return is_scalar($value) ? (string) $value : $default;
+                },
+                'elv_breadcrumbs' => function () {
+                    return Seo::breadcrumbs();
+                },
+                'elv_related' => function ($post, $limit = 3) {
+                    return $post instanceof Post ? Blog::related($post, (int) $limit) : collect();
+                },
+            ],
+            'filters' => [
+                'elv_money' => function ($cents, $currency = null) {
+                    return Money::format((int) $cents, $currency);
+                },
+                'elv_excerpt' => function ($value, $limit = 160) {
+                    $text = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $value)) ?? '');
+
+                    return mb_strlen($text) > $limit
+                        ? mb_substr($text, 0, $limit - 1) . '…'
+                        : $text;
+                },
+                'elv_text' => function ($value) {
+                    return nl2br(e((string) $value), false);
+                },
+            ],
+        ];
+    }
+}

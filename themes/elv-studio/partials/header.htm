@@ -1,0 +1,36 @@
+<header class="header" id="site-header">
+    <div class="container header__inner">
+        <a class="logo" href="{{ 'index'|page }}" aria-label="{{ elv_setting('brand_name', 'Elv Kit') }} — на главную">
+            <span class="logo__mark">{{ elv_icon('cubes')|raw }}</span>
+            <span class="logo__text">
+                {{ elv_setting('brand_name', 'Elv Kit') }}
+                <small>Elv Studio</small>
+            </span>
+        </a>
+
+        <nav class="nav" id="site-nav" aria-label="Главное меню">
+            <a href="{{ 'kit'|page }}" {% if this.page.id == 'kit' %}aria-current="page"{% endif %}>Kit</a>
+            <a href="{{ 'modules'|page }}" {% if this.page.id in ['modules', 'module'] %}aria-current="page"{% endif %}>Модули</a>
+            <a href="{{ 'pricing'|page }}" {% if this.page.id == 'pricing' %}aria-current="page"{% endif %}>Тарифы</a>
+            <a href="{{ 'demo'|page }}" {% if this.page.id == 'demo' %}aria-current="page"{% endif %}>Демо</a>
+            <a href="{{ 'blog'|page }}" {% if this.page.id in ['blog', 'blog-post'] %}aria-current="page"{% endif %}>Блог</a>
+            <a href="{{ 'docs'|page }}" {% if this.page.id == 'docs' %}aria-current="page"{% endif %}>Документация</a>
+            <a href="{{ 'contacts'|page }}" {% if this.page.id == 'contacts' %}aria-current="page"{% endif %}>Контакты</a>
+        </nav>
+
+        <a class="btn btn--primary btn--sm header__cta" href="{{ 'pricing'|page }}">
+            {{ elv_icon('cart')|raw }} Купить
+        </a>
+
+        <button
+            class="burger"
+            type="button"
+            aria-controls="site-nav"
+            aria-expanded="false"
+            aria-label="Меню"
+            data-nav-toggle>
+            <span class="burger__open">{{ elv_icon('menu')|raw }}</span>
+            <span class="burger__close">{{ elv_icon('close')|raw }}</span>
+        </button>
+    </div>
+</header>

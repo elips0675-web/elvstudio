@@ -1,0 +1,59 @@
+<footer class="footer">
+    <div class="container">
+        <div class="footer__grid">
+            <div class="footer__brand">
+                <a class="logo" href="{{ 'index'|page }}">
+                    <span class="logo__mark">{{ elv_icon('cubes')|raw }}</span>
+                    <span class="logo__text">
+                        {{ elv_setting('brand_name', 'Elv Kit') }}
+                        <small>Elv Studio</small>
+                    </span>
+                </a>
+                <p class="mt-24">{{ elv_setting('brand_description', 'Модульный конструктор сайтов на October CMS: тема, модули и демо-данные.') }}</p>
+            </div>
+
+            <div>
+                <h3>Продукт</h3>
+                <ul>
+                    <li><a href="{{ 'kit'|page }}">Elv Kit</a></li>
+                    <li><a href="{{ 'modules'|page }}">Модули</a></li>
+                    <li><a href="{{ 'pricing'|page }}">Тарифы</a></li>
+                    <li><a href="{{ 'demo'|page }}">Демо-стенд</a></li>
+                    <li><a href="{{ 'order'|page }}">Купить</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Материалы</h3>
+                <ul>
+                    <li><a href="{{ 'blog'|page }}">Блог</a></li>
+                    <li><a href="{{ 'docs'|page }}">Документация</a></li>
+                    <li><a href="{{ url('/sitemap.xml') }}">sitemap.xml</a></li>
+                    <li><a href="{{ url('/rss.xml') }}">RSS</a></li>
+                    <li><a href="{{ url('/llms.txt') }}">llms.txt</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Контакты</h3>
+                <ul>
+                    {% if elv_setting('email') %}
+                        <li><a href="mailto:{{ elv_setting('email') }}">{{ elv_setting('email') }}</a></li>
+                    {% endif %}
+                    {% if elv_setting('telegram') %}
+                        <li><a href="{{ elv_setting('telegram') }}" rel="noopener" target="_blank">Telegram</a></li>
+                    {% endif %}
+                    <li><a href="{{ 'contacts'|page }}">Написать нам</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <span>© {{ elv_year() }} {{ elv_setting('brand_name', 'Elv Kit') }}. Работает на October CMS.</span>
+            <span>
+                <a href="{{ 'terms'|page }}">Оферта</a> ·
+                <a href="{{ 'privacy'|page }}">Политика конфиденциальности</a>
+            </span>
+        </div>
+    </div>
+</footer>

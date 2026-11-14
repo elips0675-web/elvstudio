@@ -1,0 +1,11 @@
+<h1 style="font:600 20px/1.35 Arial, sans-serif; margin:0 0 12px">Бронь принята</h1>
+<p style="font:14px/1.55 Arial, sans-serif; margin:0 0 14px">
+    {{ booking.person }}, мы записали вас на {{ booking.date }} в {{ booking.time }}.
+</p>
+<table cellpadding="0" cellspacing="0" style="font:14px/1.6 Arial, sans-serif">
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Услуга</td><td>{{ booking.service }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Стоимость</td><td>{{ booking.price }}</td></tr>
+</table>
+<p style="font:12px/1.5 Arial, sans-serif; margin:16px 0 0; color:#7a8494">
+    Если планы изменились — ответьте на письмо, и мы перенесём время.
+</p>

@@ -1,0 +1,14 @@
+title: Лицензии
+list: $/elv/kit/models/license/columns.yaml
+modelClass: Elv\Kit\Models\License
+recordUrl: elv/kit/licenses/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Лицензий пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Ключ, продукт или e-mail'

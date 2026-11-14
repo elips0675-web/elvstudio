@@ -1,0 +1,75 @@
+fields:
+    name:
+        label: 'Название'
+        span: left
+    slug:
+        label: 'Слаг'
+        span: right
+        comment: 'Латиница, дефисы. Попадает в URL карточки.'
+    kind:
+        label: 'Тип'
+        type: dropdown
+        span: left
+        options:
+            kit: 'Kit'
+            module: 'Модуль'
+    badge:
+        label: 'Бейдж'
+        span: right
+        comment: 'Короткая метка на карточке: «Модуль», «Входит в Kit».'
+    tagline:
+        label: 'Подзаголовок'
+        span: full
+    description:
+        label: 'Описание'
+        type: textarea
+        size: small
+    price_cents:
+        label: 'Цена Single, центы'
+        type: number
+        span: left
+    price_multi_cents:
+        label: 'Цена Multi, центы'
+        type: number
+        span: right
+    price_extended_cents:
+        label: 'Цена Extended, центы'
+        type: number
+        span: left
+    icon:
+        label: 'Иконка'
+        span: right
+        comment: 'Имя из Classes\Icons: calendar, cart, message, pencil, kit.'
+    demo_url:
+        label: 'Демо'
+        span: left
+    docs_url:
+        label: 'Документация'
+        span: right
+    features:
+        label: 'Возможности (JSON-массив строк)'
+        type: textarea
+        size: small
+        comment: '["Пункт 1", "Пункт 2"] — выводится списком на карточке.'
+    compatibility:
+        label: 'Совместимость (JSON-массив)'
+        type: textarea
+        size: small
+    changelog:
+        label: 'Changelog (JSON)'
+        type: textarea
+        size: small
+        comment: '[{"version":"1.0.0","date":"2026-11-14","note":"Релиз"}]'
+    meta:
+        label: 'Метаданные (JSON)'
+        type: textarea
+        size: small
+        comment: '{"tables":10,"css_kb":28} — вес и состав для карточки.'
+    is_active:
+        label: 'Активен'
+        type: switch
+        span: left
+    sort_order:
+        label: 'Порядок'
+        type: number
+        span: right

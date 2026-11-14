@@ -1,0 +1,4 @@
+name: Статья
+modelClass: Elv\Kit\Models\Post
+form: $/elv/kit/models/post/fields.yaml
+defaultRedirect: elv/kit/posts

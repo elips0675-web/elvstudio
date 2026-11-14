@@ -1,0 +1,44 @@
+fields:
+    id:
+        label: '#'
+        disabled: true
+        span: left
+    created_at:
+        label: 'Получено'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    name:
+        label: 'Имя'
+        disabled: true
+        span: left
+    email:
+        label: 'E-mail'
+        disabled: true
+        span: right
+    phone:
+        label: 'Телефон'
+        disabled: true
+        span: left
+    subject:
+        label: 'Тема'
+        disabled: true
+        span: right
+    message:
+        label: 'Сообщение'
+        type: textarea
+        size: large
+        disabled: true
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: left
+        options:
+            new: 'Новое'
+            in_progress: 'В работе'
+            closed: 'Закрыто'
+    source:
+        label: 'Источник'
+        disabled: true
+        span: right

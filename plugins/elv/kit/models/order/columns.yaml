@@ -1,0 +1,36 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    created_at:
+        label: 'Создан'
+        type: datetime
+        sortable: true
+    order_no:
+        label: 'Номер'
+        searchable: true
+    product_name:
+        label: 'Товар'
+        searchable: true
+    plan:
+        label: 'Тариф'
+        type: text
+        select: plan_label
+    amount_label:
+        label: 'Сумма'
+        type: text
+        select: amount_label
+    status:
+        label: 'Статус'
+        type: selectable
+        select: status
+        options:
+            new: 'Новый'
+            pending: 'Ожидает оплаты'
+            paid: 'Оплачен'
+            cancelled: 'Отменён'
+            refunded: 'Возврат'
+    email:
+        label: 'E-mail'
+        searchable: true

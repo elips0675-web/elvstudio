@@ -1,0 +1,20 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    name:
+        label: 'Название'
+        searchable: true
+    slug:
+        label: 'Слаг'
+        searchable: true
+    posts_count:
+        label: 'Статей'
+        type: number
+        relation: posts
+        select: count
+    sort_order:
+        label: 'Порядок'
+        type: number
+        sortable: true

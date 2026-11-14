@@ -1,0 +1,28 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    license_key:
+        label: 'Ключ'
+        searchable: true
+    product_slug:
+        label: 'Продукт'
+        searchable: true
+    email:
+        label: 'E-mail'
+        searchable: true
+    status:
+        label: 'Статус'
+        type: selectable
+        select: status
+        options:
+            active: 'Активна'
+            revoked: 'Отозвана'
+    domain_limit:
+        label: 'Доменов'
+        type: number
+    created_at:
+        label: 'Выдана'
+        type: datetime
+        sortable: true

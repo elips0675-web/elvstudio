@@ -1,0 +1,118 @@
+tabs:
+    fields:
+        brand_name:
+            label: 'Название продукта'
+            tab: 'Бренд'
+            span: left
+            default: 'Elv Kit'
+        brand_tagline:
+            label: 'Слоган'
+            tab: 'Бренд'
+            span: right
+            default: 'Модульный конструктор сайтов на October CMS'
+        brand_description:
+            label: 'Описание для микроразметки'
+            tab: 'Бренд'
+            type: textarea
+            size: small
+            default: 'Elv Kit — тема, модули и демо-данные для October CMS 4.x.'
+
+        email:
+            label: 'E-mail'
+            tab: 'Контакты'
+            span: left
+            default: 'sales@example.com'
+        phone:
+            label: 'Телефон'
+            tab: 'Контакты'
+            span: right
+        telegram:
+            label: 'Telegram'
+            tab: 'Контакты'
+            comment: 'Полная ссылка https://t.me/… — иначе пусто.'
+            span: left
+        github_url:
+            label: 'GitHub'
+            tab: 'Контакты'
+            span: right
+        docs_url:
+            label: 'Документация'
+            tab: 'Контакты'
+            span: left
+            default: '/docs/'
+        demo_url:
+            label: 'Демо-стенд'
+            tab: 'Контакты'
+            span: right
+            default: '/demo/'
+
+        currency:
+            label: 'Валюта'
+            tab: 'Продажи'
+            type: dropdown
+            default: USD
+            options:
+                USD: USD
+                BYN: BYN
+                RUB: RUB
+        payments_mode:
+            label: 'Режим оплаты'
+            tab: 'Продажи'
+            type: dropdown
+            default: auto
+            comment: 'auto — mock вне production и только без ключей; live — только шлюз; mock — заказ помечается оплаченным сразу (запрещено в production).'
+            options:
+                auto: 'Авто (безопасно)'
+                live: 'Только шлюз'
+                mock: 'Mock (демо)'
+        order_notify_email:
+            label: 'Копия заказа'
+            tab: 'Продажи'
+            comment: 'Адрес администратора для писем о заказах и бронях.'
+            default: 'sales@example.com'
+        yookassa_shop_id:
+            label: 'ЮKassa: shopId'
+            tab: 'Продажи'
+            span: left
+        yookassa_secret:
+            label: 'ЮKassa: секретный ключ'
+            tab: 'Продажи'
+            type: password
+            span: right
+            comment: 'Лучше хранить в .env (YOOKASSA_SECRET). Значение в БД — запасной вариант.'
+        stripe_secret:
+            label: 'Stripe: secret key'
+            tab: 'Продажи'
+            type: password
+            span: left
+        stripe_webhook_secret:
+            label: 'Stripe: webhook secret'
+            tab: 'Продажи'
+            type: password
+            span: right
+
+        license_api_token:
+            label: 'Токен API лицензий'
+            tab: 'Лицензии'
+            type: password
+            comment: 'Необязательный общий токен для POST /api/v1/license/activate. Пусто — проверяется только ключ.'
+        license_stats_public:
+            label: 'Показывать счётчик активаций'
+            tab: 'Лицензии'
+            type: switch
+            default: true
+
+        analytics_google:
+            label: 'Google Analytics 4 (G-…)'
+            tab: 'SEO и аналитика'
+            span: left
+            comment: 'Скрипт грузится лениво после первого взаимодействия — PageSpeed не страдает.'
+        analytics_yandex:
+            label: 'Яндекс Метрика (номер)'
+            tab: 'SEO и аналитика'
+            span: right
+        metrika_webvisor:
+            label: 'Вебвизор'
+            tab: 'SEO и аналитика'
+            type: switch
+            default: false

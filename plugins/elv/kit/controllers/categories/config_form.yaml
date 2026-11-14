@@ -1,0 +1,4 @@
+name: Категория
+modelClass: Elv\Kit\Models\Category
+form: $/elv/kit/models/category/fields.yaml
+defaultRedirect: elv/kit/categories

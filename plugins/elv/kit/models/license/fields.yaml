@@ -1,0 +1,41 @@
+fields:
+    license_key:
+        label: 'Ключ'
+        disabled: true
+        span: left
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: right
+        options:
+            active: 'Активна'
+            revoked: 'Отозвана'
+    product_slug:
+        label: 'Продукт'
+        disabled: true
+        span: left
+    email:
+        label: 'E-mail'
+        disabled: true
+        span: right
+    order_id:
+        label: 'Заказ'
+        type: number
+        disabled: true
+        span: left
+    domain_limit:
+        label: 'Лимит доменов'
+        type: number
+        span: right
+    activated_at:
+        label: 'Активирована'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: left
+    last_seen_at:
+        label: 'Последняя проверка'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right

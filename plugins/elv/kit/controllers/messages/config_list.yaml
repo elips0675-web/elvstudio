@@ -1,0 +1,14 @@
+title: Сообщения
+list: $/elv/kit/models/message/columns.yaml
+modelClass: Elv\Kit\Models\Message
+recordUrl: elv/kit/messages/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Сообщений пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Имя, e-mail или тема'

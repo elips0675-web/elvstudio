@@ -1,0 +1,14 @@
+<section class="cta">
+    <div class="split">
+        <div>
+            <h2>{{ title|default('Начните с демо-стенда, а не с покупки') }}</h2>
+            <p>{{ text|default('Покажем админку, брони и оплату на живом October CMS. Если подойдёт — заберёте Kit с демо-данными и исходниками.') }}</p>
+        </div>
+        <div class="cta__actions">
+            <a class="btn btn--light" href="{{ cta_url|default('pricing'|page) }}">
+                {{ cta_label|default('Купить Elv Kit') }}
+            </a>
+            <a class="btn btn--ghost" href="{{ 'demo'|page }}">Записаться на демо</a>
+        </div>
+    </div>
+</section>

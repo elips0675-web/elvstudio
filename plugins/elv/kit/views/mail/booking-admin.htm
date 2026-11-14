@@ -1,0 +1,13 @@
+<h1 style="font:600 18px/1.4 Arial, sans-serif; margin:0 0 12px">Новая бронь</h1>
+<table cellpadding="0" cellspacing="0" style="font:14px/1.6 Arial, sans-serif">
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Услуга</td><td>{{ booking.service }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Дата</td><td>{{ booking.date }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Время</td><td>{{ booking.time }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Имя</td><td>{{ booking.person }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Телефон</td><td>{{ booking.phone }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">E-mail</td><td>{{ booking.email }}</td></tr>
+</table>
+<p style="font:14px/1.55 Arial, sans-serif; margin:14px 0 0">{{ booking.comment }}</p>
+<p style="margin:16px 0 0">
+    <a href="{{ backend }}" style="color:#1c5cf0; font:600 14px/1 Arial, sans-serif">Открыть бронь в админке</a>
+</p>

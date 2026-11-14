@@ -1,0 +1,4 @@
+name: Лицензия
+modelClass: Elv\Kit\Models\License
+form: $/elv/kit/models/license/fields.yaml
+defaultRedirect: elv/kit/licenses

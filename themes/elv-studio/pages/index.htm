@@ -1,0 +1,392 @@
+title = "Elv Kit — модульный конструктор сайтов на October CMS"
+url = "/"
+layout = "default"
+seo_title = "Elv Kit — тема и модули для сайта с заказами на October CMS"
+seo_description = "Тема, модули и демо-данные для October CMS: заказ товара, бронирование, обратная связь, блог и SEO. CSS и JS инлайн, ноль внешних запросов."
+==
+{% set kit = elv_kit() %}
+{% set plans = elv_plans(kit) %}
+
+<main id="main">
+    <section class="hero">
+        <div class="container">
+            <div class="hero__grid">
+                <div>
+                    <span class="eyebrow">October CMS 4.x · PHP 8.3</span>
+                    <h1>Сайт с заказами, бронями и блогом — <em>без конструктора</em></h1>
+                    <p class="lead">
+                        Elv Kit — тема, модули и демо-данные для October CMS. Ставится на свой сервер,
+                        открывается за минуту и не тянет ни одного внешнего скрипта.
+                    </p>
+
+                    <div class="hero__chips">
+                        <span class="hero__chip">{{ elv_icon('bolt')|raw }} CSS и JS инлайн</span>
+                        <span class="hero__chip">{{ elv_icon('shield')|raw }} CSP без unsafe-inline</span>
+                        <span class="hero__chip">{{ elv_icon('search')|raw }} SEO и llms.txt</span>
+                    </div>
+
+                    <div class="hero__actions">
+                        <a class="btn btn--primary" href="{{ 'pricing'|page }}">
+                            {{ elv_icon('cart')|raw }} Купить Elv Kit
+                        </a>
+                        <a class="btn btn--light" href="{{ 'demo'|page }}">
+                            {{ elv_icon('play')|raw }} Посмотреть демо
+                        </a>
+                    </div>
+
+                    <div class="hero__note">
+                        <span>{{ elv_icon('check')|raw }} Исходники без шифрования</span>
+                        <span>{{ elv_icon('check')|raw }} Обновления 12 месяцев</span>
+                        <span>{{ elv_icon('check')|raw }} Оплата картой или через ЮKassa</span>
+                    </div>
+                </div>
+
+                <div class="mock" aria-hidden="true">
+                    <div class="mock__bar">
+                        <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
+                        <span class="mock__url">elv-studio.by/admin/elv/kit/orders</span>
+                    </div>
+                    <div class="mock__body">
+                        <div class="mock__side">
+                            <span class="mock__nav is-active"></span>
+                            <span class="mock__nav"></span>
+                            <span class="mock__nav"></span>
+                            <span class="mock__nav"></span>
+                            <span class="mock__nav"></span>
+                        </div>
+                        <div class="mock__main">
+                            <div class="mock__row">
+                                <div class="mock__tile"><b>128</b><span>заказов</span></div>
+                                <div class="mock__tile"><b>34</b><span>брони</span></div>
+                                <div class="mock__tile"><b>12</b><span>статей</span></div>
+                            </div>
+                            <div class="mock__chart">
+                                <span class="mock__bar-i h-38"></span>
+                                <span class="mock__bar-i h-56"></span>
+                                <span class="mock__bar-i h-44"></span>
+                                <span class="mock__bar-i h-72"></span>
+                                <span class="mock__bar-i h-61"></span>
+                                <span class="mock__bar-i h-86"></span>
+                                <span class="mock__bar-i h-68"></span>
+                                <span class="mock__bar-i h-94"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <div class="stats">
+                <div class="stat"><b>0</b><span>внешних запросов</span></div>
+                <div class="stat"><b>10</b><span>таблиц в базе</span></div>
+                <div class="stat"><b>4</b><span>модуля в комплекте</span></div>
+                <div class="stat"><b>1</b><span>команда для демо-данных</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Что внутри</span>
+                <h2>Контур, который обычно собирают неделями</h2>
+                <p>Каждый блок уже связан с остальными: формы пишут в базу, оплата выдаёт файл, слот не продаётся дважды.</p>
+            </div>
+
+            <div class="grid grid--3">
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
+                    <h3>Заказ и оплата</h3>
+                    <p>Заказ в базе, редирект на ЮKassa или Stripe, фиксация оплаты по подписи и выдача архива по токену.</p>
+                </article>
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('calendar-check')|raw }}</div>
+                    <h3>Брони без овербукинга</h3>
+                    <p>UNIQUE-слот, транзакция с <code>lockForUpdate</code> и условный <code>UPDATE taken &lt; capacity</code>.</p>
+                </article>
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('message')|raw }}</div>
+                    <h3>Обратная связь</h3>
+                    <p>Виджет с honeypot и лимитом запросов: сообщение в базе, письмо администратору, статусы обработки.</p>
+                </article>
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
+                    <h3>Блог в меню</h3>
+                    <p>Категории, теги, RSS, отложенная публикация и Article-разметка для Google и Яндекса.</p>
+                </article>
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('search')|raw }}</div>
+                    <h3>SEO по умолчанию</h3>
+                    <p>canonical, OG, JSON-LD, sitemap.xml, robots.txt с Clean-param и llms.txt для ИИ-выдачи.</p>
+                </article>
+                <article class="card">
+                    <div class="card__icon">{{ elv_icon('speed')|raw }}</div>
+                    <h3>Скорость как продукт</h3>
+                    <p>Системные шрифты, CSS и JS внутри страницы, SVG-иконки. Ноль внешних доменов и блокирующих ресурсов.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper" id="modules">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Модули</span>
+                <h2>Берётся целиком или по частям</h2>
+                <p>Ядро закрывает тему, SEO, формы и безопасность. Модули подключаются отдельно — можно купить только то, что нужно сейчас.</p>
+            </div>
+
+            <div class="grid grid--3">
+                {% for module in elv_modules() %}
+                    <a class="card card--link" href="{{ 'module'|page({ slug: module.slug }) }}">
+                        <div class="card__icon">{{ elv_icon(module.icon ?: 'cube')|raw }}</div>
+                        <h3>{{ module.name }}</h3>
+                        {% if module.badge %}
+                            <span class="badge badge--line">{{ module.badge }}</span>
+                        {% endif %}
+                        <p class="mt-24">{{ module.tagline }}</p>
+                        <span class="card__more">
+                            {% if module.price_cents > 0 %}{{ elv_money(module.price_cents) }}{% else %}Входит в Kit{% endif %}
+                            {{ elv_icon('arrow-right')|raw }}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Админка</span>
+                    <h2>Управление не требует инструкции</h2>
+                    <p class="lead">Заказы, брони, сообщения, статьи и товары лежат в одном разделе. Статус меняется кнопкой, карточка заказа показывает платёж и ссылку выдачи.</p>
+
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check-circle')|raw }} Список заказов с фильтром по статусу и поиском</li>
+                        <li>{{ elv_icon('check-circle')|raw }} Отмена брони освобождает слот, а не только меняет подпись</li>
+                        <li>{{ elv_icon('check-circle')|raw }} Статьи с редактором и SEO-полями</li>
+                        <li>{{ elv_icon('check-circle')|raw }} Лицензии и лимит доменов для активации</li>
+                    </ul>
+
+                    <div class="stack-actions">
+                        <a class="btn btn--ghost" href="{{ 'docs'|page }}">Как установить {{ elv_icon('arrow-right')|raw }}</a>
+                    </div>
+                </div>
+
+                <div class="card card--flat">
+                    <div class="mock" aria-hidden="true">
+                        <div class="mock__bar">
+                            <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
+                            <span class="mock__url">/admin/elv/kit/bookings</span>
+                        </div>
+                        <div class="mock__body">
+                            <div class="mock__side">
+                                <span class="mock__nav"></span>
+                                <span class="mock__nav is-active"></span>
+                                <span class="mock__nav"></span>
+                                <span class="mock__nav"></span>
+                            </div>
+                            <div class="mock__main">
+                                <div class="mock__row">
+                                    <div class="mock__tile"><b>10:00</b><span>свободно</span></div>
+                                    <div class="mock__tile"><b>12:00</b><span>занято</span></div>
+                                    <div class="mock__tile"><b>14:00</b><span>свободно</span></div>
+                                </div>
+                                <div class="mock__row">
+                                    <div class="mock__tile"><b>16:00</b><span>свободно</span></div>
+                                    <div class="mock__tile"><b>18:00</b><span>занято</span></div>
+                                    <div class="mock__tile"><b>20:00</b><span>свободно</span></div>
+                                </div>
+                                <div class="mock__tile"><b>17</b><span>броней на этой неделе</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper" id="pricing">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">Тарифы</span>
+                <h2>Один платёж, без подписки</h2>
+                <p>Лицензия навсегда: сайт продолжает работать, даже если вы не продлеваете обновления.</p>
+            </div>
+
+            <div class="grid grid--3">
+                {% for plan in plans %}
+                    <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
+                        {% if plan.featured %}
+                            <span class="badge price-card__flag">Выбирают чаще</span>
+                        {% endif %}
+                        <span class="price-card__label">{{ plan.label }}</span>
+                        <div class="price-card__value">
+                            <b>{{ elv_money(plan.price) }}</b>
+                        </div>
+                        <span class="price-card__period">{{ plan.period }}</span>
+                        <ul>
+                            {% for feature in plan.features %}
+                                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
+                            Выбрать {{ plan.label }}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="center mt-32">
+                <a class="btn btn--ghost" href="{{ 'pricing'|page }}">Сравнить тарифы подробно {{ elv_icon('arrow-right')|raw }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Сравнение</span>
+                <h2>Что входит в каждый тариф</h2>
+                <p>Разница только в количестве сайтов, сроке обновлений и поддержке — функциональность ядра одинаковая.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="compare">
+                    <thead>
+                        <tr>
+                            <th>Возможность</th>
+                            <th>Single</th>
+                            <th>Multi-Site</th>
+                            <th>Extended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in elv_compare() %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                {% for value in row.values %}
+                                    <td>
+                                        {% if value == 'yes' %}
+                                            <span class="yes" aria-label="Да">✓</span>
+                                        {% elseif value == 'no' %}
+                                            <span class="no" aria-label="Нет">—</span>
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="grid grid--2">
+                <div class="card">
+                    <h3>{{ elv_icon('check-circle')|raw }} Входит</h3>
+                    <ul class="list-check mt-24">
+                        {% for item in elv_includes() %}
+                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>{{ elv_icon('info')|raw }} Не обещаем</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        {% for item in elv_excludes() %}
+                            <li>{{ elv_icon('close')|raw }} {{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Кому подходит</span>
+                <h2>Три сценария, под которые делался Kit</h2>
+            </div>
+
+            <div class="grid grid--3">
+                {% for scenario in elv_scenarios() %}
+                    <div class="card">
+                        <div class="scenario">
+                            <span class="avatar">{{ elv_icon(scenario.icon ?: 'user')|raw }}</span>
+                            <div>
+                                <h3>{{ scenario.role }}</h3>
+                                <p>{{ scenario.text }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper" id="blog">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Блог</span>
+                <h2>Пишем о том, что проверяем кодом</h2>
+                <p>Архитектура, гонки в бронировании, SEO для ИИ-выдачи. Без «10 трендов 2026».</p>
+            </div>
+
+            <div class="blog-grid">
+                {% for post in elv_posts(3) %}
+                    <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
+                        <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
+                        <div class="post-card__body">
+                            <div class="post-card__meta">
+                                <span>{{ post.display_date }}</span>
+                                <span>{{ post.reading_time }} мин</span>
+                            </div>
+                            <h3>{{ post.title }}</h3>
+                            <p>{{ post.excerpt|elv_excerpt(140) }}</p>
+                            <span class="post-card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div class="center mt-32">
+                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Все статьи {{ elv_icon('arrow-right')|raw }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">FAQ</span>
+                <h2>Частые вопросы</h2>
+            </div>
+
+            <div class="faq">
+                {% for item in elv_faq() %}
+                    <details>
+                        <summary>{{ item.q }}</summary>
+                        <div><p>{{ item.a }}</p></div>
+                    </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>
