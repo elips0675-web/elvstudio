@@ -16,17 +16,60 @@ class Assets
 
     public static function css(string $relative): string
     {
-        return static::read($relative);
+        return static::minifyCss(static::read($relative));
     }
 
     public static function js(string $relative): string
     {
-        return static::read($relative);
+        return static::minifyJs(static::read($relative));
     }
 
     public static function inlineCss(string $css): string
     {
         return trim($css);
+    }
+
+    /**
+     * Сжатие CSS без разбора грамматики: комментарии, переносы и пробелы вокруг
+     * служебных символов. Пробелы вокруг `:` не трогаем — `a :hover` и `a:hover`
+     * это разные селекторы.
+     */
+    protected static function minifyCss(string $css): string
+    {
+        if ($css === '') {
+            return '';
+        }
+
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        $css = (string) preg_replace('~\s+~', ' ', $css);
+        $css = (string) preg_replace('~\s*([{};,])\s*~', '$1', $css);
+        $css = str_replace(';}', '}', $css);
+
+        return trim($css);
+    }
+
+    /**
+     * Сжатие JS без перестановки токенов: убираем комментарии, отступы и пустые
+     * строки. Переводы строк сохраняются, поэтому ASI не ломается.
+     */
+    protected static function minifyJs(string $js): string
+    {
+        if ($js === '') {
+            return '';
+        }
+
+        $js = (string) preg_replace('~/\*.*?\*/~s', '', $js);
+        $lines = preg_split('~\R~', $js) ?: [];
+
+        $lines = array_map(static function ($line) {
+            return trim($line);
+        }, $lines);
+
+        $lines = array_filter($lines, static function ($line) {
+            return $line !== '';
+        });
+
+        return implode("\n", $lines);
     }
 
     protected static function read(string $relative): string

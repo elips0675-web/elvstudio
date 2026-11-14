@@ -29,13 +29,14 @@
 
 ## P1 — витрина и SEO
 
-- [ ] `themes/elv-studio/assets/img/og-default.png` 1200×630 (сейчас `Seo::image()`
-      ссылается на файл, которого нет) + `favicon.svg` (`layouts/default.htm:38`).
+- [ ] `themes/elv-studio/assets/img/og-default.png` 1200×630: `Seo::image()`
+      ссылается на файл, которого нет (favicon.svg создан в Stage 2).
 - [ ] Проверить JSON-LD через Rich Results: Organization, WebSite, SoftwareApplication,
       FAQPage, BlogPosting, BreadcrumbList.
 - [ ] `llms.txt` и `robots.txt` сверить с реальными адресами после появления страниц.
-- [ ] Замер Lighthouse (mobile) на `/`, `/kit/`, `/pricing/`, `/blog/`;
-      зафиксировать фактические числа HTML/CSS/JS и поправить бюджеты в README.
+- [ ] Замер Lighthouse: `/` — сделано в Stage 2 (mobile **100**, desktop **100**);
+      осталось повторить на `/kit/`, `/pricing/`, `/blog/`, когда страницы появятся,
+      и зафиксировать фактические числа HTML/CSS/JS в README.
 - [ ] Проверить адаптив 360/768/1024 и бургер-меню на телефоне.
 - [ ] Тексты: убрать «рыбные» формулировки, сверить цены/состав тарифов с `Catalog`.
 

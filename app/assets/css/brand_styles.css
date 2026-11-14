@@ -1,50 +1,50 @@
-// Брендинг админки. Файл читается при первом создании настроек бренда
-// (modules/backend/models/BrandSetting.php:103-106) и компилируется вместе
-// с палитрой (BrandSetting::compileCss(), :310-346).
-// Цвета совпадают с токенами сайта: themes/elv/assets/css/styles.css:13-21.
+/*
+ * Elv Studio — оформление панели управления October CMS.
+ *
+ * Палитра совпадает с лендингом: themes/elv-studio/assets/css/styles.css:3-20
+ * (brand #1c5cf0, brand-2 #0f3fb8, accent #16c2a3).
+ * Файл подключается из config/backend.php -> brand.stylesheet_path.
+ * Он не переопределяет Bootstrap целиком, только переменные темы.
+ */
 
-:root, [data-bs-theme="light"] {
-    --bs-primary: #2563eb;
-    --bs-primary-rgb: 37, 99, 235;
-    --bs-link-color: #2563eb;
-    --bs-link-color-rgb: 37, 99, 235;
-    --bs-link-hover-color: #1d4ed8;
-    --bs-link-hover-color-rgb: 29, 78, 216;
-    --oc-primary-hover-bg: #1d4ed8;
-    --oc-primary-active-bg: #1e40af;
-    --oc-selection: #10b981;
-    --oc-sidebar-active-bg: #2563eb;
-    --oc-settings-active-bg: #2563eb;
+:root,
+[data-bs-theme="light"] {
+    --bs-primary: #1c5cf0;
+    --bs-primary-rgb: 28, 92, 240;
+    --bs-link-color: #1c5cf0;
+    --bs-link-color-rgb: 28, 92, 240;
+    --bs-link-hover-color: #0f3fb8;
+    --bs-link-hover-color-rgb: 15, 63, 184;
+    --oc-primary-hover-bg: #0f3fb8;
+    --oc-primary-active-bg: #0b3399;
+    --oc-selection: #16c2a3;
+    --oc-sidebar-active-bg: #1c5cf0;
+    --oc-settings-active-bg: #1c5cf0;
 }
 
 [data-bs-theme="dark"] {
-    --bs-primary: #3b82f6;
-    --bs-primary-rgb: 59, 130, 246;
-    --bs-link-color: #93c5fd;
-    --bs-link-color-rgb: 147, 197, 253;
-    --bs-link-hover-color: #bfdbfe;
-    --bs-link-hover-color-rgb: 191, 219, 254;
-    --oc-primary-hover-bg: #2563eb;
-    --oc-primary-active-bg: #1d4ed8;
-    --oc-selection: #34d399;
-    --oc-sidebar-active-bg: #3b82f6;
-    --oc-settings-active-bg: #3b82f6;
+    --bs-primary: #6f8bff;
+    --bs-primary-rgb: 111, 139, 255;
+    --bs-link-color: #a8bbff;
+    --bs-link-color-rgb: 168, 187, 255;
+    --bs-link-hover-color: #cfdaff;
+    --bs-link-hover-color-rgb: 207, 218, 255;
+    --oc-primary-hover-bg: #4f6ef0;
+    --oc-primary-active-bg: #1c5cf0;
+    --oc-selection: #16c2a3;
+    --oc-sidebar-active-bg: #3f61d8;
+    --oc-settings-active-bg: #3f61d8;
 }
 
-// Полировка (Stage 23): верхнее меню в градиенте сайта, мягкие скругления
-// у кнопок и полей. Селекторы взяты из живой разметки бэкенда
-// (.main-menu-container .navbar.control-toolbar), цвета — из
-// themes/elv/assets/css/styles.css:35 (--elv-grad).
-
 .main-menu-container .navbar.control-toolbar {
-    background-color: #2563eb;
-    background-image: linear-gradient(135deg, #2563eb 0%, #7c3aed 55%, #9333ea 100%);
+    background-color: #1c5cf0;
+    background-image: linear-gradient(135deg, #1c5cf0 0%, #3f61d8 55%, #0f3fb8 100%);
     border-bottom: 0;
 }
 
 [data-bs-theme="dark"] .main-menu-container .navbar.control-toolbar {
-    background-color: #1e3a8a;
-    background-image: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 60%, #7e22ce 100%);
+    background-color: #0b3399;
+    background-image: linear-gradient(135deg, #0b3399 0%, #1c5cf0 60%, #16a08a 100%);
 }
 
 .btn {
@@ -52,11 +52,10 @@
 }
 
 .btn-primary {
-    box-shadow: 0 6px 16px -8px rgba(37, 99, 235, 0.8);
+    box-shadow: 0 6px 16px -8px rgba(28, 92, 240, 0.8);
 }
 
 .form-control,
 .form-select {
     border-radius: 8px;
 }
-

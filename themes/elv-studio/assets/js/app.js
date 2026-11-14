@@ -188,23 +188,4 @@
         });
     });
 
-    if (window.matchMedia) {
-        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (!reduce.matches && 'IntersectionObserver' in window) {
-            var elements = document.querySelectorAll('.card, .stat, .post-card');
-            var observer = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { rootMargin: '0px 0px -40px 0px' });
-
-            Array.prototype.forEach.call(elements, function (element) {
-                element.classList.add('reveal');
-                observer.observe(element);
-            });
-        }
-    }
 })();

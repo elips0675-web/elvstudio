@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 48" role="img" aria-label="Elv Studio">
+    <defs>
+        <linearGradient id="elv-menu-mark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1c5cf0"/>
+            <stop offset="1" stop-color="#6f8bff"/>
+        </linearGradient>
+    </defs>
+    <rect x="2" y="4" width="40" height="40" rx="10" fill="url(#elv-menu-mark)"/>
+    <rect x="12" y="14" width="4" height="20" rx="1.5" fill="#ffffff"/>
+    <rect x="12" y="14" width="13" height="4" rx="1.5" fill="#ffffff"/>
+    <rect x="12" y="22" width="10" height="4" rx="1.5" fill="#ffffff" fill-opacity="0.85"/>
+    <rect x="12" y="30" width="13" height="4" rx="1.5" fill="#ffffff"/>
+    <text x="54" y="32" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#ffffff">Elv Studio</text>
+</svg>

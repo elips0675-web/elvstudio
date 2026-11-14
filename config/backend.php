@@ -44,22 +44,19 @@ return [
 
     'brand' => [
         'enabled' => true,
-        'app_name' => env('APP_NAME', 'Библиотека 2026'),
-        'tagline' => 'Панель управления библиотекой',
+        'app_name' => env('APP_NAME', 'Elv Studio'),
+        'tagline' => 'Панель управления сайтом',
         'menu_mode' => 'icons',
         'color_mode' => 'auto',
         'color_palette' => 'classic',
-        'logo_path' => '~/app/assets/images/logo.svg',
-        'favicon_path' => '~/app/assets/images/favicon.svg',
-        'menu_logo_path' => '~/app/assets/images/menu-logo.svg',
-        'dashboard_icon_path' => '~/app/assets/images/dashboard-icon.svg',
+        'logo_path' => '~/app/assets/images/logo-elv.svg',
+        'favicon_path' => '~/app/assets/images/favicon-elv.svg',
+        'menu_logo_path' => '~/app/assets/images/menu-logo-elv.svg',
+        'dashboard_icon_path' => '~/app/assets/images/dashboard-icon-elv.svg',
         'stylesheet_path' => '~/app/assets/css/brand_styles.css',
         'login_background_type' => 'color',
-        'login_background_color' => '#f8fafc',
-        'login_background_wallpaper' => '~/app/assets/images/login_wallpaper.png',
-        'login_background_wallpaper_size' => 'auto',
+        'login_background_color' => '#f6f7fb',
         'login_image_type' => 'autumn_images',
-        'login_custom_image' => '~/app/assets/images/loginimage.png',
     ],
 
     /*
@@ -210,7 +207,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Europe/Minsk',
 
     /*
     |--------------------------------------------------------------------------

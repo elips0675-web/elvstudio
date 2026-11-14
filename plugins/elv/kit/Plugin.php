@@ -7,6 +7,7 @@ use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
 use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\CompressResponse;
 use Elv\Kit\Classes\SecurityHeaders;
 use Elv\Kit\Classes\Seo;
 use Elv\Kit\Classes\Slots;
@@ -172,7 +173,8 @@ class Plugin extends PluginBase
 
         $this->app
             ->make(\Illuminate\Contracts\Http\Kernel::class)
-            ->pushMiddleware(SecurityHeaders::class);
+            ->pushMiddleware(SecurityHeaders::class)
+            ->pushMiddleware(CompressResponse::class);
     }
 
     public function registerMarkupTags()

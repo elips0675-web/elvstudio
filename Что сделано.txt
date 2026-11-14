@@ -6,6 +6,57 @@
 
 ---
 
+(Stage 2 — 14.11.2026) — **Админка открывалась без стилей, брендинг был от чужого проекта, Lighthouse 97 → 100.**
+
+1. `php artisan serve` отдавал статику как HTML. `server.php:29` подключает
+   `tools/serve-static.php`, а каталога `tools/` в инсталляции не было: `require`
+   падал на каждом `/modules/...`, `/themes/...`, поэтому `/admin` приходил с
+   `text/html` на CSS/JS — страница входа выглядела как «абы что».
+   Скопирован `tools/serve-static.php` (gzip + ETag + правильный `Content-Type`).
+   Там же `Cache-Control`: `immutable` только для файлов с `?v=` (ассеты October
+   версионирует), остальные — `no-cache, must-revalidate`, иначе браузер держал
+   старый логотип и правки не были видны до жёсткой перезагрузки.
+
+2. Брендинг админки был скопирован из библиотечного проекта: `config/backend.php`
+   (`app_name` «Библиотека 2026», `tagline` «Панель управления библиотекой»),
+   `app/assets/images/{logo,menu-logo,favicon,dashboard-icon}.svg` с надписью
+   «Библиотека 2026», `app/assets/css/brand_styles.css` с комментариями `//`
+   (невалидный CSS) и ссылками на тему `elv`. Заменено: новые SVG-знаки
+   `*-elv.svg` (палитра лендинга `#1c5cf0`/`#6f8bff`), чистый CSS с `/* */`,
+   `tagline` → «Панель управления сайтом», часовой пояс `Europe/Minsk`,
+   удалены ключи на несуществующие `login_wallpaper.png`/`loginimage.png`.
+
+3. Lighthouse Performance: было 97 (mobile) / 96 (desktop), стало **100 / 100**.
+   Причины и правки:
+   - HTML отдавался без сжатия — 107 621 байт (`uses-text-compression`: экономия
+     86 KiB). Добавлен `Classes\CompressResponse` (gzip ≥ 1 КБ, только фронтенд,
+     заголовок `Vary: Accept-Encoding`): 107 621 → 18 586 байт.
+   - инлайн CSS/JS вшивались «как есть». `Classes\Assets` теперь сжимает CSS
+     (комментарии, пробелы вокруг `{};,`, но **не** вокруг `:` — `a :hover`
+     и `a:hover` разные селекторы) и JS (комментарии, отступы, пустые строки,
+     переводы строк сохранены — ASI не ломается).
+   - `.reveal { opacity: 0 }` держал карточки невидимыми до срабатывания
+     IntersectionObserver — задержка отрисовки била по Speed Index. Эффект
+     удалён из `styles.css` и `app.js` (визуал не изменился, карточки видны сразу).
+   - `themes/elv-studio/assets/img/favicon.svg` не существовал (404 на каждом
+     хите) — создан.
+
+Проверено: `/` mobile — Performance **100**, FCP 1.1 s, LCP 1.2 s, TBT 0 ms,
+CLS 0, SI 1.6 s; desktop (2 прогона) — **100 / 100**, FCP 0.5/0.4 s, LCP 0.6/0.5 s,
+SI 0.8/0.7 s, TTFB 370/300 ms. `curl` с `Accept-Encoding: gzip` → `Content-Encoding: gzip`,
+18 586 байт. `/admin` — стили грузятся (`text/css`), вход `admin` / `ElvStudio2026!`
+работает (POST → 200, дашборд 143 989 байт, в меню новый `menu-logo-elv.svg`).
+Сжатый `app.js` проверен `node --check` (exit 0). AJAX-форма: `POST /subscribe`
+с CSRF из мета-тега → 201 `{"ok":true}`. Лендинг отсмотрен скриншотом — вёрстка
+цела. Консольные ошибки после правок не перепроверял отдельным прогоном.
+
+Ограничение измерения: локальный `php -S` на Windows тратит ~200 мс на любой
+PHP-запрос (статику отдаёт 200 мс, Laravel — ~470 мс), поэтому TTFB здесь
+не показатель продакшена; на cPanel/LiteSpeed он будет ниже, а скорость
+ограничена уже не сервером, а размером документа.
+
+---
+
 (Stage 1 — 14.11.2026) — **Инсталляция October CMS, плагин Elv.Kit, тема и запуск.**
 
 Развёрнута отдельная инсталляция October CMS 4.4.13 (Laravel 12.71.0, PHP 8.3.30)
