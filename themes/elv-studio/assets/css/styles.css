@@ -460,5 +460,4 @@ table.compare tbody tr:hover td { background: #fafbff; }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     * { transition: none !important; animation: none !important; }
-    .reveal { opacity: 1; }
 }

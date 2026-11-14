@@ -15,6 +15,10 @@ class Message extends Model
 
     public $table = 'elv_kit_messages';
 
+    public $fillable = [
+        'name', 'email', 'phone', 'subject', 'message', 'status', 'source', 'ip',
+    ];
+
     public $rules = [
         'name' => 'required|max:160',
         'email' => 'required|email|max:191',

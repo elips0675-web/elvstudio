@@ -31,20 +31,31 @@ tabs:
             tab: 'Контакты'
             comment: 'Полная ссылка https://t.me/… — иначе пусто.'
             span: left
+        whatsapp:
+            label: 'WhatsApp'
+            tab: 'Контакты'
+            comment: 'Номер в международном формате или ссылка wa.me — пусто, если канал не нужен.'
+            span: right
         github_url:
             label: 'GitHub'
             tab: 'Контакты'
-            span: right
+            span: left
         docs_url:
             label: 'Документация'
             tab: 'Контакты'
-            span: left
+            span: right
             default: '/docs/'
         demo_url:
             label: 'Демо-стенд'
             tab: 'Контакты'
-            span: right
+            span: left
             default: '/demo/'
+        chat_enabled:
+            label: 'ИИ-консультант в виджете'
+            tab: 'Виджет'
+            type: switch
+            default: true
+            comment: 'Отвечает по базе знаний сайта: тарифы, модули, установка, оплата. Внешних сервисов нет.'
 
         currency:
             label: 'Валюта'

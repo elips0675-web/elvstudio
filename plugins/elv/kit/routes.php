@@ -1,6 +1,7 @@
 <?php
 
 use Elv\Kit\Classes\Http\BookingController;
+use Elv\Kit\Classes\Http\ChatController;
 use Elv\Kit\Classes\Http\DownloadController;
 use Elv\Kit\Classes\Http\FeedbackController;
 use Elv\Kit\Classes\Http\LicenseController;
@@ -19,6 +20,10 @@ Route::middleware(['web', 'throttle:20,1'])->group(function () {
     Route::post('booking', [BookingController::class, 'store'])->name('elv.kit.booking');
     Route::post('feedback', [FeedbackController::class, 'store'])->name('elv.kit.feedback');
     Route::post('subscribe', [SubscribeController::class, 'store'])->name('elv.kit.subscribe');
+});
+
+Route::middleware(['web', 'throttle:40,1'])->group(function () {
+    Route::post('chat', [ChatController::class, 'store'])->name('elv.kit.chat');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {

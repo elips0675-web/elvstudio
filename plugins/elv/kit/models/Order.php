@@ -18,6 +18,13 @@ class Order extends Model
 
     public $table = 'elv_kit_orders';
 
+    public $fillable = [
+        'order_no', 'product_id', 'product_name', 'plan', 'qty', 'amount_cents',
+        'currency', 'status', 'customer_name', 'email', 'phone', 'company',
+        'comment', 'payment_provider', 'payment_id', 'download_token',
+        'paid_at', 'delivered_at', 'ip', 'meta',
+    ];
+
     public $rules = [
         'email' => 'required|email|max:191',
         'customer_name' => 'required|max:160',

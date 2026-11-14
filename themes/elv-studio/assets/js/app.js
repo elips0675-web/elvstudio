@@ -118,6 +118,7 @@
                         form.parentNode.insertBefore(success, form);
                         form.classList.add('is-hidden');
                         success.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                        form.dispatchEvent(new CustomEvent('elv:form-sent', { bubbles: true }));
                         return;
                     }
 

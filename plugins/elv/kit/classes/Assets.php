@@ -24,6 +24,16 @@ class Assets
         return static::minifyJs(static::read($relative));
     }
 
+    public static function pluginCss(string $relative): string
+    {
+        return static::minifyCss(static::readPlugin($relative));
+    }
+
+    public static function pluginJs(string $relative): string
+    {
+        return static::minifyJs(static::readPlugin($relative));
+    }
+
     public static function inlineCss(string $css): string
     {
         return trim($css);
@@ -51,6 +61,9 @@ class Assets
     /**
      * Сжатие JS без перестановки токенов: убираем комментарии, отступы и пустые
      * строки. Переводы строк сохраняются, поэтому ASI не ломается.
+     *
+     * Разбор идёт по явным `\r\n|\r|\n`: `\R` без флага `u` считает переводом
+     * строки байт 0x85, а это второй байт русской «х» — строка рвётся посередине.
      */
     protected static function minifyJs(string $js): string
     {
@@ -59,7 +72,7 @@ class Assets
         }
 
         $js = (string) preg_replace('~/\*.*?\*/~s', '', $js);
-        $lines = preg_split('~\R~', $js) ?: [];
+        $lines = preg_split('/\r\n|\r|\n/', $js) ?: [];
 
         $lines = array_map(static function ($line) {
             return trim($line);
@@ -70,6 +83,24 @@ class Assets
         });
 
         return implode("\n", $lines);
+    }
+
+    protected static function readPlugin(string $relative): string
+    {
+        $relative = ltrim(str_replace('\\', '/', $relative), '/');
+        $key = 'plugin:' . $relative;
+
+        if (isset(static::$cache[$key])) {
+            return static::$cache[$key];
+        }
+
+        $path = dirname(__DIR__) . '/' . $relative;
+
+        if (!is_file($path)) {
+            return static::$cache[$key] = '';
+        }
+
+        return static::$cache[$key] = (string) file_get_contents($path);
     }
 
     protected static function read(string $relative): string

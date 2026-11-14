@@ -24,6 +24,7 @@ class DemoCommand extends Command
 
         if (!$this->option('refresh-slots')) {
             $created = Demo::seed();
+            Demo::contacts();
 
             $this->info(sprintf(
                 'Демо-данные: категорий %d, товаров %d, статей %d.',

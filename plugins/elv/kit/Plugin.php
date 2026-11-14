@@ -280,6 +280,15 @@ class Plugin extends PluginBase
                 'elv_js' => function ($relative) {
                     return Assets::js((string) $relative);
                 },
+                'elv_widget' => function () {
+                    return view('elv.kit::widget')->render();
+                },
+                'elv_kit_css' => function () {
+                    return Assets::pluginCss('assets/widget.css');
+                },
+                'elv_kit_js' => function () {
+                    return Assets::pluginJs('assets/widget.js');
+                },
                 'elv_blog' => function ($perPage = 9) {
                     return Blog::paginate([
                         'category' => request()->query('category'),

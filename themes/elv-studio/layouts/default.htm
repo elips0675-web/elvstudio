@@ -45,6 +45,7 @@ description = "Основной макет: шапка, подвал, инлай
     <script type="application/ld+json" nonce="{{ elv_csp_nonce() }}">{{ elv_jsonld(this.page)|raw }}</script>
 
     <style nonce="{{ elv_csp_nonce() }}">{{ elv_css('assets/css/styles.css')|raw }}</style>
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_kit_css()|raw }}</style>
 </head>
 <body>
 <a class="skip-link" href="#main">К содержимому</a>
@@ -55,7 +56,10 @@ description = "Основной макет: шапка, подвал, инлай
 
 {% partial 'footer' %}
 
+{{ elv_widget()|raw }}
+
 <script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_kit_js()|raw }}</script>
 {% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
     {% partial 'analytics' %}
 {% endif %}

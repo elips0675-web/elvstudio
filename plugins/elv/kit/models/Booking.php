@@ -15,6 +15,11 @@ class Booking extends Model
 
     public $table = 'elv_kit_bookings';
 
+    public $fillable = [
+        'service_code', 'service', 'price', 'date', 'time', 'person',
+        'phone', 'email', 'comment', 'status', 'source', 'ip',
+    ];
+
     public $rules = [
         'service_code' => 'required|max:64',
         'date' => 'required|date',

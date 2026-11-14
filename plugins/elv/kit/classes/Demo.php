@@ -61,9 +61,28 @@ class Demo
     }
 
     /**
-     * slots — генерирует сетку для всех услуг демо-бронирования.
+     * contacts — заполняет контакты виджета, если владелец их ещё не задал.
+     *
+     * Значения демонстрационные: в админке (Настройки → Elv Kit → Контакты)
+     * их заменяют на реальные, повторный запуск команды ничего не перетирает.
      */
-    public static function slots(int $days = 21): int
+    public static function contacts(): void
+    {
+        $defaults = [
+            'email' => 'sales@elv-studio.by',
+            'telegram' => 'https://t.me/elvstudio',
+        ];
+
+        foreach ($defaults as $key => $value) {
+            if ((string) \Elv\Kit\Models\Settings::get($key) === '') {
+                \Elv\Kit\Models\Settings::set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * slots — генерирует сетку для всех услуг демо-бронирования.
+     */    public static function slots(int $days = 21): int
     {
         $created = 0;
 

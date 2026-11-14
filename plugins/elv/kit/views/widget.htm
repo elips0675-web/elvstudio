@@ -1,0 +1,164 @@
+{#
+    Виджет Elv Kit: кнопка связи, меню контактов, форма обратной связи,
+    ИИ-консультант и кнопка «наверх».
+
+    Разметка живёт в плагине, чтобы ехать вместе с ним при продаже модуля.
+    Стили и скрипт — assets/widget.css и assets/widget.js, вшиваются инлайном.
+#}
+{% set telegram = elv_setting('telegram') %}
+{% set whatsapp = elv_setting('whatsapp') %}
+{% set phone = elv_setting('phone') %}
+{% set mail = elv_setting('email') %}
+{% set chatEnabled = elv_setting('chat_enabled', true) != false %}
+
+{% set links = 0 %}
+{% if telegram %}{% set links = links + 1 %}{% endif %}
+{% if whatsapp %}{% set links = links + 1 %}{% endif %}
+{% if phone %}{% set links = links + 1 %}{% endif %}
+{% if mail %}{% set links = links + 1 %}{% endif %}
+
+<div class="fab" data-fab>
+    <div class="fab__menu" id="elv-fab-menu" role="group" aria-label="Способы связи">
+        {% if telegram %}
+            <a class="fab__item" href="{{ telegram|e }}" target="_blank" rel="noopener noreferrer">
+                <span>Telegram</span>
+                <span class="fab__ico fab__ico--tg">{{ elv_icon('telegram')|raw }}</span>
+            </a>
+        {% endif %}
+        {% if whatsapp %}
+            <a class="fab__item" href="https://wa.me/{{ whatsapp|replace({' ': '', '-': '', '(': '', ')': '', '+': ''})|e('html_attr') }}" target="_blank" rel="noopener noreferrer">
+                <span>WhatsApp</span>
+                <span class="fab__ico fab__ico--wa">{{ elv_icon('whatsapp')|raw }}</span>
+            </a>
+        {% endif %}
+        {% if phone %}
+            <a class="fab__item" href="tel:{{ phone|replace({' ': '', '-': '', '(': '', ')': ''})|e('html_attr') }}">
+                <span>{{ phone|e }}</span>
+                <span class="fab__ico fab__ico--phone">{{ elv_icon('phone')|raw }}</span>
+            </a>
+        {% endif %}
+        {% if mail %}
+            <a class="fab__item" href="mailto:{{ mail|e('html_attr') }}">
+                <span>E-mail</span>
+                <span class="fab__ico fab__ico--mail">{{ elv_icon('mail')|raw }}</span>
+            </a>
+        {% endif %}
+        <button class="fab__item" type="button" data-feedback-open aria-haspopup="dialog">
+            <span>Обратная связь</span>
+            <span class="fab__ico fab__ico--chat">{{ elv_icon('message')|raw }}</span>
+        </button>
+        {% if chatEnabled %}
+            <button class="fab__item" type="button" data-chat-open aria-controls="elv-chat" aria-expanded="false">
+                <span>ИИ-консультант</span>
+                <span class="fab__ico fab__ico--bot">{{ elv_icon('spark')|raw }}</span>
+            </button>
+        {% endif %}
+    </div>
+
+    <button class="fab__toggle" type="button" data-fab-toggle data-links="{{ links }}" aria-expanded="false" aria-controls="elv-fab-menu" aria-label="Способы связи">
+        <span class="fab__toggle-open">{{ elv_icon('message')|raw }}</span>
+        <span class="fab__toggle-close">{{ elv_icon('close')|raw }}</span>
+    </button>
+</div>
+
+{% if chatEnabled %}
+    <div class="elv-chat" id="elv-chat" role="dialog" aria-labelledby="elv-chat-title" hidden>
+        <div class="elv-chat__head">
+            <span class="elv-chat__titles">
+                <span class="elv-chat__title" id="elv-chat-title">ИИ-консультант</span>
+                <span class="elv-chat__status" data-chat-status>Отвечает по базе знаний сайта</span>
+            </span>
+            <button class="elv-chat__icon-btn" type="button" data-chat-expand aria-pressed="false" aria-label="Развернуть окно чата">
+                {{ elv_icon('expand')|raw }}
+            </button>
+            <button class="elv-chat__icon-btn" type="button" data-chat-close aria-label="Закрыть чат">
+                {{ elv_icon('close')|raw }}
+            </button>
+        </div>
+
+        <div class="elv-chat__log" id="elv-chat-log" role="log" aria-live="polite" data-greeting="Здравствуйте! Я консультант Elv Studio. Отвечаю по базе знаний сайта: тарифы, модули, установка, оплата. Что подсказать?"></div>
+
+        <div class="elv-chat__suggest" data-chat-suggest>
+            <button class="elv-chat__chip" type="button" data-chat-q="Сколько стоит Elv Kit?">Сколько стоит?</button>
+            <button class="elv-chat__chip" type="button" data-chat-q="Что входит в Elv Kit?">Что входит?</button>
+            <button class="elv-chat__chip" type="button" data-chat-q="Как установить на хостинг?">Как установить?</button>
+            <button class="elv-chat__chip" type="button" data-chat-q="Какие модули продаются отдельно?">Модули</button>
+        </div>
+
+        <form class="elv-chat__form" data-chat-form autocomplete="off">
+            <label class="elv-sr" for="elv-chat-input">Сообщение</label>
+            <input class="elv-chat__input" id="elv-chat-input" type="text" name="message" maxlength="500" placeholder="Спросите про тарифы, модули, установку" autocomplete="off" required>
+            <button class="elv-chat__send" type="submit" aria-label="Отправить сообщение">
+                {{ elv_icon('send')|raw }}
+            </button>
+        </form>
+
+        <p class="elv-chat__error" data-chat-error role="alert" hidden></p>
+
+        <p class="elv-chat__hint">
+            Не нашли ответ?
+            <button class="elv-chat__link" type="button" data-feedback-open>Напишите нам</button>
+        </p>
+    </div>
+
+    <div class="elv-prompt" data-chat-prompt hidden>
+        <button class="elv-prompt__main" type="button" data-chat-open aria-controls="elv-chat" aria-expanded="false">
+            Подобрать тариф или задать вопрос консультанту?
+        </button>
+        <button class="elv-prompt__close" type="button" data-chat-prompt-close aria-label="Скрыть подсказку">×</button>
+    </div>
+{% endif %}
+
+<button class="to-top" type="button" data-to-top aria-label="Наверх">
+    {{ elv_icon('arrow-up')|raw }}
+</button>
+
+<dialog class="fb-modal" id="elv-feedback" data-feedback aria-labelledby="elv-feedback-title">
+    <div class="fb-modal__head">
+        <div>
+            <h2 class="fb-modal__title" id="elv-feedback-title">Обратная связь</h2>
+            <p class="fb-modal__lead">Ответим на e-mail в течение рабочего дня.</p>
+        </div>
+        <button class="fb-modal__close" type="button" data-feedback-close aria-label="Закрыть">
+            {{ elv_icon('close')|raw }}
+        </button>
+    </div>
+
+    <form class="form" method="post" action="{{ url('/feedback') }}" data-elv-form data-success="Сообщение отправлено. Ответим на e-mail.">
+        {{ elv_csrf()|raw }}
+        <input type="hidden" name="source" value="widget">
+
+        <div class="fb-hp" aria-hidden="true">
+            <label for="elv-fb-site">Сайт</label>
+            <input class="input" id="elv-fb-site" type="text" name="website_url" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="form__row">
+            <div class="field">
+                <label for="elv-fb-name">Имя</label>
+                <input class="input" id="elv-fb-name" type="text" name="name" maxlength="160" autocomplete="name" required>
+            </div>
+            <div class="field">
+                <label for="elv-fb-email">E-mail</label>
+                <input class="input" id="elv-fb-email" type="email" name="email" maxlength="191" autocomplete="email" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="elv-fb-phone">Телефон <span class="hint">— необязательно</span></label>
+            <input class="input" id="elv-fb-phone" type="tel" name="phone" maxlength="32" autocomplete="tel" placeholder="+375 (__) ___-__-__">
+        </div>
+
+        <div class="field">
+            <label for="elv-fb-message">Сообщение</label>
+            <textarea class="textarea" id="elv-fb-message" name="message" rows="4" maxlength="5000" required></textarea>
+        </div>
+
+        <label class="fb-check">
+            <input type="checkbox" name="consent" value="1" required>
+            <span>Согласен на обработку персональных данных по <a href="{{ url('/privacy/') }}">политике конфиденциальности</a>.</span>
+        </label>
+
+        <button class="btn btn--primary btn--block" type="submit">Отправить</button>
+    </form>
+</dialog>
