@@ -15,14 +15,14 @@ description = "Основной макет: шапка, подвал, инлай
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b1220">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ elv_csrf_token() }}">
 
     <title>{{ seo_title }}</title>
     <meta name="description" content="{{ seo_description|striptags|slice(0, 300) }}">
     {% if seo_noindex %}
         <meta name="robots" content="noindex, nofollow">
     {% else %}
-        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+        <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     {% endif %}
     <link rel="canonical" href="{{ elv_canonical() }}">
     <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">

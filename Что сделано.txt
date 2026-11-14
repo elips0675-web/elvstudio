@@ -1,0 +1,89 @@
+# Что сделано
+
+Журнал этапов лендинга Elv Studio (October CMS, `D:\Elv Landing`).
+Сверху — свежее. Формат записи: этап, дата, что изменено, чем проверено,
+что **не** проверено.
+
+---
+
+(Stage 1 — 14.11.2026) — **Инсталляция October CMS, плагин Elv.Kit, тема и запуск.**
+
+Развёрнута отдельная инсталляция October CMS 4.4.13 (Laravel 12.71.0, PHP 8.3.30)
+в `D:\Elv Landing`. База `elv_studio` (MySQL 8.4.3, utf8mb4), `.env`:
+`APP_URL=http://localhost:8090`, `ACTIVE_THEME=elv-studio`, `QUEUE_CONNECTION=sync`,
+`MAIL_MAILER=log`, часовой пояс `Europe/Minsk`. Ключ приложения сгенерирован.
+
+Плагин `plugins/elv/kit` (37 php-файлов в `classes/`):
+
+- `Plugin.php:178-329` — 40+ markup-функций темы (каталог, блог, слоты, SEO, иконки,
+  деньги, CSRF, query, хлебные крошки), регистрация настроек, прав, навигации,
+  расписания, middleware `SecurityHeaders`;
+- `routes.php` — формы под `web` + `throttle`, вебхуки оплаты, выдача файла,
+  `sitemap.xml`/`robots.txt`/`llms.txt`/`rss.xml`, `/api/v1/license/*`;
+- `classes/` — `Catalog`, `Seo`, `Blog`, `Slots`, `Demo`, `Icons`, `Assets`, `Money`,
+  `OrderService`, `BookingService`, `LicenseService`, `DownloadService`, `AntiSpam`,
+  `SecurityHeaders`, `Payment\{PaymentManager,Stripe,YooKassa}`, `Http\*` (8 контроллеров),
+  `Mail\*` (6 писем);
+- `models/` — 10 моделей и YAML-описания колонок/полей;
+- `updates/create_kit_tables.php` — 10 таблиц `elv_kit_*` (products, posts, categories,
+  orders, slots, bookings, messages, subscribers, licenses, installs);
+- `updates/seed_kit_demo.php` → `Classes\Demo` — единственный источник демо-каталога;
+- `console/` — `elv:kit:demo`, `elv:kit:reset`, `elv:kit:package`;
+- backend — 8 контроллеров (заказы, брони, сообщения, подписчики, товары, статьи,
+  категории, лицензии) с `config_list`/`config_form` и кастомной отменой брони;
+- `views/mail/*.htm` — 6 шаблонов писем.
+
+Тема `themes/elv-studio`:
+
+- `theme.yaml`;
+- `layouts/default.htm` — head: title/description из `Seo`, canonical, OG/Twitter,
+  JSON-LD, robots; инлайн `<style nonce>`/`<script nonce>` из `Assets::css/js`;
+- `partials/header.htm`, `footer.htm`, `cta.htm`, `analytics.htm` (ленивая загрузка
+  GA4/Метрики после первого взаимодействия, под nonce);
+- `pages/index.htm` — главная: hero, статистика, 6 возможностей, модули, админка,
+  тарифы, сравнение, «входит/не обещаем», сценарии, блог, FAQ, CTA;
+- `assets/css/styles.css` (~28 КБ), `assets/js/app.js` (~4 КБ: меню, AJAX-формы
+  с CSRF, выбор тарифа и пересчёт суммы, копирование, reveal-анимация классами).
+
+Выполненные команды:
+
+- `php artisan october:migrate` — ядро October + 3 миграции плагина (v1.0.1–v1.0.3);
+- `php artisan october:admin --login=admin ...` — администратор создан;
+- `php artisan elv:kit:demo` — «создано 0»: данные уже засеяны миграцией
+  `seed_kit_demo.php` (3 категории, 5 товаров, 3 статьи, 180 слотов).
+
+Запуск на Windows: `запуск.bat` (проверка PHP и MySQL 3306, `artisan serve`
+на `0.0.0.0:8090`, ожидание порта, открытие браузера) и `админка.bat`.
+
+Проверено:
+
+- `GET http://localhost:8090/` → 200, 100 971 байт (бюджет HTML ≤ 120 КБ соблюдён);
+- `GET http://localhost:8090/admin` → 200, форма входа (`name="login"`);
+- порт слушается на `0.0.0.0:8090`, оба адреса (`localhost` и `127.0.0.1`) отвечают 200.
+
+Найдено и исправлено по ходу:
+
+- `october:admin` падал с `file_put_contents(storage/cms/blueprint-permission.php)` —
+  в инсталляции не хватало каталогов `storage/cms/{cache,combiner,twig}`,
+  `storage/app/{media,resources,uploads/*}`, `storage/temp/*`; созданы, после этого
+  администратор создан;
+- `{{ csrf_token() }}` в макете — такой функции в Twig October нет (Twig падал
+  с `Unknown "csrf_token" function`); добавлена markup-функция
+  `elv_csrf_token()` (`Plugin.php:257-259`), макет переведён на неё;
+- `Seo::title/description` читали несуществующие поля `seo_title`/`seo_description`
+  страницы; October хранит их как `meta_title`/`meta_description`
+  (`modules/cms/classes/Page.php:37-38`) — класс и front matter главной исправлены;
+- `Seo::image()` указывал на несуществующий путь `/themes/elv-kit/...` — заменён на
+  `/themes/elv-studio/assets/img/og-default.png` (сам файл ещё не создан, см. бэклог).
+
+Не проверено:
+
+- остальные страницы темы не созданы (в `pages/` только `index.htm`): ссылки
+  `kit|page`, `modules|page`, `pricing|page`, `blog|page` и др. рендерятся пустыми;
+- формы (заказ, бронь, обратная связь, подписка) не отправлялись;
+- `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/rss.xml` не запрашивались;
+- выдача ZIP по `download_token` не проверялась;
+- Lighthouse/PageSpeed не замерялись, бюджеты CSS/JS не считались на живых страницах;
+- реальные ключи оплаты, SMTP и домен не подключены (демо-контур).
+
+Репозиторий: `https://github.com/elips0675-web/elvstudio`, ветка `main`.

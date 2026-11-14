@@ -74,10 +74,10 @@ class Seo
     public static function title($page): string
     {
         if (static::$post) {
-            return ($page->seo_title ?: static::$post->seo_title ?: static::$post->title) . ' — ' . static::siteName();
+            return ($page->meta_title ?: static::$post->seo_title ?: static::$post->title) . ' — ' . static::siteName();
         }
 
-        $raw = trim((string) ($page->seo_title ?? $page->title ?? ''));
+        $raw = trim((string) ($page->meta_title ?? $page->title ?? ''));
         $raw = $raw !== '' ? $raw : static::siteName();
 
         return str_contains($raw, static::siteName()) ? $raw : $raw . ' — ' . static::siteName();
@@ -85,7 +85,7 @@ class Seo
 
     public static function description($page): string
     {
-        $value = trim((string) ($page->seo_description ?? ''));
+        $value = trim((string) ($page->meta_description ?? ''));
 
         if ($value === '' && static::$post) {
             $value = trim((string) (static::$post->seo_description ?: strip_tags((string) static::$post->excerpt)));

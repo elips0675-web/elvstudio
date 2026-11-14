@@ -1,0 +1,63 @@
+# Что доделать
+
+Только открытые пункты. Сделанное — в `Что сделано.txt`.
+Приоритет: P0 — без этого сайт не работает, P1 — витрина и SEO, P2 — прод.
+
+## P0 — сайт целиком
+
+- [ ] Страницы темы (сейчас в `themes/elv-studio/pages/` только `index.htm`):
+      `kit.htm` (`/kit/`), `modules.htm` (`/modules/`), `module.htm` (`/modules/:slug/`),
+      `pricing.htm`, `demo.htm`, `docs.htm`, `blog.htm` (`/blog/`),
+      `blog-post.htm` (`/blog/:slug/`), `order.htm`, `order-success.htm`
+      (`/order/success/:number/`), `booking.htm`, `feedback.htm`, `contacts.htm`,
+      `terms.htm`, `privacy.htm`, `sitemap.htm`, `404.htm`.
+      Пока их нет, `'kit'|page` и подобные возвращают `null` → пустые `href`.
+- [ ] Партиал подписки (`partials/subscribe.htm`) и форма подписки на блог.
+- [ ] `404.htm` + проверить, что неизвестный адрес отдаёт 404 с макетом.
+- [ ] Пройти все страницы вручную: заголовки, крошки, пустые состояния.
+
+## P0 — проверка после страниц
+
+- [ ] `php artisan elv:kit:demo` идемпотентен: повторный запуск не плодит дубли.
+- [ ] Отправка форм: заказ (JSON + обычный POST), бронь (гонка за слот → 409),
+      обратная связь, подписка (double opt-in письмо в `storage/logs`).
+- [ ] `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/rss.xml` — 200 и валидное тело.
+- [ ] `GET /download/{token}` до и после оплаты (до — отказ, после — ZIP).
+- [ ] CSP: страница не содержит инлайн-стилей без nonce, консоль без ошибок.
+- [ ] `node`-гейты (по образцу `D:\October CMS\tools`): `check-urls`, `check-seo`,
+      `check-headers`, `check-budget`, `check-orphans`.
+
+## P1 — витрина и SEO
+
+- [ ] `themes/elv-studio/assets/img/og-default.png` 1200×630 (сейчас `Seo::image()`
+      ссылается на файл, которого нет) + `favicon.svg` (`layouts/default.htm:38`).
+- [ ] Проверить JSON-LD через Rich Results: Organization, WebSite, SoftwareApplication,
+      FAQPage, BlogPosting, BreadcrumbList.
+- [ ] `llms.txt` и `robots.txt` сверить с реальными адресами после появления страниц.
+- [ ] Замер Lighthouse (mobile) на `/`, `/kit/`, `/pricing/`, `/blog/`;
+      зафиксировать фактические числа HTML/CSS/JS и поправить бюджеты в README.
+- [ ] Проверить адаптив 360/768/1024 и бургер-меню на телефоне.
+- [ ] Тексты: убрать «рыбные» формулировки, сверить цены/состав тарифов с `Catalog`.
+
+## P1 — контент в админке
+
+- [ ] Создать 3–5 статей блога с обложками и SEO-полями (демо-статьи уже есть).
+- [ ] Проверить редактор статей (richeditor), сохранение тела и `reading_time`.
+- [ ] Настроить `Settings` плагина: бренд, e-mail, Telegram, аналитика.
+
+## P2 — прод
+
+- [ ] Реальные ключи ЮKassa/Stripe, SMTP, домен `elv-studio.by`, SSL.
+- [ ] Cron на хостинге: `php artisan schedule:run` каждую минуту (слоты, очередь).
+- [ ] Очередь: `QUEUE_CONNECTION=database` + `queue:work` (сейчас `sync`).
+- [ ] Проверить `.htaccess`/nginx на cPanel, права `storage` и `bootstrap/cache`.
+- [ ] Бэкап БД и `storage/app` перед публикацией.
+- [ ] `php artisan october:optimize` (config/route/view cache) и повторный замер.
+- [ ] Документация этапов 01–11 в `docs/` (сейчас только `00-audit-documents.md`).
+
+## Известные ограничения (не баги, зафиксировано)
+
+- `QUEUE_CONNECTION=sync`, `MAIL_MAILER=log` — письма пишутся в лог, не отправляются.
+- Оплата в демо-контуре: без ключей `PaymentManager` работает в mock-режиме.
+- `modules/` и `vendor/` не в репозитории — ставятся `composer install`.
+- `D:\Elv Landing` — рабочая копия; живой библиотечный сайт `D:\October CMS` не трогаем.

@@ -257,6 +257,9 @@ class Plugin extends PluginBase
                 'elv_csrf' => function () {
                     return csrf_field();
                 },
+                'elv_csrf_token' => function () {
+                    return csrf_token();
+                },
                 'elv_license_stats' => function ($product = '') {
                     return (new LicenseService())->stats((string) $product);
                 },

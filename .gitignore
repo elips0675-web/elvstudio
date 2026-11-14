@@ -31,6 +31,12 @@ selenium.php
 /storage/framework/views/*
 /storage/framework/testing/*
 /storage/framework/*.php
+/storage/cms/*
+!/storage/cms/.gitignore
+/storage/debugbar/*
+!/storage/debugbar/.gitignore
+/storage/temp/*
+!/storage/temp/.gitignore
 /storage/logs/*
 /storage/temp/*
 /storage/debugbar/*
