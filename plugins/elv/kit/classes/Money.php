@@ -24,7 +24,7 @@ class Money
     public static function format(int $cents, ?string $currency = null): string
     {
         $value = $cents / 100;
-        $formatted = $value === floor($value) ? number_format($value, 0, ',', ' ') : number_format($value, 2, ',', ' ');
+        $formatted = $value == floor($value) ? number_format($value, 0, ',', ' ') : number_format($value, 2, ',', ' ');
 
         $symbol = static::symbol($currency);
 

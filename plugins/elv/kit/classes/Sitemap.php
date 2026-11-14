@@ -16,15 +16,15 @@ class Sitemap
         $base = Seo::base();
 
         foreach (static::pages() as $page) {
-            $urls[$page['loc']] = $page['lastmod'];
+            $urls[rtrim((string) $page['loc'], '/')] = $page['lastmod'];
         }
 
         foreach (Product::query()->active()->get() as $product) {
-            $urls[$product->url] = optional($product->updated_at)->format('c') ?: now()->format('c');
+            $urls[rtrim((string) $product->url, '/')] = optional($product->updated_at)->format('c') ?: now()->format('c');
         }
 
         foreach (Post::query()->published()->get() as $post) {
-            $urls[$post->url] = optional($post->updated_at)->format('c') ?: now()->format('c');
+            $urls[rtrim((string) $post->url, '/')] = optional($post->updated_at)->format('c') ?: now()->format('c');
         }
 
         ksort($urls);

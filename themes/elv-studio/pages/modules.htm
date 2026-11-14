@@ -1,0 +1,104 @@
+title = "Модули"
+url = "/modules/"
+layout = "default"
+meta_title = "Модули Elv Kit: Booking, Shop, Feedback, Blog"
+meta_description = "Модули продаются отдельно: бронирование без овербукинга, магазин с оплатой и выдачей файла, виджет обратной связи. Блог входит в Kit."
+==
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Модули</span>
+            <h1>Берётся целиком или по частям</h1>
+            <p class="lead">
+                Ядро закрывает тему, SEO, формы и безопасность. Модуль добавляет одну функцию и работает
+                с тем же плагином — без второй админки и второй базы.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid--2">
+                {% for module in elv_modules() %}
+                    <article class="card">
+                        <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
+                        <div class="chips mb-24">
+                            {% if module.badge %}
+                                <span class="badge badge--line">{{ module.badge }}</span>
+                            {% endif %}
+                            <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Kit' }}</span>
+                        </div>
+                        <h2>{{ module.name }}</h2>
+                        <p class="lead">{{ module.tagline }}</p>
+                        <p>{{ module.description }}</p>
+
+                        {% if module.features %}
+                            <ul class="list-check mt-24">
+                                {% for feature in module.features %}
+                                    <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        <div class="stack-actions">
+                            <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">
+                                Подробно {{ elv_icon('arrow-right')|raw }}
+                            </a>
+                            {% if module.price_cents > 0 %}
+                                <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug, plan: 'single' }) }}">
+                                    {{ elv_icon('cart')|raw }} Купить {{ elv_money(module.price_cents) }}
+                                </a>
+                            {% else %}
+                                <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
+                                    {{ elv_icon('cart')|raw }} Купить в составе Kit
+                                </a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% else %}
+                    <div class="empty">
+                        <h2>Модулей пока нет</h2>
+                        <p>Запустите <code>php artisan elv:kit:demo</code> или добавьте товары в админке.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Совместимость</span>
+                <h2>Один плагин, одна база</h2>
+                <p>Модули не тянут собственные таблицы с префиксами и не конфликтуют: всё живёт в <code>elv_kit_*</code> и управляется из раздела «Elv Kit».</p>
+            </div>
+
+            <div class="grid grid--3">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('database')|raw }}</div>
+                    <h3>10 таблиц</h3>
+                    <p>Товары, заказы, слоты, брони, статьи, категории, сообщения, подписчики, лицензии, настройки.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
+                    <h3>Права по разделам</h3>
+                    <p>Каждый модуль — отдельное право: редактор видит статьи, менеджер — заказы, и наоборот.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
+                    <h3>Без обфускации</h3>
+                    <p>Исходники читаются и правятся. Обновления ставятся поверх, демо-данные пересоздаются одной командой.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

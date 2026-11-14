@@ -12,7 +12,18 @@ use Closure;
  */
 class CompressResponse
 {
-    protected $skip = ['admin', 'admin/*', 'modules/*', 'system/*', 'combine/*'];
+    protected $skip = [
+        'admin',
+        'admin/*',
+        'modules/system/*',
+        'modules/backend/*',
+        'modules/cms/*',
+        'modules/editor/*',
+        'modules/media/*',
+        'modules/tailor/*',
+        'modules/dashboard/*',
+        'combine/*',
+    ];
 
     public function handle($request, Closure $next)
     {

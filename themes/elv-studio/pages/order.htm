@@ -1,0 +1,200 @@
+title = "Заказ"
+url = "/order/"
+layout = "default"
+meta_title = "Оформление заказа Elv Kit"
+meta_description = "Заказ Elv Kit и модулей: выбор лицензии, оплата картой через ЮKassa или Stripe, выдача архива и лицензионного ключа на e-mail."
+==
+{% set product = elv_product(elv_query('product')) %}
+{% set product = product ?: elv_kit() %}
+{% if not product %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set plans = elv_plans(product) %}
+{% set selectedPlan = elv_query('plan', 'single') %}
+{% if selectedPlan not in ['single', 'multi', 'extended'] %}
+    {% set selectedPlan = 'single' %}
+{% endif %}
+{% if product.kind != 'kit' %}
+    {% set selectedPlan = 'single' %}
+{% endif %}
+{% set planLabel = product.kind == 'kit' ? (selectedPlan == 'multi' ? 'Multi-Site' : (selectedPlan == 'extended' ? 'Extended' : 'Single Site')) : 'Один сайт' %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Заказ</span>
+            <h1>Оформление покупки</h1>
+            <p class="lead">Один шаг: данные, оплата на стороне шлюза, письмо с архивом и лицензионным ключом.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="chips mb-24">
+                {% set kitProduct = elv_kit() %}
+                {% if kitProduct %}
+                    <a class="chip{% if product.slug == kitProduct.slug %} chip--active{% endif %}" href="{{ 'order'|page({ product: kitProduct.slug }) }}">
+                        {{ kitProduct.name }}
+                    </a>
+                {% endif %}
+                {% for item in elv_modules() %}
+                    {% if item.price_cents > 0 %}
+                        <a class="chip{% if product.slug == item.slug %} chip--active{% endif %}" href="{{ 'order'|page({ product: item.slug }) }}">
+                            {{ item.name }} — {{ elv_money(item.price_cents) }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            <div class="checkout">
+                <form
+                    class="form"
+                    id="order-form"
+                    method="post"
+                    action="{{ url('/order') }}"
+                    data-elv-form
+                    data-order-form
+                    data-currency="{{ elv_currency_symbol() }}"
+                    data-success="Заказ создан. Если оплата не открылась, мы свяжемся с вами.">
+                    {{ elv_csrf()|raw }}
+                    <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <input type="hidden" name="product" value="{{ product.slug }}">
+
+                    <div class="field">
+                        <span class="label">Лицензия</span>
+                        {% if product.kind == 'kit' %}
+                            <div class="plan-picker">
+                                {% for plan in plans %}
+                                    <div class="plan-option">
+                                        <input
+                                            type="radio"
+                                            id="plan-{{ plan.key }}"
+                                            name="plan"
+                                            value="{{ plan.key }}"
+                                            data-price="{{ plan.price }}"
+                                            {% if plan.key == selectedPlan %}checked{% endif %}
+                                            {% if loop.first %}required{% endif %}>
+                                        <label for="plan-{{ plan.key }}">
+                                            <span>
+                                                <b>{{ plan.label }}</b>
+                                                <small>{{ plan.period }}</small>
+                                            </span>
+                                            <span class="price">{{ elv_money(plan.price) }}</span>
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <input type="hidden" name="plan" value="single" data-price="{{ product.price_cents }}">
+                            <div class="plan-picker">
+                                <div class="plan-option">
+                                    <label>
+                                        <span>
+                                            <b>Один сайт</b>
+                                            <small>лицензия на один домен</small>
+                                        </span>
+                                        <span class="price">{{ elv_money(product.price_cents) }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <label class="check">
+                        <input type="checkbox" name="bump" value="1" data-bump="1900">
+                        <span>
+                            <b>Установка и настройка на хостинге — {{ elv_money(1900) }}</b>
+                            <span class="muted">Развернём, настроим почту и оплату, проверим формы. Один сайт.</span>
+                        </span>
+                    </label>
+
+                    <hr>
+
+                    <div class="form__row">
+                        <div class="field">
+                            <label for="order-name">Имя</label>
+                            <input class="input" id="order-name" type="text" name="customer_name" required maxlength="160" autocomplete="name" value="{{ elv_old('customer_name') }}">
+                        </div>
+                        <div class="field">
+                            <label for="order-email">E-mail</label>
+                            <input class="input" id="order-email" type="email" name="email" required maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
+                            <span class="hint">На него придёт архив и лицензионный ключ.</span>
+                        </div>
+                    </div>
+
+                    <div class="form__row">
+                        <div class="field">
+                            <label for="order-phone">Телефон <span class="muted">— необязательно</span></label>
+                            <input class="input" id="order-phone" type="tel" name="phone" maxlength="32" autocomplete="tel" value="{{ elv_old('phone') }}">
+                        </div>
+                        <div class="field">
+                            <label for="order-company">Компания <span class="muted">— необязательно</span></label>
+                            <input class="input" id="order-company" type="text" name="company" maxlength="191" autocomplete="organization" value="{{ elv_old('company') }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="order-comment">Комментарий <span class="muted">— необязательно</span></label>
+                        <textarea class="textarea" id="order-comment" name="comment" maxlength="2000" placeholder="Домен, хостинг, пожелания по установке">{{ elv_old('comment') }}</textarea>
+                    </div>
+
+                    <label class="check">
+                        <input type="checkbox" name="consent" value="1" required>
+                        <span>Принимаю <a href="{{ 'terms'|page }}">условия оферты</a> и согласен на обработку данных по <a href="{{ 'privacy'|page }}">политике</a>.</span>
+                    </label>
+
+                    <div>
+                        <button class="btn btn--primary btn--block" type="submit">
+                            {{ elv_icon('wallet')|raw }} Перейти к оплате
+                        </button>
+                    </div>
+                    <p class="tiny muted mb-0">
+                        После нажатия открывается защищённая страница ЮKassa или Stripe. Данные карты вводятся там,
+                        на сервер сайта они не попадают.
+                    </p>
+                </form>
+
+                <aside class="card summary">
+                    <span class="price-card__label">Ваш заказ</span>
+                    <h2 class="mt-24">{{ product.name }}</h2>
+                    <p class="muted">{{ product.tagline }}</p>
+
+                    <div class="summary__row">
+                        <span>Лицензия</span>
+                        <span>{{ planLabel }}</span>
+                    </div>
+                    <div class="summary__row">
+                        <span>Обновления</span>
+                        <span>12 месяцев</span>
+                    </div>
+                    <div class="summary__row">
+                        <span>Выдача</span>
+                        <span>сразу после оплаты</span>
+                    </div>
+
+                    <div class="summary__total">
+                        <span>Итого</span>
+                        <b data-total="{{ elv_money(product.planPrice(selectedPlan)) }}">{{ elv_money(product.planPrice(selectedPlan)) }}</b>
+                    </div>
+
+                    <ul class="list-check mt-24">
+                        {% for item in elv_includes()|slice(0, 4) %}
+                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="notice mt-24">
+                        {{ elv_icon('shield')|raw }}
+                        <p>Если оплата не проходит, заказ остаётся в базе — напишите нам, выставим счёт вручную.</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>

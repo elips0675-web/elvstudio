@@ -44,6 +44,12 @@ class Demo
         }
 
         $categoryId = (int) DB::table('elv_kit_categories')->where('slug', 'engineering')->value('id');
+        $categoryIds = DB::table('elv_kit_categories')->pluck('id', 'slug')->all();
+        $postCategories = [
+            'why-october-cms' => 'engineering',
+            'booking-without-race' => 'practice',
+            'seo-for-google-ai' => 'seo',
+        ];
 
         foreach (static::posts() as $post) {
             $exists = DB::table('elv_kit_posts')->where('slug', $post['slug'])->exists();
@@ -52,7 +58,8 @@ class Demo
                 continue;
             }
 
-            $post['category_id'] = $post['category_id'] ?: $categoryId;
+            $slug = $postCategories[$post['slug']] ?? '';
+            $post['category_id'] = $post['category_id'] ?: (int) ($categoryIds[$slug] ?? $categoryId);
             DB::table('elv_kit_posts')->insert($post + ['created_at' => $now, 'updated_at' => $now]);
             $created['posts']++;
         }

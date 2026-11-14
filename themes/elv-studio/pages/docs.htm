@@ -1,0 +1,206 @@
+title = "Документация"
+url = "/docs/"
+layout = "default"
+meta_title = "Документация Elv Kit: установка и настройка"
+meta_description = "Установка Elv Kit на October CMS 4.4: требования, миграции, демо-данные, оплата ЮKassa и Stripe, почта и очередь, лицензии, обновления и типовые ошибки."
+==
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Документация</span>
+            <h1>Установка и настройка</h1>
+            <p class="lead">
+                Всё, что нужно, чтобы поднять сайт с нуля: от требований до вебхука оплаты.
+                Инструкция проверена на October CMS 4.4.13, PHP 8.3.30 и MySQL 8.4.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <div class="toc">
+                        <b>Содержание</b>
+                        <ol>
+                            <li><a href="#requirements">Требования</a></li>
+                            <li><a href="#install">Установка</a></li>
+                            <li><a href="#settings">Настройки плагина</a></li>
+                            <li><a href="#payments">Оплата и вебхуки</a></li>
+                            <li><a href="#mail">Почта и очередь</a></li>
+                            <li><a href="#licenses">Лицензии и API</a></li>
+                            <li><a href="#demo">Демо-данные</a></li>
+                            <li><a href="#update">Обновление</a></li>
+                            <li><a href="#troubles">Типовые ошибки</a></li>
+                            <li><a href="#checklist">Чек-лист после установки</a></li>
+                        </ol>
+                    </div>
+
+                    <h2 id="requirements">1. Требования</h2>
+                    <ul class="list-check">
+                        <li>{{ elv_icon('check')|raw }} PHP 8.3+ с расширениями mysqli, pdo_mysql, mbstring, json, curl, zip, gd</li>
+                        <li>{{ elv_icon('check')|raw }} MySQL 8.0+ или MariaDB 10.6+, <code>utf8mb4</code></li>
+                        <li>{{ elv_icon('check')|raw }} Composer 2 и доступ к SSH либо распаковка архива через панель</li>
+                        <li>{{ elv_icon('check')|raw }} 512 МБ памяти PHP, 1 ГБ диска</li>
+                        <li>{{ elv_icon('check')|raw }} HTTPS-сертификат и домен</li>
+                        <li>{{ elv_icon('check')|raw }} cron раз в минуту — очередь писем и ночное обновление слотов</li>
+                    </ul>
+
+                    <h2 id="install">2. Установка</h2>
+                    <p>Есть два пути: чистая установка October CMS и распаковка архива поверх неё.</p>
+
+                    <h3>Чистая установка</h3>
+                    <pre><code>composer create-project october/october site
+cd site
+php artisan october:migrate
+php artisan october:env
+php artisan key:generate</code></pre>
+                    <p>В <code>.env</code> укажите доступ к базе и адрес сайта:</p>
+                    <pre><code>APP_URL=https://example.ru
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_DATABASE=elv_studio
+DB_USERNAME=elv
+DB_PASSWORD=secret</code></pre>
+
+                    <h3>Архив с темой и плагином</h3>
+                    <p>Распакуйте содержимое архива в корень установки, чтобы получилось два каталога:</p>
+                    <pre><code>themes/elv-studio/
+plugins/elv/kit/</code></pre>
+                    <p>Затем примените миграции и создайте администратора:</p>
+                    <pre><code>php artisan october:migrate
+php artisan october:admin
+php artisan elv:kit:demo</code></pre>
+                    <p>Активная тема — <strong>elv-studio</strong>. Плагин включается сам, как только появился в <code>plugins/</code>.</p>
+
+                    <h2 id="settings">3. Настройки плагина</h2>
+                    <p>Админка → <strong>Elv Kit → Настройки</strong>. Пять вкладок:</p>
+                    <ul>
+                        <li><strong>Бренд</strong> — название, слоган и описание для микроразметки.</li>
+                        <li><strong>Контакты</strong> — e-mail, телефон, Telegram, WhatsApp, GitHub, адреса документации и демо. Из них собирается виджет и футер.</li>
+                        <li><strong>Виджет</strong> — включение ИИ-консультанта. Он отвечает по каталогу и настройкам, без внешних API.</li>
+                        <li><strong>Продажи</strong> — валюта, режим оплаты, копия заказа, ключи ЮKassa и Stripe.</li>
+                        <li><strong>Лицензии и SEO</strong> — токен API, счётчик активаций, коды аналитики.</li>
+                    </ul>
+                    <div class="notice mt-24">
+                        {{ elv_icon('info')|raw }}
+                        <p>Ключи лучше держать в <code>.env</code>, а не в базе: настройки попадают в дамп и в бэкапы.</p>
+                    </div>
+
+                    <h2 id="payments">4. Оплата и вебхуки</h2>
+                    <p>Сервер не принимает карты. Заказ создаётся в базе, покупатель уходит на страницу шлюза, оплата фиксируется вебхуком.</p>
+
+                    <h3>ЮKassa</h3>
+                    <pre><code>YOOKASSA_SHOP_ID=123456
+YOOKASSA_SECRET=live_...</code></pre>
+                    <p>URL для уведомлений: <code>https://example.ru/payment/yookassa</code>. Событие — <code>payment.succeeded</code>.</p>
+
+                    <h3>Stripe</h3>
+                    <pre><code>STRIPE_SECRET=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...</code></pre>
+                    <p>Endpoint: <code>https://example.ru/payment/stripe</code>. События: <code>checkout.session.completed</code> и <code>checkout.session.async_payment_succeeded</code>.</p>
+
+                    <h3>Режимы</h3>
+                    <ul>
+                        <li><code>auto</code> — реальный шлюз, если ключи есть; mock только вне <code>production</code> и без ключей.</li>
+                        <li><code>live</code> — только шлюз. Без ключей заказ сохраняется, оплата отвечает 503.</li>
+                        <li><code>mock</code> — заказ сразу помечается оплаченным. В <code>production</code> запрещён.</li>
+                    </ul>
+
+                    <h2 id="mail">5. Почта и очередь</h2>
+                    <p>Письма ставятся в очередь, поэтому без cron они не уходят. Минимальный набор:</p>
+                    <pre><code>MAIL_MAILER=smtp
+MAIL_HOST=smtp.example.ru
+MAIL_PORT=587
+MAIL_USERNAME=noreply@example.ru
+MAIL_PASSWORD=secret
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@example.ru
+
+QUEUE_CONNECTION=database</code></pre>
+                    <p>Cron на хостинге:</p>
+                    <pre><code>* * * * * cd /home/user/site &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</code></pre>
+
+                    <h2 id="licenses">6. Лицензии и API</h2>
+                    <p>После оплаты заказ получает ключ вида <code>ELV-XXXX-XXXX-XXXX-XXXX</code> и лимит доменов по тарифу. Активация — отдельным запросом:</p>
+                    <pre><code>POST /api/v1/license/activate
+Content-Type: application/json
+
+{"license_key":"ELV-...","product":"elv-kit","domain":"example.ru","version":"1.0.0"}</code></pre>
+                    <p>Статистика активаций: <code>GET /api/v1/license/stats?product=elv-kit</code>. Публичность переключается в настройках.</p>
+
+                    <h2 id="demo">7. Демо-данные</h2>
+                    <ul>
+                        <li><code>php artisan elv:kit:demo</code> — добавить недостающие товары, статьи, категории и слоты. Идемпотентно.</li>
+                        <li><code>php artisan elv:kit:demo --refresh-slots</code> — обновить расписание броней.</li>
+                        <li><code>php artisan elv:kit:reset</code> — стереть демо-контент и сообщения, затем создать заново.</li>
+                        <li><code>php artisan elv:kit:package</code> — собрать ZIP поставки из текущей темы и плагина.</li>
+                    </ul>
+
+                    <h2 id="update">8. Обновление</h2>
+                    <ol>
+                        <li>Сделайте дамп базы и копию <code>themes/elv-studio</code> и <code>plugins/elv/kit</code>.</li>
+                        <li>Загрузите новые файлы, не удаляя <code>storage/</code> и <code>.env</code>.</li>
+                        <li>Выполните <code>php artisan october:migrate</code> и <code>php artisan cache:clear</code>.</li>
+                        <li>Проверьте главную, заказ, бронь и админку.</li>
+                    </ol>
+                    <p>Обновления не перезаписывают ваши правки в теме: если меняли шаблоны — сравните с новой версией вручную.</p>
+
+                    <h2 id="troubles">9. Типовые ошибки</h2>
+
+                    <h3>500 после переноса на хостинг</h3>
+                    <p>Права на <code>storage/</code> и <code>bootstrap/cache/</code>, затем <code>php artisan cache:clear</code> и <code>php artisan october:migrate</code>. Проверьте версию PHP — 8.3 обязательна.</p>
+
+                    <h3>419 Page Expired</h3>
+                    <p>Сессия не сохраняется: проверьте <code>SESSION_DRIVER</code>, права на <code>storage/framework/sessions</code> и что домен в <code>APP_URL</code> совпадает с адресом в браузере.</p>
+
+                    <h3>Письма не приходят</h3>
+                    <p><code>QUEUE_CONNECTION</code> указывает на очередь, а cron не настроен. Проверьте <code>php artisan queue:work --stop-when-empty</code> вручную.</p>
+
+                    <h3>Нет свободных слотов</h3>
+                    <p>Слоты генерируются на будни на три недели вперёд. Запустите <code>php artisan elv:kit:demo --refresh-slots</code>.</p>
+
+                    <h3>429 Too Many Requests</h3>
+                    <p>Формы — 20 запросов в минуту с IP, чат — 40. Лимиты Laravel; при необходимости меняются в <code>plugins/elv/kit/routes.php</code>.</p>
+
+                    <h2 id="checklist">10. Чек-лист после установки</h2>
+                    <ul class="list-check">
+                        <li>{{ elv_icon('check')|raw }} Главная, /kit/, /modules/, /pricing/, /docs/, /blog/ открываются без ошибок</li>
+                        <li>{{ elv_icon('check')|raw }} Формы заказа и брони создают записи в админке</li>
+                        <li>{{ elv_icon('check')|raw }} Письмо о заказе приходит на адрес из настроек</li>
+                        <li>{{ elv_icon('check')|raw }} Вебхук шлюза отвечает 200 и переводит заказ в «Оплачен»</li>
+                        <li>{{ elv_icon('check')|raw }} /sitemap.xml, /robots.txt, /llms.txt и /rss.xml отдают 200</li>
+                        <li>{{ elv_icon('check')|raw }} Админка закрыта паролем, тестовые пользователи удалены</li>
+                    </ul>
+                </div>
+
+                <div class="card summary">
+                    <h3>Нужна помощь?</h3>
+                    <p class="muted">Установка входит в тариф Extended и доступна как услуга для Single и Multi.</p>
+                    <div class="stack-actions">
+                        <a class="btn btn--primary" href="{{ 'contacts'|page }}">Написать {{ elv_icon('arrow-right')|raw }}</a>
+                        {% if elv_setting('telegram') %}
+                            <a class="btn btn--ghost" href="{{ elv_setting('telegram') }}" rel="noopener" target="_blank">Telegram</a>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    <ul class="specs">
+                        <li><span>Версия</span><span>1.0.0</span></li>
+                        <li><span>October CMS</span><span>4.4+</span></li>
+                        <li><span>PHP</span><span>8.3+</span></li>
+                        <li><span>MySQL</span><span>8.0+</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

@@ -187,6 +187,9 @@ class Plugin extends PluginBase
                 'elv_money' => function ($cents, $currency = null) {
                     return Money::format((int) $cents, $currency);
                 },
+                'elv_currency_symbol' => function () {
+                    return Money::symbol();
+                },
                 'elv_base' => function () {
                     return Seo::base();
                 },
@@ -197,7 +200,10 @@ class Plugin extends PluginBase
                     return Catalog::modules();
                 },
                 'elv_product' => function ($slug) {
-                    return Catalog::find((string) $slug);
+                    $product = Catalog::find((string) $slug);
+                    Seo::setProduct($product);
+
+                    return $product;
                 },
                 'elv_plans' => function ($product = null) {
                     return Catalog::plans($product instanceof Product ? $product : null);

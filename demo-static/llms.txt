@@ -1,0 +1,23 @@
+# Elv Kit
+
+> Модульный конструктор сайтов на October CMS
+
+
+
+## Продукт
+- [Elv Kit](https://elvstudio.vercel.app/kit/): тема, модули и демо-данные для October CMS 4.x; цена от $79.
+- [Цены](https://elvstudio.vercel.app/pricing/): Single, Multi-Site, Extended; модули продаются отдельно.
+- [Модули](https://elvstudio.vercel.app/modules/): Booking, Shop, Feedback, Blog.
+
+## Документация
+- [Установка](https://elvstudio.vercel.app/docs/): October CMS 4.4, PHP 8.3, MySQL 8.
+- [Демо](https://elvstudio.vercel.app/demo/): демо-контур и порядок сброса данных.
+
+## Блог
+- [AI-режим Google: что реально влияет на видимость](https://elvstudio.vercel.app/blog/seo-for-google-ai): Разметка, прямые ответы, llms.txt и скорость. Чек-лист, который можно проверить, а не пересказать.
+- [Защита от овербукинга: UNIQUE против «проверил и записал»](https://elvstudio.vercel.app/blog/booking-without-race): Проверка доступности слота без блокировки — это гонка. Показываем схему с UNIQUE и lockForUpdate, которая держит нагрузку.
+- [Почему October CMS, а не конструктор](https://elvstudio.vercel.app/blog/why-october-cms): Конструктор даёт скорость старта, October — владение кодом, транзакциями и ценой владения. Разбираем на цифрах.
+
+## Контакты
+- E-mail: sales@elv-studio.by
+- Telegram: https://t.me/elvstudio

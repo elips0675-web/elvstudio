@@ -1,0 +1,181 @@
+title = "Бронирование"
+url = "/booking/"
+layout = "default"
+meta_title = "Запись на демо и консультацию — Elv Kit"
+meta_description = "Запись на экскурсию по демо-стенду, консультацию по October CMS и аудит скорости сайта. Свободное время строится из базы, занятый слот не продаётся дважды."
+==
+{% set services = elv_booking_services() %}
+{% set service = services|filter(item => item.code == elv_query('service'))|first %}
+{% set service = service ?: services|first %}
+{% set days = service ? elv_slots(service.code, 21) : [] %}
+{% set day = days|filter(item => item.date == elv_query('date'))|first %}
+{% set day = day ?: days|first %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Бронирование</span>
+            <h1>Выберите время</h1>
+            <p class="lead">
+                Свободные слоты берутся из базы. После записи время исчезает из списка — два человека
+                не попадут на один час, даже если нажмут одновременно.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            {% if services %}
+                <div class="grid grid--3 mb-24">
+                    {% for item in services %}
+                        <a
+                            class="card card--link{% if item.code == service.code %} card--selected{% endif %}"
+                            href="{{ 'booking'|page }}?service={{ item.code }}">
+                            <div class="card__icon">{{ elv_icon(item.icon ?: 'calendar')|raw }}</div>
+                            <h3>{{ item.name }}</h3>
+                            <p>{{ item.description }}</p>
+                            <span class="card__more">{{ item.duration }} мин · {{ item.price }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if day %}
+                    <div class="card">
+                        <div class="split">
+                            <div>
+                                <span class="eyebrow">Услуга</span>
+                                <h2>{{ service.name }}</h2>
+                                <p class="muted">{{ service.duration }} минут · {{ service.price }}</p>
+                            </div>
+                            <div>
+                                <span class="tiny muted">Дата</span>
+                                <div class="booking-days mt-24">
+                                    {% for item in days %}
+                                        <a class="day{% if item.date == day.date %} day--active{% endif %}"
+                                           href="{{ 'booking'|page }}?service={{ service.code }}&date={{ item.date }}">
+                                            <b>{{ item.label }}</b>
+                                            <span>{{ item.weekday }}</span>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form
+                        class="form mt-32"
+                        id="booking-form"
+                        method="post"
+                        action="{{ url('/booking') }}"
+                        data-elv-form
+                        data-success="Записали. Подтверждение отправили на e-mail.">
+                        {{ elv_csrf()|raw }}
+                        <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <input type="hidden" name="service_code" value="{{ service.code }}">
+                        <input type="hidden" name="date" value="{{ day.date }}">
+
+                        <div class="field">
+                            <span class="label">Время на {{ day.label }}</span>
+                            <div class="times">
+                                {% for slot in day.slots %}
+                                    <div class="time-option">
+                                        <input
+                                            type="radio"
+                                            id="time-{{ loop.index }}"
+                                            name="time"
+                                            value="{{ slot.time }}"
+                                            {% if loop.first %}checked{% endif %}
+                                            required>
+                                        <label for="time-{{ loop.index }}">
+                                            {{ slot.time }}
+                                            {% if slot.left > 1 %}
+                                                <span class="tiny">· {{ slot.left }} места</span>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form__row">
+                            <div class="field">
+                                <label for="booking-person">Имя</label>
+                                <input class="input" id="booking-person" type="text" name="person" required maxlength="160" autocomplete="name" value="{{ elv_old('person') }}">
+                            </div>
+                            <div class="field">
+                                <label for="booking-phone">Телефон</label>
+                                <input class="input" id="booking-phone" type="tel" name="phone" required maxlength="32" autocomplete="tel" value="{{ elv_old('phone') }}">
+                            </div>
+                        </div>
+
+                        <div class="form__row">
+                            <div class="field">
+                                <label for="booking-email">E-mail <span class="muted">— необязательно</span></label>
+                                <input class="input" id="booking-email" type="email" name="email" maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
+                                <span class="hint">На него придёт подтверждение и ссылка на встречу.</span>
+                            </div>
+                            <div class="field">
+                                <label for="booking-comment">Комментарий <span class="muted">— необязательно</span></label>
+                                <input class="input" id="booking-comment" type="text" name="comment" maxlength="2000" value="{{ elv_old('comment') }}">
+                            </div>
+                        </div>
+
+                        <label class="check">
+                            <input type="checkbox" name="consent" value="1" required>
+                            <span>Согласен на обработку данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                        </label>
+
+                        <div>
+                            <button class="btn btn--primary" type="submit">{{ elv_icon('calendar-check')|raw }} Записаться</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="empty">
+                        <h2>Свободных слотов нет</h2>
+                        <p>Расписание генерируется на будни на три недели вперёд. Напишите нам — предложим время вручную.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty">
+                    <h2>Услуги не настроены</h2>
+                    <p>Список услуг лежит в <code>plugins/elv/kit/config/booking.php</code>.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="grid grid--3">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
+                    <h3>Без овербукинга</h3>
+                    <p>Уникальный индекс на услугу, дату и время плюс условное обновление счётчика мест.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
+                    <h3>Отмена освобождает</h3>
+                    <p>Отмена брони в админке уменьшает занятость — слот снова доступен для записи.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('mail')|raw }}</div>
+                    <h3>Письма обеим сторонам</h3>
+                    <p>Клиент получает подтверждение, администратор — карточку брони с контактами.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

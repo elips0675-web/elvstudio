@@ -1,0 +1,67 @@
+title = "Обратная связь"
+url = "/feedback/"
+layout = "default"
+meta_title = "Обратная связь — Elv Kit"
+meta_description = "Напишите нам: вопрос по установке, оплате, лицензии или доработке. Форма с защитой от спама, ответ в рабочий день."
+==
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Обратная связь</span>
+            <h1>Напишите нам</h1>
+            <p class="lead">
+                Вопрос по установке, оплате или лицензии — отвечаем в рабочий день. Если нужна доработка,
+                опишите задачу и сроки: скажем, входит ли это в поддержку.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="checkout">
+                <div class="card">
+                    {% if elv_flash('elv_success') %}
+                        <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+                    {% endif %}
+
+                    {% partial 'feedback-form' %}
+                </div>
+
+                <aside class="card summary">
+                    <h3>Другие каналы</h3>
+                    <ul class="list-check mt-24">
+                        {% if elv_setting('email') %}
+                            <li>{{ elv_icon('mail')|raw }} <a href="mailto:{{ elv_setting('email') }}">{{ elv_setting('email') }}</a></li>
+                        {% endif %}
+                        {% if elv_setting('telegram') %}
+                            <li>{{ elv_icon('telegram')|raw }} <a href="{{ elv_setting('telegram') }}" rel="noopener" target="_blank">Telegram</a></li>
+                        {% endif %}
+                        {% if elv_setting('whatsapp') %}
+                            <li>{{ elv_icon('whatsapp')|raw }} <a href="{{ elv_setting('whatsapp') }}" rel="noopener" target="_blank">WhatsApp</a></li>
+                        {% endif %}
+                        {% if elv_setting('phone') %}
+                            <li>{{ elv_icon('phone')|raw }} <a href="tel:{{ elv_setting('phone') }}">{{ elv_setting('phone') }}</a></li>
+                        {% endif %}
+                    </ul>
+
+                    <hr>
+
+                    <h3>Что дальше</h3>
+                    <ol class="mt-24">
+                        <li>Письмо сохраняется в базе и не теряется, даже если почта недоступна.</li>
+                        <li>Отвечаем на указанный e-mail в рабочий день.</li>
+                        <li>Если нужен созвон — предложим время в ответе.</li>
+                    </ol>
+
+                    <div class="notice mt-24">
+                        {{ elv_icon('clock')|raw }}
+                        <p>Часовой пояс — Минск (UTC+3). Обычно отвечаем в течение рабочего дня.</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>

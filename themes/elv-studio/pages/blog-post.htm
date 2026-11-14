@@ -1,0 +1,97 @@
+title = "Статья"
+url = "/blog/:slug"
+layout = "default"
+==
+{% set post = elv_use_post(this.param.slug) %}
+{% if not post %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set crumbs = elv_breadcrumbs() %}
+{% set related = elv_related(post, 3) %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <div class="article__meta">
+                {% if post.category %}
+                    <a href="{{ 'blog'|page }}?category={{ post.category.slug }}">{{ post.category.name }}</a>
+                {% endif %}
+                <span>{{ post.display_date }}</span>
+                <span>{{ post.reading_time }} мин чтения</span>
+                {% if post.author %}
+                    <span>{{ post.author }}</span>
+                {% endif %}
+            </div>
+            <h1 class="mt-24">{{ post.title }}</h1>
+            {% if post.excerpt %}
+                <p class="lead">{{ post.excerpt|striptags }}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <article class="article">
+                <div class="article__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
+
+                <div class="article__body">
+                    {!! post.body !!}
+                </div>
+
+                {% if post.tag_list %}
+                    <div class="chips mt-32">
+                        {% for tag in post.tag_list %}
+                            <a class="chip" href="{{ 'blog'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </article>
+        </div>
+    </section>
+
+    {% if related|length %}
+        <section class="section section--paper">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Читать дальше</span>
+                    <h2>По теме</h2>
+                </div>
+
+                <div class="blog-grid">
+                    {% for item in related %}
+                        <a class="post-card" href="{{ 'blog-post'|page({ slug: item.slug }) }}">
+                            <div class="post-card__cover">{{ elv_cover_icon(item.cover)|raw }}</div>
+                            <div class="post-card__body">
+                                <div class="post-card__meta">
+                                    <span>{{ item.display_date }}</span>
+                                    <span>{{ item.reading_time }} мин</span>
+                                </div>
+                                <h3>{{ item.title }}</h3>
+                                <p>{{ item.excerpt|elv_excerpt(130) }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section">
+        <div class="container">
+            <div class="article">
+                <div class="card">
+                    <div class="split">
+                        <div>
+                            <h2 class="mb-0">Новые разборы — на почту</h2>
+                            <p class="muted mb-0">Одна статья в две недели, без рекламы.</p>
+                        </div>
+                        <div>
+                            {% partial 'subscribe' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

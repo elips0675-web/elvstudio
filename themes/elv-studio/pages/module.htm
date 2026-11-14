@@ -1,0 +1,171 @@
+title = "Модуль"
+url = "/modules/:slug"
+layout = "default"
+==
+{% set product = elv_product(this.param.slug) %}
+{% if not product %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <div class="chips mb-24">
+                {% if product.badge %}
+                    <span class="badge badge--line">{{ product.badge }}</span>
+                {% endif %}
+                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Kit' }}</span>
+            </div>
+            <h1>{{ product.name }}</h1>
+            <p class="lead">{{ product.tagline }}</p>
+            <div class="stack-actions">
+                {% if product.price_cents > 0 %}
+                    <a class="btn btn--primary" href="{{ 'order'|page({ product: product.slug, plan: 'single' }) }}">
+                        {{ elv_icon('cart')|raw }} Купить модуль
+                    </a>
+                {% else %}
+                    <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
+                        {{ elv_icon('cart')|raw }} Купить в составе Kit
+                    </a>
+                {% endif %}
+                <a class="btn btn--ghost" href="{{ 'booking'|page }}">
+                    {{ elv_icon('play')|raw }} Посмотреть на демо
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Возможности</span>
+                    <h2>Что даёт модуль</h2>
+                    <p class="lead">{{ product.description }}</p>
+
+                    <ul class="list-check mt-24">
+                        {% for feature in product.features %}
+                            <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Параметры</h3>
+                    <ul class="specs mt-24">
+                        <li><span>Тип</span><span>{{ product.kind == 'kit' ? 'Комплект' : 'Модуль' }}</span></li>
+                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Kit' }}</span></li>
+                        <li><span>Платформа</span><span>October CMS 4.4+</span></li>
+                        <li><span>PHP</span><span>8.3+</span></li>
+                        <li><span>База</span><span>MySQL 8.0+</span></li>
+                        <li><span>Право в админке</span><span class="mono">elv.kit.{{ product.slug }}</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if product.compatibility %}
+        <section class="section section--paper">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Совместимость</span>
+                    <h2>С чем работает</h2>
+                </div>
+                <div class="chips">
+                    {% for item in product.compatibility %}
+                        <span class="chip">{{ item }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Установка</span>
+                <h2>Четыре шага</h2>
+                <p>Модуль не требует отдельной установки: он уже внутри плагина и включается вместе с ним.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('download')|raw }}</div>
+                    <h3>1. Распаковать архив</h3>
+                    <p>Тема кладётся в <code>themes/elv-studio</code>, плагин — в <code>plugins/elv/kit</code>.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
+                    <h3>2. Применить миграции</h3>
+                    <p><code>php artisan october:migrate</code> создаёт таблицы и не трогает существующие.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('database')|raw }}</div>
+                    <h3>3. Заполнить демо</h3>
+                    <p><code>php artisan elv:kit:demo</code> добавляет товары, статьи и слоты. Повторный запуск не плодит дубли.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('key')|raw }}</div>
+                    <h3>4. Включить доступ</h3>
+                    <p>Роль и права в админке, ключи оплаты и SMTP — в настройках плагина и <code>.env</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if product.changelog %}
+        <section class="section section--paper">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Изменения</span>
+                    <h2>Версии модуля</h2>
+                </div>
+                <div class="card">
+                    <ul class="timeline">
+                        {% for entry in product.changelog %}
+                            <li>
+                                <time>{{ entry.date }}</time>
+                                <div>
+                                    <b>Версия {{ entry.version }}</b>
+                                    <span class="muted">{{ entry.note }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Рядом</span>
+                <h2>Другие модули</h2>
+            </div>
+            <div class="grid grid--3">
+                {% for other in elv_modules() %}
+                    {% if other.slug != product.slug %}
+                        <a class="card card--link" href="{{ 'module'|page({ slug: other.slug }) }}">
+                            <div class="card__icon">{{ elv_icon(other.icon ?: 'puzzle')|raw }}</div>
+                            <h3>{{ other.name }}</h3>
+                            <p>{{ other.tagline }}</p>
+                            <span class="card__more">
+                                Подробно {{ elv_icon('arrow-right')|raw }}
+                            </span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

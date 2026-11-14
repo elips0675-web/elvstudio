@@ -1,0 +1,129 @@
+title = "Блог"
+url = "/blog/"
+layout = "default"
+meta_title = "Блог Elv Studio: October CMS, бронирование, SEO"
+meta_description = "Статьи о том, как устроен Elv Kit: защита от двойного бронирования, оплата без PCI-нагрузки, SEO под Google, Яндекс и ИИ-выдачу."
+==
+{% set posts = elv_blog(9) %}
+{% set categories = elv_categories() %}
+{% set tags = elv_tags() %}
+{% set activeCategory = elv_query('category') %}
+{% set activeTag = elv_query('tag') %}
+{% set query = elv_query('q') %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Блог</span>
+            <h1>Пишем о том, что проверяем кодом</h1>
+            <p class="lead">Архитектура, гонки в бронировании, вес страницы и SEO для ИИ-выдачи. Без «10 трендов 2026».</p>
+
+            <form class="subscribe mt-24" method="get" action="{{ 'blog'|page }}" role="search">
+                <label class="sr-only" for="blog-search">Поиск по статьям</label>
+                <input class="input" id="blog-search" type="search" name="q" value="{{ query }}" placeholder="Найти статью: бронь, оплата, SEO">
+                {% if activeCategory %}<input type="hidden" name="category" value="{{ activeCategory }}">{% endif %}
+                {% if activeTag %}<input type="hidden" name="tag" value="{{ activeTag }}">{% endif %}
+                <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Найти</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            {% if elv_query('subscribed') == '1' %}
+                <div class="alert alert--ok mb-24" role="status">Подписка подтверждена. Новые статьи будут приходить на почту.</div>
+            {% elseif elv_query('subscribed') == 'invalid' %}
+                <div class="alert alert--err mb-24" role="alert">Ссылка подтверждения устарела. Подпишитесь ещё раз.</div>
+            {% elseif elv_query('unsubscribed') == '1' %}
+                <div class="alert alert--warn mb-24" role="status">Вы отписаны. Вернуться можно в любой момент.</div>
+            {% endif %}
+
+            <div class="chips">
+                <a class="chip{% if not activeCategory and not activeTag and not query %} chip--active{% endif %}" href="{{ 'blog'|page }}">Все статьи</a>
+                {% for category in categories %}
+                    <a
+                        class="chip{% if activeCategory == category.slug %} chip--active{% endif %}"
+                        href="{{ 'blog'|page }}?category={{ category.slug }}">
+                        {{ category.name }} <span class="muted">{{ category.posts_count }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+
+            {% if tags %}
+                <div class="chips mt-24">
+                    <span class="tiny muted">Теги:</span>
+                    {% for tag in tags %}
+                        <a class="chip{% if activeTag == tag %} chip--active{% endif %}" href="{{ 'blog'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            {% if posts|length %}
+                <div class="blog-grid">
+                    {% for post in posts %}
+                        <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
+                            <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
+                            <div class="post-card__body">
+                                <div class="post-card__meta">
+                                    {% if post.category %}
+                                        <span>{{ post.category.name }}</span>
+                                    {% endif %}
+                                    <span>{{ post.display_date }}</span>
+                                    <span>{{ post.reading_time }} мин</span>
+                                </div>
+                                <h3>{{ post.title }}</h3>
+                                <p>{{ post.excerpt|elv_excerpt(150) }}</p>
+                                <span class="post-card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if posts.lastPage() > 1 %}
+                    <nav class="pagination" aria-label="Страницы блога">
+                        {% if posts.currentPage() > 1 %}
+                            <a href="{{ posts.previousPageUrl() }}" rel="prev">← Новее</a>
+                        {% else %}
+                            <span class="is-disabled">← Новее</span>
+                        {% endif %}
+                        <span>Страница {{ posts.currentPage() }} из {{ posts.lastPage() }}</span>
+                        {% if posts.hasMorePages() %}
+                            <a href="{{ posts.nextPageUrl() }}" rel="next">Старее →</a>
+                        {% else %}
+                            <span class="is-disabled">Старее →</span>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="empty">
+                    <h2>Ничего не нашлось</h2>
+                    <p>Попробуйте другой запрос или сбросьте фильтры.</p>
+                    <div class="stack-actions">
+                        <a class="btn btn--ghost" href="{{ 'blog'|page }}">Сбросить фильтры</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Подписка</span>
+                    <h2>Одна статья в две недели</h2>
+                    <p class="lead">Без рассылок «обновились» и рекламы. Только разборы кода, которые уже в репозитории.</p>
+                </div>
+                <div class="card">
+                    {% partial 'subscribe' %}
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

@@ -1,0 +1,108 @@
+title = "Контакты"
+url = "/contacts/"
+layout = "default"
+meta_title = "Контакты Elv Studio"
+meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp. Вопросы по Elv Kit, установке, лицензиям и доработкам."
+==
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Контакты</span>
+            <h1>Связаться с Elv Studio</h1>
+            <p class="lead">Один разработчик, без менеджеров и скриптов. Пишите по делу — ответ будет по делу.</p>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <div class="contact-cards">
+                {% if elv_setting('email') %}
+                    <a class="contact-card" href="mailto:{{ elv_setting('email') }}">
+                        <span class="contact-card__icon">{{ elv_icon('mail')|raw }}</span>
+                        <span>
+                            <b>E-mail</b>
+                            <span>{{ elv_setting('email') }}</span>
+                        </span>
+                    </a>
+                {% endif %}
+
+                {% if elv_setting('telegram') %}
+                    <a class="contact-card" href="{{ elv_setting('telegram') }}" rel="noopener" target="_blank">
+                        <span class="contact-card__icon">{{ elv_icon('telegram')|raw }}</span>
+                        <span>
+                            <b>Telegram</b>
+                            <span>{{ elv_setting('telegram') }}</span>
+                        </span>
+                    </a>
+                {% endif %}
+
+                {% if elv_setting('whatsapp') %}
+                    <a class="contact-card" href="{{ elv_setting('whatsapp') }}" rel="noopener" target="_blank">
+                        <span class="contact-card__icon">{{ elv_icon('whatsapp')|raw }}</span>
+                        <span>
+                            <b>WhatsApp</b>
+                            <span>{{ elv_setting('whatsapp') }}</span>
+                        </span>
+                    </a>
+                {% endif %}
+
+                {% if elv_setting('phone') %}
+                    <a class="contact-card" href="tel:{{ elv_setting('phone') }}">
+                        <span class="contact-card__icon">{{ elv_icon('phone')|raw }}</span>
+                        <span>
+                            <b>Телефон</b>
+                            <span>{{ elv_setting('phone') }}</span>
+                        </span>
+                    </a>
+                {% endif %}
+
+                {% if not elv_setting('email') and not elv_setting('telegram') and not elv_setting('phone') %}
+                    <div class="empty">
+                        <h2>Контакты не заполнены</h2>
+                        <p>Настройки → Elv Kit → Контакты. Пока их нет, форма ниже всё равно работает.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="checkout">
+                <div class="card">
+                    <h2>Форма обратной связи</h2>
+                    <p class="muted">Сообщение попадает в базу и в админку, письмо — администратору.</p>
+
+                    {% if elv_flash('elv_success') %}
+                        <div class="alert alert--ok mb-24 mt-24" role="status">{{ elv_flash('elv_success') }}</div>
+                    {% endif %}
+
+                    {% partial 'feedback-form' %}
+                </div>
+
+                <aside class="card summary">
+                    <h3>Реквизиты и условия</h3>
+                    <ul class="specs mt-24">
+                        <li><span>Продавец</span><span>Elv Studio</span></li>
+                        <li><span>Формат работы</span><span>онлайн, Беларусь</span></li>
+                        <li><span>Часовой пояс</span><span>Минск, UTC+3</span></li>
+                        <li><span>Документы</span><span><a href="{{ 'terms'|page }}">оферта</a>, <a href="{{ 'privacy'|page }}">политика</a></span></li>
+                    </ul>
+
+                    <hr>
+
+                    <h3>Прежде чем писать</h3>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('book')|raw }} <a href="{{ 'docs'|page }}">Документация</a> — установка, оплата, ошибки</li>
+                        <li>{{ elv_icon('play')|raw }} <a href="{{ 'demo'|page }}">Демо-стенд</a> — что показываем на экскурсии</li>
+                        <li>{{ elv_icon('cart')|raw }} <a href="{{ 'pricing'|page }}">Тарифы</a> — что входит в лицензии</li>
+                        <li>{{ elv_icon('message')|raw }} ИИ-консультант в правом нижнем углу — отвечает по каталогу</li>
+                    </ul>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>

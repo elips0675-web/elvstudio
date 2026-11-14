@@ -1,0 +1,139 @@
+title = "Демо"
+url = "/demo/"
+layout = "default"
+meta_title = "Демо-стенд Elv Kit на October CMS"
+meta_description = "Что показывает демо-стенд Elv Kit: витрина, заказ, бронирование без овербукинга, блог и админка. Как записаться на экскурсию и сбросить демо-данные."
+==
+{% set services = elv_booking_services() %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Демо-стенд</span>
+            <h1>Посмотреть до покупки</h1>
+            <p class="lead">
+                Демо — это та же поставка, что получает покупатель: тема, плагин, демо-данные и админка.
+                Ничего не «нарисовано» на скриншотах: заказы, брони и статьи лежат в MySQL.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ 'booking'|page }}">
+                    {{ elv_icon('calendar-check')|raw }} Записаться на экскурсию
+                </a>
+                <a class="btn btn--ghost" href="{{ 'docs'|page }}">
+                    {{ elv_icon('book')|raw }} Инструкция по установке
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Что показываем</span>
+                <h2>Пять сценариев за 30 минут</h2>
+                <p>Экскурсия идёт по живому сайту: не слайды, а клики. Можно задавать вопросы и просить показать код.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('store')|raw }}</div>
+                    <h3>Витрина и заказ</h3>
+                    <p>Каталог, карточка модуля, форма заказа с выбором лицензии, редирект на оплату и выдача архива по токену.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('calendar-check')|raw }}</div>
+                    <h3>Бронирование</h3>
+                    <p>Сетка слотов из базы, запись, занятое время и отказ 409 вместо двойной продажи одного часа.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
+                    <h3>Блог и SEO</h3>
+                    <p>Статьи с категориями и тегами, RSS, sitemap.xml, JSON-LD и llms.txt — в исходном коде страницы.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
+                    <h3>Админка и права</h3>
+                    <p>Разделы «Elv Kit», фильтры, смена статуса заказа, освобождение слота при отмене брони.</p>
+                </div>
+            </div>
+
+            <div class="notice mt-32">
+                {{ elv_icon('info')|raw }}
+                <p>Доступ к админке демо-стенда выдаётся по запросу: пароль не публикуется, иначе стенд превращается в песочницу для ботов.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Запись</span>
+                <h2>Свободное время</h2>
+                <p>Экскурсия — 30 минут, бесплатно. Консультация и аудит скорости — платные услуги, оплата после подтверждения времени.</p>
+            </div>
+
+            <div class="grid grid--3">
+                {% for service in services %}
+                    <div class="card">
+                        <div class="card__icon">{{ elv_icon(service.icon ?: 'calendar')|raw }}</div>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.description }}</p>
+                        <ul class="specs mt-24">
+                            <li><span>Длительность</span><span>{{ service.duration }} мин</span></li>
+                            <li><span>Стоимость</span><span>{{ service.price }}</span></li>
+                        </ul>
+                        <div class="stack-actions">
+                            <a class="btn btn--ghost" href="{{ 'booking'|page }}?service={{ service.code }}">
+                                Выбрать время {{ elv_icon('arrow-right')|raw }}
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Своими руками</span>
+                    <h2>Поднять демо локально</h2>
+                    <p class="lead">Нужны PHP 8.3, Composer и MySQL. Три команды — и сайт открывается на <code>localhost:8000</code>.</p>
+
+                    <pre class="mt-24"><code>composer create-project october/october demo
+cd demo
+php artisan october:migrate
+php artisan elv:kit:demo</code></pre>
+
+                    <p class="mt-24 muted">
+                        Архив из покупки уже содержит тему и плагин — распакуйте его в корень установки
+                        и выполните миграции. Порядок описан в <a href="{{ 'docs'|page }}">документации</a>.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Сброс демо-данных</h3>
+                    <ul class="specs mt-24">
+                        <li><span><code>elv:kit:demo</code></span><span>добавить недостающее</span></li>
+                        <li><span><code>elv:kit:demo --refresh-slots</code></span><span>обновить слоты</span></li>
+                        <li><span><code>elv:kit:reset</code></span><span>стереть и создать заново</span></li>
+                        <li><span><code>elv:kit:package</code></span><span>собрать ZIP поставки</span></li>
+                    </ul>
+                    <div class="notice mt-24">
+                        {{ elv_icon('shield')|raw }}
+                        <p><code>elv:kit:reset</code> удаляет демо-контент и сообщения. Заказы, лицензии и подписчики остаются.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

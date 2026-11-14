@@ -1,0 +1,51 @@
+title = "Страница не найдена"
+url = "/404"
+layout = "default"
+==
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">404</span>
+            <h1>Такой страницы нет</h1>
+            <p class="lead">
+                Адрес мог устареть или в нём опечатка. Ниже — то, что чаще всего ищут:
+                состав Kit, цены, документация и блог.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ 'index'|page }}">На главную</a>
+                <a class="btn btn--ghost" href="{{ 'docs'|page }}">Документация</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid--3">
+                <a class="card card--link" href="{{ 'kit'|page }}">
+                    <div class="card__icon">{{ elv_icon('cubes')|raw }}</div>
+                    <h3>Elv Kit</h3>
+                    <p>Что входит в поставку и какие требования к серверу.</p>
+                    <span class="card__more">Открыть {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+                <a class="card card--link" href="{{ 'pricing'|page }}">
+                    <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
+                    <h3>Тарифы</h3>
+                    <p>Single, Multi-Site, Extended и цены модулей.</p>
+                    <span class="card__more">Смотреть цены {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+                <a class="card card--link" href="{{ 'blog'|page }}">
+                    <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
+                    <h3>Блог</h3>
+                    <p>Разборы кода, бронирование и SEO без воды.</p>
+                    <span class="card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+            </div>
+
+            <form class="subscribe mt-32" method="get" action="{{ 'blog'|page }}" role="search">
+                <label class="sr-only" for="notfound-search">Поиск по блогу</label>
+                <input class="input" id="notfound-search" type="search" name="q" placeholder="Что искали? Например, оплата">
+                <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Искать в блоге</button>
+            </form>
+        </div>
+    </section>
+</main>

@@ -32,6 +32,8 @@ class Seo
 
     protected static $post = null;
 
+    protected static $product = null;
+
     public static function siteName(): string
     {
         return (string) (Settings::get('brand_name') ?: 'Elv Kit');
@@ -66,6 +68,16 @@ class Seo
     public static function post(): ?Post
     {
         return static::$post;
+    }
+
+    public static function setProduct(?Product $product): void
+    {
+        static::$product = $product;
+    }
+
+    public static function product(): ?Product
+    {
+        return static::$product;
     }
 
     /**
@@ -206,6 +218,10 @@ class Seo
             $graph[] = static::articleNode(static::$post);
         }
 
+        if (static::$product) {
+            $graph[] = static::productNode(static::$product);
+        }
+
         $crumbs = static::breadcrumbs();
 
         if (count($crumbs) > 1) {
@@ -272,6 +288,31 @@ class Seo
         }
 
         return ['@type' => 'FAQPage', '@id' => static::base() . '/#faq', 'mainEntity' => $items];
+    }
+
+    protected static function productNode(Product $product): array
+    {
+        $node = static::withoutEmpty([
+            '@type' => 'Product',
+            '@id' => static::canonical() . '#product',
+            'name' => (string) $product->name,
+            'description' => (string) ($product->description ?: $product->tagline),
+            'sku' => (string) $product->slug,
+            'brand' => ['@type' => 'Brand', 'name' => static::siteName()],
+            'url' => static::canonical(),
+        ]);
+
+        if ((int) $product->price_cents > 0) {
+            $node['offers'] = [
+                '@type' => 'Offer',
+                'price' => (string) ($product->price_cents / 100),
+                'priceCurrency' => Money::currency(),
+                'url' => static::canonical(),
+                'availability' => 'https://schema.org/InStock',
+            ];
+        }
+
+        return $node;
     }
 
     protected static function articleNode(Post $post): array

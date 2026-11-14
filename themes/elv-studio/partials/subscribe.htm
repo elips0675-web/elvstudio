@@ -1,0 +1,22 @@
+<form
+    class="subscribe"
+    method="post"
+    action="{{ url('/subscribe') }}"
+    data-elv-form
+    data-success="Проверьте почту: отправлено письмо со ссылкой подтверждения.">
+    {{ elv_csrf()|raw }}
+    <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="sr-only" for="subscribe-email">E-mail для подписки на статьи</label>
+    <input
+        class="input"
+        id="subscribe-email"
+        type="email"
+        name="email"
+        required
+        autocomplete="email"
+        placeholder="e-mail для новых статей">
+    <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Подписаться</button>
+</form>
+<p class="form-note tiny muted">
+    Подписка с подтверждением: письмо приходит один раз, отписаться можно любой ссылкой в нём.
+</p>

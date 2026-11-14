@@ -1,0 +1,20 @@
+# robots.txt — Elv Kit
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /order/success/
+Disallow: /download/
+Disallow: /*?q=
+Disallow: /*?category=
+Disallow: /*?tag=
+
+# Яндекс: параметры фильтров не создают новых страниц
+Clean-param: q&category&tag /blog/
+
+User-agent: Yandex
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://elvstudio.vercel.app/sitemap.xml

@@ -6,6 +6,43 @@
 
 ---
 
+(Stage 4 — 14.11.2026) — **Все страницы темы, динамические маршруты, SEO-обвязка и статическая демо-версия для Vercel.**
+
+1. Страницы темы: `kit`, `modules`, `module` (`/modules/:slug/`), `pricing`, `demo`,
+   `docs`, `blog`, `blog-post` (`/blog/:slug/`), `order`, `order-success`, `booking`,
+   `feedback`, `contacts`, `terms`, `privacy`, `sitemap`, `404`; партиалы
+   `breadcrumbs`, `subscribe`, `feedback-form`. Обход 27 URL — 200, несуществующие — 404.
+
+2. Динамические страницы отдавали 404 из-за `this.param('slug')`: в October
+   `this.param` — массив, а не метод. Заменено на `this.param.slug`
+   (`layouts/default.htm:3-4`, `pages/module.htm:5`, `pages/blog-post.htm:5`,
+   `pages/order-success.htm:5`).
+
+3. Крошки не выводились — партиал не видел `crumbs`; во всех 16 страницах вызов
+   стал `{% partial 'breadcrumbs' crumbs=crumbs %}`. Добавлен `Product` JSON-LD
+   (`Seo::productNode()`) на страницах модулей.
+
+4. `assets/img/og-default.png` (1200×630, 57 КБ) — `og:image` больше не битый.
+
+5. gzip не работал на `/modules/*`: skip-лист `modules/*` в `CompressResponse`
+   (для ассетов ядра) совпадал с публичным разделом. Заменён на конкретные
+   каталоги; HTML сжимается (82 845 → 18 250 байт).
+
+6. `Money::format`: в PHP 8 `3900 / 100` — int, `=== floor()` давал `$39,00`,
+   исправлено на `==`. На `/order/` для модулей скрыт выбор тарифов (один сайт),
+   итог пересчитывается JS (блок итога лежит вне формы — раньше не находился).
+
+7. Адаптив: `.split > * { min-width: 0 }`, `code { overflow-wrap: anywhere }` —
+   убран горизонтальный выезд на `/booking/` и `/docs/`.
+
+8. Демо: статьи разложены по категориям (engineering / practice / seo),
+   `Sitemap` больше не дублирует `/kit` и `/kit/`.
+
+9. Vercel не исполняет PHP (отдавал `index.php` файлом). Добавлены
+   `tools/export-static.php` (снимок 22 страниц в `demo-static/`: относительные
+   ссылки, абсолютные canonical/OG, баннер «демо-версия», блокировка форм, чата
+   и оплаты), `vercel.json` (`outputDirectory: demo-static`), `.vercelignore`.
+
 (Stage 3 — 14.11.2026) — **Виджет Elv Kit: меню контактов, форма обратной связи, ИИ-консультант и фильтр слов; всё живёт в плагине.**
 
 1. Виджет перенесён из темы в плагин `plugins/elv/kit`: разметка `views/widget.htm`

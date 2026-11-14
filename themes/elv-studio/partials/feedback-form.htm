@@ -1,0 +1,57 @@
+<form
+    class="form"
+    id="feedback-form"
+    method="post"
+    action="{{ url('/feedback') }}"
+    data-elv-form
+    data-success="Сообщение отправлено. Ответим на указанный e-mail.">
+    {{ elv_csrf()|raw }}
+    <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input type="hidden" name="source" value="page">
+
+    {% if elv_errors() %}
+        <div class="alert alert--err" role="alert">
+            {% for field, messages in elv_errors() %}
+                {{ messages|first }}
+                {% if not loop.last %}<br>{% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form__row">
+        <div class="field">
+            <label for="fb-name">Имя</label>
+            <input class="input" id="fb-name" type="text" name="name" required maxlength="160" autocomplete="name" value="{{ elv_old('name') }}">
+        </div>
+        <div class="field">
+            <label for="fb-email">E-mail</label>
+            <input class="input" id="fb-email" type="email" name="email" required maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
+        </div>
+    </div>
+
+    <div class="form__row">
+        <div class="field">
+            <label for="fb-phone">Телефон <span class="muted">— необязательно</span></label>
+            <input class="input" id="fb-phone" type="tel" name="phone" maxlength="32" autocomplete="tel" value="{{ elv_old('phone') }}">
+        </div>
+        <div class="field">
+            <label for="fb-subject">Тема <span class="muted">— необязательно</span></label>
+            <input class="input" id="fb-subject" type="text" name="subject" maxlength="200" value="{{ elv_old('subject') }}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="fb-message">Сообщение</label>
+        <textarea class="textarea" id="fb-message" name="message" required minlength="5" maxlength="5000" placeholder="Что нужно сделать, какие сроки и бюджет">{{ elv_old('message') }}</textarea>
+        <span class="hint">Чем конкретнее задача, тем точнее ответ. Отвечаем в рабочий день.</span>
+    </div>
+
+    <label class="check">
+        <input type="checkbox" name="consent" value="1" required>
+        <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+    </label>
+
+    <div>
+        <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить</button>
+    </div>
+</form>

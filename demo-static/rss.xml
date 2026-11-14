@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+    <title>Elv Kit</title>
+    <link>https://elvstudio.vercel.app/blog/</link>
+    <description>Модульный конструктор сайтов на October CMS</description>
+    <language>ru</language>
+    <item>
+      <title>AI-режим Google: что реально влияет на видимость</title>
+      <link>https://elvstudio.vercel.app/blog/seo-for-google-ai</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-for-google-ai</guid>
+      <description>Разметка, прямые ответы, llms.txt и скорость. Чек-лист, который можно проверить, а не пересказать.</description>
+      <pubDate>Thu, 12 Nov 2026 12:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Защита от овербукинга: UNIQUE против «проверил и записал»</title>
+      <link>https://elvstudio.vercel.app/blog/booking-without-race</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/booking-without-race</guid>
+      <description>Проверка доступности слота без блокировки — это гонка. Показываем схему с UNIQUE и lockForUpdate, которая держит нагрузку.</description>
+      <pubDate>Wed, 11 Nov 2026 10:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Почему October CMS, а не конструктор</title>
+      <link>https://elvstudio.vercel.app/blog/why-october-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/why-october-cms</guid>
+      <description>Конструктор даёт скорость старта, October — владение кодом, транзакциями и ценой владения. Разбираем на цифрах.</description>
+      <pubDate>Tue, 10 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+</channel></rss>

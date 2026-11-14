@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+/modules
+/storage
+/backup
+/.git
+/.github

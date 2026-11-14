@@ -1,0 +1,76 @@
+title = "Карта сайта"
+url = "/sitemap/"
+layout = "default"
+meta_title = "Карта сайта — Elv Kit"
+meta_description = "Все разделы сайта Elv Kit: продукт, модули, тарифы, документация, демо, блог, контакты и правовые документы."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set sections = [
+    { 'name': 'Главная', 'url': 'index'|page },
+    { 'name': 'Elv Kit', 'url': 'kit'|page },
+    { 'name': 'Модули', 'url': 'modules'|page },
+    { 'name': 'Тарифы', 'url': 'pricing'|page },
+    { 'name': 'Демо-стенд', 'url': 'demo'|page },
+    { 'name': 'Документация', 'url': 'docs'|page },
+    { 'name': 'Заказ', 'url': 'order'|page },
+    { 'name': 'Бронирование', 'url': 'booking'|page },
+    { 'name': 'Обратная связь', 'url': 'feedback'|page },
+    { 'name': 'Контакты', 'url': 'contacts'|page },
+    { 'name': 'Оферта', 'url': 'terms'|page },
+    { 'name': 'Политика конфиденциальности', 'url': 'privacy'|page }
+] %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Навигация</span>
+            <h1>Карта сайта</h1>
+            <p class="lead">Все страницы в одном месте. Машиночитаемая версия — <a href="{{ url('/sitemap.xml') }}">sitemap.xml</a>, лента статей — <a href="{{ url('/rss.xml') }}">RSS</a>.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid--2">
+                <div class="card">
+                    <h2>Разделы</h2>
+                    <ul class="anchor-list mt-24">
+                        {% for item in sections %}
+                            <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>Продукты</h2>
+                    <ul class="mt-24">
+                        {% for product in elv_modules() %}
+                            <li><a href="{{ 'module'|page({ slug: product.slug }) }}">{{ product.name }}</a></li>
+                        {% endfor %}
+                        <li><a href="{{ 'pricing'|page }}">Лицензии и цены</a></li>
+                    </ul>
+
+                    <h2 class="mt-32">Служебные</h2>
+                    <ul class="mt-24">
+                        <li><a href="{{ url('/sitemap.xml') }}">sitemap.xml</a></li>
+                        <li><a href="{{ url('/robots.txt') }}">robots.txt</a></li>
+                        <li><a href="{{ url('/llms.txt') }}">llms.txt</a></li>
+                        <li><a href="{{ url('/rss.xml') }}">rss.xml</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-32">
+                <h2>Блог</h2>
+                <ul class="anchor-list mt-24">
+                    {% for post in elv_posts(50) %}
+                        <li><a href="{{ 'blog-post'|page({ slug: post.slug }) }}">{{ post.title }}</a></li>
+                    {% else %}
+                        <li class="muted">Статей пока нет.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>

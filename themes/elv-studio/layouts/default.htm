@@ -1,7 +1,7 @@
 description = "Основной макет: шапка, подвал, инлайн CSS и JS, SEO-разметка"
 ==
-{% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param('slug')) : null %}
-{% set seo_product = this.page.id == 'module' ? elv_product(this.param('slug')) : null %}
+{% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
+{% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
 {% set seo_noindex = this.page.id in ['404', 'order-success'] %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')

@@ -1,0 +1,149 @@
+title = "Тарифы"
+url = "/pricing/"
+layout = "default"
+meta_title = "Цены Elv Kit: Single, Multi-Site, Extended"
+meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Site на пять проектов и Extended без ограничений. Модули Booking, Shop и Feedback продаются отдельно."
+==
+{% set kit = elv_kit() %}
+{% set plans = elv_plans(kit) %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Тарифы</span>
+            <h1>Один платёж, без подписки</h1>
+            <p class="lead">
+                Лицензия бессрочная: сайт продолжает работать, даже если обновления не продлены.
+                Разница между тарифами — количество сайтов, срок обновлений и поддержка.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid--3">
+                {% for plan in plans %}
+                    <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
+                        {% if plan.featured %}
+                            <span class="badge price-card__flag">Выбирают чаще</span>
+                        {% endif %}
+                        <span class="price-card__label">{{ plan.label }}</span>
+                        <div class="price-card__value">
+                            <b>{{ elv_money(plan.price) }}</b>
+                        </div>
+                        <span class="price-card__period">{{ plan.period }}</span>
+                        <ul>
+                            {% for feature in plan.features %}
+                                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
+                            Выбрать {{ plan.label }}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Сравнение</span>
+                <h2>Построчно</h2>
+                <p>Функциональность ядра одинаковая во всех тарифах. Отличаются только условия использования и поддержка.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="compare">
+                    <thead>
+                        <tr>
+                            <th>Возможность</th>
+                            <th>Single</th>
+                            <th>Multi-Site</th>
+                            <th>Extended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in elv_compare() %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                {% for value in row.values %}
+                                    <td>
+                                        {% if value == 'yes' %}
+                                            <span class="yes" aria-label="Да">✓</span>
+                                        {% elseif value == 'no' %}
+                                            <span class="no" aria-label="Нет">—</span>
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {% if elv_modules() %}
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Докупить</span>
+                    <h2>Модули отдельно</h2>
+                    <p>Если Kit уже куплен, модули докупаются по цене ниже — напишите на почту, пришлём счёт с учётом лицензии.</p>
+                </div>
+
+                <div class="grid grid--3">
+                    {% for module in elv_modules() %}
+                        <div class="card">
+                            <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
+                            <h3>{{ module.name }}</h3>
+                            <p>{{ module.tagline }}</p>
+                            <div class="summary__total">
+                                <span class="muted small">Цена</span>
+                                <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Kit' }}</b>
+                            </div>
+                            <div class="stack-actions">
+                                <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
+                                {% if module.price_cents > 0 %}
+                                    <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Купить</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="grid grid--2">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('wallet')|raw }}</div>
+                    <h3>Как проходит оплата</h3>
+                    <p>Заказ создаётся на сайте, оплата — на защищённой странице ЮKassa или Stripe Checkout. Карты не проходят через сервер, после подтверждения приходит письмо со ссылкой на архив и лицензионным ключом.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
+                    <h3>Возврат</h3>
+                    <p>Цифровой товар с мгновенной выдачей: возврат возможен, пока архив не скачан. Если что-то не работает — сначала пишем и чиним, возврат остаётся крайней мерой.</p>
+                </div>
+            </div>
+            <div class="center mt-32">
+                <a class="btn btn--ghost" href="{{ 'terms'|page }}">Условия оферты {{ elv_icon('arrow-right')|raw }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

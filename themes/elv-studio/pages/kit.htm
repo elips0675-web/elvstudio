@@ -1,0 +1,154 @@
+title = "Elv Kit"
+url = "/kit/"
+layout = "default"
+meta_title = "Elv Kit — тема и модули для October CMS"
+meta_description = "Что входит в Elv Kit: тема лендинга, бронирование, заказы с оплатой, блог, SEO и админка. Требования, состав поставки и изменения по версиям."
+==
+{% set kit = elv_kit() %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Состав поставки</span>
+            <h1>{{ kit ? kit.name : 'Elv Kit' }}</h1>
+            <p class="lead">{{ kit ? kit.tagline : 'Тема, модули и демо-данные для October CMS.' }}</p>
+        </div>
+    </section>
+
+    {% if kit %}
+        <section class="section">
+            <div class="container">
+                <div class="split">
+                    <div>
+                        <span class="eyebrow">Что внутри</span>
+                        <h2>Каркас, который не приходится собирать заново</h2>
+                        <p class="lead">{{ kit.description }}</p>
+                        <ul class="list-check mt-24">
+                            {% for feature in kit.features %}
+                                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'order'|page({ product: kit.slug }) }}">
+                                {{ elv_icon('cart')|raw }} Купить {{ elv_money(kit.price_cents) }}
+                            </a>
+                            <a class="btn btn--ghost" href="{{ 'demo'|page }}">
+                                {{ elv_icon('play')|raw }} Посмотреть демо
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Коротко</h3>
+                        <ul class="specs mt-24">
+                            <li><span>Платформа</span><span>October CMS 4.4+ / Laravel 12</span></li>
+                            <li><span>PHP</span><span>8.3 и новее</span></li>
+                            <li><span>База</span><span>MySQL 8.0+ или MariaDB 10.6+</span></li>
+                            <li><span>Лицензия</span><span>{{ elv_money(kit.price_cents) }} разово</span></li>
+                            <li><span>Обновления</span><span>12 месяцев</span></li>
+                            <li><span>Поддержка</span><span>30 дней с установки</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--paper">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Анатомия</span>
+                    <h2>Что именно добавляется в установку</h2>
+                    <p>Плагин ставится рядом с вашими, ничего не перезаписывая. Тема — отдельный каталог, её можно скопировать и править под бренд.</p>
+                </div>
+
+                <div class="grid grid--2">
+                    {% for group in elv_anatomy() %}
+                        <article class="card">
+                            <h3>{{ group.title }}</h3>
+                            <div class="chips mt-24">
+                                {% for item in group.items %}
+                                    <span class="chip">{{ item }}</span>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="split">
+                    <div>
+                        <span class="eyebrow">Требования</span>
+                        <h2>Сервер и хостинг</h2>
+                        <p>Ничего экзотического: обычный shared-хостинг с PHP, MySQL и cron. Подойдёт Fly Старт и любой аналог с SSH или панелью.</p>
+                        <ul class="list-check mt-24">
+                            <li>{{ elv_icon('check')|raw }} PHP 8.3+, расширения mysqli, pdo_mysql, mbstring, json, curl, zip</li>
+                            <li>{{ elv_icon('check')|raw }} MySQL 8.0+ или MariaDB 10.6+, кодировка utf8mb4</li>
+                            <li>{{ elv_icon('check')|raw }} 512 МБ памяти и 1 ГБ диска под демо-данные</li>
+                            <li>{{ elv_icon('check')|raw }} HTTPS и домен — для оплаты и писем</li>
+                            <li>{{ elv_icon('check')|raw }} cron раз в минуту для очереди писем</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card--flat">
+                        <h3>Чего не будет</h3>
+                        <p class="muted">Честный список, чтобы не было сюрпризов после покупки.</p>
+                        <ul class="list-check list-check--no mt-24">
+                            {% for item in elv_excludes() %}
+                                <li>{{ elv_icon('close')|raw }} {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--paper">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Изменения</span>
+                    <h2>Что менялось по версиям</h2>
+                    <p>Журнал ведётся по факту: версия, дата и что именно исправлено.</p>
+                </div>
+
+                <div class="card">
+                    <ul class="timeline">
+                        {% for entry in elv_changelog() %}
+                            <li>
+                                <time>{{ entry.date }}</time>
+                                <div>
+                                    <b>Версия {{ entry.version }}</b>
+                                    <span class="muted">{{ entry.note }}</span>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li>
+                                <time>—</time>
+                                <div><b>Записей нет</b><span class="muted">Версия появится после первой поставки.</span></div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        <section class="section">
+            <div class="container">
+                <div class="empty">
+                    <h2>Каталог не заполнен</h2>
+                    <p>Запустите <code>php artisan elv:kit:demo</code>, чтобы создать демо-товары.</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' %}
+        </div>
+    </section>
+</main>

@@ -142,18 +142,18 @@
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-elv-form]'), bindForm);
 
-    function money(cents) {
+    function money(cents, symbol) {
         var value = cents / 100;
         var text = value === Math.floor(value)
             ? value.toLocaleString('ru-RU')
             : value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        return text;
+        return symbol === '$' ? '$' + text : text + ' ' + symbol;
     }
 
     var orderForm = document.querySelector('[data-order-form]');
     if (orderForm) {
-        var totalNode = orderForm.querySelector('[data-total]');
-        var currencyNode = orderForm.querySelector('[data-currency]');
+        var totalNode = document.querySelector('[data-total]');
+        var currency = orderForm.getAttribute('data-currency') || '$';
         var bump = orderForm.querySelector('[name="bump"]');
 
         var recalc = function () {
@@ -163,7 +163,7 @@
                 cents += parseInt(bump.getAttribute('data-bump'), 10) || 0;
             }
             if (totalNode) {
-                totalNode.textContent = money(cents);
+                totalNode.textContent = money(cents, currency);
             }
         };
 
