@@ -6,6 +6,7 @@ const scripts = [
   'check-headers.mjs',
   'check-budget.mjs',
   'check-orphans.mjs',
+  'check-console.mjs',
 ];
 
 const failed = [];

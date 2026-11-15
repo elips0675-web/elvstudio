@@ -28,7 +28,6 @@ class Post extends Model
     ];
 
     protected $casts = [
-        'tags' => 'array',
         'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
@@ -84,7 +83,14 @@ class Post extends Model
 
     public function getTagListAttribute(): array
     {
-        return is_array($this->tags) ? array_values(array_filter($this->tags)) : [];
+        $tags = $this->tags;
+
+        if (is_string($tags)) {
+            $decoded = json_decode($tags, true);
+            $tags = is_array($decoded) ? $decoded : [];
+        }
+
+        return is_array($tags) ? array_values(array_filter($tags)) : [];
     }
 
     public function getReadingTimeAttribute($value): int

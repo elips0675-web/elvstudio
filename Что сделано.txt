@@ -22,7 +22,23 @@
 
 7. Живой Vercel после пуша проверен: `/blog/tech/` 200, новая статья 200, `/blog/page/4/` 200, `/blog/category/practice/page/2/` 200, `/blog/page/5/` 308 → `/blog/page/4/`, `/blog/category/engineering/page/2/` 308 → рубрика, случайный адрес 404; в бизнес-ленте 0 технических slug'ов, в sitemap 69 URL.
 
-8. **Не проверено:** сохранение тела и поля «Аудитория» через rich-редактор админки, Lighthouse после добавления `/blog/tech/` и 12 статей, реальный телефон 360 px, Firefox и Safari.
+8. **На момент Stage 10 не проверено:** сохранение тела и поля «Аудитория» через rich-редактор админки, Lighthouse после добавления `/blog/tech/` и 12 статей, реальный телефон 360 px, Firefox и Safari. Закрыто в Stage 11.
+
+---
+
+(Stage 11 — 15.11.2026) — **Rich-редактор проверен и починен, Lighthouse 100/100/100/100, 360 px и консольный гейт.**
+
+1. **Rich-редактор.** При открытии статьи в `/admin/elv/kit/posts/update/39` была 500: `htmlspecialchars(): Argument #1 ($string) must be of type string, array given`. Причина — `Post::$casts` приводил `tags` к массиву, а поле формы `tags` — textarea. Каст убран, `getTagListAttribute()` декодирует JSON-строку, теги на странице статьи снова выводятся. Проверено: тело изменено через Froala (маркер `rich-editor-test`), «Аудитория» переключена на `tech`, сохранены `reading_time = 7`, обложка `calendar`, теги; БД подтвердила все значения. Затем `php artisan elv:kit:demo --refresh-posts` вернул канонический текст и `business` (35/15, статья 39 — 3247 символов, `wallet`, 5 минут).
+
+2. **Lighthouse mobile** на живом Vercel: `/blog/tech/` — 100 / 100 / 100 / 100 (LCP 1.2 s, CLS 0, TBT 0 ms); `/blog/skolko-stoit-sajt-s-onlajn-zapisyu/` — 100 / 100 / 100 / 100 (LCP 1.1 s, CLS 0.002, TBT 0 ms). Отчёты и команда — `docs/qa/`.
+
+3. **Viewport 360 px.** `/blog/`, `/blog/tech/`, статья про цену: `window.innerWidth = 360`, `scrollWidth = 360`, горизонтальной прокрутки нет. Проверено в headless Chrome; Firefox 360 px снят отдельными скриншотами. Safari на Windows недоступен. Скриншоты и JSON — `docs/qa/`.
+
+4. **Консольный гейт.** Добавлен `tools/check-console.mjs` и `npm run check:console`: поднимает `demo-static/` на PHP, обходит все 78 HTML-страниц в headless Chrome при viewport 360×800 и падает на console-ошибке, необработанном исключении, ошибке `Log`, ответе 5xx или горизонтальной прокрутке. На 15.11.2026 — 0 ошибок и 0 переполнений; шаг включён в `npm run check`.
+
+5. `npm run check` после изменений — зелёный: 58 внутренних URL, 69 URL в sitemap, заголовки, бюджет, 19 страниц и 7 partials без сирот, 78 страниц без консольных ошибок и переполнения на 360 px. `php -l` по `Post.php` — без ошибок.
+
+6. **Не проверено:** Google Rich Results и Яндекс.Вебмастер (нужны аккаунты и публичный домен), реальный телефон 360 px, Safari на macOS/iOS.
 
 ---
 

@@ -9,6 +9,7 @@
     "check:seo": "node tools/check-seo.mjs",
     "check:headers": "node tools/check-headers.mjs",
     "check:budget": "node tools/check-budget.mjs",
-    "check:orphans": "node tools/check-orphans.mjs"
+    "check:orphans": "node tools/check-orphans.mjs",
+    "check:console": "node tools/check-console.mjs"
   }
 }

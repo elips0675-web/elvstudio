@@ -13,7 +13,7 @@ Booking, Shop, Feedback, Blog.
 |---|---|
 | `plugins/elv/kit` | плагин: модели, миграции, маршруты форм, оплата, лицензии, Seo, админка |
 | `themes/elv-studio` | тема лендинга: макет, партиалы, страницы, `styles.css`, `app.js` |
-| `docs/` | аудит источников, решения этапа 0 и аудит блога (`docs/blog-audit.md`) |
+| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`) и QA-снимок (`docs/qa/`) |
 | `Что сделано.txt` / `Что доделать.txt` | журнал этапов и открытый бэклог |
 | `config/`, `app/`, `bootstrap/` | конфигурация инсталляции October CMS |
 
@@ -85,6 +85,8 @@ php artisan serve --port=8090
 ## Команды
 
 ```bash
+npm run check                       # ссылки, SEO, заголовки, бюджет, сироты, консоль
+npm run check:console               # 78 статических страниц: консоль, 5xx, 360 px
 php artisan elv:kit:demo            # демо-каталог, статьи, слоты
 php artisan elv:kit:demo --refresh-slots
 php artisan elv:kit:reset --force   # очистить демо-данные

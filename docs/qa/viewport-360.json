@@ -1,0 +1,81 @@
+[
+  {
+    "name": "blog-tech",
+    "url": "https://elvstudio.vercel.app/blog/tech/",
+    "title": "Технический раздел — Elv Kit",
+    "innerWidth": 360,
+    "clientWidth": 360,
+    "rootScrollWidth": 360,
+    "bodyScrollWidth": 360,
+    "horizontalOverflow": false,
+    "offenders": [
+      {
+        "tag": "a",
+        "cls": "skip-link",
+        "left": -999,
+        "right": -849,
+        "width": 150,
+        "text": "К содержимому"
+      }
+    ],
+    "screenshot": "viewport-360-blog-tech.png"
+  },
+  {
+    "name": "blog-article",
+    "url": "https://elvstudio.vercel.app/blog/skolko-stoit-sajt-s-onlajn-zapisyu/",
+    "title": "Сколько стоит сайт с онлайн-записью и из чего складывается цена — Elv Kit",
+    "innerWidth": 360,
+    "clientWidth": 360,
+    "rootScrollWidth": 360,
+    "bodyScrollWidth": 360,
+    "horizontalOverflow": false,
+    "offenders": [
+      {
+        "tag": "a",
+        "cls": "skip-link",
+        "left": -999,
+        "right": -849,
+        "width": 150,
+        "text": "К содержимому"
+      },
+      {
+        "tag": "input",
+        "cls": "hp",
+        "left": -9999,
+        "right": -9991,
+        "width": 8,
+        "text": ""
+      }
+    ],
+    "screenshot": "viewport-360-blog-article.png"
+  },
+  {
+    "name": "blog-index",
+    "url": "https://elvstudio.vercel.app/blog/",
+    "title": "Блог о сайтах для бизнеса — Elv Kit",
+    "innerWidth": 360,
+    "clientWidth": 360,
+    "rootScrollWidth": 360,
+    "bodyScrollWidth": 360,
+    "horizontalOverflow": false,
+    "offenders": [
+      {
+        "tag": "a",
+        "cls": "skip-link",
+        "left": -999,
+        "right": -849,
+        "width": 150,
+        "text": "К содержимому"
+      },
+      {
+        "tag": "input",
+        "cls": "hp",
+        "left": -9999,
+        "right": -9991,
+        "width": 8,
+        "text": ""
+      }
+    ],
+    "screenshot": "viewport-360-blog-index.png"
+  }
+]
