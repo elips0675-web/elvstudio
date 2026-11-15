@@ -9,11 +9,11 @@ layout = "default"
             <h1>Такой страницы нет</h1>
             <p class="lead">
                 Адрес мог устареть или в нём опечатка. Ниже — то, что чаще всего ищут:
-                состав Kit, цены, документация и блог.
+                возможности сайта, цены, инструкция и блог.
             </p>
             <div class="stack-actions">
                 <a class="btn btn--primary" href="{{ 'index'|page }}">На главную</a>
-                <a class="btn btn--ghost" href="{{ 'docs'|page }}">Документация</a>
+                <a class="btn btn--ghost" href="{{ 'docs'|page }}">Инструкция</a>
             </div>
         </div>
     </section>
@@ -23,20 +23,20 @@ layout = "default"
             <div class="grid grid--3">
                 <a class="card card--link" href="{{ 'kit'|page }}">
                     <div class="card__icon">{{ elv_icon('cubes')|raw }}</div>
-                    <h3>Elv Kit</h3>
-                    <p>Что входит в поставку и какие требования к серверу.</p>
+                    <h3>Возможности</h3>
+                    <p>Что входит в сайт и что нужно для запуска.</p>
                     <span class="card__more">Открыть {{ elv_icon('arrow-right')|raw }}</span>
                 </a>
                 <a class="card card--link" href="{{ 'pricing'|page }}">
                     <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
-                    <h3>Тарифы</h3>
-                    <p>Single, Multi-Site, Extended и цены модулей.</p>
+                    <h3>Цены</h3>
+                    <p>Один сайт, до пяти сайтов и без ограничений.</p>
                     <span class="card__more">Смотреть цены {{ elv_icon('arrow-right')|raw }}</span>
                 </a>
                 <a class="card card--link" href="{{ 'blog'|page }}">
                     <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
                     <h3>Блог</h3>
-                    <p>Разборы кода, бронирование и SEO без воды.</p>
+                    <p>Статьи о записи, оплате и продвижении без кода.</p>
                     <span class="card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
                 </a>
             </div>

@@ -1,4 +1,4 @@
-title = "Модуль"
+title = "Раздел сайта"
 url = "/modules/:slug"
 layout = "default"
 ==
@@ -16,21 +16,21 @@ layout = "default"
                 {% if product.badge %}
                     <span class="badge badge--line">{{ product.badge }}</span>
                 {% endif %}
-                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Kit' }}</span>
+                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Elv Kit' }}</span>
             </div>
             <h1>{{ product.name }}</h1>
             <p class="lead">{{ product.tagline }}</p>
             <div class="stack-actions">
                 {% if product.price_cents > 0 %}
                     <a class="btn btn--primary" href="{{ 'order'|page({ product: product.slug, plan: 'single' }) }}">
-                        {{ elv_icon('cart')|raw }} Купить модуль
+                        {{ elv_icon('cart')|raw }} Подключить раздел
                     </a>
                 {% else %}
                     <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
-                        {{ elv_icon('cart')|raw }} Купить в составе Kit
+                        {{ elv_icon('cart')|raw }} Заказать сайт
                     </a>
                 {% endif %}
-                <a class="btn btn--ghost" href="{{ 'booking'|page }}">
+                <a class="btn btn--ghost" href="{{ 'demo'|page }}">
                     {{ elv_icon('play')|raw }} Посмотреть на демо
                 </a>
             </div>
@@ -42,7 +42,7 @@ layout = "default"
             <div class="split">
                 <div>
                     <span class="eyebrow">Возможности</span>
-                    <h2>Что даёт модуль</h2>
+                    <h2>Что умеет раздел</h2>
                     <p class="lead">{{ product.description }}</p>
 
                     <ul class="list-check mt-24">
@@ -53,14 +53,13 @@ layout = "default"
                 </div>
 
                 <div class="card">
-                    <h3>Параметры</h3>
+                    <h3>Коротко</h3>
                     <ul class="specs mt-24">
-                        <li><span>Тип</span><span>{{ product.kind == 'kit' ? 'Комплект' : 'Модуль' }}</span></li>
-                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Kit' }}</span></li>
-                        <li><span>Платформа</span><span>October CMS 4.4+</span></li>
-                        <li><span>PHP</span><span>8.3+</span></li>
-                        <li><span>База</span><span>MySQL 8.0+</span></li>
-                        <li><span>Право в админке</span><span class="mono">elv.kit.{{ product.slug }}</span></li>
+                        <li><span>Что это</span><span>{{ product.kind == 'kit' ? 'Готовый сайт' : 'Дополнительный раздел' }}</span></li>
+                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Elv Kit' }}</span></li>
+                        <li><span>Запуск</span><span>1–3 рабочих дня</span></li>
+                        <li><span>Поддержка</span><span>По выбранному тарифу</span></li>
+                        <li><span>Где работает</span><span>На вашем домене</span></li>
                     </ul>
                 </div>
             </div>
@@ -86,31 +85,31 @@ layout = "default"
     <section class="section">
         <div class="container">
             <div class="section-head">
-                <span class="eyebrow">Установка</span>
-                <h2>Четыре шага</h2>
-                <p>Модуль не требует отдельной установки: он уже внутри плагина и включается вместе с ним.</p>
+                <span class="eyebrow">Подключение</span>
+                <h2>Четыре шага до работы</h2>
+                <p>Раздел не нужно устанавливать отдельно: он подключается к вашему сайту и сразу появляется в меню.</p>
             </div>
 
             <div class="grid grid--2">
                 <div class="card">
+                    <div class="card__icon">{{ elv_icon('play')|raw }}</div>
+                    <h3>1. Смотрите демо</h3>
+                    <p>Показываем раздел на живом примере и отвечаем на вопросы.</p>
+                </div>
+                <div class="card">
                     <div class="card__icon">{{ elv_icon('download')|raw }}</div>
-                    <h3>1. Распаковать архив</h3>
-                    <p>Тема кладётся в <code>themes/elv-studio</code>, плагин — в <code>plugins/elv/kit</code>.</p>
+                    <h3>2. Подключаем</h3>
+                    <p>Добавляем раздел на ваш сайт и оформляем под ваш бренд.</p>
                 </div>
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
-                    <h3>2. Применить миграции</h3>
-                    <p><code>php artisan october:migrate</code> создаёт таблицы и не трогает существующие.</p>
+                    <h3>3. Настраиваем</h3>
+                    <p>Вносим услуги, цены, письма и оплату — по вашим данным.</p>
                 </div>
                 <div class="card">
-                    <div class="card__icon">{{ elv_icon('database')|raw }}</div>
-                    <h3>3. Заполнить демо</h3>
-                    <p><code>php artisan elv:kit:demo</code> добавляет товары, статьи и слоты. Повторный запуск не плодит дубли.</p>
-                </div>
-                <div class="card">
-                    <div class="card__icon">{{ elv_icon('key')|raw }}</div>
-                    <h3>4. Включить доступ</h3>
-                    <p>Роль и права в админке, ключи оплаты и SMTP — в настройках плагина и <code>.env</code>.</p>
+                    <div class="card__icon">{{ elv_icon('check-circle')|raw }}</div>
+                    <h3>4. Вы управляете</h3>
+                    <p>Записи, заказы и сообщения появляются в админке. Показываем, как всё устроено.</p>
                 </div>
             </div>
         </div>
@@ -120,8 +119,8 @@ layout = "default"
         <section class="section section--paper">
             <div class="container">
                 <div class="section-head">
-                    <span class="eyebrow">Изменения</span>
-                    <h2>Версии модуля</h2>
+                    <span class="eyebrow">Обновления</span>
+                    <h2>Что менялось</h2>
                 </div>
                 <div class="card">
                     <ul class="timeline">
@@ -144,7 +143,7 @@ layout = "default"
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Рядом</span>
-                <h2>Другие модули</h2>
+                <h2>Другие разделы</h2>
             </div>
             <div class="grid grid--3">
                 {% for other in elv_modules() %}

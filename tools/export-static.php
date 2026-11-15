@@ -108,6 +108,8 @@ function staticFinalize(string $html, string $base, string $origin, string $inje
     $html = (string) preg_replace('~/blog/?\?page=(\d+)(?:&amp;|&)category=([a-z0-9-]+)~i', '/blog/category/$2/page/$1/', $html);
     $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)~i', '/blog/category/$1/', $html);
     $html = (string) preg_replace('~/blog/?\?page=(\d+)~i', '/blog/page/$1/', $html);
+    $html = (string) preg_replace('~/blog/page/1/?~i', '/blog/', $html);
+    $html = (string) preg_replace('~/blog/category/([a-z0-9-]+)/page/1/?~i', '/blog/category/$1/', $html);
 
     $bar = '<div id="elv-demo-bar" role="status">Статическая демо-версия Elv Kit: формы, бронирование и оплата отключены. Полная версия работает на PHP-хостинге.</div>';
 
@@ -218,7 +220,7 @@ $paths = [];
 foreach ($matches[1] ?? [] as $loc) {
     $path = (string) parse_url(html_entity_decode($loc, ENT_QUOTES | ENT_XML1), PHP_URL_PATH);
 
-    if ($path === '' || str_contains($path, '/download/') || str_contains($path, '/order/success') || str_contains($path, '/admin')) {
+    if ($path === '' || str_contains($path, '/download/') || str_contains($path, '/order/success') || str_starts_with($path, '/admin')) {
         continue;
     }
 

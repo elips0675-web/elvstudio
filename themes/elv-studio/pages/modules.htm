@@ -1,8 +1,8 @@
-title = "Модули"
+title = "Разделы сайта"
 url = "/modules/"
 layout = "default"
-meta_title = "Модули Elv Kit: Booking, Shop, Feedback, Blog"
-meta_description = "Модули продаются отдельно: бронирование без овербукинга, магазин с оплатой и выдачей файла, виджет обратной связи. Блог входит в Kit."
+meta_title = "Онлайн-запись, заказы и обратная связь — разделы Elv Kit"
+meta_description = "Разделы сайта: онлайн-запись, заказы с оплатой и форма обратной связи. Блог входит в Elv Kit. Всё работает в одной админке на вашем домене."
 ==
 {% set crumbs = elv_breadcrumbs() %}
 
@@ -10,11 +10,11 @@ meta_description = "Модули продаются отдельно: брони
     <section class="page-hero">
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
-            <span class="eyebrow">Модули</span>
-            <h1>Берётся целиком или по частям</h1>
+            <span class="eyebrow">Разделы</span>
+            <h1>Нужная функция — без лишнего</h1>
             <p class="lead">
-                Ядро закрывает тему, SEO, формы и безопасность. Модуль добавляет одну функцию и работает
-                с тем же плагином — без второй админки и второй базы.
+                Начните с готового сайта и добавьте только то, что нужно: запись клиентов, продажу товаров
+                или форму вопросов. Всё в одной админке, без второго сайта и второй базы.
             </p>
         </div>
     </section>
@@ -29,7 +29,7 @@ meta_description = "Модули продаются отдельно: брони
                             {% if module.badge %}
                                 <span class="badge badge--line">{{ module.badge }}</span>
                             {% endif %}
-                            <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Kit' }}</span>
+                            <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Elv Kit' }}</span>
                         </div>
                         <h2>{{ module.name }}</h2>
                         <p class="lead">{{ module.tagline }}</p>
@@ -49,19 +49,19 @@ meta_description = "Модули продаются отдельно: брони
                             </a>
                             {% if module.price_cents > 0 %}
                                 <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug, plan: 'single' }) }}">
-                                    {{ elv_icon('cart')|raw }} Купить {{ elv_money(module.price_cents) }}
+                                    {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(module.price_cents) }}
                                 </a>
                             {% else %}
                                 <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
-                                    {{ elv_icon('cart')|raw }} Купить в составе Kit
+                                    {{ elv_icon('cart')|raw }} Заказать сайт
                                 </a>
                             {% endif %}
                         </div>
                     </article>
                 {% else %}
                     <div class="empty">
-                        <h2>Модулей пока нет</h2>
-                        <p>Запустите <code>php artisan elv:kit:demo</code> или добавьте товары в админке.</p>
+                        <h2>Разделы наполняются</h2>
+                        <p>Скоро здесь появятся возможности сайта. Если нужно раньше — <a href="{{ 'contacts'|page }}">напишите нам</a>.</p>
                     </div>
                 {% endfor %}
             </div>
@@ -71,26 +71,26 @@ meta_description = "Модули продаются отдельно: брони
     <section class="section section--paper">
         <div class="container">
             <div class="section-head">
-                <span class="eyebrow">Совместимость</span>
-                <h2>Один плагин, одна база</h2>
-                <p>Модули не тянут собственные таблицы с префиксами и не конфликтуют: всё живёт в <code>elv_kit_*</code> и управляется из раздела «Elv Kit».</p>
+                <span class="eyebrow">Как это работает</span>
+                <h2>Один сайт, одна админка</h2>
+                <p>Разделы не нужно связывать между собой: заказы, записи и сообщения попадают в общее меню.</p>
             </div>
 
             <div class="grid grid--3">
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('database')|raw }}</div>
-                    <h3>10 таблиц</h3>
-                    <p>Товары, заказы, слоты, брони, статьи, категории, сообщения, подписчики, лицензии, настройки.</p>
+                    <h3>Всё в одном месте</h3>
+                    <p>Заказы, записи и сообщения не нужно искать по разным сервисам и таблицам.</p>
                 </div>
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
-                    <h3>Права по разделам</h3>
-                    <p>Каждый модуль — отдельное право: редактор видит статьи, менеджер — заказы, и наоборот.</p>
+                    <h3>Доступы для сотрудников</h3>
+                    <p>Администратор видит всё, менеджер — только свои разделы: записи, заказы или статьи.</p>
                 </div>
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
-                    <h3>Без обфускации</h3>
-                    <p>Исходники читаются и правятся. Обновления ставятся поверх, демо-данные пересоздаются одной командой.</p>
+                    <h3>Без ежемесячной платы</h3>
+                    <p>Купили один раз — сайт ваш. Обновления и поддержка входят в выбранный тариф.</p>
                 </div>
             </div>
         </div>

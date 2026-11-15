@@ -6,6 +6,28 @@
 
 ---
 
+(Stage 7 — 15.11.2026) — **Тексты переписаны для владельца бизнеса, а не для студии; исправлена выгрузка статики.**
+
+1. Публичные страницы переведены на язык владельца бизнеса: «готовый сайт для бизнеса», «онлайн-запись», «заказы и оплата», «обратная связь», «блог». Технические слова (`тема`, `плагин`, `модуль`, `миграции`, `JSON-LD`, `sitemap`) остались только в `pages/docs.htm` (инструкция по запуску) и юридических `terms.htm`/`privacy.htm`. Переписаны `index.htm`, `kit.htm`, `modules.htm`, `module.htm`, `pricing.htm`, `demo.htm`, `feedback.htm`, `contacts.htm`, `blog.htm`, `docs.htm`, `sitemap.htm`, `terms.htm`, `privacy.htm`, `order.htm`, `order-success.htm`, `404.htm`, `partials/header.htm`, `partials/footer.htm`, `partials/cta.htm`, `partials/feedback-form.htm`.
+
+2. Из подвала убрано «Работает на October CMS» (`themes/elv-studio/partials/footer.htm:52`): теперь «Сайт и данные остаются у вас». Тарифы в интерфейсе называются «Один сайт», «До 5 сайтов», «Без ограничений»; ярлыки заказа и письма берут те же подписи (`plugins/elv/kit/models/Order.php:58`, `plugins/elv/kit/models/Product.php:73`).
+
+3. Главная показывает не технические статьи, а практические материалы для бизнеса: `elv_posts(3, 'content')` (`themes/elv-studio/pages/index.htm:348`), сам хелпер получил необязательный слаг рубрики (`plugins/elv/kit/Plugin.php:239`). Облако из 79 тегов убрано со страницы блога: технические `lockforupdate`, `json-ld`, `honeypot` больше не первое, что видит владелец бизнеса.
+
+4. `llms.txt` переписан: вместо «тема, модули и демо-данные для October CMS 4.x» — «готовый сайт для бизнеса», разделы и инструкция без команд (`plugins/elv/kit/classes/Seo.php:378`). ИИ-чат отвечает теми же словами: тарифы, разделы, запуск, оплата, ключи; из ответов убраны `php artisan`, пути `themes/...`, `POST /api/v1/license/activate`, `UNIQUE` и `lockForUpdate` (`plugins/elv/kit/classes/Chat.php:80-170`). Пустой каталог больше не предлагает запускать команду (`Chat.php:231`), разделы описаны по-человечески (`Chat.php:260`). Фильтр грубых слов просит спросить про «разделы сайта и ключи» (`plugins/elv/kit/classes/TextFilter.php:14`).
+
+5. Установщик и инструкция: кнопка «Обновить слоты броней» стала «Обновить свободное время» (`plugins/elv/kit/controllers/install/index.htm:30`), счётчики — «Записи», «Свободное время», «Ключи» (`controllers/install/_counts.htm:4-11`), в `pages/docs.htm` те же слова. Терминал и SSH по-прежнему не нужны.
+
+6. Демо-данные обновлены без пересоздания базы: `php artisan elv:kit:demo --refresh-catalog` (категории, товары, бейджи «Раздел»); описание онлайн-записи больше не говорит «на один слот», а говорит «на одно время» (`plugins/elv/kit/classes/Demo.php:200`).
+
+7. Исправлена выгрузка статики: фильтр `str_contains($path, '/admin')` выкидывал статью `admin-workflow-orders` (слаг начинается с `admin`), поэтому на Vercel её не было, хотя она есть в sitemap и ленте. Заменено на `str_starts_with($path, '/admin')` (`tools/export-static.php:223`); выгрузка теперь 67 страниц, статья на месте. Ссылки «предыдущая страница» на `/blog/page/1/` и `/blog/category/*/page/1/` переписаны на `/blog/` и рубрику (`tools/export-static.php:111`), иначе в статике они вели на 404.
+
+8. Проверено: `npm run check` — 35 URL, 56 URL в sitemap, заголовки, бюджет (HTML 132.2 КБ, CSS 34.3 КБ, JS 19.2 КБ, gzip 24.2 КБ), 18 страниц и 7 partials без сирот. Lighthouse mobile на `/`, `/kit/`, `/blog/`, `/demo/` — **100/100/100/100**. `php -l` по изменённым PHP — без ошибок. Статическая выгрузка — 67 страниц; `check-urls` по `demo-static` обошёл 67 ссылок, единственная запись — локальный PHP-сервер отдаёт 200 на несуществующий путь (на Vercel проверить после пуша).
+
+9. Не проверено: живой Vercel после пуша (проверяется следующей командой), Rich Results/Яндекс.Вебмастер, реальные телефон/Firefox/Safari, сохранение 18 статей через richeditor.
+
+---
+
 (Stage 6 — 15.11.2026) — **Блог до 38 статей, установка без терминала, проверка админ-установщика и три правки доступности.**
 
 1. Тело статьи не рендерилось: в `themes/elv-studio/pages/blog-post.htm:39`

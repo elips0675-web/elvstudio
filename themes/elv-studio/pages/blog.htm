@@ -1,12 +1,11 @@
 title = "Блог"
 url = "/blog/"
 layout = "default"
-meta_title = "Блог Elv Studio: October CMS, бронирование, SEO"
-meta_description = "Статьи о том, как устроен Elv Kit: защита от двойного бронирования, оплата без PCI-нагрузки, SEO под Google, Яндекс и ИИ-выдачу."
+meta_title = "Блог о сайтах для бизнеса — Elv Kit"
+meta_description = "Статьи о сайтах простым языком: как принимать записи и оплату, вести блог и продвигать бизнес в поиске. Практика без маркетингового шума."
 ==
 {% set posts = elv_blog(9) %}
 {% set categories = elv_categories() %}
-{% set tags = elv_tags() %}
 {% set activeCategory = elv_query('category') %}
 {% set activeTag = elv_query('tag') %}
 {% set query = elv_query('q') %}
@@ -17,12 +16,12 @@ meta_description = "Статьи о том, как устроен Elv Kit: за�
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <span class="eyebrow">Блог</span>
-            <h1>Пишем о том, что проверяем кодом</h1>
-            <p class="lead">Архитектура, гонки в бронировании, вес страницы и SEO для ИИ-выдачи. Без «10 трендов 2026».</p>
+            <h1>Статьи о сайтах простым языком</h1>
+            <p class="lead">Как выбрать сайт, принимать записи и оплату, писать статьи и продвигаться в поиске. Понятным языком, без маркетингового шума.</p>
 
             <form class="subscribe mt-24" method="get" action="{{ 'blog'|page }}" role="search">
                 <label class="sr-only" for="blog-search">Поиск по статьям</label>
-                <input class="input" id="blog-search" type="search" name="q" value="{{ query }}" placeholder="Найти статью: бронь, оплата, SEO">
+                <input class="input" id="blog-search" type="search" name="q" value="{{ query }}" placeholder="Найти статью: запись, оплата, SEO">
                 {% if activeCategory %}<input type="hidden" name="category" value="{{ activeCategory }}">{% endif %}
                 {% if activeTag %}<input type="hidden" name="tag" value="{{ activeTag }}">{% endif %}
                 <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Найти</button>
@@ -51,14 +50,7 @@ meta_description = "Статьи о том, как устроен Elv Kit: за�
                 {% endfor %}
             </div>
 
-            {% if tags %}
-                <div class="chips mt-24">
-                    <span class="tiny muted">Теги:</span>
-                    {% for tag in tags %}
-                        <a class="chip{% if activeTag == tag %} chip--active{% endif %}" href="{{ 'blog'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+
         </div>
     </section>
 
@@ -119,7 +111,7 @@ meta_description = "Статьи о том, как устроен Elv Kit: за�
                 <div>
                     <span class="eyebrow">Подписка</span>
                     <h2>Одна статья в две недели</h2>
-                    <p class="lead">Без рассылок «обновились» и рекламы. Только разборы кода, которые уже в репозитории.</p>
+                    <p class="lead">Без рассылок «обновились» и рекламы. Только понятные разборы для владельцев сайтов.</p>
                 </div>
                 <div class="card">
                     {% partial 'subscribe' %}

@@ -70,9 +70,9 @@ class Product extends Model
     public function planLabel(string $plan): string
     {
         return match ($plan) {
-            'multi' => 'Multi-Site',
-            'extended' => 'Extended',
-            default => 'Single Site',
+            'multi' => 'До 5 сайтов',
+            'extended' => 'Без ограничений',
+            default => 'Один сайт',
         };
     }
 

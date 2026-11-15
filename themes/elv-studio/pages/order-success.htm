@@ -16,7 +16,7 @@ layout = "default"
             <h1>{{ order.isPaid ? 'Оплата получена' : 'Заказ создан' }}</h1>
             <p class="lead">
                 {% if order.isPaid %}
-                    Архив и лицензионный ключ отправлены на e-mail, указанный при заказе. Ссылка ниже действует,
+                    Файлы сайта и ключ отправлены на e-mail, указанный при заказе. Ссылка ниже действует,
                     пока заказ существует.
                 {% else %}
                     Мы получили заказ и ждём подтверждения оплаты от шлюза. Страница обновится сама,
@@ -34,7 +34,7 @@ layout = "default"
                     <ul class="specs mt-24">
                         <li><span>Номер</span><span class="mono">{{ order.order_no }}</span></li>
                         <li><span>Товар</span><span>{{ order.product_name }}</span></li>
-                        <li><span>Лицензия</span><span>{{ order.plan_label }}</span></li>
+                        <li><span>Тариф</span><span>{{ order.plan_label }}</span></li>
                         <li><span>Сумма</span><span>{{ order.amount_label }}</span></li>
                         <li><span>Статус</span><span>{{ order.status_label }}</span></li>
                         <li><span>Дата</span><span>{{ order.created_at ? order.created_at.format('d.m.Y H:i') : '—' }}</span></li>
@@ -43,7 +43,7 @@ layout = "default"
                     {% if order.isPaid and order.download_url %}
                         <div class="stack-actions">
                             <a class="btn btn--primary" href="{{ order.download_url }}">
-                                {{ elv_icon('download')|raw }} Скачать архив
+                                {{ elv_icon('download')|raw }} Скачать файлы
                             </a>
                             <a class="btn btn--ghost" href="{{ 'docs'|page }}">
                                 {{ elv_icon('book')|raw }} Инструкция
@@ -60,10 +60,10 @@ layout = "default"
                 <aside class="card summary">
                     <h3>Что дальше</h3>
                     <ol class="mt-24">
-                        <li>Письмо с архивом и ключом приходит на e-mail из заказа.</li>
-                        <li>Распакуйте тему и плагин в установку October CMS.</li>
-                        <li>Выполните <code>php artisan october:migrate</code>.</li>
-                        <li>Активируйте ключ на домене — лимит по тарифу.</li>
+                        <li>Письмо с файлами сайта и ключом приходит на e-mail из заказа.</li>
+                        <li>Установите сайт по <a href="{{ 'docs'|page }}">инструкции</a> — или закажите установку.</li>
+                        <li>Введите ключ в админке на своём домене.</li>
+                        <li>Проверьте формы, почту и оплату перед запуском.</li>
                     </ol>
                     <p class="muted small">Письмо не пришло? Проверьте «Спам» и напишите нам — продублируем ссылку.</p>
                     <div class="stack-actions">

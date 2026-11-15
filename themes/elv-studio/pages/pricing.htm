@@ -1,8 +1,8 @@
-title = "Тарифы"
+title = "Цены"
 url = "/pricing/"
 layout = "default"
-meta_title = "Цены Elv Kit: Single, Multi-Site, Extended"
-meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Site на пять проектов и Extended без ограничений. Модули Booking, Shop и Feedback продаются отдельно."
+meta_title = "Цены на готовый сайт Elv Kit — один платёж"
+meta_description = "Сколько стоит готовый сайт: тарифы на один сайт, до пяти сайтов и без ограничений. Разовая оплата, обновления и поддержка. Онлайн-запись, заказы и блог включены."
 ==
 {% set kit = elv_kit() %}
 {% set plans = elv_plans(kit) %}
@@ -12,11 +12,11 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
     <section class="page-hero">
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
-            <span class="eyebrow">Тарифы</span>
-            <h1>Один платёж, без подписки</h1>
+            <span class="eyebrow">Цены</span>
+            <h1>Одна оплата — сайт ваш</h1>
             <p class="lead">
-                Лицензия бессрочная: сайт продолжает работать, даже если обновления не продлены.
-                Разница между тарифами — количество сайтов, срок обновлений и поддержка.
+                Вы платите один раз. В стоимость входят все разделы, обновления и поддержка
+                по выбранному тарифу. Никаких ежемесячных списаний.
             </p>
         </div>
     </section>
@@ -40,7 +40,7 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
                             {% endfor %}
                         </ul>
                         <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
-                            Выбрать {{ plan.label }}
+                            Выбрать «{{ plan.label }}»
                         </a>
                     </div>
                 {% endfor %}
@@ -52,8 +52,8 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Сравнение</span>
-                <h2>Построчно</h2>
-                <p>Функциональность ядра одинаковая во всех тарифах. Отличаются только условия использования и поддержка.</p>
+                <h2>Что входит в тарифы</h2>
+                <p>Функции одинаковые. Отличаются число сайтов, срок обновлений и поддержка.</p>
             </div>
 
             <div class="table-wrap">
@@ -61,9 +61,9 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
                     <thead>
                         <tr>
                             <th>Возможность</th>
-                            <th>Single</th>
-                            <th>Multi-Site</th>
-                            <th>Extended</th>
+                            <th>Один сайт</th>
+                            <th>До 5 сайтов</th>
+                            <th>Без ограничений</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,8 +94,8 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
             <div class="container">
                 <div class="section-head">
                     <span class="eyebrow">Докупить</span>
-                    <h2>Модули отдельно</h2>
-                    <p>Если Kit уже куплен, модули докупаются по цене ниже — напишите на почту, пришлём счёт с учётом лицензии.</p>
+                    <h2>Дополнительные разделы</h2>
+                    <p>Если сайт уже куплен, разделы подключаются отдельно — напишите, пришлём счёт с учётом уже купленного тарифа.</p>
                 </div>
 
                 <div class="grid grid--3">
@@ -106,12 +106,12 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
                             <p>{{ module.tagline }}</p>
                             <div class="summary__total">
                                 <span class="muted small">Цена</span>
-                                <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Kit' }}</b>
+                                <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Elv Kit' }}</b>
                             </div>
                             <div class="stack-actions">
                                 <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
                                 {% if module.price_cents > 0 %}
-                                    <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Купить</a>
+                                    <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Подключить</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -127,12 +127,12 @@ meta_description = "Лицензии Elv Kit разово: Single Site, Multi-Si
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('wallet')|raw }}</div>
                     <h3>Как проходит оплата</h3>
-                    <p>Заказ создаётся на сайте, оплата — на защищённой странице ЮKassa или Stripe Checkout. Карты не проходят через сервер, после подтверждения приходит письмо со ссылкой на архив и лицензионным ключом.</p>
+                    <p>Заказ создаётся на сайте, оплата — на защищённой странице ЮKassa или Stripe. Данные карты не проходят через ваш сервер. После подтверждения приходит письмо со ссылкой на файлы сайта и ключом.</p>
                 </div>
                 <div class="card">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
                     <h3>Возврат</h3>
-                    <p>Цифровой товар с мгновенной выдачей: возврат возможен, пока архив не скачан. Если что-то не работает — сначала пишем и чиним, возврат остаётся крайней мерой.</p>
+                    <p>Сайт передаётся сразу после оплаты, поэтому возврат возможен, пока файлы не скачаны. Если что-то не работает — сначала чиним; возврат остаётся крайней мерой.</p>
                 </div>
             </div>
             <div class="center mt-32">

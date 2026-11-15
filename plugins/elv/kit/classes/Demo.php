@@ -15,9 +15,10 @@ class Demo
      * seed — идемпотентно создаёт категории, товары и статьи.
      *
      * @param bool $refreshPosts перезаписать тексты демо-статей (нужно миграции обновления)
+     * @param bool $refreshCatalog обновить названия и описания категорий и товаров
      * @return array{categories: int, products: int, posts: int}
      */
-    public static function seed(bool $refreshPosts = false): array
+    public static function seed(bool $refreshPosts = false, bool $refreshCatalog = false): array
     {
         $created = ['categories' => 0, 'products' => 0, 'posts' => 0];
         $now = now();
@@ -26,6 +27,10 @@ class Demo
             $exists = DB::table('elv_kit_categories')->where('slug', $category['slug'])->exists();
 
             if ($exists) {
+                if ($refreshCatalog) {
+                    DB::table('elv_kit_categories')->where('slug', $category['slug'])->update($category + ['updated_at' => $now]);
+                }
+
                 continue;
             }
 
@@ -37,6 +42,10 @@ class Demo
             $exists = DB::table('elv_kit_products')->where('slug', $product['slug'])->exists();
 
             if ($exists) {
+                if ($refreshCatalog) {
+                    DB::table('elv_kit_products')->where('slug', $product['slug'])->update($product + ['updated_at' => $now]);
+                }
+
                 continue;
             }
 
@@ -119,27 +128,27 @@ class Demo
     {
         return [
             [
-                'name' => 'Инженерия',
+                'name' => 'Технологии',
                 'slug' => 'engineering',
-                'description' => 'Как устроен Elv Kit и почему он быстрый.',
+                'description' => 'Как устроен сайт и почему он работает быстро.',
                 'sort_order' => 10,
             ],
             [
                 'name' => 'Практика',
                 'slug' => 'practice',
-                'description' => 'Сценарии, рецепты и разборы внедрения.',
+                'description' => 'Как запустить сайт и вести его каждый день.',
                 'sort_order' => 20,
             ],
             [
                 'name' => 'SEO и трафик',
                 'slug' => 'seo',
-                'description' => 'Поиск, разметка и ИИ-выдача Google.',
+                'description' => 'Как сайт находят в Google и Яндексе.',
                 'sort_order' => 30,
             ],
             [
                 'name' => 'Контент',
                 'slug' => 'content',
-                'description' => 'Как писать статьи, которые читают и покупают.',
+                'description' => 'Как писать статьи, которые читают и заказывают.',
                 'sort_order' => 40,
             ],
         ];
@@ -152,129 +161,129 @@ class Demo
                 'name' => 'Elv Kit',
                 'slug' => 'elv-kit',
                 'kind' => 'kit',
-                'tagline' => 'Тема, модули и демо-данные для October CMS 4.x',
-                'description' => 'Модульный конструктор сайтов: ядро (тема + SEO + формы + безопасность) и подключаемые модули — бронирование, заказ товара, виджет обратной связи, блог. Ставится в October CMS, данные остаются на вашем сервере.',
+                'tagline' => 'Готовый сайт для бизнеса: запись, заказы и блог',
+                'description' => 'Сайт, который принимает клиентов: страницы услуг, онлайн-запись, продажа товаров, обратная связь и блог. Устанавливаем на ваш домен, настраиваем оплату и почту. Всё управляется из одной админки, данные остаются у вас.',
                 'price_cents' => 7900,
                 'price_multi_cents' => 24900,
                 'price_extended_cents' => 49900,
-                'badge' => 'Ядро + все модули',
+                'badge' => 'Сайт и все разделы',
                 'icon' => 'kit',
                 'demo_url' => '/demo/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
-                    'Тема на системных шрифтах, CSS инлайн, ноль внешних запросов',
-                    'Бронирование с UNIQUE-слотом и lockForUpdate',
-                    'Заказ товара и цифровая выдача по токену',
-                    'Виджет обратной связи с защитой от спама',
-                    'Блог с категориями, тегами, RSS и Article-разметкой',
-                    'SEO: sitemap.xml, robots.txt, llms.txt, JSON-LD',
+                    'Готовые страницы: главная, услуги, запись, блог, контакты',
+                    'Онлайн-запись без двойных броней',
+                    'Заказы и оплата картой, выдача файлов',
+                    'Форма обратной связи с защитой от спама',
+                    'Блог с категориями, тегами и RSS',
+                    'SEO и быстрая загрузка из коробки',
                 ]),
                 'compatibility' => static::json([
-                    'October CMS 4.4+',
-                    'PHP 8.3+',
-                    'MySQL 8.0+',
-                    'Laravel 12',
-                    'Bootstrap не требуется',
+                    'Ваш домен',
+                    'Обычный хостинг',
+                    'Телефон и компьютер',
+                    'Оплата картой',
+                    'Почта и Telegram',
                 ]),
                 'changelog' => static::json([
-                    ['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Первый публичный релиз: ядро, Booking, Shop, Feedback, Blog, SEO.'],
+                    ['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Первый публичный релиз: сайт, онлайн-запись, заказы, обратная связь и блог.'],
                 ]),
                 'meta' => static::json(['css_kb' => 28, 'js_kb' => 8, 'requests' => 0, 'tables' => 10]),
                 'is_active' => true,
                 'sort_order' => 1,
             ],
             [
-                'name' => 'Elv Booking',
+                'name' => 'Онлайн-запись',
                 'slug' => 'booking',
                 'kind' => 'module',
-                'tagline' => 'Бронирование услуг, помещений и слотов',
-                'description' => 'Слоты с уникальным ключом, защита от двойной записи на уровне БД и транзакции. Админка: подтверждение и отмена, освобождение слота.',
+                'tagline' => 'Клиенты записываются сами, без звонков и переписки',
+                'description' => 'Клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся. Вы видите все записи в админке и можете отменить или перенести.',
                 'price_cents' => 4900,
-                'badge' => 'Модуль',
+                'badge' => 'Раздел',
                 'icon' => 'calendar',
                 'demo_url' => '/booking/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
-                    'UNIQUE (service_code, date, time)',
-                    'lockForUpdate + условный UPDATE taken',
-                    'Подтверждение и отмена брони',
-                    'Освобождение слота при отмене',
-                    'Письма клиенту и администратору',
+                    'Услуги, даты и свободные часы',
+                    'Защита от двойной записи',
+                    'Подтверждение на e-mail',
+                    'Отмена освобождает время',
+                    'Все записи в одной админке',
                 ]),
-                'compatibility' => static::json(['October CMS 4.x', 'PHP 8.3+', 'MySQL 8+']),
-                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз модуля.']]),
+                'compatibility' => static::json(['Ваш домен', 'Телефон и компьютер', 'Почта']),
+                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз раздела.']]),
                 'meta' => static::json(['tables' => 2, 'queries' => 3, 'size_kb' => 64]),
                 'is_active' => true,
                 'sort_order' => 10,
             ],
             [
-                'name' => 'Elv Shop',
+                'name' => 'Заказы и оплата',
                 'slug' => 'shop',
                 'kind' => 'module',
-                'tagline' => 'Лёгкий заказ товара без Shopaholic',
-                'description' => 'Каталог, оформление заказа, оплата через ЮKassa или Stripe, автоматическая выдача файла по токену. Одна таблица заказов вместо десятков.',
+                'tagline' => 'Продажа товаров и файлов с оплатой картой',
+                'description' => 'Покупатель выбирает товар, оформляет заказ и платит на защищённой странице. После оплаты автоматически получает файл или подтверждение. Заказы и статусы видны в админке.',
                 'price_cents' => 3900,
-                'badge' => 'Модуль',
+                'badge' => 'Раздел',
                 'icon' => 'cart',
                 'demo_url' => '/order/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
-                    'Каталог и карточка товара',
-                    'Заказ с серверной валидацией',
-                    'ЮKassa и Stripe Checkout',
-                    'Подпись вебхука и проверка статуса',
-                    'ZIP по download_token после оплаты',
+                    'Карточки товаров и цены',
+                    'Оформление заказа без лишних шагов',
+                    'Оплата картой через ЮKassa или Stripe',
+                    'Автоматическая выдача файла',
+                    'Письмо с подтверждением',
                 ]),
-                'compatibility' => static::json(['October CMS 4.x', 'PHP 8.3+', 'MySQL 8+']),
-                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз модуля.']]),
+                'compatibility' => static::json(['Ваш домен', 'Оплата картой', 'Почта']),
+                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз раздела.']]),
                 'meta' => static::json(['tables' => 2, 'queries' => 4, 'size_kb' => 82]),
                 'is_active' => true,
                 'sort_order' => 20,
             ],
             [
-                'name' => 'Elv Feedback',
+                'name' => 'Обратная связь',
                 'slug' => 'feedback',
                 'kind' => 'module',
-                'tagline' => 'Виджет обратной связи с защитой от спама',
-                'description' => 'Форма, honeypot, лимит запросов, запись в БД и письмо администратору. Встраивается в любую страницу October одним partial.',
+                'tagline' => 'Форма вопросов и заявок с защитой от спама',
+                'description' => 'Клиент пишет вопрос прямо на сайте. Сообщение сохраняется в админке и приходит вам на почту. Спам-боты отсекаются без капчи и лишних проверок.',
                 'price_cents' => 2900,
-                'badge' => 'Модуль',
+                'badge' => 'Раздел',
                 'icon' => 'message',
                 'demo_url' => '/feedback/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
-                    'Honeypot без капчи',
-                    'Лимит запросов на IP',
-                    'Статусы new / in_progress / closed',
-                    'Письмо администратору из очереди',
-                    'AJAX без внешних библиотек',
+                    'Форма на любой странице',
+                    'Защита от спама без капчи',
+                    'Уведомление на почту',
+                    'Статусы: новое, в работе, закрыто',
+                    'Работает без внешних сервисов',
                 ]),
-                'compatibility' => static::json(['October CMS 4.x', 'PHP 8.3+', 'MySQL 8+']),
-                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз модуля.']]),
+                'compatibility' => static::json(['Ваш домен', 'Почта', 'Telegram']),
+                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Публичный релиз раздела.']]),
                 'meta' => static::json(['tables' => 1, 'queries' => 2, 'size_kb' => 41]),
                 'is_active' => true,
                 'sort_order' => 30,
             ],
             [
-                'name' => 'Elv Blog',
+                'name' => 'Блог',
                 'slug' => 'blog',
                 'kind' => 'module',
-                'tagline' => 'Блог в меню, RSS и Article-разметка',
-                'description' => 'Статьи с категориями и тегами, оглавлением и CTA на продукт. Публикация по расписанию, RSS, sitemap и JSON-LD.',
+                'tagline' => 'Статьи, которые приводят клиентов из поиска',
+                'description' => 'Пишите об услугах, товарах и полезных советах. Категории, теги и подписка помогают читателю найти нужное, а поисковые системы видят структуру и даты публикации.',
                 'price_cents' => 0,
-                'badge' => 'Входит в Kit',
+                'badge' => 'Входит в Elv Kit',
                 'icon' => 'pencil',
                 'demo_url' => '/blog/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
                     'Категории и теги',
-                    'Черновики и дата публикации',
-                    'RSS 2.0 и sitemap',
-                    'Article / BlogPosting JSON-LD',
-                    'CTA на продукт в статье',
+                    'Публикация по расписанию',
+                    'RSS и карта сайта',
+                    'Красивые карточки статей',
+                    'Кнопка подписки',
                 ]),
-                'compatibility' => static::json(['October CMS 4.x', 'PHP 8.3+', 'MySQL 8+']),
-                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Блог включён в ядро.']]),
+                'compatibility' => static::json(['Ваш домен', 'Телефон и компьютер', 'Почта']),
+                'changelog' => static::json([['version' => '1.0.0', 'date' => '2026-11-14', 'note' => 'Блог включён в состав сайта.']]),
                 'meta' => static::json(['tables' => 2, 'queries' => 2, 'size_kb' => 58]),
                 'is_active' => true,
                 'sort_order' => 40,

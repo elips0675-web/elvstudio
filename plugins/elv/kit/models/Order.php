@@ -55,9 +55,9 @@ class Order extends Model
     public function getPlanLabelAttribute(): string
     {
         return match ($this->plan) {
-            'multi' => 'Multi-Site',
-            'extended' => 'Extended',
-            default => 'Single Site',
+            'multi' => 'До 5 сайтов',
+            'extended' => 'Без ограничений',
+            default => 'Один сайт',
         };
     }
 

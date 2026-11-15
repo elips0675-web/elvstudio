@@ -28,7 +28,7 @@ class Plugin extends PluginBase
     {
         return [
             'name' => 'Elv Kit',
-            'description' => 'Модульный конструктор сайтов на October CMS: каталог, блог, заказы, брони и обратная связь.',
+            'description' => 'Готовый сайт для бизнеса: онлайн-запись, заказы и оплата, блог и обратная связь.',
             'author' => 'Elv Studio',
             'icon' => 'icon-cubes',
             'homepage' => 'https://elv-studio.by',
@@ -236,8 +236,16 @@ class Plugin extends PluginBase
                 'elv_changelog' => function () {
                     return Catalog::changelog();
                 },
-                'elv_posts' => function ($limit = 6) {
-                    return Post::query()->published()->with('category')->limit((int) $limit)->get();
+                'elv_posts' => function ($limit = 6, $category = null) {
+                    $query = Post::query()->published()->with('category');
+
+                    if ($category) {
+                        $query->whereHas('category', function ($q) use ($category) {
+                            $q->where('slug', (string) $category);
+                        });
+                    }
+
+                    return $query->limit((int) $limit)->get();
                 },
                 'elv_post' => function ($slug) {
                     return Blog::find((string) $slug);

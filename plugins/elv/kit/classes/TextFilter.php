@@ -11,7 +11,7 @@
  */
 class TextFilter
 {
-    public const REFUSAL = 'Давайте без грубостей — отвечу по делу. Спросите про тарифы, модули, установку, оплату или лицензию.';
+    public const REFUSAL = 'Давайте без грубостей — отвечу по делу. Спросите про тарифы, разделы сайта, установку, оплату или ключи.';
 
     /** @var array<string, string> */
     protected const LOOKALIKE = [

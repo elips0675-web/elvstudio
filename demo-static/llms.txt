@@ -1,17 +1,17 @@
 # Elv Kit
 
-> Модульный конструктор сайтов на October CMS
+> Готовый сайт для бизнеса с онлайн-записью и оплатой
 
 
 
-## Продукт
-- [Elv Kit](https://elvstudio.vercel.app/kit/): тема, модули и демо-данные для October CMS 4.x; цена от $79.
-- [Цены](https://elvstudio.vercel.app/pricing/): Single, Multi-Site, Extended; модули продаются отдельно.
-- [Модули](https://elvstudio.vercel.app/modules/): Booking, Shop, Feedback, Blog.
+## Что это
+- [Elv Kit](https://elvstudio.vercel.app/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка; цена от $79.
+- [Цены](https://elvstudio.vercel.app/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.
+- [Разделы](https://elvstudio.vercel.app/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.
 
-## Документация
-- [Установка](https://elvstudio.vercel.app/docs/): October CMS 4.4, PHP 8.3, MySQL 8.
-- [Демо](https://elvstudio.vercel.app/demo/): демо-контур и порядок сброса данных.
+## Помощь
+- [Инструкция](https://elvstudio.vercel.app/docs/): запуск на своём домене по шагам, без команд.
+- [Демо](https://elvstudio.vercel.app/demo/): как выглядит сайт и админка.
 
 ## Блог
 - [Блог, который продаёт: структура статьи и CTA](https://elvstudio.vercel.app/blog/blog-that-sells): Статья приносит заявки, когда отвечает на вопрос и предлагает следующий шаг. Разбираем структуру, которая работает без давления.

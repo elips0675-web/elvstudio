@@ -1,8 +1,8 @@
 title = "Заказ"
 url = "/order/"
 layout = "default"
-meta_title = "Оформление заказа Elv Kit"
-meta_description = "Заказ Elv Kit и модулей: выбор лицензии, оплата картой через ЮKassa или Stripe, выдача архива и лицензионного ключа на e-mail."
+meta_title = "Заказать готовый сайт Elv Kit"
+meta_description = "Заказ готового сайта и разделов: выбор тарифа, оплата картой через ЮKassa или Stripe, файлы сайта и ключ на e-mail. Поможем с установкой на ваш домен."
 ==
 {% set product = elv_product(elv_query('product')) %}
 {% set product = product ?: elv_kit() %}
@@ -17,7 +17,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
 {% if product.kind != 'kit' %}
     {% set selectedPlan = 'single' %}
 {% endif %}
-{% set planLabel = product.kind == 'kit' ? (selectedPlan == 'multi' ? 'Multi-Site' : (selectedPlan == 'extended' ? 'Extended' : 'Single Site')) : 'Один сайт' %}
+{% set planLabel = product.kind == 'kit' ? (selectedPlan == 'multi' ? 'До 5 сайтов' : (selectedPlan == 'extended' ? 'Без ограничений' : 'Один сайт')) : 'Один сайт' %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -25,8 +25,8 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <span class="eyebrow">Заказ</span>
-            <h1>Оформление покупки</h1>
-            <p class="lead">Один шаг: данные, оплата на стороне шлюза, письмо с архивом и лицензионным ключом.</p>
+            <h1>Заказать сайт</h1>
+            <p class="lead">Оставьте контакты — пришлём счёт и поможем с запуском. Оплата картой на защищённой странице.</p>
         </div>
     </section>
 
@@ -67,7 +67,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                     <input type="hidden" name="product" value="{{ product.slug }}">
 
                     <div class="field">
-                        <span class="label">Лицензия</span>
+                        <span class="label">Тариф</span>
                         {% if product.kind == 'kit' %}
                             <div class="plan-picker">
                                 {% for plan in plans %}
@@ -97,7 +97,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                                     <label>
                                         <span>
                                             <b>Один сайт</b>
-                                            <small>лицензия на один домен</small>
+                                            <small>один сайт</small>
                                         </span>
                                         <span class="price">{{ elv_money(product.price_cents) }}</span>
                                     </label>
@@ -110,7 +110,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                         <input type="checkbox" name="bump" value="1" data-bump="1900">
                         <span>
                             <b>Установка и настройка на хостинге — {{ elv_money(1900) }}</b>
-                            <span class="muted">Развернём, настроим почту и оплату, проверим формы. Один сайт.</span>
+                            <span class="muted">Разместим сайт на вашем домене, настроим почту и оплату, проверим формы. Один сайт.</span>
                         </span>
                     </label>
 
@@ -124,7 +124,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                         <div class="field">
                             <label for="order-email">E-mail</label>
                             <input class="input" id="order-email" type="email" name="email" required maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
-                            <span class="hint">На него придёт архив и лицензионный ключ.</span>
+                            <span class="hint">На него придут файлы сайта и ключ.</span>
                         </div>
                     </div>
 
@@ -166,7 +166,7 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                     <p class="muted">{{ product.tagline }}</p>
 
                     <div class="summary__row">
-                        <span>Лицензия</span>
+                        <span>Тариф</span>
                         <span>{{ planLabel }}</span>
                     </div>
                     <div class="summary__row">
@@ -174,7 +174,11 @@ meta_description = "Заказ Elv Kit и модулей: выбор лицен�
                         <span>12 месяцев</span>
                     </div>
                     <div class="summary__row">
-                        <span>Выдача</span>
+                        <span>Запуск</span>
+                        <span>1–3 рабочих дня</span>
+                    </div>
+                    <div class="summary__row">
+                        <span>Файлы сайта</span>
                         <span>сразу после оплаты</span>
                     </div>
 

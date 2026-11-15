@@ -1,8 +1,8 @@
 title = "Контакты"
 url = "/contacts/"
 layout = "default"
-meta_title = "Контакты Elv Studio"
-meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp. Вопросы по Elv Kit, установке, лицензиям и доработкам."
+meta_title = "Контакты — Elv Kit"
+meta_description = "Связаться по вопросам сайта: e-mail, Telegram, WhatsApp. Поможем с запуском, оплатой и доработками. Отвечаем в рабочий день."
 ==
 {% set crumbs = elv_breadcrumbs() %}
 
@@ -11,8 +11,8 @@ meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <span class="eyebrow">Контакты</span>
-            <h1>Связаться с Elv Studio</h1>
-            <p class="lead">Один разработчик, без менеджеров и скриптов. Пишите по делу — ответ будет по делу.</p>
+            <h1>Связаться с нами</h1>
+            <p class="lead">Отвечаем сами, без менеджеров и ботов. Пишите по делу — ответ будет по делу.</p>
         </div>
     </section>
 
@@ -61,8 +61,8 @@ meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp
 
                 {% if not elv_setting('email') and not elv_setting('telegram') and not elv_setting('phone') %}
                     <div class="empty">
-                        <h2>Контакты не заполнены</h2>
-                        <p>Настройки → Elv Kit → Контакты. Пока их нет, форма ниже всё равно работает.</p>
+                        <h2>Контакты скоро появятся</h2>
+                        <p>А пока оставьте сообщение в форме ниже — мы ответим на указанный e-mail.</p>
                     </div>
                 {% endif %}
             </div>
@@ -74,7 +74,7 @@ meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp
             <div class="checkout">
                 <div class="card">
                     <h2>Форма обратной связи</h2>
-                    <p class="muted">Сообщение попадает в базу и в админку, письмо — администратору.</p>
+                    <p class="muted">Сообщение сохраняется в админке и приходит нам на почту.</p>
 
                     {% if elv_flash('elv_success') %}
                         <div class="alert alert--ok mb-24 mt-24" role="status">{{ elv_flash('elv_success') }}</div>
@@ -96,10 +96,10 @@ meta_description = "Связаться с Elv Studio: e-mail, Telegram, WhatsApp
 
                     <h3>Прежде чем писать</h3>
                     <ul class="list-check mt-24">
-                        <li>{{ elv_icon('book')|raw }} <a href="{{ 'docs'|page }}">Документация</a> — установка, оплата, ошибки</li>
-                        <li>{{ elv_icon('play')|raw }} <a href="{{ 'demo'|page }}">Демо-стенд</a> — что показываем на экскурсии</li>
-                        <li>{{ elv_icon('cart')|raw }} <a href="{{ 'pricing'|page }}">Тарифы</a> — что входит в лицензии</li>
-                        <li>{{ elv_icon('message')|raw }} ИИ-консультант в правом нижнем углу — отвечает по каталогу</li>
+                        <li>{{ elv_icon('book')|raw }} <a href="{{ 'docs'|page }}">Инструкция</a> — как проходит запуск</li>
+                        <li>{{ elv_icon('play')|raw }} <a href="{{ 'demo'|page }}">Демо</a> — как выглядит сайт</li>
+                        <li>{{ elv_icon('cart')|raw }} <a href="{{ 'pricing'|page }}">Цены</a> — что входит в тариф</li>
+                        <li>{{ elv_icon('message')|raw }} ИИ-консультант в правом нижнем углу — отвечает по сайту</li>
                     </ul>
                 </aside>
             </div>

@@ -1,8 +1,8 @@
-title = "Elv Kit"
+title = "Elv Kit — готовый сайт для бизнеса"
 url = "/kit/"
 layout = "default"
-meta_title = "Elv Kit — тема и модули для October CMS"
-meta_description = "Что входит в Elv Kit: тема лендинга, бронирование, заказы с оплатой, блог, SEO и админка. Требования, состав поставки и изменения по версиям."
+meta_title = "Что входит в Elv Kit — готовый сайт для бизнеса"
+meta_description = "Готовый сайт для бизнеса: страницы услуг, онлайн-запись, заказы и оплата, блог, SEO и админка. Установка на ваш хостинг, файлы сайта и обновления."
 ==
 {% set kit = elv_kit() %}
 {% set crumbs = elv_breadcrumbs() %}
@@ -11,9 +11,9 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
     <section class="page-hero">
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
-            <span class="eyebrow">Состав поставки</span>
-            <h1>{{ kit ? kit.name : 'Elv Kit' }}</h1>
-            <p class="lead">{{ kit ? kit.tagline : 'Тема, модули и демо-данные для October CMS.' }}</p>
+            <span class="eyebrow">Возможности</span>
+            <h1>{{ kit ? kit.name : 'Elv Kit' }} — готовый сайт для вашего бизнеса</h1>
+            <p class="lead">{{ kit ? kit.tagline : 'Готовый сайт с онлайн-записью, заказами и блогом.' }}</p>
         </div>
     </section>
 
@@ -23,7 +23,7 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
                 <div class="split">
                     <div>
                         <span class="eyebrow">Что внутри</span>
-                        <h2>Каркас, который не приходится собирать заново</h2>
+                        <h2>Сайт, который можно запустить сразу</h2>
                         <p class="lead">{{ kit.description }}</p>
                         <ul class="list-check mt-24">
                             {% for feature in kit.features %}
@@ -32,7 +32,7 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
                         </ul>
                         <div class="stack-actions">
                             <a class="btn btn--primary" href="{{ 'order'|page({ product: kit.slug }) }}">
-                                {{ elv_icon('cart')|raw }} Купить {{ elv_money(kit.price_cents) }}
+                                {{ elv_icon('cart')|raw }} Заказать сайт за {{ elv_money(kit.price_cents) }}
                             </a>
                             <a class="btn btn--ghost" href="{{ 'demo'|page }}">
                                 {{ elv_icon('play')|raw }} Посмотреть демо
@@ -43,12 +43,12 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
                     <div class="card">
                         <h3>Коротко</h3>
                         <ul class="specs mt-24">
-                            <li><span>Платформа</span><span>October CMS 4.4+ / Laravel 12</span></li>
-                            <li><span>PHP</span><span>8.3 и новее</span></li>
-                            <li><span>База</span><span>MySQL 8.0+ или MariaDB 10.6+</span></li>
-                            <li><span>Лицензия</span><span>{{ elv_money(kit.price_cents) }} разово</span></li>
+                            <li><span>Что это</span><span>Готовый сайт для бизнеса</span></li>
+                            <li><span>Домен</span><span>Ваш</span></li>
+                            <li><span>Оплата</span><span>{{ elv_money(kit.price_cents) }} разово</span></li>
                             <li><span>Обновления</span><span>12 месяцев</span></li>
-                            <li><span>Поддержка</span><span>30 дней с установки</span></li>
+                            <li><span>Поддержка</span><span>30 дней после запуска</span></li>
+                            <li><span>Владение</span><span>сайт и файлы остаются у вас</span></li>
                         </ul>
                     </div>
                 </div>
@@ -58,9 +58,9 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
         <section class="section section--paper">
             <div class="container">
                 <div class="section-head">
-                    <span class="eyebrow">Анатомия</span>
-                    <h2>Что именно добавляется в установку</h2>
-                    <p>Плагин ставится рядом с вашими, ничего не перезаписывая. Тема — отдельный каталог, её можно скопировать и править под бренд.</p>
+                    <span class="eyebrow">Что вы получаете</span>
+                    <h2>Готовые страницы и понятная админка</h2>
+                    <p>Ничего не нужно собирать из блоков: сайт уже работает, а вы меняете тексты, цены и расписание сами.</p>
                 </div>
 
                 <div class="grid grid--2">
@@ -82,15 +82,15 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
             <div class="container">
                 <div class="split">
                     <div>
-                        <span class="eyebrow">Требования</span>
-                        <h2>Сервер и хостинг</h2>
-                        <p>Ничего экзотического: обычный shared-хостинг с PHP, MySQL и cron. Подойдёт Fly Старт и любой аналог с SSH или панелью.</p>
+                        <span class="eyebrow">Запуск</span>
+                        <h2>Что нужно, чтобы сайт заработал</h2>
+                        <p>Обычный хостинг, домен и доступ к панели управления. Если чего-то нет — подскажем, где взять, и поможем с настройкой.</p>
                         <ul class="list-check mt-24">
-                            <li>{{ elv_icon('check')|raw }} PHP 8.3+, расширения mysqli, pdo_mysql, mbstring, json, curl, zip</li>
-                            <li>{{ elv_icon('check')|raw }} MySQL 8.0+ или MariaDB 10.6+, кодировка utf8mb4</li>
-                            <li>{{ elv_icon('check')|raw }} 512 МБ памяти и 1 ГБ диска под демо-данные</li>
-                            <li>{{ elv_icon('check')|raw }} HTTPS и домен — для оплаты и писем</li>
-                            <li>{{ elv_icon('check')|raw }} cron раз в минуту для очереди писем</li>
+                            <li>{{ elv_icon('check')|raw }} Домен или желаемое имя сайта</li>
+                            <li>{{ elv_icon('check')|raw }} Хостинг с PHP и базой данных — подойдёт недорогой тариф</li>
+                            <li>{{ elv_icon('check')|raw }} Доступ к панели хостинга или файлам сайта</li>
+                            <li>{{ elv_icon('check')|raw }} Почтовый ящик для писем клиентам</li>
+                            <li>{{ elv_icon('check')|raw }} Аккаунт ЮKassa или Stripe, если нужна оплата картой</li>
                         </ul>
                     </div>
 
@@ -110,9 +110,9 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
         <section class="section section--paper">
             <div class="container">
                 <div class="section-head">
-                    <span class="eyebrow">Изменения</span>
-                    <h2>Что менялось по версиям</h2>
-                    <p>Журнал ведётся по факту: версия, дата и что именно исправлено.</p>
+                    <span class="eyebrow">Обновления</span>
+                    <h2>Что менялось в сайте</h2>
+                    <p>Журнал ведём по факту: версия, дата и что именно улучшили.</p>
                 </div>
 
                 <div class="card">
@@ -139,8 +139,8 @@ meta_description = "Что входит в Elv Kit: тема лендинга, �
         <section class="section">
             <div class="container">
                 <div class="empty">
-                    <h2>Каталог не заполнен</h2>
-                    <p>Запустите <code>php artisan elv:kit:demo</code>, чтобы создать демо-товары.</p>
+                    <h2>Каталог наполняется</h2>
+                    <p>Скоро здесь появятся тарифы и состав сайта. Если нужно раньше — <a href="{{ 'contacts'|page }}">напишите нам</a>.</p>
                 </div>
             </div>
         </section>

@@ -15,14 +15,14 @@ use Elv\Kit\Models\Settings;
 class Seo
 {
     public const SECTIONS = [
-        'kit' => 'Elv Kit',
-        'modules' => 'Модули',
+        'kit' => 'Возможности',
+        'modules' => 'Разделы',
         'pricing' => 'Цены',
         'demo' => 'Демо',
         'blog' => 'Блог',
-        'docs' => 'Документация',
+        'docs' => 'Инструкция',
         'order' => 'Заказать',
-        'booking' => 'Бронирование',
+        'booking' => 'Запись на показ',
         'feedback' => 'Обратная связь',
         'contacts' => 'Контакты',
         'terms' => 'Оферта',
@@ -41,7 +41,7 @@ class Seo
 
     public static function tagline(): string
     {
-        return (string) (Settings::get('brand_tagline') ?: 'Модульный конструктор сайтов на October CMS');
+        return (string) (Settings::get('brand_tagline') ?: 'Готовый сайт для бизнеса с онлайн-записью и оплатой');
     }
 
     public static function base(): string
@@ -375,14 +375,14 @@ class Seo
             '',
             (string) (Settings::get('brand_description') ?: ''),
             '',
-            '## Продукт',
-            '- [Elv Kit](' . static::base() . '/kit/): тема, модули и демо-данные для October CMS 4.x; цена от ' . Money::format($kit ? $kit->price_cents : 7900) . '.',
-            '- [Цены](' . static::base() . '/pricing/): Single, Multi-Site, Extended; модули продаются отдельно.',
-            '- [Модули](' . static::base() . '/modules/): Booking, Shop, Feedback, Blog.',
+            '## Что это',
+            '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка; цена от ' . Money::format($kit ? $kit->price_cents : 7900) . '.',
+            '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
+            '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
             '',
-            '## Документация',
-            '- [Установка](' . static::base() . '/docs/): October CMS 4.4, PHP 8.3, MySQL 8.',
-            '- [Демо](' . static::base() . '/demo/): демо-контур и порядок сброса данных.',
+            '## Помощь',
+            '- [Инструкция](' . static::base() . '/docs/): запуск на своём домене по шагам, без команд.',
+            '- [Демо](' . static::base() . '/demo/): как выглядит сайт и админка.',
             '',
             '## Блог',
         ];
