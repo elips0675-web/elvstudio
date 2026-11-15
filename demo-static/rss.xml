@@ -144,4 +144,130 @@
       <description>Конструктор даёт скорость старта, October — владение кодом, транзакциями и ценой владения. Разбираем на цифрах.</description>
       <pubDate>Tue, 20 Oct 2026 09:00:00 +0000</pubDate>
     </item>
+    <item>
+      <title>Как выбрать CMS для сайта в 2026 году</title>
+      <link>https://elvstudio.vercel.app/blog/kak-vybrat-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-cms</guid>
+      <description>Выбор CMS определяет бюджет разработки, скорость работы и стоимость продвижения. Универсального «лучшего движка» не существует. Есть подходящий под конкретную задачу…</description>
+      <pubDate>Sun, 18 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Как выбрать хостинг для сайта: полный гид</title>
+      <link>https://elvstudio.vercel.app/blog/kak-vybrat-hosting</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-hosting</guid>
+      <description>Экономия пары долларов в месяц на сервере оборачивается медленным откликом, просадкой позиций в поиске и потерянными заявками. Хостинг — это фундамент сайта.…</description>
+      <pubDate>Thu, 15 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Почему сайт медленно грузится и как это исправить</title>
+      <link>https://elvstudio.vercel.app/blog/pochemu-sajt-medlenno-gruzitsya</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pochemu-sajt-medlenno-gruzitsya</guid>
+      <description>Скорость влияет на отказы, конверсию и позиции в поиске. Core Web Vitals — официальный фактор ранжирования Google. При этом «виновата» обычно не CMS, а инфраструктура…</description>
+      <pubDate>Mon, 12 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>SEO-фундамент сайта: что заложить до запуска</title>
+      <link>https://elvstudio.vercel.app/blog/seo-fundament-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-fundament-sajta</guid>
+      <description>Продвигать готовый сайт без технической оптимизации в два раза дороже. Часть работ придётся делать заново, ломая уже сформированную структуру. Разберём, какой…</description>
+      <pubDate>Fri, 09 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>UX/UI и адаптивность: почему посетители уходят без заявки</title>
+      <link>https://elvstudio.vercel.app/blog/ux-ui-i-adaptivnost</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/ux-ui-i-adaptivnost</guid>
+      <description>Самый быстрый сайт с идеальным SEO не продаст, если посетитель не понимает, куда нажать. Конверсия — это про удобство, а не про красоту. Разберём, как UX/UI и…</description>
+      <pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Безопасность сайта: как защитить от взлома и атак</title>
+      <link>https://elvstudio.vercel.app/blog/bezopasnost-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/bezopasnost-sajta</guid>
+      <description>Взломанный сайт мгновенно вылетает из поиска — поисковики помечают его как угрожающий. Утечка данных клиентов грозит штрафами и потерей репутации. Разберём, как…</description>
+      <pubDate>Sat, 03 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Интеграции и автоматизация: как превратить сайт в машину продаж</title>
+      <link>https://elvstudio.vercel.app/blog/integracii-i-avtomatizaciya</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/integracii-i-avtomatizaciya</guid>
+      <description>Современный сайт — не витрина, а часть экосистемы бизнеса. Ручная обработка заявок убивает продажи: клиент успевает уйти к конкуренту, пока менеджер ищет письмо.…</description>
+      <pubDate>Wed, 30 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Веб-аналитика: как понять, что сайт работает эффективно</title>
+      <link>https://elvstudio.vercel.app/blog/veb-analitika</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/veb-analitika</guid>
+      <description>Без аналитики развитие сайта — гадание на кофейной гуще. Владелец должен видеть, какая реклама окупается, а какая сливает бюджет. Разберём, какие инструменты…</description>
+      <pubDate>Sun, 27 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Контент-маркетинг: главный актив сайта</title>
+      <link>https://elvstudio.vercel.app/blog/kontent-marketing</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kontent-marketing</guid>
+      <description>Сайт без контента — как магазин без товара. Контент работает на SEO, доверие и конверсию годами. Это не «тексты ради текстов», а система, встроенная в воронку продаж.…</description>
+      <pubDate>Thu, 24 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>AI-инструменты для сайта и бизнеса</title>
+      <link>https://elvstudio.vercel.app/blog/ai-instrumenty-dlya-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/ai-instrumenty-dlya-sajta</guid>
+      <description>В 2025–2026 AI перестал быть «вау-фичей» и стал стандартом. Сайты без AI-элементов начинают проигрывать конкурентам по скорости обслуживания и конверсии. Разберём,…</description>
+      <pubDate>Mon, 21 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Юридические аспекты сайта: что нужно знать владельцу</title>
+      <link>https://elvstudio.vercel.app/blog/yuridicheskie-aspekty-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/yuridicheskie-aspekty-sajta</guid>
+      <description>Юридические ошибки обходятся дороже, чем хостинг за год. Штрафы по 152-ФЗ для юрлиц — до 500 тыс. ₽ за инцидент, а блокировка сайта Роскомнадзором — это остановка…</description>
+      <pubDate>Fri, 18 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Доступность сайта (a11y): зачем и как обеспечить</title>
+      <link>https://elvstudio.vercel.app/blog/dostupnost-sajta-a11y</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/dostupnost-sajta-a11y</guid>
+      <description>Доступный сайт — это не только про людей с ограниченными возможностями. Это про 15% трафика, которые вы теряете, и про SEO: поисковики «читают» сайт так же, как…</description>
+      <pubDate>Tue, 15 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Поддержка сайта после запуска: что делать, чтобы он не устарел</title>
+      <link>https://elvstudio.vercel.app/blog/podderzhka-sajta-posle-zapuska</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/podderzhka-sajta-posle-zapuska</guid>
+      <description>Запуск — это 20% работы. 80% — это то, что происходит после. Сайт без поддержки устаревает за 6–12 месяцев: ломается, теряет позиции, перестаёт конвертировать.…</description>
+      <pubDate>Sat, 12 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Зачем бизнесу нужен свой сайт, если есть соцсети</title>
+      <link>https://elvstudio.vercel.app/blog/zachem-biznesu-nuzhen-sajt</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/zachem-biznesu-nuzhen-sajt</guid>
+      <description>Частый вопрос от малого бизнеса: «Зачем тратить деньги на сайт, если клиенты сидят в Telegram и ВКонтакте?» Короткий ответ: соцсети — это канал, а сайт — это ваша…</description>
+      <pubDate>Wed, 09 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Онлайн-бронирование на сайте: как настроить приём заказов</title>
+      <link>https://elvstudio.vercel.app/blog/onlajn-bronirovanie-na-sajte</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/onlajn-bronirovanie-na-sajte</guid>
+      <description>Возможность записаться или оформить заказ в три часа ночи — это не «удобная фича», а базовое требование 2026 года. Клиент не будет ждать утра, он уйдёт к конкуренту,…</description>
+      <pubDate>Sun, 06 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Виджеты обратной связи: типы и как выбрать</title>
+      <link>https://elvstudio.vercel.app/blog/vidzhety-obratnoj-svyazi</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/vidzhety-obratnoj-svyazi</guid>
+      <description>Виджет обратной связи — это мост между сайтом и клиентом. Правильно подобранный виджет увеличивает конверсию на 15–30%, неправильно выбранный — раздражает и…</description>
+      <pubDate>Thu, 03 Sep 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Продвижение в соцсетях: как связать с сайтом и получать заявки</title>
+      <link>https://elvstudio.vercel.app/blog/prodvizhenie-v-socsetah</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/prodvizhenie-v-socsetah</guid>
+      <description>Соцсети в 2026 году — это не «постить картинки», а полноценный канал продаж. Но без связки с сайтом они работают вполсилы: вы теряете SEO-эффект, аналитику и контроль…</description>
+      <pubDate>Mon, 31 Aug 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Воронка «соцсети → сайт → продажа»: как собрать систему</title>
+      <link>https://elvstudio.vercel.app/blog/voronka-socseti-sajt-prodazha</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/voronka-socseti-sajt-prodazha</guid>
+      <description>Все блоки — сайт, виджеты, соцсети — работают вместе. По отдельности они дают эффект, но не результат. Соберём воронку «соцсети → сайт → продажа» в систему, которую…</description>
+      <pubDate>Fri, 28 Aug 2026 09:00:00 +0000</pubDate>
+    </item>
 </channel></rss>

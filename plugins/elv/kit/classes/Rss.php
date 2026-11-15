@@ -3,7 +3,7 @@
 use Elv\Kit\Models\Post;
 
 /**
- * Rss — лента блога, 20 последних опубликованных статей.
+ * Rss — лента блога: все опубликованные статьи, свежие сверху.
  */
 class Rss
 {
@@ -12,7 +12,7 @@ class Rss
         $base = Seo::base();
         $items = [];
 
-        foreach (Post::query()->published()->limit(20)->get() as $post) {
+        foreach (Post::query()->published()->limit(50)->get() as $post) {
             $items[] = '    <item>';
             $items[] = '      <title>' . htmlspecialchars((string) $post->title, ENT_XML1) . '</title>';
             $items[] = '      <link>' . htmlspecialchars((string) $post->url, ENT_XML1) . '</link>';

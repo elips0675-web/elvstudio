@@ -67,8 +67,11 @@
 8. Гейты `npm run check`: `check-urls` — 35 внутренних URL, `check-seo` —
    **56 URL** из sitemap, `check-headers`, `check-budget` (HTML 131 КБ, CSS
    34.3 КБ, JS 19.1 КБ, gzip 24.7 КБ), `check-orphans` (18 страниц) — все
-   зелёные. `demo-static/` пересобран: 56 страниц, sitemap/RSS/robots/llms,
-   новые статьи и `/docs/` внутри снимка.
+   зелёные. В `plugins/elv/kit/classes/Rss.php` лимит ленты поднят с 20 до 50:
+   при 38 статьях импортированные (даты 08–10.2026) не попадали в RSS вовсе —
+   теперь лента отдаёт все 38 позиций. `demo-static/` пересобран: 56 страниц,
+   sitemap 56 URL, RSS 38 позиций, robots/llms, новые статьи и `/docs/` внутри
+   снимка.
 
 (Stage 5 — 14.11.2026) — **Проверки, гейты и найденные ими дефекты: CSP на `/modules/*`, SEO-описания, адаптив 761–799 px.**
 
