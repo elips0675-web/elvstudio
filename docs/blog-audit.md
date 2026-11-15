@@ -716,11 +716,13 @@ headless, Laravel, сравнение движков.
 - `vercel.json`: `/blog/page/4/` больше не редиректится, `/blog/page/5/` ведёт на
   `/blog/page/4/`, общий редирект `/blog/category/*/page/2/` заменён явными правилами
   для `engineering`, `seo`, `content`; `practice/page/2/` остаётся рабочей.
+- Живой Vercel после пуша: `/blog/tech/` 200, новая статья 200, `/blog/page/4/` 200,
+  `/blog/category/practice/page/2/` 200, `/blog/page/5/` 308 → `/blog/page/4/`,
+  `/blog/category/engineering/page/2/` 308 → рубрика, случайный адрес 404; в бизнес-ленте
+  0 технических slug'ов, в sitemap 69 URL.
 
 ### Что не проверено
 
-- Живой Vercel после пуша: новые URL, `/blog/page/4/`, `/blog/category/practice/page/2/`,
-  редирект `/blog/page/5/` и честный 404.
 - Сохранение тела, `reading_time`, обложки, тегов и поля «Аудитория» через rich-редактор.
 - Lighthouse после добавления `/blog/tech/` и 12 статей.
 - Реальный телефон 360 px, Firefox и Safari.

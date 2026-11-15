@@ -20,7 +20,9 @@
 
 6. `vercel.json`: `/blog/page/4/` теперь реальная страница и больше не редиректится; `/blog/page/5/` ведёт на `/blog/page/4/`; общий редирект `/blog/category/*/page/2/` убран, оставлены явные редиректы для `engineering`, `seo`, `content`, а `practice/page/2/` остаётся рабочей.
 
-7. **Не проверено:** живой Vercel после пуша (новые URL, `/blog/page/4/`, `/blog/category/practice/page/2/`, 404), сохранение тела и поля «Аудитория» через rich-редактор админки, Lighthouse после добавления `/blog/tech/` и 12 статей.
+7. Живой Vercel после пуша проверен: `/blog/tech/` 200, новая статья 200, `/blog/page/4/` 200, `/blog/category/practice/page/2/` 200, `/blog/page/5/` 308 → `/blog/page/4/`, `/blog/category/engineering/page/2/` 308 → рубрика, случайный адрес 404; в бизнес-ленте 0 технических slug'ов, в sitemap 69 URL.
+
+8. **Не проверено:** сохранение тела и поля «Аудитория» через rich-редактор админки, Lighthouse после добавления `/blog/tech/` и 12 статей, реальный телефон 360 px, Firefox и Safari.
 
 ---
 
