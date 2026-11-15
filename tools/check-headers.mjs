@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 const BASE = (process.env.ELV_BASE || 'http://127.0.0.1:8090').replace(/\/+$/, '');
 const errors = [];
 
@@ -76,6 +78,20 @@ for (const [path, type] of assets) {
   if (response.status !== 200 || !actual.includes(type)) {
     errors.push(`${path}: ${response.status} ${actual}`);
   }
+}
+
+const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+const globalHeaders = (vercel.headers || []).find((entry) => entry.source === '/(.*)')?.headers || [];
+const robotsHeader = globalHeaders.find((header) => String(header.key).toLowerCase() === 'x-robots-tag');
+
+if (!robotsHeader || !/noindex/i.test(String(robotsHeader.value))) {
+  errors.push('vercel.json: X-Robots-Tag noindex missing');
+}
+
+const staticRobots = await readFile(new URL('../demo-static/robots.txt', import.meta.url), 'utf8');
+
+if (!/User-agent:\s*\*/i.test(staticRobots) || !/^Disallow:\s*\/\s*$/im.test(staticRobots)) {
+  errors.push('demo-static/robots.txt: Googlebot/Vercel disallow missing');
 }
 
 if (errors.length) {

@@ -331,6 +331,11 @@ foreach (['sitemap.xml', 'robots.txt', 'llms.txt', 'rss.xml'] as $name) {
     echo 'file: ' . $name . PHP_EOL;
 }
 
+if (str_contains($origin, 'vercel.app')) {
+    file_put_contents($out . '/robots.txt', "User-agent: *\nDisallow: /\n");
+    echo 'file: robots.txt (Vercel: noindex)' . PHP_EOL;
+}
+
 staticCopy(dirname(__DIR__) . '/themes/elv-studio/assets', $out . '/themes/elv-studio/assets');
 
 echo 'pages: ' . $pages . PHP_EOL;
