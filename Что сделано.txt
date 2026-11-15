@@ -6,6 +6,22 @@
 
 ---
 
+(Stage 12 — 15.11.2026) — **Vercel-демо закрыто от поисковых роботов: noindex-заголовок и robots.txt.**
+
+1. `vercel.json`: в глобальный блок `headers` добавлен `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`. Заголовок действует на все ответы статического демо, включая HTML, sitemap и assets.
+
+2. `demo-static/robots.txt` переписан на `User-agent: *` + `Disallow: /`, ссылка на sitemap убрана. `tools/export-static.php` при `--origin=...vercel.app` перезаписывает `robots.txt` после экспорта, поэтому следующая сборка не вернёт индексируемую версию.
+
+3. `tools/check-headers.mjs` проверяет наличие `X-Robots-Tag` с `noindex` в `vercel.json` и `Disallow: /` в `demo-static/robots.txt`; проверка входит в `npm run check`.
+
+4. `npm run check` — зелёный: 58 внутренних URL, 69 URL в sitemap, заголовки, бюджет, 19 страниц и 7 partials без сирот, 78 страниц без консольных ошибок и переполнения на 360 px. Экспорт в временную папку с `--origin=https://elvstudio.vercel.app` подтвердил запись `robots.txt` с `Disallow: /`.
+
+5. Живой Vercel после пуша `b13ad86`: `curl -I https://elvstudio.vercel.app/` отдаёт `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`, `/robots.txt` — `User-agent: *` + `Disallow: /`.
+
+6. **Не проверено:** удаление уже проиндексированных URL. Заголовок и robots.txt закрывают обход и запрещают индексацию, но убрать старые сниппеты из выдачи можно только через Google Search Console (нужен аккаунт) — это внешний шаг, не код.
+
+---
+
 (Stage 10 — 15.11.2026) — **Блог доведён до 50 статей: 8 переписаны под владельца бизнеса, 12 новых добавлены; 35 `business` / 15 `tech`.**
 
 1. Переписаны 8 статей. Тексты вынесены в `plugins/elv/kit/classes/BlogContent.php`, `Demo::posts()` накладывает их на базовый массив по `slug`, поэтому URL не менялись. Глубоко: `kak-vybrat-cms`, `seo-for-google-ai`, `meta-title-length`. Слегка: `kak-vybrat-hosting`, `bezopasnost-sajta`, `dostupnost-sajta-a11y`, `integracii-i-avtomatizaciya`, `admin-workflow-orders`.

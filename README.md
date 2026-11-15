@@ -89,6 +89,7 @@ npm run check                       # ссылки, SEO, заголовки, б�
 npm run check:console               # 78 статических страниц: консоль, 5xx, 360 px
 php artisan elv:kit:demo            # демо-каталог, статьи, слоты
 php artisan elv:kit:demo --refresh-slots
+php tools/export-static.php --origin=https://elvstudio.vercel.app  # демо для Vercel, noindex
 php artisan elv:kit:reset --force   # очистить демо-данные
 php artisan elv:kit:package         # ZIP темы и плагина для покупателя
 ```

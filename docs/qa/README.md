@@ -55,3 +55,20 @@ headless Chrome с viewport 360×800 и падает на console-ошибке,
 переполнением.
 
 Команда входит в общий `npm run check` (после `check:orphans`).
+
+## Vercel-демо закрыто от поиска
+
+Статический снимок `demo-static/` — витрина, а не боевой сайт, поэтому
+`vercel.json` отдаёт `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`
+на все ответы, а `robots.txt` содержит `Disallow: /`. Проверка живого
+деплоя:
+
+```bash
+curl -I https://elvstudio.vercel.app/
+curl https://elvstudio.vercel.app/robots.txt
+```
+
+`tools/export-static.php` при `--origin=...vercel.app` сам перезаписывает
+`robots.txt`, поэтому повторная сборка не вернёт индексируемую версию.
+`npm run check` проверяет оба признака. Уже проиндексированные URL
+удаляются только вручную через Google Search Console.
