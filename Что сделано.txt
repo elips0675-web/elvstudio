@@ -6,6 +6,24 @@
 
 ---
 
+(Stage 10 — 15.11.2026) — **Блог доведён до 50 статей: 8 переписаны под владельца бизнеса, 12 новых добавлены; 35 `business` / 15 `tech`.**
+
+1. Переписаны 8 статей. Тексты вынесены в `plugins/elv/kit/classes/BlogContent.php`, `Demo::posts()` накладывает их на базовый массив по `slug`, поэтому URL не менялись. Глубоко: `kak-vybrat-cms`, `seo-for-google-ai`, `meta-title-length`. Слегка: `kak-vybrat-hosting`, `bezopasnost-sajta`, `dostupnost-sajta-a11y`, `integracii-i-avtomatizaciya`, `admin-workflow-orders`.
+
+2. Добавлены 12 пользовательских статей: `skolko-stoit-sajt-s-onlajn-zapisyu`, `kak-prinimat-oplatu-na-sajte`, `proverka-sajta-pered-zapuskom`, `zayavki-est-prodazh-net`, `pochemu-klienty-ne-prihodyat-na-zapis`, `napominaniya-klientam`, `chto-podgotovit-k-zapusku-sajta`, `onlajn-zapis-ili-messendzher`, `sajt-dlya-salona-krasoty`, `sajt-dlya-mastera`, `sajt-dlya-magazina`, `otzyvy-i-doverie-na-sajte`. У всех `audience = business` по умолчанию, один CTA и 1–2 внутренние ссылки. Даты публикации — 14.11.2026: приложение живёт в UTC, даты 15.11 скрывали бы статьи до наступления часа.
+
+3. Проверены объёмы тела без HTML: 8 переписанных — 1608–2990 символов (`kak-vybrat-cms` 2990 при лимите 3000), 4 P0 — 2208–2523, 8 P1 — 1491–1660. `php -l` по `BlogContent.php` и `Demo.php` без ошибок, нелатинских символов в текстах нет.
+
+4. БД обновлена командой `php artisan elv:kit:demo --refresh-posts`: **35 business / 15 tech, всего 50**. `/blog/` — 4 страницы, `/blog/category/practice/page/2/` — вторая страница рубрики, `/blog/tech/` — 15 технических, главная — 3 статьи P0, технических в бизнес-ленте нет.
+
+5. `demo-static/` пересобран: **78 страниц**, включая 12 новых статей, `/blog/page/4/` и `/blog/category/practice/page/2/`. Sitemap — 69 URL. `npm run check` зелёный: 58 внутренних URL, 69 URL в sitemap, заголовки, бюджет (HTML 132.4 КБ, CSS 34.3 КБ, JS 19.2 КБ, gzip 24.3 КБ), 19 страниц и 7 partials без сирот.
+
+6. `vercel.json`: `/blog/page/4/` теперь реальная страница и больше не редиректится; `/blog/page/5/` ведёт на `/blog/page/4/`; общий редирект `/blog/category/*/page/2/` убран, оставлены явные редиректы для `engineering`, `seo`, `content`, а `practice/page/2/` остаётся рабочей.
+
+7. **Не проверено:** живой Vercel после пуша (новые URL, `/blog/page/4/`, `/blog/category/practice/page/2/`, 404), сохранение тела и поля «Аудитория» через rich-редактор админки, Lighthouse после добавления `/blog/tech/` и 12 статей.
+
+---
+
 (Stage 9 — 15.11.2026) — **Блог разделён на пользовательский и технический: поле `audience`, лента `/blog/` только для бизнеса, технический хаб `/blog/tech/`.**
 
 1. Добавлено поле `audience` (`business` / `tech`, по умолчанию `business`): миграция `plugins/elv/kit/updates/add_audience_to_posts.php`, версия плагина `1.0.5`, колонка и индекс также внесены в `create_kit_tables.php` для свежей установки. На существующей БД миграция применилась: **23 пользовательские / 15 технических** статей, состав технических зафиксирован в `Demo::techPostSlugs()`.

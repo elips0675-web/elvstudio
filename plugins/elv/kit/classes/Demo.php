@@ -298,7 +298,7 @@ class Demo
 
     public static function posts(): array
     {
-        return [
+        $posts = [
             [
                 'title' => 'Блог, который продаёт: структура статьи и CTA',
                 'slug' => 'blog-that-sells',
@@ -1840,6 +1840,19 @@ WHERE service_code = ? AND date = ? AND time = ? AND taken &lt; capacity</code><
                 'author' => 'Elv Studio',
             ],
         ];
+
+        $overrides = BlogContent::posts();
+        $bySlug = [];
+
+        foreach ($posts as $post) {
+            $bySlug[$post['slug']] = $post;
+        }
+
+        foreach ($overrides as $post) {
+            $bySlug[$post['slug']] = $post;
+        }
+
+        return array_values($bySlug);
     }
 
     /**
