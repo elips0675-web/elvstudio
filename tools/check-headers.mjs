@@ -84,14 +84,14 @@ const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.u
 const globalHeaders = (vercel.headers || []).find((entry) => entry.source === '/(.*)')?.headers || [];
 const robotsHeader = globalHeaders.find((header) => String(header.key).toLowerCase() === 'x-robots-tag');
 
-if (!robotsHeader || !/noindex/i.test(String(robotsHeader.value))) {
-  errors.push('vercel.json: X-Robots-Tag noindex missing');
+if (robotsHeader && /noindex/i.test(String(robotsHeader.value))) {
+  errors.push('vercel.json: X-Robots-Tag blocks the indexed demo');
 }
 
 const staticRobots = await readFile(new URL('../demo-static/robots.txt', import.meta.url), 'utf8');
 
-if (!/User-agent:\s*\*/i.test(staticRobots) || !/^Disallow:\s*\/\s*$/im.test(staticRobots)) {
-  errors.push('demo-static/robots.txt: Googlebot/Vercel disallow missing');
+if (!/User-agent:\s*\*/i.test(staticRobots) || !/^Allow:\s*\/\s*$/im.test(staticRobots) || /^Disallow:\s*\/\s*$/im.test(staticRobots)) {
+  errors.push('demo-static/robots.txt: demo must stay indexable');
 }
 
 if (errors.length) {
