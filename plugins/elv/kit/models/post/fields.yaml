@@ -44,6 +44,15 @@ fields:
         label: 'Опубликована'
         type: switch
         span: right
+    audience:
+        label: 'Аудитория'
+        type: dropdown
+        options:
+            business: 'Для бизнеса'
+            tech: 'Технический раздел'
+        default: business
+        span: left
+        comment: 'Пользовательская статья или технический разбор.'
     seo_title:
         label: 'SEO title'
         span: left

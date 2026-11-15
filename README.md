@@ -75,7 +75,7 @@ php artisan serve --port=8090
 | `/modules/`, `/modules/:slug/` | `pages/modules.htm`, `pages/module.htm` |
 | `/pricing/` | `pages/pricing.htm` |
 | `/demo/` | `pages/demo.htm` |
-| `/blog/`, `/blog/:slug/` | `pages/blog.htm`, `pages/blog-post.htm` |
+| `/blog/`, `/blog/tech/`, `/blog/:slug/` | `pages/blog.htm`, `pages/blog-tech.htm`, `pages/blog-post.htm` |
 | `/docs/` | `pages/docs.htm` |
 | `/order/`, `/order/success/:number/` | `pages/order.htm`, `pages/order-success.htm` |
 | `/booking/`, `/feedback/`, `/contacts/` | одноимённые страницы |

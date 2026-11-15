@@ -55,11 +55,16 @@ class Demo
 
         $categoryId = (int) DB::table('elv_kit_categories')->where('slug', 'engineering')->value('id');
         $categoryIds = DB::table('elv_kit_categories')->pluck('id', 'slug')->all();
+        $hasAudience = \Schema::hasColumn('elv_kit_posts', 'audience');
 
         foreach (static::posts() as $post) {
             $categorySlug = (string) ($post['category'] ?? '');
             unset($post['category']);
             $post['category_id'] = $post['category_id'] ?: (int) ($categoryIds[$categorySlug] ?? $categoryId);
+
+            if ($hasAudience) {
+                $post['audience'] = static::audienceFor((string) $post['slug']);
+            }
 
             $exists = DB::table('elv_kit_posts')->where('slug', $post['slug'])->exists();
 
@@ -1835,6 +1840,37 @@ WHERE service_code = ? AND date = ? AND time = ? AND taken &lt; capacity</code><
                 'author' => 'Elv Studio',
             ],
         ];
+    }
+
+    /**
+     * techPostSlugs — демо-статьи, которые уходят в технический раздел.
+     *
+     * @return string[]
+     */
+    public static function techPostSlugs(): array
+    {
+        return [
+            'no-external-requests',
+            'css-inline-budget',
+            'static-cache-headers',
+            'october-migrations-discipline',
+            'laravel-queue-without-redis',
+            'why-october-cms',
+            'payment-webhook-idempotency',
+            'digital-delivery-token',
+            'backup-restore-plan',
+            'booking-without-race',
+            'form-spam-without-captcha',
+            'core-web-vitals-lcp',
+            'jsonld-ecommerce',
+            'sitemap-robots-llms',
+            'article-checklist',
+        ];
+    }
+
+    public static function audienceFor(string $slug): string
+    {
+        return in_array($slug, static::techPostSlugs(), true) ? 'tech' : 'business';
     }
 
     protected static function json(array $value): string

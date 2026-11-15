@@ -9,9 +9,12 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
  */
 class Blog
 {
-    public static function paginate(array $filters = [], int $perPage = 9): LengthAwarePaginator
-    {
-        $query = Post::query()->published()->with('category');
+    public static function paginate(
+        array $filters = [],
+        int $perPage = 9,
+        string $audience = Post::AUDIENCE_BUSINESS
+    ): LengthAwarePaginator {
+        $query = Post::query()->published()->with('category')->audience($audience);
 
         $category = trim((string) ($filters['category'] ?? ''));
 
@@ -51,13 +54,17 @@ class Blog
     }
 
     /**
-     * categories — рубрики с числом опубликованных статей.
+     * categories — рубрики с числом опубликованных статей выбранной аудитории.
      */
-    public static function categories()
+    public static function categories(string $audience = Post::AUDIENCE_BUSINESS)
     {
         return Category::query()
-            ->withCount(['posts' => function ($q) {
+            ->withCount(['posts' => function ($q) use ($audience) {
                 $q->where('is_published', true);
+
+                if ($audience !== '' && $audience !== 'all') {
+                    $q->where('audience', $audience);
+                }
             }])
             ->orderBy('sort_order')
             ->get();
@@ -68,11 +75,11 @@ class Blog
      *
      * @return string[]
      */
-    public static function tags(): array
+    public static function tags(string $audience = Post::AUDIENCE_BUSINESS): array
     {
         $tags = [];
 
-        foreach (Post::query()->published()->pluck('tags') as $row) {
+        foreach (Post::query()->published()->audience($audience)->pluck('tags') as $row) {
             $decoded = is_array($row) ? $row : json_decode((string) $row, true);
 
             foreach ((array) $decoded as $tag) {
@@ -91,7 +98,12 @@ class Blog
 
     public static function related(Post $post, int $limit = 3)
     {
-        $query = Post::query()->published()->with('category')->where('id', '!=', $post->id);
+        $audience = (string) ($post->audience ?: Post::AUDIENCE_BUSINESS);
+        $query = Post::query()
+            ->published()
+            ->audience($audience)
+            ->with('category')
+            ->where('id', '!=', $post->id);
 
         if ($post->category_id) {
             $query->where('category_id', $post->category_id);
@@ -102,6 +114,7 @@ class Blog
         if ($posts->count() < $limit) {
             $posts = Post::query()
                 ->published()
+                ->audience($audience)
                 ->with('category')
                 ->where('id', '!=', $post->id)
                 ->limit($limit)

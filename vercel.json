@@ -5,7 +5,10 @@
   "redirects": [
     { "source": "/index.php", "destination": "/", "permanent": true },
     { "source": "/blog/page/1/", "destination": "/blog/", "permanent": true },
-    { "source": "/blog/category/:slug/page/1/", "destination": "/blog/category/:slug/", "permanent": true }
+    { "source": "/blog/page/4/", "destination": "/blog/", "permanent": true },
+    { "source": "/blog/page/5/", "destination": "/blog/", "permanent": true },
+    { "source": "/blog/category/:slug/page/1/", "destination": "/blog/category/:slug/", "permanent": true },
+    { "source": "/blog/category/:slug/page/2/", "destination": "/blog/category/:slug/", "permanent": true }
   ],
   "headers": [
     {

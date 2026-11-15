@@ -4,8 +4,8 @@ layout = "default"
 meta_title = "Блог о сайтах для бизнеса — Elv Kit"
 meta_description = "Статьи о сайтах простым языком: как принимать записи и оплату, вести блог и продвигать бизнес в поиске. Практика без маркетингового шума."
 ==
-{% set posts = elv_blog(9) %}
-{% set categories = elv_categories() %}
+{% set posts = elv_blog(9, 'business') %}
+{% set categories = elv_categories('business') %}
 {% set activeCategory = elv_query('category') %}
 {% set activeTag = elv_query('tag') %}
 {% set query = elv_query('q') %}
@@ -49,6 +49,8 @@ meta_description = "Статьи о сайтах простым языком: к
                     </a>
                 {% endfor %}
             </div>
+
+            <p class="mt-24"><a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a></p>
 
 
         </div>

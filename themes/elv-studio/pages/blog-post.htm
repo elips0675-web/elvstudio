@@ -15,7 +15,14 @@ layout = "default"
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <div class="article__meta">
                 {% if post.category %}
-                    <a href="{{ 'blog'|page }}?category={{ post.category.slug }}">{{ post.category.name }}</a>
+                    {% if post.audience == 'tech' %}
+                        <a href="{{ 'blog-tech'|page }}">{{ post.category.name }}</a>
+                    {% else %}
+                        <a href="{{ 'blog'|page }}?category={{ post.category.slug }}">{{ post.category.name }}</a>
+                    {% endif %}
+                {% endif %}
+                {% if post.audience == 'tech' %}
+                    <span>Технический разбор</span>
                 {% endif %}
                 <span>{{ post.display_date }}</span>
                 <span>{{ post.reading_time }} мин чтения</span>
@@ -42,7 +49,11 @@ layout = "default"
                 {% if post.tag_list %}
                     <div class="chips mt-32">
                         {% for tag in post.tag_list %}
-                            <a class="chip" href="{{ 'blog'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
+                            {% if post.audience == 'tech' %}
+                                <a class="chip" href="{{ 'blog-tech'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
+                            {% else %}
+                                <a class="chip" href="{{ 'blog'|page }}?tag={{ tag|url_encode }}">#{{ tag }}</a>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% endif %}

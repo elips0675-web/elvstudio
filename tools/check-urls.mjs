@@ -17,6 +17,7 @@ const critical = [
   '/demo/',
   '/docs/',
   '/blog/',
+  '/blog/tech/',
   '/blog/why-october-cms/',
   '/blog/booking-without-race/',
   '/blog/seo-for-google-ai/',

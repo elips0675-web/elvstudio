@@ -10,6 +10,12 @@ columns:
         label: 'Категория'
         relation: category
         select: name
+    audience:
+        label: 'Аудитория'
+        type: select
+        options:
+            business: 'Для бизнеса'
+            tech: 'Технический'
     published_at:
         label: 'Публикация'
         type: datetime

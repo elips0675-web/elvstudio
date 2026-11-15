@@ -10,11 +10,21 @@ class Post extends Model
 {
     use \October\Rain\Database\Traits\Validation;
 
+    public const AUDIENCE_BUSINESS = 'business';
+
+    public const AUDIENCE_TECH = 'tech';
+
+    public const AUDIENCES = [
+        self::AUDIENCE_BUSINESS => 'Для бизнеса',
+        self::AUDIENCE_TECH => 'Технический раздел',
+    ];
+
     public $table = 'elv_kit_posts';
 
     public $rules = [
         'title' => 'required|max:200',
         'slug' => 'required|max:200|unique:elv_kit_posts,slug',
+        'audience' => 'required|in:business,tech',
     ];
 
     protected $casts = [
@@ -36,6 +46,25 @@ class Post extends Model
             })
             ->orderByDesc('published_at')
             ->orderByDesc('id');
+    }
+
+    public function scopeAudience($query, string $audience)
+    {
+        if ($audience !== '' && $audience !== 'all') {
+            $query->where('audience', $audience);
+        }
+
+        return $query;
+    }
+
+    public function getIsTechnicalAttribute(): bool
+    {
+        return $this->audience === self::AUDIENCE_TECH;
+    }
+
+    public function getAudienceLabelAttribute(): string
+    {
+        return self::AUDIENCES[$this->audience] ?? self::AUDIENCES[self::AUDIENCE_BUSINESS];
     }
 
     public function getUrlAttribute(): string

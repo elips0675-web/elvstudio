@@ -140,6 +140,22 @@ class Seo
         ];
 
         if (count($segments) > 1) {
+            if ($segments[1] === 'tech' && !static::$post) {
+                $crumbs[] = [
+                    'name' => 'Технический раздел',
+                    'url' => static::base() . '/blog/tech/',
+                ];
+
+                return $crumbs;
+            }
+
+            if (static::$post && static::$post->audience === Post::AUDIENCE_TECH) {
+                $crumbs[] = [
+                    'name' => 'Технический раздел',
+                    'url' => static::base() . '/blog/tech/',
+                ];
+            }
+
             $name = static::slugTitle($segments[1]);
             $crumbs[] = ['name' => $name, 'url' => static::canonical()];
         }
@@ -384,10 +400,18 @@ class Seo
             '- [Инструкция](' . static::base() . '/docs/): запуск на своём домене по шагам, без команд.',
             '- [Демо](' . static::base() . '/demo/): как выглядит сайт и админка.',
             '',
-            '## Блог',
+            '## Блог для бизнеса',
         ];
 
-        foreach (Post::query()->published()->limit(10)->get() as $post) {
+        foreach (Post::query()->published()->audience(Post::AUDIENCE_BUSINESS)->limit(10)->get() as $post) {
+            $lines[] = '- [' . $post->title . '](' . $post->url . '): ' . trim(strip_tags((string) $post->excerpt));
+        }
+
+        $lines[] = '';
+        $lines[] = '## Технический раздел';
+        $lines[] = '- [Разборы для разработчиков](' . static::base() . '/blog/tech/): скорость, миграции, оплата, бронирование и SEO.';
+
+        foreach (Post::query()->published()->audience(Post::AUDIENCE_TECH)->limit(5)->get() as $post) {
             $lines[] = '- [' . $post->title . '](' . $post->url . '): ' . trim(strip_tags((string) $post->excerpt));
         }
 

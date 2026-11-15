@@ -236,8 +236,11 @@ class Plugin extends PluginBase
                 'elv_changelog' => function () {
                     return Catalog::changelog();
                 },
-                'elv_posts' => function ($limit = 6, $category = null) {
-                    $query = Post::query()->published()->with('category');
+                'elv_posts' => function ($limit = 6, $category = null, $audience = Post::AUDIENCE_BUSINESS) {
+                    $query = Post::query()
+                        ->published()
+                        ->audience((string) $audience)
+                        ->with('category');
 
                     if ($category) {
                         $query->whereHas('category', function ($q) use ($category) {
@@ -250,11 +253,11 @@ class Plugin extends PluginBase
                 'elv_post' => function ($slug) {
                     return Blog::find((string) $slug);
                 },
-                'elv_categories' => function () {
-                    return Blog::categories();
+                'elv_categories' => function ($audience = Post::AUDIENCE_BUSINESS) {
+                    return Blog::categories((string) $audience);
                 },
-                'elv_tags' => function () {
-                    return Blog::tags();
+                'elv_tags' => function ($audience = Post::AUDIENCE_BUSINESS) {
+                    return Blog::tags((string) $audience);
                 },
                 'elv_faq' => function () {
                     return Faq::items();
@@ -313,12 +316,12 @@ class Plugin extends PluginBase
                 'elv_kit_js' => function () {
                     return Assets::pluginJs('assets/widget.js');
                 },
-                'elv_blog' => function ($perPage = 9) {
+                'elv_blog' => function ($perPage = 9, $audience = Post::AUDIENCE_BUSINESS) {
                     return Blog::paginate([
                         'category' => request()->query('category'),
                         'tag' => request()->query('tag'),
                         'q' => request()->query('q'),
-                    ], (int) $perPage);
+                    ], (int) $perPage, (string) $audience);
                 },
                 'elv_use_post' => function ($slug) {
                     $post = Blog::find((string) $slug);

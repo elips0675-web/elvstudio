@@ -345,7 +345,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             </div>
 
             <div class="blog-grid">
-                {% for post in elv_posts(3, 'content') %}
+                {% for post in elv_posts(3, null, 'business') %}
                     <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
                         <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
                         <div class="post-card__body">

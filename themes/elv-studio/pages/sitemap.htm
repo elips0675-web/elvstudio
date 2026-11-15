@@ -64,7 +64,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             <div class="card mt-32">
                 <h2>Блог</h2>
                 <ul class="anchor-list mt-24">
-                    {% for post in elv_posts(50) %}
+                    {% for post in elv_posts(50, null, 'all') %}
                         <li><a href="{{ 'blog-post'|page({ slug: post.slug }) }}">{{ post.title }}</a></li>
                     {% else %}
                         <li class="muted">Статей пока нет.</li>

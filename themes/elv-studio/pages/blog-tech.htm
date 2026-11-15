@@ -1,0 +1,59 @@
+title = "Технический раздел"
+url = "/blog/tech/"
+layout = "default"
+meta_title = "Технический раздел — Elv Kit"
+meta_description = "Как устроен сайт на October CMS: скорость, миграции, оплата, бронирование, SEO и разметка. Разборы для разработчиков и технических специалистов."
+==
+{% set posts = elv_blog(50, 'tech') %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Технический раздел</span>
+            <h1>Как устроен сайт: разборы для разработчиков</h1>
+            <p class="lead">Скорость, миграции, оплата, бронирование и SEO — с деталями, которые важны при внедрении и поддержке. Для владельца бизнеса у нас есть отдельный блог.</p>
+
+            <div class="stack-actions mt-24">
+                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Статьи для бизнеса {{ elv_icon('arrow-right')|raw }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            {% if posts|length %}
+                <h2 class="sr-only">Технические статьи</h2>
+                <div class="blog-grid">
+                    {% for post in posts %}
+                        <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
+                            <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
+                            <div class="post-card__body">
+                                <div class="post-card__meta">
+                                    {% if post.category %}
+                                        <span>{{ post.category.name }}</span>
+                                    {% endif %}
+                                    <span>Технический разбор</span>
+                                    <span>{{ post.display_date }}</span>
+                                    <span>{{ post.reading_time }} мин</span>
+                                </div>
+                                <h3>{{ post.title }}</h3>
+                                <p>{{ post.excerpt|elv_excerpt(150) }}</p>
+                                <span class="post-card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty">
+                    <h2>Технических статей пока нет</h2>
+                    <p>Вернитесь в блог для бизнеса — там практические материалы о записи, оплате и продвижении.</p>
+                    <div class="stack-actions">
+                        <a class="btn btn--ghost" href="{{ 'blog'|page }}">Перейти в блог</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</main>

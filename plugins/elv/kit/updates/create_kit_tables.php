@@ -50,6 +50,7 @@ return new class extends Migration
             Schema::create('elv_kit_posts', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->unsignedBigInteger('category_id')->nullable();
+                $table->string('audience', 20)->default('business');
                 $table->string('title', 200);
                 $table->string('slug', 200)->unique();
                 $table->string('author', 120)->nullable();
@@ -64,6 +65,7 @@ return new class extends Migration
                 $table->dateTime('published_at')->nullable();
                 $table->timestamps();
 
+                $table->index(['audience', 'is_published', 'published_at'], 'elv_kit_posts_audience_published');
                 $table->index(['is_published', 'published_at']);
                 $table->index('category_id');
             });
