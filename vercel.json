@@ -3,7 +3,9 @@
   "outputDirectory": "demo-static",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/index.php", "destination": "/", "permanent": true }
+    { "source": "/index.php", "destination": "/", "permanent": true },
+    { "source": "/blog/page/1", "destination": "/blog", "permanent": true },
+    { "source": "/blog/category/:slug/page/1", "destination": "/blog/category/:slug", "permanent": true }
   ],
   "headers": [
     {
