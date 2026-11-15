@@ -104,10 +104,10 @@ function staticFinalize(string $html, string $base, string $origin, string $inje
     $html = (string) preg_replace('~(\b(?:href|src|action)=")' . $quoted . '"~i', '$1/"', $html);
     $html = (string) preg_replace('~(<link rel="canonical" href=")/~i', '$1' . $origin . '/', $html);
 
-    $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)(?:&amp;|&)page=(\d+)~i', '/blog/category/$1/page/$2', $html);
-    $html = (string) preg_replace('~/blog/?\?page=(\d+)(?:&amp;|&)category=([a-z0-9-]+)~i', '/blog/category/$2/page/$1', $html);
-    $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)~i', '/blog/category/$1', $html);
-    $html = (string) preg_replace('~/blog/?\?page=(\d+)~i', '/blog/page/$1', $html);
+    $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)(?:&amp;|&)page=(\d+)~i', '/blog/category/$1/page/$2/', $html);
+    $html = (string) preg_replace('~/blog/?\?page=(\d+)(?:&amp;|&)category=([a-z0-9-]+)~i', '/blog/category/$2/page/$1/', $html);
+    $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)~i', '/blog/category/$1/', $html);
+    $html = (string) preg_replace('~/blog/?\?page=(\d+)~i', '/blog/page/$1/', $html);
 
     $bar = '<div id="elv-demo-bar" role="status">Статическая демо-версия Elv Kit: формы, бронирование и оплата отключены. Полная версия работает на PHP-хостинге.</div>';
 
