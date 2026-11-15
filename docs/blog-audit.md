@@ -746,16 +746,16 @@ headless, Laravel, сравнение движков.
   и горизонтальной прокрутки нет. Скрипт добавлен в `npm run check`.
 - **`npm run check`** после изменений: 58 внутренних URL, 69 URL в sitemap,
   заголовки, бюджет, сироты и консоль — зелёные.
-- **Vercel-демо закрыто от поиска.** `vercel.json` отдаёт
-  `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`, `demo-static/robots.txt`
-  содержит `Disallow: /`; `tools/export-static.php` сохраняет это при
-  `--origin=...vercel.app`. Живой деплой проверен `curl`: заголовок и
-  `robots.txt` на месте. Гейт — `tools/check-headers.mjs` в `npm run check`.
+- **Vercel-демо индексируется.** `vercel.json` не отдаёт
+  `X-Robots-Tag: noindex`, `demo-static/robots.txt` содержит `Allow: /`
+  и sitemap. Живой деплой проверен `curl`: заголовка нет, `robots.txt`
+  открыт. Гейт — `tools/check-headers.mjs` в `npm run check`; после
+  возврата индексации нужен переобход в Google Search Console.
 
 ### Что осталось непроверенным
 
 - Реальный телефон 360 px (эмуляция не заменяет устройство).
 - Safari на macOS/iOS: на Windows браузер недоступен.
 - Google Rich Results и Яндекс.Вебмастер: нужны аккаунты и публичный домен.
-- Удаление уже проиндексированных URL Vercel-демо: `noindex` и `Disallow: /`
-  стоят, но старые сниппеты убираются вручную через Google Search Console.
+- Переобход Vercel-демо после возврата индексации: запрашивается вручную
+  через Google Search Console.

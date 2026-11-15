@@ -6,6 +6,24 @@
 
 ---
 
+(Stage 13 — 15.11.2026) — **Vercel-демо возвращено в индекс по решению владельца.**
+
+1. Из `vercel.json` убран `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`.
+
+2. `demo-static/robots.txt` восстановлен из `bde25bd`: `Allow: /`, `Disallow` только для служебных путей, `Clean-param` и `Sitemap` на месте.
+
+3. `tools/export-static.php` больше не перезаписывает `robots.txt` для `--origin=...vercel.app`.
+
+4. `tools/check-headers.mjs` теперь контролирует обратное: в `vercel.json` не должно быть `noindex`, в `demo-static/robots.txt` должен быть `Allow: /` и не должно быть `Disallow: /`.
+
+5. `npm run check` — зелёный: 58 внутренних URL, 69 URL в sitemap, заголовки, бюджет, 19 страниц и 7 partials без сирот, 78 страниц без консольных ошибок и переполнения на 360 px.
+
+6. Живой Vercel после пуша `c5b8137`: `X-Robots-Tag` отсутствует, `/robots.txt` снова отдаёт `Allow: /` и `Sitemap: https://elvstudio.vercel.app/sitemap.xml`.
+
+7. **Не проверено:** переобход Google после возврата индексации — это внешний шаг, ускоряется через Google Search Console (запросить переобход URL).
+
+---
+
 (Stage 12 — 15.11.2026) — **Vercel-демо закрыто от поисковых роботов: noindex-заголовок и robots.txt.**
 
 1. `vercel.json`: в глобальный блок `headers` добавлен `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`. Заголовок действует на все ответы статического демо, включая HTML, sitemap и assets.

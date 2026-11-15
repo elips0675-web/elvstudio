@@ -11,9 +11,8 @@
 - [ ] Открыть сайт на реальном телефоне (360 px) и в Safari:
       Firefox 360 px и headless Chrome уже проверены (`docs/qa/`), реальный
       телефон и Safari на Windows недоступны.
-- [ ] Убрать уже проиндексированные URL Vercel-демо из Google:
-      `X-Robots-Tag: noindex` и `Disallow: /` уже стоят, но старые сниппеты
-      удаляются вручную через Google Search Console (нужен аккаунт).
+- [ ] Запросить переобход Vercel-демо в Google Search Console после возврата
+      индексации (нужен аккаунт); `X-Robots-Tag` и `Disallow: /` уже убраны.
 
 ## P1 — контент
 
@@ -41,7 +40,7 @@
 - `modules/` и `vendor/` не в репозитории — ставятся `composer install`.
 - Vercel-демо (`elvstudio.vercel.app`) — статический снимок `demo-static/`:
   формы, чат и оплата там отключены (PHP на Vercel не исполняется);
-  демо закрыто от поиска (`X-Robots-Tag: noindex` + `robots.txt` с `Disallow: /`);
+  демо индексируется (`Allow: /`, без `X-Robots-Tag: noindex`);
   пересобрать: `php tools/export-static.php --origin=https://elvstudio.vercel.app`.
   Пагинация блога и рубрики сгенерированы статически (`blog/page/N/`,
   `blog/category/<slug>/`), а теги и поиск показывают подсказку «доступно

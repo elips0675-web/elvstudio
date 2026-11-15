@@ -56,19 +56,18 @@ headless Chrome с viewport 360×800 и падает на console-ошибке,
 
 Команда входит в общий `npm run check` (после `check:orphans`).
 
-## Vercel-демо закрыто от поиска
+## Vercel-демо индексируется
 
-Статический снимок `demo-static/` — витрина, а не боевой сайт, поэтому
-`vercel.json` отдаёт `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`
-на все ответы, а `robots.txt` содержит `Disallow: /`. Проверка живого
-деплоя:
+Статический снимок `demo-static/` открыт для поиска: `vercel.json` не
+отдаёт `X-Robots-Tag: noindex`, а `robots.txt` содержит `Allow: /`.
+Проверка живого деплоя:
 
 ```bash
 curl -I https://elvstudio.vercel.app/
 curl https://elvstudio.vercel.app/robots.txt
 ```
 
-`tools/export-static.php` при `--origin=...vercel.app` сам перезаписывает
-`robots.txt`, поэтому повторная сборка не вернёт индексируемую версию.
-`npm run check` проверяет оба признака. Уже проиндексированные URL
-удаляются только вручную через Google Search Console.
+В ответе не должно быть `X-Robots-Tag: noindex`, в `robots.txt` должен
+быть `Allow: /`. `npm run check` проверяет, что демо снова не закрыли
+случайно. После возврата индексации переобход запрашивается в Google
+Search Console.
