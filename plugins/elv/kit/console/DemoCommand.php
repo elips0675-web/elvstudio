@@ -14,6 +14,7 @@ class DemoCommand extends Command
 {
     protected $signature = 'elv:kit:demo
         {--refresh-slots : только обновить сетку слотов}
+        {--refresh-posts : перезаписать тексты демо-статей}
         {--days=21 : на сколько дней вперёд генерировать слоты}';
 
     protected $description = 'Наполняет Elv Kit демо-данными (каталог, статьи, слоты).';
@@ -23,8 +24,12 @@ class DemoCommand extends Command
         $days = max(1, (int) $this->option('days'));
 
         if (!$this->option('refresh-slots')) {
-            $created = Demo::seed();
+            $created = Demo::seed((bool) $this->option('refresh-posts'));
             Demo::contacts();
+
+            if ($this->option('refresh-posts')) {
+                $this->info('Тексты демо-статей обновлены из классов\Demo.');
+            }
 
             $this->info(sprintf(
                 'Демо-данные: категорий %d, товаров %d, статей %d.',

@@ -65,6 +65,10 @@ class Plugin extends PluginBase
                 'label' => 'Настройки Elv Kit',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.install' => [
+                'label' => 'Установка Elv Kit',
+                'tab' => 'Elv Kit',
+            ],
             'elv.kit.orders' => [
                 'label' => 'Заказы',
                 'tab' => 'Elv Kit',
@@ -106,6 +110,12 @@ class Plugin extends PluginBase
                 'order' => 410,
                 'permissions' => ['elv.kit.orders'],
                 'sideMenu' => [
+                    'install' => [
+                        'label' => 'Установка',
+                        'icon' => 'icon-magic',
+                        'url' => \Backend::url('elv/kit/install'),
+                        'permissions' => ['elv.kit.install'],
+                    ],
                     'orders' => [
                         'label' => 'Заказы',
                         'icon' => 'icon-shopping-cart',
@@ -335,6 +345,9 @@ class Plugin extends PluginBase
                 },
                 'elv_breadcrumbs' => function () {
                     return Seo::breadcrumbs();
+                },
+                'elv_backend_url' => function ($path = '') {
+                    return \Backend::url((string) $path);
                 },
                 'elv_related' => function ($post, $limit = 3) {
                     return $post instanceof Post ? Blog::related($post, (int) $limit) : collect();

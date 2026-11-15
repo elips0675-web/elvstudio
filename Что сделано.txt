@@ -6,6 +6,70 @@
 
 ---
 
+(Stage 6 — 15.11.2026) — **Блог до 38 статей, установка без терминала, проверка админ-установщика и три правки доступности.**
+
+1. Тело статьи не рендерилось: в `themes/elv-studio/pages/blog-post.htm:39`
+   стоял `{!! post.body !!}` — October 4 (Twig) такой синтаксис не понимает и
+   выводил литерал, поэтому ни один текст не доходил до читателя (h2/blockquote
+   в HTML отсутствовали). Заменено на `{{ post.body|raw }}`; проверено на
+   `/blog/blog-that-sells/` (5 h2, blockquote) и на новой статье.
+
+2. Изучен `Готовые статьи для блога от выбора CMS до воронки продаж deepseek.html`
+   (18 готовых статей с мета-тегами). Все 18 перенесены в
+   `plugins/elv/kit/classes/Demo.php` (1835 строк): заголовок, slug из мета-блока,
+   SEO title/description, текст с h2/h3, списками и таблицами. Вырезаны
+   `meta-box`, `section-num`, классы и `style`; серые врезки `div.note`/`div.warn`
+   сконвертированы в `blockquote`; `table-scroll` развёрнут. Рубрики:
+   engineering — 6, seo — 3, practice — 5, content — 4; теги и иконки обложек
+   заданы по теме. Итого в блоге **38 опубликованных статей** (20 своих + 18
+   готовых), 4 рубрики, 5 страниц по 9 карточек.
+
+3. `DemoCommand` (`plugins/elv/kit/console/DemoCommand.php:17`) получил
+   `--refresh-posts`: перезапись текстов демо-статей из `Demo::posts()` без
+   создания дублей. Прогон `php artisan elv:kit:demo --refresh-posts` обновил
+   тела в БД; все 18 страниц проверены на баланс `div`, отсутствие классов/`style`
+   и наличие blockquote.
+
+4. Установка переписана без терминала: `themes/elv-studio/pages/docs.htm`
+   (13 разделов) — домен и SSL, PHP/база в панели, три способа поставить
+   October CMS (установщик панели, готовый архив, `install.php`), загрузка
+   архива через файловый менеджер, первый вход в `/admin`, активация темы,
+   кнопки установщика, настройки, cron, почта/оплата, проверка, обновление,
+   типовые ситуации. Ни одной команды: значения `.env` поданы как поля, cron —
+   строка из админки. Ссылка на установщик — `elv_backend_url('elv/kit/install')`
+   (`docs.htm:141`, `docs.htm:284`).
+
+5. Админ-установщик проверен вживую (временный суперпользователь, после теста
+   удалён): страница `/admin/elv/kit/install` отдаёт 200, чек-лист и счётчики
+   таблиц на месте. При первом открытии был **500**: `Install::run()` совпадал
+   по имени с публичным `Backend\Controller::run()` →
+   `Access level ... must be public`. Метод переименован в `runArtisan()`
+   (`controllers/Install.php:116`). AJAX-хендлеры `onCheck`, `onMigrate`,
+   `onDemo`, `onQueue`, `onClearCache`, `onSlots` отвечают 200 и JSON-патчем
+   (`X-AJAX-HANDLER` — новый заголовок Larajax, старый `X-OCTOBER-REQUEST-HANDLER`
+   в October 4 не работает).
+
+6. В установщик добавлены кнопка «Обновить слоты броней» (`onSlots`,
+   `Install.php:86`) и блок «Задание планировщика» с готовой cron-строкой
+   (`cronLine()`, `Install.php:245`; textarea в
+   `controllers/install/index.htm`) — её копируют в панель хостинга, вручную
+   ничего собирать не нужно.
+
+7. Lighthouse mobile после правок: `/docs/` — 100/100/100/100,
+   `/blog/kak-vybrat-cms/` — 100/100/100/100 (LCP 1.2 c, CLS 0).
+   На `/blog/` первый прогон дал accessibility 94 — три реальных дефекта:
+   подпись логотипа не содержала видимый текст (`partials/header.htm:3`),
+   после `h1` сразу шли `h3` карточек (`pages/blog.htm:68` — добавлен
+   `h2.sr-only`), у выключенной стрелки пагинации контраст 3.03
+   (`assets/css/styles.css:426` — `--muted`, `opacity: 1`). Повторный прогон —
+   100/100/100/100.
+
+8. Гейты `npm run check`: `check-urls` — 35 внутренних URL, `check-seo` —
+   **56 URL** из sitemap, `check-headers`, `check-budget` (HTML 131 КБ, CSS
+   34.3 КБ, JS 19.1 КБ, gzip 24.7 КБ), `check-orphans` (18 страниц) — все
+   зелёные. `demo-static/` пересобран: 56 страниц, sitemap/RSS/robots/llms,
+   новые статьи и `/docs/` внутри снимка.
+
 (Stage 5 — 14.11.2026) — **Проверки, гейты и найденные ими дефекты: CSP на `/modules/*`, SEO-описания, адаптив 761–799 px.**
 
 1. Гейты в `tools/`: `check-urls.mjs` (обход 22 внутренних ссылок + известные

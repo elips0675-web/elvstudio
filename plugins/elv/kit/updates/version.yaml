@@ -6,3 +6,6 @@
 1.0.3:
     - 'Демо-каталог: Elv Kit, Booking, Shop, Feedback, Blog и три статьи блога'
     - seed_kit_demo.php
+1.0.4:
+    - 'Установка из админки без терминала и 38 статей блога с полным текстом'
+    - seed_kit_blog.php

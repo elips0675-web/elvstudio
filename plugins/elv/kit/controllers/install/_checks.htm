@@ -1,0 +1,25 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Проверка</th>
+            <th style="width: 180px">Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($checks as $check): ?>
+            <tr>
+                <td>
+                    <strong><?= e($check['label']) ?></strong>
+                    <div class="text-muted small"><?= e($check['hint']) ?></div>
+                </td>
+                <td>
+                    <?php if ($check['ok']): ?>
+                        <span class="text-success">&#10003; Готово</span>
+                    <?php else: ?>
+                        <span class="text-danger">&#10007; Требует внимания</span>
+                    <?php endif ?>
+                </td>
+            </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>

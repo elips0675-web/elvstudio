@@ -65,6 +65,7 @@ meta_description = "Статьи о том, как устроен Elv Kit: за�
     <section class="section section--tight">
         <div class="container">
             {% if posts|length %}
+                <h2 class="sr-only">Статьи блога</h2>
                 <div class="blog-grid">
                     {% for post in posts %}
                         <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">

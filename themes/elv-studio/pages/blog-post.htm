@@ -36,7 +36,7 @@ layout = "default"
                 <div class="article__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
 
                 <div class="article__body">
-                    {!! post.body !!}
+                    {{ post.body|raw }}
                 </div>
 
                 {% if post.tag_list %}

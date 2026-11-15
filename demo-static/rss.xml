@@ -5,24 +5,143 @@
     <description>Модульный конструктор сайтов на October CMS</description>
     <language>ru</language>
     <item>
+      <title>Блог, который продаёт: структура статьи и CTA</title>
+      <link>https://elvstudio.vercel.app/blog/blog-that-sells</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/blog-that-sells</guid>
+      <description>Статья приносит заявки, когда отвечает на вопрос и предлагает следующий шаг. Разбираем структуру, которая работает без давления.</description>
+      <pubDate>Sat, 14 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Core Web Vitals на практике: LCP, CLS и INP без магии</title>
+      <link>https://elvstudio.vercel.app/blog/core-web-vitals-lcp</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/core-web-vitals-lcp</guid>
+      <description>LCP, CLS и INP измеряются, а не угадываются. Показываем, какие правки дают 100 в Lighthouse на реальном лендинге.</description>
+      <pubDate>Fri, 13 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>JSON-LD для магазина: Product, Offer и BreadcrumbList без ошибок</title>
+      <link>https://elvstudio.vercel.app/blog/jsonld-ecommerce</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/jsonld-ecommerce</guid>
+      <description>Микроразметка не поднимает сайт в выдаче, но снимает неопределённость. Какие типы нужны магазину и где чаще всего ломается валидатор.</description>
+      <pubDate>Thu, 12 Nov 2026 12:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>AI-режим Google: что реально влияет на видимость</title>
       <link>https://elvstudio.vercel.app/blog/seo-for-google-ai</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-for-google-ai</guid>
       <description>Разметка, прямые ответы, llms.txt и скорость. Чек-лист, который можно проверить, а не пересказать.</description>
-      <pubDate>Thu, 12 Nov 2026 12:00:00 +0000</pubDate>
+      <pubDate>Wed, 11 Nov 2026 12:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Вебхук оплаты: идемпотентность и повторные события</title>
+      <link>https://elvstudio.vercel.app/blog/payment-webhook-idempotency</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/payment-webhook-idempotency</guid>
+      <description>Шлюз может прислать одно событие дважды. Если вебхук просто ставит paid, заказ спишется два раза или уйдёт два письма.</description>
+      <pubDate>Tue, 10 Nov 2026 09:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Ноль внешних запросов: как страница грузится за 1,3 секунды</title>
+      <link>https://elvstudio.vercel.app/blog/no-external-requests</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/no-external-requests</guid>
+      <description>Каждый внешний запрос — чужой DNS и чужое время ответа. Что мы убрали из лендинга и чем за это заплатили.</description>
+      <pubDate>Mon, 09 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Выдача файла по токену: почему нельзя давать ссылку на storage</title>
+      <link>https://elvstudio.vercel.app/blog/digital-delivery-token</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/digital-delivery-token</guid>
+      <description>Ссылка на файл расходится по чатам за минуту. Показываем схему с токеном, проверкой оплаты и потоковой отдачей.</description>
+      <pubDate>Sun, 08 Nov 2026 11:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Бэкап, который восстанавливается: дамп, файлы и проверка</title>
+      <link>https://elvstudio.vercel.app/blog/backup-restore-plan</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/backup-restore-plan</guid>
+      <description>Бэкап существует не тогда, когда файл создан, а когда из него восстановили данные. Что копировать и как проверить.</description>
+      <pubDate>Sat, 07 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Инлайн CSS и бюджет 36 КБ: что выкинуть первым</title>
+      <link>https://elvstudio.vercel.app/blog/css-inline-budget</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/css-inline-budget</guid>
+      <description>Инлайн CSS ускоряет первый экран и замедляет следующие страницы. Бюджет — причина сказать «нет» новой утилите.</description>
+      <pubDate>Fri, 06 Nov 2026 10:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Защита от овербукинга: UNIQUE против «проверил и записал»</title>
       <link>https://elvstudio.vercel.app/blog/booking-without-race</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/booking-without-race</guid>
       <description>Проверка доступности слота без блокировки — это гонка. Показываем схему с UNIQUE и lockForUpdate, которая держит нагрузку.</description>
-      <pubDate>Wed, 11 Nov 2026 10:30:00 +0000</pubDate>
+      <pubDate>Thu, 05 Nov 2026 10:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Заказы в админке: статусы, письма и возвраты без хаоса</title>
+      <link>https://elvstudio.vercel.app/blog/admin-workflow-orders</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/admin-workflow-orders</guid>
+      <description>Четыре статуса вместо десяти, письма из очереди и возврат, который закрывает доступ. Как вести заказы, чтобы не звать разработчика.</description>
+      <pubDate>Wed, 04 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Кэш и заголовки: как не отдавать HTML заново</title>
+      <link>https://elvstudio.vercel.app/blog/static-cache-headers</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/static-cache-headers</guid>
+      <description>Ассеты можно кэшировать на год, HTML — нет. Разбираем Cache-Control, ETag и gzip без риска показать чужую страницу.</description>
+      <pubDate>Tue, 03 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Title и description: как писать под сниппет, а не под счётчик</title>
+      <link>https://elvstudio.vercel.app/blog/meta-title-length</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/meta-title-length</guid>
+      <description>Title обрезается по ширине, а не по символам. Формула, примеры до и после и четыре ошибки, которые видно в выдаче.</description>
+      <pubDate>Mon, 02 Nov 2026 09:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Антиспам без капчи: honeypot, лимиты и время заполнения</title>
+      <link>https://elvstudio.vercel.app/blog/form-spam-without-captcha</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/form-spam-without-captcha</guid>
+      <description>Капча снижает конверсию и не спасает от всего. Три невидимые проверки, которые отсекают ботов в форме обратной связи.</description>
+      <pubDate>Sun, 01 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Чек-лист статьи перед публикацией: 12 пунктов</title>
+      <link>https://elvstudio.vercel.app/blog/article-checklist</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/article-checklist</guid>
+      <description>Текст, SEO и техника: короткий список, который ловит ошибки до публикации, а не через месяц в поиске.</description>
+      <pubDate>Sat, 31 Oct 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Миграции без страха: forward-only и проверка схемы</title>
+      <link>https://elvstudio.vercel.app/blog/october-migrations-discipline</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/october-migrations-discipline</guid>
+      <description>Миграция выполнится на проде однажды и откатить её нельзя. Правила, которые дешевле восстановления из бэкапа.</description>
+      <pubDate>Fri, 30 Oct 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Очередь на database без Redis: когда этого хватает</title>
+      <link>https://elvstudio.vercel.app/blog/laravel-queue-without-redis</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/laravel-queue-without-redis</guid>
+      <description>Письмо не должно задерживать ответ формы. Redis для этого не обязателен — хватает таблицы jobs и планировщика.</description>
+      <pubDate>Wed, 28 Oct 2026 09:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>sitemap.xml, robots.txt и llms.txt: три файла, которые работают</title>
+      <link>https://elvstudio.vercel.app/blog/sitemap-robots-llms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sitemap-robots-llms</guid>
+      <description>Карта страниц, правила обхода и карта для моделей — разные задачи. Путать их роли значит терять страницы из индекса.</description>
+      <pubDate>Mon, 26 Oct 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Контент-план на 20 статей: как не писать «10 трендов»</title>
+      <link>https://elvstudio.vercel.app/blog/content-plan-20</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/content-plan-20</guid>
+      <description>Двадцать статей не пишутся потоком вдохновения. Сетка из четырёх направлений, один вопрос на текст и честный ритм.</description>
+      <pubDate>Sat, 24 Oct 2026 09:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Почему October CMS, а не конструктор</title>
       <link>https://elvstudio.vercel.app/blog/why-october-cms</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/why-october-cms</guid>
       <description>Конструктор даёт скорость старта, October — владение кодом, транзакциями и ценой владения. Разбираем на цифрах.</description>
-      <pubDate>Tue, 10 Nov 2026 09:00:00 +0000</pubDate>
+      <pubDate>Tue, 20 Oct 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>

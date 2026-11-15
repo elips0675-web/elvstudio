@@ -1,0 +1,78 @@
+<div class="layout-row">
+    <div class="layout-main">
+        <div class="callout callout-info">
+            <div class="callout-content">
+                <p>Установка без терминала. Загрузите тему и плагин через файловый менеджер хостинга,
+                откройте эту страницу и нажмите две кнопки: «Применить миграции» и «Загрузить демо-данные».</p>
+            </div>
+        </div>
+
+        <div id="elv-install-checks">
+            <?= $this->makePartial('checks') ?>
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="btn btn-default" data-request="onCheck" data-load-indicator="Проверяю">
+                Проверить требования
+            </button>
+            <button type="button" class="btn btn-primary" data-request="onMigrate" data-load-indicator="Применяю миграции">
+                Применить миграции
+            </button>
+            <button type="button" class="btn btn-primary" data-request="onDemo" data-load-indicator="Загружаю данные">
+                Загрузить демо-данные
+            </button>
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="btn btn-default" data-request="onQueue" data-load-indicator="Обрабатываю очередь">
+                Обработать очередь
+            </button>
+            <button type="button" class="btn btn-default" data-request="onSlots" data-load-indicator="Обновляю слоты">
+                Обновить слоты броней
+            </button>
+            <button type="button" class="btn btn-default" data-request="onClearCache" data-load-indicator="Очищаю кэш">
+                Очистить кэш
+            </button>
+        </div>
+
+        <div id="elv-install-counts">
+            <?= $this->makePartial('counts') ?>
+        </div>
+
+        <div id="elv-install-output">
+            <?= $this->makePartial('output') ?>
+        </div>
+    </div>
+
+    <div class="layout-sidebar">
+        <div class="callout callout-warning">
+            <div class="callout-content">
+                <p>«Применить миграции» создаёт недостающие таблицы. Повторный запуск безопасен:
+                существующие таблицы и записи не удаляются.</p>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-content">
+                <p>«Загрузить демо-данные» добавляет товары, категории, статьи и слоты только там,
+                где записей ещё нет. Ваши статьи и товары не перезаписываются.</p>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-content">
+                <p>Очередь писем обрабатывается кнопкой «Обработать очередь», если на хостинге
+                не настроен планировщик. Для постоянной работы настройте cron в панели хостинга.</p>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-content">
+                <p>Задание планировщика для панели хостинга (Cron Jobs). Создайте задание
+                с интервалом «каждую минуту» и вставьте строку целиком:</p>
+                <textarea class="form-control" rows="3" readonly onclick="this.select()"><?= e($cron) ?></textarea>
+                <p class="help-block">Строка уже содержит путь к сайту и к PHP этого сервера.</p>
+            </div>
+        </div>
+    </div>
+</div>

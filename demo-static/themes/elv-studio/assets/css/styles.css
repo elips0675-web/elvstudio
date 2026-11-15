@@ -423,7 +423,7 @@ table.compare tbody tr:hover td { background: #fafbff; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 30px; font-size: 14px; }
 .pagination a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--ink); }
 .pagination a:hover { border-color: var(--brand); color: var(--brand); }
-.pagination .is-disabled { opacity: .45; pointer-events: none; }
+.pagination .is-disabled { color: var(--muted); opacity: 1; pointer-events: none; }
 
 .empty { text-align: center; padding: 50px 20px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); }
 

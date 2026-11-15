@@ -1,0 +1,31 @@
+<?php
+$labels = [
+    'elv_kit_categories' => 'Категории статей',
+    'elv_kit_products' => 'Товары и модули',
+    'elv_kit_posts' => 'Статьи блога',
+    'elv_kit_orders' => 'Заказы',
+    'elv_kit_bookings' => 'Брони',
+    'elv_kit_slots' => 'Слоты расписания',
+    'elv_kit_messages' => 'Сообщения',
+    'elv_kit_subscribers' => 'Подписчики',
+    'elv_kit_licenses' => 'Лицензии',
+    'elv_kit_installs' => 'Активации',
+];
+?>
+<h4>Что уже в базе</h4>
+<table class="table table-condensed">
+    <tbody>
+        <?php foreach ($counts as $table => $count): ?>
+            <tr>
+                <td><?= e($labels[$table] ?? $table) ?></td>
+                <td style="width: 120px" class="text-right">
+                    <?php if ($count === null): ?>
+                        <span class="text-muted">таблицы нет</span>
+                    <?php else: ?>
+                        <strong><?= (int) $count ?></strong>
+                    <?php endif ?>
+                </td>
+            </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>
