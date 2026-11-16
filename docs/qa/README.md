@@ -111,3 +111,19 @@ php tools/export-blog-articles.php --base=http://localhost:8090
 краткое описание, SEO-описание, автор, дата, время чтения, число
 символов и статус. Каталог `exports/` в `.gitignore`: это выгрузка,
 а не исходники.
+
+## Прод-чек
+
+```bash
+php tools/production-check.php
+php tools/production-check.php --strict
+```
+
+Скрипт проверяет PHP 8.3+, расширения `pdo_mysql`/`mbstring`/`json`/`gd`,
+права `storage/*` и `bootstrap/cache`, `.htaccess` с `RewriteEngine On`,
+`APP_KEY`, `APP_ENV`, `APP_DEBUG`, `APP_URL`, подключение к БД, очередь,
+почту и наличие платёжных ключей. Секреты не печатаются — только факт
+«задано / не задано». `--strict` превращает предупреждения в ошибки: это
+режим для cPanel после заполнения `.env`. Локально 16.11.2026: 15 OK,
+7 предупреждений (local, debug, localhost, sync, log, ключи, cron),
+0 ошибок.

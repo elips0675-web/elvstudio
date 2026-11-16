@@ -6,6 +6,16 @@
 
 ---
 
+(Stage 25 — 16.11.2026) — **Добавлен прод-чек `tools/production-check.php`.**
+
+1. Скрипт проверяет PHP 8.3+, расширения `pdo_mysql`/`mbstring`/`json`/`gd`, права `storage`, `storage/app`, `storage/framework/{cache,sessions,views}`, `storage/logs`, `bootstrap/cache`, `.htaccess` с `RewriteEngine On`, `APP_KEY`, `APP_ENV`, `APP_DEBUG`, `APP_URL`, подключение к БД, очередь, почту и платёжные ключи. Секреты не печатаются, только «задано / не задано».
+
+2. Локальный прогон: 15 OK, 7 предупреждений (`local`, `debug`, `localhost`, `sync`, `log`, ключи, cron), 0 ошибок. `--strict` возвращает exit 1 на предупреждениях — это режим для cPanel после заполнения `.env`.
+
+3. `README.md` и `docs/qa/README.md` описывают команду; в `Что доделать.txt` пункт про `.htaccess`/права переведён в конкретное действие на cPanel. `php -l` чистый, `npm run check` зелёный.
+
+---
+
 (Stage 24 — 16.11.2026) — **`october:optimize` проверен локально, кеш возвращён в dev-состояние.**
 
 1. `php artisan october:optimize` прошёл без ошибок: config, routes и theme закешировались. `npm run check` на закешированном приложении — зелёный (73 внутренних URL, 69 URL sitemap, 78 страниц без консольных ошибок).

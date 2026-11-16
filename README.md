@@ -87,6 +87,8 @@ php artisan serve --port=8090
 ```bash
 npm run check                       # ссылки, SEO, заголовки, бюджет, сироты, консоль
 npm run check:console               # 78 статических страниц: консоль, 5xx, 360 px
+php tools/production-check.php      # прод-чек: права, БД, .htaccess, ключи, очередь
+php tools/production-check.php --strict  # предупреждения считаются ошибками
 php artisan elv:kit:demo            # демо-каталог, статьи, слоты
 php artisan elv:kit:demo --refresh-slots
 php tools/export-static.php --origin=https://elvstudio.vercel.app  # демо для Vercel, индексируется

@@ -19,7 +19,9 @@
 - [ ] Реальные ключи ЮKassa/Stripe, SMTP, домен `elv-studio.by`, SSL.
 - [ ] Cron на хостинге: `php artisan schedule:run` каждую минуту (слоты, очередь).
 - [ ] Очередь: `QUEUE_CONNECTION=database` + `queue:work` (сейчас `sync`).
-- [ ] Проверить `.htaccess`/nginx на cPanel, права `storage` и `bootstrap/cache`.
+- [ ] На cPanel прогнать `php tools/production-check.php --strict`: права
+      `storage`/`bootstrap/cache`, `.htaccess`, БД и ключи. Локально 16.11.2026 —
+      15 OK, 7 предупреждений (local/debug/localhost/sync/log/ключи/cron), 0 ошибок.
 - [ ] Бэкап БД и `storage/app` перед публикацией.
 - [ ] На проде после деплоя: `php artisan october:optimize` и замер на
       cPanel/LiteSpeed. Локально проверено 16.11.2026, кеш очищен.
