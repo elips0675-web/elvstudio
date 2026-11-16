@@ -18,7 +18,7 @@
 
 Основание: `docs/blog-content-plan.md`; проверка: `php tools/blog-content-audit.php`.
 
-Срез после Stage 27: 0 статей короче 1 500, 0 без внутренних ссылок,
+Срез после Stage 34: 0 статей короче 1 500, 0 без внутренних ссылок,
 0 без CTA, 0 SEO-описаний, равных краткому. `BlogPosting` дополнен 16.11.2026
 (`image`, `wordCount`, `keywords`, `articleSection`); остались FAQ и изображения.
 
