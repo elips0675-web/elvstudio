@@ -6,6 +6,21 @@
 
 ---
 
+(Stage 29 — 16.11.2026) — **Карта репозиториев в README и срезе.**
+
+- `README.md:10-16` — раздел «Репозитории»: `D:\October CMS` →
+  https://github.com/elips0675-web/OctoberCMS, `D:\Elv Landing` →
+  https://github.com/elips0675-web/elvstudio, `D:\Elv test` →
+  https://github.com/elips0675-web/Elvtest.
+- `test/Для анализа.txt:27-29`, `test/README.md:3-5` — полные адреса GitHub
+  вместо `github.com/...`.
+- `AGENTS.md` (черновик владельца, в git не входит) — та же карта в шапке.
+
+Чем проверено: `git remote -v` витрины совпадает с документами; изменены
+только `.md`/`.txt`, PHP не затрагивался.
+
+---
+
 (Stage 28 — 16.11.2026) — **Срез витрины для внешнего AI-аудита.**
 
 Что сделано:

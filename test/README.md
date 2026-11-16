@@ -1,5 +1,9 @@
 # Папка `test` — вход для внешнего AI-аудита
 
+Репозитории: витрина — `D:\Elv Landing` → https://github.com/elips0675-web/elvstudio,
+продукт — `D:\October CMS` → https://github.com/elips0675-web/OctoberCMS,
+стенд — `D:\Elv test` → https://github.com/elips0675-web/Elvtest.
+
 Здесь лежит **самодостаточный срез витрины Elv Studio** для анализа
 в браузере (DeepSeek, Qwen и другие модели без доступа к диску).
 

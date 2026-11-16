@@ -7,6 +7,14 @@ Booking, Shop, Feedback, Blog.
 Контур собран так, чтобы страницы отдавались одним файлом: CSS и JS встроены в HTML,
 иконки — инлайновые SVG, растровых картинок и внешних доменов нет.
 
+## Репозитории
+
+| Локально | GitHub |
+|---|---|
+| `D:\October CMS` | https://github.com/elips0675-web/OctoberCMS |
+| `D:\Elv Landing` | https://github.com/elips0675-web/elvstudio |
+| `D:\Elv test` | https://github.com/elips0675-web/Elvtest |
+
 ## Что в репозитории
 
 | Путь | Роль |
