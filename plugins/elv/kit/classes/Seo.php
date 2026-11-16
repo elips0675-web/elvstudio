@@ -346,7 +346,19 @@ class Seo
             'publisher' => ['@id' => static::base() . '/#organization'],
             'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => static::canonical()],
             'url' => static::canonical(),
+            'image' => static::image(),
+            'wordCount' => static::articleWordCount($post),
+            'keywords' => implode(', ', $post->tag_list),
+            'articleSection' => $post->category ? (string) $post->category->name : (string) $post->audience_label,
         ]);
+    }
+
+    protected static function articleWordCount(Post $post): int
+    {
+        $matches = [];
+        preg_match_all('/[\p{L}\p{N}]+/u', strip_tags((string) $post->body), $matches);
+
+        return count($matches[0] ?? []);
     }
 
     /**

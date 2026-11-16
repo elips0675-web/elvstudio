@@ -6,6 +6,24 @@
 
 ---
 
+(Stage 33 — 16.11.2026) — **`BlogPosting`: image, wordCount, keywords, articleSection.**
+
+- `plugins/elv/kit/classes/Seo.php` — в `articleNode()` добавлены `image`
+  (общий `og-default.png`), `wordCount` (подсчёт `\p{L}\p{N}` по `body`),
+  `keywords` (`tag_list`) и `articleSection` (категория или аудитория);
+  добавлен `articleWordCount()`.
+- `tools/check-seo.mjs` — гейт требует у `BlogPosting` `image`, `wordCount`,
+  `articleSection` кроме `headline`, `datePublished`, `author`.
+- `demo-static/` пересобран: 78 страниц; `node tools/gate.mjs` зелёный;
+  JSON-LD статьи `/blog/backup-restore-plan/` проверен вживую.
+- `Что доделать.txt` — schema-пункт закрыт, остались FAQ и изображения в теле.
+- `docs/blog-content-plan.md` — статус 4.4 и список «Осталось» обновлены.
+
+Что **не** проверено: Rich Results и Яндекс.Вебмастер; `image` пока общий для
+всех статей, уникальные обложки не делались.
+
+---
+
 (Stage 32 — 16.11.2026) — **Страница цен: границы стоимости, FAQ и CTA «30 минут».**
 
 - `themes/elv-studio/pages/pricing.htm` — в hero добавлено «Хостинг и домен
