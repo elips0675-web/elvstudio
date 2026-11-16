@@ -31,7 +31,6 @@
 - [ ] Проверить `.htaccess`/nginx на cPanel, права `storage` и `bootstrap/cache`.
 - [ ] Бэкап БД и `storage/app` перед публикацией.
 - [ ] `php artisan october:optimize` (config/route/view cache) и повторный замер.
-- [ ] Документация этапов 01–11 в `docs/` (сейчас `00-audit-documents.md` и `blog-audit.md`).
 
 ## Известные ограничения (не баги, зафиксировано)
 
