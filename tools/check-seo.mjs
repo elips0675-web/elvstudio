@@ -16,6 +16,8 @@ if (/^Disallow:\s*\/\s*$/im.test(robotsTxt)) {
 }
 
 const seen = new Set(urls.map((url) => normalizePath(new URL(url).pathname)));
+const titles = new Map();
+const descriptions = new Map();
 
 for (const raw of urls) {
   const path = new URL(raw).pathname + (raw.endsWith('/') ? '' : '');
@@ -38,10 +40,22 @@ for (const raw of urls) {
     errors.push(`${where}: title length ${title.length}`);
   }
 
+  if (titles.has(title)) {
+    errors.push(`${where}: duplicate title with ${titles.get(title)}`);
+  } else {
+    titles.set(title, where);
+  }
+
   const description = first(html, /<meta\s+name="description"\s+content="([^"]*)"/i);
 
   if (description.length < 50 || description.length > 300) {
     errors.push(`${where}: description length ${description.length}`);
+  }
+
+  if (descriptions.has(description)) {
+    errors.push(`${where}: duplicate description with ${descriptions.get(description)}`);
+  } else {
+    descriptions.set(description, where);
   }
 
   const canonical = first(html, /<link\s+rel="canonical"\s+href="([^"]+)"/i);

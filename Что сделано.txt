@@ -6,6 +6,14 @@
 
 ---
 
+(Stage 15 — 16.11.2026) — **SEO-гейт расширен на уникальность title и description.**
+
+1. `tools/check-seo.mjs` теперь падает на повторяющемся `<title>` и повторяющемся `meta description` среди 69 URL sitemap. Раньше проверялись только длина, canonical, OG/Twitter, H1 и JSON-LD.
+
+2. Прогон: 69 URL, дублей title и description нет, `npm run check` зелёный.
+
+---
+
 (Stage 14 — 15.11.2026) — **SEO-гейт защищает индексацию, локальный Lighthouse 100/100.**
 
 1. `tools/check-seo.mjs` теперь проверяет на всех 69 URL: `meta robots` содержит `index` и не содержит `noindex`, `X-Robots-Tag` не блокирует страницу, а `/robots.txt` не содержит корневой `Disallow: /`. Гейт ловит случайный возврат закрытия после истории с Vercel.
