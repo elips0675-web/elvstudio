@@ -61,6 +61,7 @@ _ide_helper.php
 /backup
 
 # Инструменты и отчёты
+/exports
 /.idea
 /.vscode
 /.claude

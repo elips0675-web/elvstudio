@@ -87,6 +87,23 @@ async function visit(path) {
 await visit('/');
 seen.set('/', '/');
 
+const sitemap = await fetchPage('/sitemap.xml');
+
+if (sitemap.status !== 200) {
+  errors.push(`sitemap.xml -> ${sitemap.status}`);
+} else {
+  for (const match of sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const target = internal(match[1]);
+
+    if (!target || skip.test(target) || seen.has(target)) {
+      continue;
+    }
+
+    seen.set(target, '/sitemap.xml');
+    queue.push(target);
+  }
+}
+
 while (queue.length) {
   const path = queue.shift();
   await visit(path);

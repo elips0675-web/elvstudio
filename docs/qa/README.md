@@ -94,3 +94,20 @@ CLS 0, Speed Index 0.8 s. Единственная аудит-находка —
 Числа из DevTools могут отличаться: другой профиль throttling, открытые
 расширения или параллельная нагрузка на машину добавляют TBT и Speed
 Index. Для сравнения запускайте headless Lighthouse на том же профиле.
+
+## Выгрузка статей блога
+
+```bash
+php tools/export-blog-articles.php
+php tools/export-blog-articles.php --base=http://localhost:8090
+```
+
+Скрипт читает `elv_kit_posts` и пишет два файла в `exports/`:
+
+- `blog-articles-YYYY-MM-DD.csv` — таблица для Excel (UTF-8 BOM, `;`);
+- `blog-articles-YYYY-MM-DD.md` — сводная таблица и карточки статей.
+
+Поля: ID, раздел, категория, заголовок, slug, URL, ключевые слова,
+краткое описание, SEO-описание, автор, дата, время чтения, число
+символов и статус. Каталог `exports/` в `.gitignore`: это выгрузка,
+а не исходники.
