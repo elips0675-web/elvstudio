@@ -754,11 +754,11 @@ headless, Laravel, сравнение движков.
 - **SEO-гейт.** `tools/check-seo.mjs` проверяет на всех 69 URL `meta robots`
   с `index`, отсутствие блокирующего `X-Robots-Tag`, отсутствие корневого
   `Disallow: /` в `robots.txt`, уникальность `<title>` и
-  `meta description`, а также обязательные поля JSON-LD для `BlogPosting`,
-  `BreadcrumbList`, `FAQPage`, `Organization`, `WebSite`, `Product` и
-  `SoftwareApplication`. Гейт нашёл `Product` без `offers` у бесплатного
-  `/modules/blog/`; `Seo::productNode()` теперь всегда отдаёт `Offer`
-  с `price: "0"`.
+  `meta description`, viewport, `alt` у изображений, а также обязательные
+  поля JSON-LD для `BlogPosting`, `BreadcrumbList`, `FAQPage`,
+  `Organization`, `WebSite`, `Product` и `SoftwareApplication`. Гейт нашёл
+  `Product` без `offers` у бесплатного `/modules/blog/`;
+  `Seo::productNode()` теперь всегда отдаёт `Offer` с `price: "0"`.
 
 ### Что осталось непроверенным
 

@@ -34,6 +34,16 @@ for (const raw of urls) {
     errors.push(`${where}: <html lang="ru"> missing`);
   }
 
+  if (!/<meta\s+name="viewport"/i.test(html)) {
+    errors.push(`${where}: viewport meta missing`);
+  }
+
+  for (const attrs of all(html, /<img\b([^>]*)>/gi)) {
+    if (!/\balt\s*=/i.test(attrs)) {
+      errors.push(`${where}: img without alt`);
+    }
+  }
+
   const title = plain(first(html, /<title>([\s\S]*?)<\/title>/i));
 
   if (title.length < 10 || title.length > 75) {
