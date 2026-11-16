@@ -1,0 +1,200 @@
+# D:\Elv Landing — витрина Elv Studio / Elv Kit: срез для внешнего анализа
+
+> **Что это за файл.** Самодостаточный срез витрины для AI-аудита в браузере
+> (DeepSeek, Qwen и т. п.): что за проект, на чём сделан, что от ядра и
+> магазина, где кастомный код, чем проверено, что осталось. Числа и пути
+> перепроверены 16.11.2026 (Stage 27, коммит `de1395e`).
+>
+> **Как пользоваться.** Загрузить файл в чат и задать вопросы из раздела
+> «Что смотреть аудитору». Кода нет — только карта и факты; детали просить
+> по конкретному пути из карты.
+>
+> Первоисточники: `README.md`, `Что сделано.txt`, `Что доделать.txt`,
+> `docs/` (аудит блога, план контента, политика контактов, QA).
+
+## 1. Что это
+
+`D:\Elv Landing` — **сайт студии и витрина продукта Elv Kit** на October CMS
+4.x: тема `elv-studio` + плагин `Elv.Kit` (модули Booking, Shop, Feedback,
+Blog) + демо-данные. Витрина продаёт «комбайн» и отдельные модули: страницы
+kit, modules, pricing, demo; блог из 50 статей продаёт через контент.
+
+Три площадки (подробно — `D:\October CMS\Структура трех проектов.txt`):
+
+| Площадка | Роль | Гит |
+|---|---|---|
+| `D:\October CMS` | продукт «ELV Library»: тема + плагин | `github.com/elips0675-web/OctoberCMS` |
+| `D:\Elv Landing` | витрина Elv Kit + блог + лицензии/оплата | `github.com/elips0675-web/elvstudio` |
+| `D:\Elv test` | чистый стенд установки/апгрейда | `github.com/elips0675-web/Elvtest` |
+
+**Это не тот же код, что продукт**: общих файлов нет, каждый — своя
+инсталляция October. Статьи блога витрины в продукт не переносятся
+(переносится только SEO-логика).
+
+## 2. Стек и окружение
+
+| Что | Значение |
+|---|---|
+| CMS | October CMS **4.4.13** (`composer.lock`, `october/rain v4.4.13`) |
+| Framework | Laravel **12.71.0** |
+| PHP | **8.3.30** (`C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe`) |
+| БД | MySQL **8.4.3**, база `elv_studio`, `127.0.0.1`, `root` без пароля (локально) |
+| Адрес | `http://localhost:8090` |
+| Тема | `elv-studio` (`ACTIVE_THEME=elv-studio`) |
+| Локаль | `ru` |
+
+Фронтенд намеренно «одним файлом»: свои `styles.css` (29 КБ) и `app.js`
+(7,4 КБ), иконки — инлайновые SVG, внешних CDN и растровых картинок нет
+(README, раздел «Что в репозитории»). Bootstrap в теме не используется.
+
+## 3. Что откуда: ядро, магазин, кастом
+
+**Магазин October CMS — 0 позиций.** В `plugins/` только `elv/kit`, в
+`themes/` только `elv-studio`. Лицензионного ключа нет; Marketplace-плагины
+не ставятся. Ядро — composer-пакет `october/rain`, модули
+`modules/{backend,cms,dashboard,editor,media,system,tailor}`; `vendor/` и
+`modules/` в репозиторий не входят (README:20).
+
+**Кастом:**
+
+| Путь | Объём | Роль |
+|---|---|---|
+| `plugins/elv/kit` | 73 PHP-файла, 42 класса | модели, миграции, маршруты, оплата, лицензии, SEO, админка |
+| `themes/elv-studio` | 19 страниц, `styles.css`, `app.js` | лендинг и витрина модулей |
+| `demo-static/` | 78 HTML + `robots.txt`, `sitemap.xml`, `rss.xml`, `llms.txt` | статический снимок для Vercel |
+| `tools/` | 13 скриптов | гейты, экспорт статики, прод-чек, аудит блога |
+
+## 4. Карта кастомного кода
+
+Плагин `plugins/elv/kit`:
+
+- `Plugin.php` — `pluginDetails()` (`:27-31`), регистрация, компоненты;
+- `routes.php` — маршруты форм, оплаты, лицензий, скачивания, SEO;
+- `classes/` — 42 файла: `Seo`, `Sitemap`, `Rss`, `Blog`, `BlogContent`,
+  `Faq`, `Catalog`, `BookingService`, `Slots`, `OrderService`, `Money`,
+  `LicenseService`, `DownloadService`, `Chat`, `AntiSpam`, `TextFilter`,
+  `SecurityHeaders`, `CompressResponse`, `Assets`, `Icons`, `Demo`,
+  `Payment/{PaymentManager,Stripe,YooKassa}`, `Http/*` (10 контроллеров),
+  `Mail/*` (6 писем);
+- `controllers/` — админка: Products, Categories, Orders, Bookings, Licenses,
+  Messages, Posts, Subscribers + `install/`
+  (`Install.php:61` — `onMigrate`, `:68` — `onDemo`);
+- `console/` — `elv:kit:demo`, `elv:kit:package`
+  (`PackageCommand.php:12-13`, ZIP в `storage/app/kit`), `elv:kit:reset`;
+- `updates/` — миграции и `version.yaml` (текущая версия **1.0.5**);
+- `models/` — Eloquent: product, category, order, booking, license, message,
+  post, subscriber, settings.
+
+Тема `themes/elv-studio`:
+
+- `theme.yaml` — настройки темы (SEO, контакты, бренд) — единственный файл
+  в корне темы;
+- `pages/` — 19 страниц: index, kit, modules, module, pricing, demo, docs,
+  blog, blog-post, blog-tech, booking, order, order-success, feedback,
+  contacts, privacy, terms, sitemap, 404;
+- `partials/`, `layouts/`, `content/` — макет, блоки, демо-тексты;
+- `assets/{css,js,img}` — свои стили и скрипты, картинки только для OG.
+
+Сервисы продажи: `LicenseService` (выдача лицензий), `DownloadService`
+(ZIP и токены скачивания), `Payment/{PaymentManager,Stripe,YooKassa}` —
+без ключей `PaymentManager` работает в mock-режиме (`PaymentManager.php:12-17`,
+`:49` `mockAllowed()`), `Stripe`/`YooKassa` включаются только при заданных
+ключах (`:28-33`).
+
+## 5. Контент и данные
+
+- Блог: **50 статей** (35 business / 15 tech), 109 уникальных тегов,
+  средний объём 2 117 / 1 734 знака (Stage 26–27).
+- После Stage 27: 0 статей короче 1 500, 0 без внутренних ссылок, 0 без CTA,
+  0 SEO-описаний, равных краткому; FAQ и изображений в теле нет ни у одной.
+- `demo-static/` — 78 HTML-страниц, 69 URL в sitemap (Stage 27);
+  пагинация блога и рубрики сгенерированы статически, теги и поиск в статике
+  показывают подсказку «доступно в полной версии».
+- Демо-контент ставится командой `php artisan elv:kit:demo` (идемпотентно);
+  сброс — `elv:kit:reset`.
+
+## 6. Тесты и гейты (команды и факт)
+
+```powershell
+$php = 'C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe'
+npm run check                 # node tools/gate.mjs: URL, SEO, заголовки, бюджет, сироты, консоль
+npm run check:console         # 78/78 страниц без ошибок консоли и 5xx
+php tools/production-check.php            # 15 OK, 7 предупреждений, 0 ошибок (локально)
+php tools/production-check.php --strict   # режим для cPanel: предупреждения = exit 1
+php tools/blog-content-audit.php          # отчёт по 50 статьям в exports/
+php tools/export-static.php --origin=...  # пересборка demo-static/
+php -l <файл>                             # синтаксис; PHPUnit для kit нет
+```
+
+Живые гейты требуют запущенный сервер на `:8090`.
+
+## 7. Что проверено на HEAD (16.11.2026, Stage 27)
+
+- `demo-static/` пересобран: **78 страниц, 69 URL sitemap**;
+  `node tools/gate.mjs` — зелёный (URL, SEO, заголовки, бюджет, сироты,
+  консоль); `node tools/check-console.mjs` — 78/78; `php -l` чистый.
+- `php tools/production-check.php` — 15 OK, 7 предупреждений (local/debug/
+  localhost/sync/log/ключи/cron), 0 ошибок.
+- Аудит блога: 50 статей, все длиннее 1 500, у всех ссылки и CTA,
+  0 `meta = excerpt`.
+- `git status` — только черновики владельца (html-заметки), код закоммичен.
+
+## 8. Что осталось доделать (кратко)
+
+`Что доделать.txt` — **15 открытых пунктов** (все с чекбоксами `[ ]`):
+
+- **P1 внешние проверки (3):** прогнать JSON-LD через Google Rich Results
+  и Яндекс.Вебмастер; открыть сайт на реальном телефоне (360 px) и в Safari;
+  запросить переобход Vercel-демо в Search Console.
+- **P1 контент блога (6):** FAQ (3–5 вопросов) и одна схема/таблица
+  в топ-10 статей; `image` в `BlogPosting` (в `classes/Seo.php` ключа `image`
+  нет, `Что доделать.txt:26-27`) + `wordCount`/`keywords`/`articleSection`;
+  выровнять обещание «одна статья в две недели» с фактом;
+  сократить 109 тегов до 35–40; написать 20 тем по плану; кейсы с процентами
+  — только с согласия клиента.
+- **P2 прод (6):** ключи ЮKassa/Stripe/SMTP; домен `elv-studio.by` + SSL;
+  cron `schedule:run`; очередь `database` + `queue:work`; прогон
+  `production-check.php --strict` на cPanel; бэкап БД и `storage/app`;
+  `october:optimize` после деплоя.
+
+## 9. Известные ограничения (не баги)
+
+- `QUEUE_CONNECTION=sync`, `MAIL_MAILER=log` — письма в лог, не отправляются.
+- Телефон и WhatsApp не заданы: поля есть в настройках, блоки скрыты,
+  заполняет владелец.
+- Оплата в демо-контуре: без ключей `PaymentManager` — mock.
+- `demo-static` — статика для Vercel: формы, чат и оплата там отключены
+  (PHP на Vercel не исполняется).
+- Упаковка витрины: ZIP собирает `elv:kit:package`, но тема и плагин
+  **не оформлены как товар Marketplace** — у темы нет `composer.json`,
+  `authorCode`, `version.yaml`, у плагина нет `composer.json` (проверено
+  16.11.2026). Для продажи ZIP «своими руками» это не блокер.
+- PHPUnit-тестов для `Elv.Kit` нет; качество держат гейты `tools/*` и `php -l`.
+
+## 10. Что смотреть аудитору (вопросы для DeepSeek/Qwen)
+
+1. Продажа: хватает ли витрине доказательств (кейсы, демо, тарифы),
+   что мешает конверсии.
+2. SEO: JSON-LD `@graph`, крошки, canonical/OG — что даст продукту
+   при переносе и что улучшить на витрине.
+3. Блог: 50 статей и 109 тегов — где каннибализация, какие темы дадут трафик.
+4. Оплата и лицензии: mock-режим, выдача ZIP, токены скачивания — где риски
+   (повторная выдача, утечка ссылки).
+5. Безопасность форм: AntiSpam, throttle, CSRF, валидация.
+6. Статика Vercel: что теряется по сравнению с полной версией и как это
+   влияет на доверие.
+7. Производительность: инлайн CSS/JS, вес HTML, кэш.
+8. Прод: чего не хватает до запуска на cPanel (ключи, cron, очередь).
+
+## 11. Первоисточники (что читать дальше)
+
+| Файл | Зачем |
+|---|---|
+| `README.md` | состав, установка, структура |
+| `Что сделано.txt` | журнал этапов (Stage 27 — блог) |
+| `Что доделать.txt` | 15 открытых пунктов с чекбоксами |
+| `docs/blog-content-plan.md` | план 20 тем, кластеры, матрица ссылок |
+| `docs/blog-audit.md` | аудит 50 статей |
+| `docs/content-policy.md` | контакты, чат, фильтр слов |
+| `docs/qa/README.md` | что и как проверялось |
+| `demo-static/llms.txt` | карта демо для AI-краулеров |

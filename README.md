@@ -15,6 +15,7 @@ Booking, Shop, Feedback, Blog.
 | `themes/elv-studio` | тема лендинга: макет, партиалы, страницы, `styles.css`, `app.js` |
 | `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`) и QA-снимок (`docs/qa/`) |
 | `Что сделано.txt` / `Что доделать.txt` | журнал этапов и открытый бэклог |
+| `test/Для анализа.txt` | самодостаточный срез для внешнего AI-аудита (DeepSeek/Qwen): стек, карта кода, гейты, бэклог; `test/README.md` — как пользоваться |
 | `config/`, `app/`, `bootstrap/` | конфигурация инсталляции October CMS |
 
 `vendor/` и `modules/` (ядро October) в репозиторий не входят — ставятся через `composer install`.
