@@ -226,6 +226,10 @@ class Seo
             $graph[] = static::faqNode();
         }
 
+        if ($pageId === 'pricing') {
+            $graph[] = static::faqNode(static::canonical() . '#faq');
+        }
+
         if ($pageId === 'kit') {
             $graph[] = static::softwareNode();
         }
@@ -291,7 +295,7 @@ class Seo
         ]);
     }
 
-    protected static function faqNode(): array
+    protected static function faqNode(?string $id = null): array
     {
         $items = [];
 
@@ -303,7 +307,7 @@ class Seo
             ];
         }
 
-        return ['@type' => 'FAQPage', '@id' => static::base() . '/#faq', 'mainEntity' => $items];
+        return ['@type' => 'FAQPage', '@id' => $id ?: (static::base() . '/#faq'), 'mainEntity' => $items];
     }
 
     protected static function productNode(Product $product): array

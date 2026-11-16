@@ -7,6 +7,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 {% set kit = elv_kit() %}
 {% set plans = elv_plans(kit) %}
 {% set crumbs = elv_breadcrumbs() %}
+{% set orderUrl = 'order'|page %}
 
 <main id="main">
     <section class="page-hero">
@@ -16,8 +17,13 @@ meta_description = "Сколько стоит готовый сайт: тари�
             <h1>Одна оплата — сайт ваш</h1>
             <p class="lead">
                 Вы платите один раз. В стоимость входят все разделы, обновления и поддержка
-                по выбранному тарифу. Никаких ежемесячных списаний.
+                по выбранному тарифу. Хостинг и домен оплачиваются отдельно провайдеру.
             </p>
+            <div class="stack-actions">
+                <a class="btn btn--ghost" href="{{ 'booking'|page }}">
+                    {{ elv_icon('calendar-check')|raw }} Записаться на 30 минут
+                </a>
+            </div>
         </div>
     </section>
 
@@ -89,6 +95,35 @@ meta_description = "Сколько стоит готовый сайт: тари�
         </div>
     </section>
 
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Границы</span>
+                <h2>Что входит в цену и что оплачивается отдельно</h2>
+                <p>Elv Kit — разовая покупка. Хостинг, домен и сторонние сервисы оплачиваются напрямую провайдерам.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <div class="card">
+                    <h3>{{ elv_icon('check-circle')|raw }} Входит в стоимость</h3>
+                    <ul class="list-check mt-24">
+                        {% for item in elv_includes() %}
+                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>{{ elv_icon('info')|raw }} Оплачивается отдельно</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        {% for item in elv_excludes() %}
+                            <li>{{ elv_icon('close')|raw }} {{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {% if elv_modules() %}
         <section class="section">
             <div class="container">
@@ -121,6 +156,25 @@ meta_description = "Сколько стоит готовый сайт: тари�
         </section>
     {% endif %}
 
+    <section class="section" id="pricing-faq">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Цена, запуск и поддержка</h2>
+                <p>Коротко о том, что обычно спрашивают до покупки.</p>
+            </div>
+
+            <div class="faq">
+                {% for item in elv_faq() %}
+                    <details>
+                        <summary>{{ item.q }}</summary>
+                        <div><p>{{ item.a }}</p></div>
+                    </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
     <section class="section section--paper">
         <div class="container">
             <div class="grid grid--2">
@@ -143,7 +197,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 
     <section class="section">
         <div class="container">
-            {% partial 'cta' %}
+            {% partial 'cta' title='Обсудим запуск за 30 минут' text='Покажем живой сайт, посчитаем запуск и ответим на вопросы. Без презентаций и навязывания.' cta_url=orderUrl cta_label='Перейти к заказу' %}
         </div>
     </section>
 </main>

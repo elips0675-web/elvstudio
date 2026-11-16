@@ -1,14 +1,14 @@
 <section class="cta">
     <div class="split">
         <div>
-            <h2>{{ title|default('Посмотрите сайт на живом примере') }}</h2>
-            <p>{{ text|default('За 30 минут покажем, как клиент записывается и оплачивает. Если подойдёт — запустим сайт на вашем домене.') }}</p>
+            <h2>{{ title|default('Посмотрите сайт и обсудите задачу за 30 минут') }}</h2>
+            <p>{{ text|default('Покажем живой сайт, посчитаем запуск и ответим на вопросы. Без презентаций и навязывания.') }}</p>
         </div>
         <div class="cta__actions">
             <a class="btn btn--light" href="{{ cta_url|default('pricing'|page) }}">
                 {{ cta_label|default('Заказать сайт') }}
             </a>
-            <a class="btn btn--ghost" href="{{ 'booking'|page }}">Записаться на показ</a>
+            <a class="btn btn--ghost" href="{{ 'booking'|page }}">Записаться на 30 минут</a>
         </div>
     </div>
 </section>
