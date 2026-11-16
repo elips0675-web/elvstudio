@@ -6,6 +6,26 @@
 
 ---
 
+(Stage 18 — 16.11.2026) — **`check-console` больше не падает на `EPERM` при очистке профиля Chrome.**
+
+1. На Windows `fs.rmSync()` временного профиля Chrome иногда получал `EPERM`, хотя все 78 страниц уже были проверены: `taskkill` завершал процесс, но файлы ещё держались. Гейт падал на уборке, а не на качестве страниц.
+
+2. `stopProcess()` стал асинхронным: после `taskkill /T /F` ждёт события `exit` (с таймаутом 3 с). Очистка профиля повторяется до 10 раз с паузой 250 мс; если файл всё равно занят, печатается предупреждение и проверка не считается проваленной.
+
+3. `npm run check:console` — 78 страниц, OK; полный `npm run check` — зелёный.
+
+---
+
+(Stage 17 — 16.11.2026) — **JSON-LD проверяется по структуре; у бесплатных модулей появился `Offer` с ценой 0.**
+
+1. `tools/check-seo.mjs` теперь проверяет не только валидность JSON, но и обязательные поля: `BlogPosting` (headline/datePublished/author), `BreadcrumbList` (itemListElement), `FAQPage` (mainEntity), `Organization` и `WebSite` (name/url), `Product`/`SoftwareApplication` (name/offers).
+
+2. Гейт нашёл реальный дефект: `/modules/blog/` отдавал `Product` без `offers`, потому что `Seo::productNode()` добавлял оффер только при цене > 0. Теперь `Offer` добавляется всегда, для бесплатного модуля `price: "0"`, `priceCurrency`, `availability`.
+
+3. `php -l` по `Seo.php` — без ошибок; `npm run check:seo` — 69 URL, ошибок нет.
+
+---
+
 (Stage 16 — 16.11.2026) — **`.env.example` приведён к реальному локальному стеку.**
 
 1. Исправлены расхождения с `.env`: `APP_NAME="Elv Studio"`, `APP_URL=http://localhost:8090`, `APP_FALLBACK_LOCALE=en`, `APP_TIMEZONE=Europe/Minsk`, `ACTIVE_THEME=elv-studio`, `DB_DATABASE=elv_studio`, `LOG_LEVEL=debug`, `QUEUE_CONNECTION=sync`.

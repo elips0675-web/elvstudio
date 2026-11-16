@@ -115,10 +115,56 @@ for (const raw of urls) {
   }
 
   for (const block of jsonld) {
+    let data;
+
     try {
-      JSON.parse(block);
+      data = JSON.parse(block);
     } catch (error) {
       errors.push(`${where}: JSON-LD invalid (${error.message.slice(0, 60)})`);
+      continue;
+    }
+
+    if (data['@context'] !== 'https://schema.org') {
+      errors.push(`${where}: JSON-LD @context is not schema.org`);
+    }
+
+    const nodes = Array.isArray(data['@graph']) ? data['@graph'] : [data];
+
+    if (!nodes.length) {
+      errors.push(`${where}: JSON-LD graph is empty`);
+    }
+
+    for (const node of nodes) {
+      const type = node && node['@type'];
+
+      if (!type) {
+        errors.push(`${where}: JSON-LD node without @type`);
+        continue;
+      }
+
+      if (type === 'BlogPosting' && (!node.headline || !node.datePublished || !node.author)) {
+        errors.push(`${where}: BlogPosting misses headline/datePublished/author`);
+      }
+
+      if (type === 'BreadcrumbList' && !(node.itemListElement || []).length) {
+        errors.push(`${where}: BreadcrumbList is empty`);
+      }
+
+      if (type === 'FAQPage' && !(node.mainEntity || []).length) {
+        errors.push(`${where}: FAQPage is empty`);
+      }
+
+      if (type === 'Organization' && (!node.name || !node.url)) {
+        errors.push(`${where}: Organization misses name/url`);
+      }
+
+      if (type === 'WebSite' && (!node.name || !node.url)) {
+        errors.push(`${where}: WebSite misses name/url`);
+      }
+
+      if (['Product', 'SoftwareApplication'].includes(type) && (!node.name || !node.offers)) {
+        errors.push(`${where}: ${type} misses name/offers`);
+      }
     }
   }
 }

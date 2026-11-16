@@ -114,17 +114,31 @@ async function waitFor(url, label) {
   throw new Error(`${label} did not start: ${url}`);
 }
 
-function stopProcess(child) {
+async function stopProcess(child) {
   if (!child || child.exitCode !== null) {
     return;
   }
 
   if (process.platform === 'win32') {
     spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
+    await new Promise((resolve) => {
+      const timer = setTimeout(resolve, 3000);
+      child.once('exit', () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    });
     return;
   }
 
   child.kill('SIGTERM');
+  await new Promise((resolve) => {
+    const timer = setTimeout(resolve, 3000);
+    child.once('exit', () => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
 }
 
 const php = resolvePhp();
@@ -280,9 +294,22 @@ try {
   socket.close();
   await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/close/${target.id}`);
 } finally {
-  stopProcess(chrome);
-  stopProcess(server);
-  fs.rmSync(profile, { recursive: true, force: true });
+  await stopProcess(chrome);
+  await stopProcess(server);
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    try {
+      fs.rmSync(profile, { recursive: true, force: true });
+      break;
+    } catch (error) {
+      if (attempt === 9) {
+        console.warn(`cleanup skipped: ${profile} (${error.code || error.message})`);
+        break;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
 }
 
 console.log(`checked ${pages.length} static pages`);

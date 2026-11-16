@@ -318,15 +318,13 @@ class Seo
             'url' => static::canonical(),
         ]);
 
-        if ((int) $product->price_cents > 0) {
-            $node['offers'] = [
-                '@type' => 'Offer',
-                'price' => (string) ($product->price_cents / 100),
-                'priceCurrency' => Money::currency(),
-                'url' => static::canonical(),
-                'availability' => 'https://schema.org/InStock',
-            ];
-        }
+        $node['offers'] = [
+            '@type' => 'Offer',
+            'price' => (string) (max(0, (int) $product->price_cents) / 100),
+            'priceCurrency' => Money::currency(),
+            'url' => static::canonical(),
+            'availability' => 'https://schema.org/InStock',
+        ];
 
         return $node;
     }

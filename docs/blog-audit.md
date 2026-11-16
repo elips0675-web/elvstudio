@@ -753,9 +753,12 @@ headless, Laravel, сравнение движков.
   возврата индексации нужен переобход в Google Search Console.
 - **SEO-гейт.** `tools/check-seo.mjs` проверяет на всех 69 URL `meta robots`
   с `index`, отсутствие блокирующего `X-Robots-Tag`, отсутствие корневого
-  `Disallow: /` в `robots.txt`, а также уникальность `<title>` и
-  `meta description`. Это защищает от повторного случайного закрытия сайта
-  от поиска и от дублей сниппетов.
+  `Disallow: /` в `robots.txt`, уникальность `<title>` и
+  `meta description`, а также обязательные поля JSON-LD для `BlogPosting`,
+  `BreadcrumbList`, `FAQPage`, `Organization`, `WebSite`, `Product` и
+  `SoftwareApplication`. Гейт нашёл `Product` без `offers` у бесплатного
+  `/modules/blog/`; `Seo::productNode()` теперь всегда отдаёт `Offer`
+  с `price: "0"`.
 
 ### Что осталось непроверенным
 
