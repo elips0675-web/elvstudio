@@ -21,7 +21,8 @@
 - [ ] Очередь: `QUEUE_CONNECTION=database` + `queue:work` (сейчас `sync`).
 - [ ] Проверить `.htaccess`/nginx на cPanel, права `storage` и `bootstrap/cache`.
 - [ ] Бэкап БД и `storage/app` перед публикацией.
-- [ ] `php artisan october:optimize` (config/route/view cache) и повторный замер.
+- [ ] На проде после деплоя: `php artisan october:optimize` и замер на
+      cPanel/LiteSpeed. Локально проверено 16.11.2026, кеш очищен.
 
 ## Известные ограничения (не баги, зафиксировано)
 
