@@ -6,6 +6,16 @@
 
 ---
 
+(Stage 16 — 16.11.2026) — **`.env.example` приведён к реальному локальному стеку.**
+
+1. Исправлены расхождения с `.env`: `APP_NAME="Elv Studio"`, `APP_URL=http://localhost:8090`, `APP_FALLBACK_LOCALE=en`, `APP_TIMEZONE=Europe/Minsk`, `ACTIVE_THEME=elv-studio`, `DB_DATABASE=elv_studio`, `LOG_LEVEL=debug`, `QUEUE_CONNECTION=sync`.
+
+2. Добавлены пустые платёжные ключи `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET` — без них новый разработчик не видел, какие переменные нужны для боевого контура.
+
+3. Секретов в шаблоне нет: все значения пустые или локальные. `npm run check` не затронут и остаётся зелёным.
+
+---
+
 (Stage 15 — 16.11.2026) — **SEO-гейт расширен на уникальность title и description.**
 
 1. `tools/check-seo.mjs` теперь падает на повторяющемся `<title>` и повторяющемся `meta description` среди 69 URL sitemap. Раньше проверялись только длина, canonical, OG/Twitter, H1 и JSON-LD.
