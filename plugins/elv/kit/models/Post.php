@@ -81,6 +81,11 @@ class Post extends Model
         return $this->published_at ? $this->published_at->format('d.m.Y') : '';
     }
 
+    public function getDisplayUpdatedDateAttribute(): string
+    {
+        return $this->updated_at ? $this->updated_at->format('d.m.Y') : '';
+    }
+
     public function getTagListAttribute(): array
     {
         $tags = $this->tags;

@@ -6,6 +6,25 @@
 
 ---
 
+(Stage 34 — 16.11.2026) — **Блог: честная подписка, `keywords` в гейте и дата обновления.**
+
+- `themes/elv-studio/pages/blog.htm` — заголовок «Одна статья в две недели»
+  заменён на «Разборы без спама»: календарного обещания больше нет.
+- `tools/check-seo.mjs` — `keywords` добавлен в обязательные поля `BlogPosting`.
+  В БД 0 статей без тегов, 109 тегов, гейт проходит.
+- `plugins/elv/kit/models/Post.php` — геттер `display_updated_date`;
+  `themes/elv-studio/pages/blog-post.htm` показывает «Обновлено …», если дата
+  обновления отличается от даты публикации.
+- `demo-static/` пересобран: 78 страниц; `node tools/gate.mjs` зелёный.
+- `Что доделать.txt` — пункт про обещание «одна статья в две недели» закрыт.
+- `docs/blog-content-plan.md` — статус даты обновления и список «Осталось»
+  обновлены.
+
+Что **не** проверено: Rich Results и Яндекс.Вебмастер; `image` остаётся общим
+для всех статей.
+
+---
+
 (Stage 33 — 16.11.2026) — **`BlogPosting`: image, wordCount, keywords, articleSection.**
 
 - `plugins/elv/kit/classes/Seo.php` — в `articleNode()` добавлены `image`

@@ -152,8 +152,8 @@ for (const raw of urls) {
         continue;
       }
 
-      if (type === 'BlogPosting' && (!node.headline || !node.datePublished || !node.author || !node.image || !node.wordCount || !node.articleSection)) {
-        errors.push(`${where}: BlogPosting misses headline/datePublished/author/image/wordCount/articleSection`);
+      if (type === 'BlogPosting' && (!node.headline || !node.datePublished || !node.author || !node.image || !node.wordCount || !node.keywords || !node.articleSection)) {
+        errors.push(`${where}: BlogPosting misses headline/datePublished/author/image/wordCount/keywords/articleSection`);
       }
 
       if (type === 'BreadcrumbList' && !(node.itemListElement || []).length) {

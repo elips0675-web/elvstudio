@@ -25,6 +25,9 @@ layout = "default"
                     <span>Технический разбор</span>
                 {% endif %}
                 <span>{{ post.display_date }}</span>
+                {% if post.display_updated_date and post.display_updated_date != post.display_date %}
+                    <span>Обновлено {{ post.display_updated_date }}</span>
+                {% endif %}
                 <span>{{ post.reading_time }} мин чтения</span>
                 {% if post.author %}
                     <span>{{ post.author }}</span>
