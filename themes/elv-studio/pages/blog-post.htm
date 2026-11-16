@@ -46,6 +46,19 @@ layout = "default"
                     {{ post.body|raw }}
                 </div>
 
+                <div class="card mt-32">
+                    <div class="split">
+                        <div>
+                            <h2 class="mb-0">Нужен сайт, который приносит заявки?</h2>
+                            <p class="muted mb-0">Посмотрите демо или оставьте заявку — покажем путь клиента и обсудим запуск.</p>
+                        </div>
+                        <div class="cta__actions">
+                            <a class="btn btn--primary" href="{{ 'demo'|page }}">Посмотреть демо</a>
+                            <a class="btn btn--ghost" href="{{ 'order'|page }}">Оставить заявку</a>
+                        </div>
+                    </div>
+                </div>
+
                 {% if post.tag_list %}
                     <div class="chips mt-32">
                         {% for tag in post.tag_list %}

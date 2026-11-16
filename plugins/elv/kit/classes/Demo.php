@@ -1852,6 +1852,31 @@ WHERE service_code = ? AND date = ? AND time = ? AND taken &lt; capacity</code><
             $bySlug[$post['slug']] = $post;
         }
 
+        foreach (BlogContent::extras() as $slug => $extra) {
+            if (!isset($bySlug[$slug])) {
+                continue;
+            }
+
+            $html = $extra['note'] ?? '';
+            $links = $extra['links'] ?? [];
+
+            if ($links !== []) {
+                $items = [];
+
+                foreach ($links as $link) {
+                    $items[] = '<a href="' . $link[0] . '">' . $link[1] . '</a>';
+                }
+
+                $html .= '<p><strong>Полезные материалы:</strong> ' . implode(', ', $items) . '.</p>';
+            }
+
+            if (isset($extra['cta'])) {
+                $html .= '<p><strong>Следующий шаг:</strong> <a href="' . $extra['cta'][0] . '">' . $extra['cta'][1] . '</a>.</p>';
+            }
+
+            $bySlug[$slug]['body'] .= $html;
+        }
+
         return array_values($bySlug);
     }
 
