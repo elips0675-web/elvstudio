@@ -13,7 +13,7 @@ Booking, Shop, Feedback, Blog.
 |---|---|
 | `plugins/elv/kit` | плагин: модели, миграции, маршруты форм, оплата, лицензии, Seo, админка |
 | `themes/elv-studio` | тема лендинга: макет, партиалы, страницы, `styles.css`, `app.js` |
-| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`) и QA-снимок (`docs/qa/`) |
+| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`) и QA-снимок (`docs/qa/`) |
 | `Что сделано.txt` / `Что доделать.txt` | журнал этапов и открытый бэклог |
 | `config/`, `app/`, `bootstrap/` | конфигурация инсталляции October CMS |
 
@@ -87,6 +87,7 @@ php artisan serve --port=8090
 ```bash
 npm run check                       # ссылки, SEO, заголовки, бюджет, сироты, консоль
 npm run check:console               # 78 статических страниц: консоль, 5xx, 360 px
+php tools/blog-content-audit.php    # срез блога: объём, ссылки, CTA, FAQ, meta
 php tools/production-check.php      # прод-чек: права, БД, .htaccess, ключи, очередь
 php tools/production-check.php --strict  # предупреждения считаются ошибками
 php artisan elv:kit:demo            # демо-каталог, статьи, слоты
