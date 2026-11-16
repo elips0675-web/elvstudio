@@ -71,3 +71,26 @@ curl https://elvstudio.vercel.app/robots.txt
 быть `Allow: /`. `npm run check` проверяет, что демо снова не закрыли
 случайно. После возврата индексации переобход запрашивается в Google
 Search Console.
+
+## Локальный Lighthouse
+
+Чистый замер без расширений и фоновой нагрузки (headless Chrome,
+`npx lighthouse@12`, mobile + simulated 4G):
+
+| Метрика | Значение |
+|---|---|
+| Performance | 100 |
+| SEO | 100 |
+| FCP | 1.2 s |
+| LCP | 1.3 s |
+| TBT | 0 ms |
+| CLS | 0 |
+| Speed Index | 1.8 s |
+
+Desktop-пресет: Performance 100, SEO 100, FCP 0.5 s, LCP 0.7 s, TBT 0 ms,
+CLS 0, Speed Index 0.8 s. Единственная аудит-находка — размер DOM главной
+(821 элемент, оценка 0.5); на балл Performance она не влияет.
+
+Числа из DevTools могут отличаться: другой профиль throttling, открытые
+расширения или параллельная нагрузка на машину добавляют TBT и Speed
+Index. Для сравнения запускайте headless Lighthouse на том же профиле.

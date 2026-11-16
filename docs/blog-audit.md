@@ -751,6 +751,10 @@ headless, Laravel, сравнение движков.
   и sitemap. Живой деплой проверен `curl`: заголовка нет, `robots.txt`
   открыт. Гейт — `tools/check-headers.mjs` в `npm run check`; после
   возврата индексации нужен переобход в Google Search Console.
+- **SEO-гейт.** `tools/check-seo.mjs` проверяет на всех 69 URL `meta robots`
+  с `index`, отсутствие блокирующего `X-Robots-Tag` и отсутствие корневого
+  `Disallow: /` в `robots.txt`. Это защищает от повторного случайного
+  закрытия сайта от поиска.
 
 ### Что осталось непроверенным
 

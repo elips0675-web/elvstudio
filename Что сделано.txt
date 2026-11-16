@@ -6,6 +6,20 @@
 
 ---
 
+(Stage 14 — 15.11.2026) — **SEO-гейт защищает индексацию, локальный Lighthouse 100/100.**
+
+1. `tools/check-seo.mjs` теперь проверяет на всех 69 URL: `meta robots` содержит `index` и не содержит `noindex`, `X-Robots-Tag` не блокирует страницу, а `/robots.txt` не содержит корневой `Disallow: /`. Гейт ловит случайный возврат закрытия после истории с Vercel.
+
+2. `npm run check` — зелёный: 58 внутренних URL, 69 URL в sitemap, заголовки, бюджет, 19 страниц и 7 partials без сирот, 78 страниц без консольных ошибок и переполнения на 360 px.
+
+3. Локальный Lighthouse (headless Chrome, mobile + simulated 4G): Performance 100, SEO 100, FCP 1.2 s, LCP 1.3 s, TBT 0 ms, CLS 0, Speed Index 1.8 s. Desktop: Performance 100, SEO 100, FCP 0.5 s, LCP 0.7 s, TBT 0 ms, CLS 0, SI 0.8 s. Единственная находка — 821 элемент DOM на главной (оценка 0.5), на итоговый балл не влияет.
+
+4. Числа DevTools (FCP 1.4, LCP 1.5, TBT 270 ms, SI 3.3) в headless-замере не воспроизвелись: вероятно, другой профиль throttling, расширения браузера или фоновая нагрузка на машину. Для чистого сравнения — `npx lighthouse@12` без расширений.
+
+5. Живой Vercel после `3499792`: `X-Robots-Tag` отсутствует, `/robots.txt` снова с `Allow: /` и sitemap.
+
+---
+
 (Stage 13 — 15.11.2026) — **Vercel-демо возвращено в индекс по решению владельца.**
 
 1. Из `vercel.json` убран `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`.

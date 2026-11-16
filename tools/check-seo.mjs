@@ -9,6 +9,12 @@ if (!urls.length) {
   process.exit(1);
 }
 
+const robotsTxt = (await fetchPage('/robots.txt')).body;
+
+if (/^Disallow:\s*\/\s*$/im.test(robotsTxt)) {
+  errors.push('/robots.txt: root disallow blocks the whole site');
+}
+
 const seen = new Set(urls.map((url) => normalizePath(new URL(url).pathname)));
 
 for (const raw of urls) {
@@ -50,6 +56,18 @@ for (const raw of urls) {
     if (normalizePath(new URL(canonical).pathname) !== where) {
       errors.push(`${where}: canonical path mismatch: ${canonical}`);
     }
+  }
+
+  const xRobots = (page.headers.get('x-robots-tag') || '').toLowerCase();
+
+  if (/noindex|none/.test(xRobots)) {
+    errors.push(`${where}: X-Robots-Tag blocks indexing (${xRobots})`);
+  }
+
+  const metaRobots = first(html, /<meta\s+name="robots"\s+content="([^"]*)"/i);
+
+  if (!/index/i.test(metaRobots) || /noindex/i.test(metaRobots)) {
+    errors.push(`${where}: meta robots is not indexable (${metaRobots || 'missing'})`);
   }
 
   if (!first(html, /<meta\s+property="og:title"\s+content="([^"]+)"/i)) {
