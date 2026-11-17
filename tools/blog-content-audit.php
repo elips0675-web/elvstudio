@@ -76,7 +76,7 @@ foreach ($posts as $post) {
     $seoDescription = auditPlainText($post->seo_description);
     $headings = auditHeadings($body);
     $links = auditLinks($body);
-    $ctaPaths = ['/order', '/booking', '/demo', '/pricing', '/kit', '/contacts', '/feedback'];
+    $ctaPaths = ['/order', '/booking', '/demo', '/pricing', '/kit', '/contacts', '/feedback', '/services/audit', '/services/seo'];
     $ctaLinks = array_values(array_filter($links, static function (string $link) use ($ctaPaths): bool {
         $path = parse_url($link, PHP_URL_PATH) ?: $link;
 

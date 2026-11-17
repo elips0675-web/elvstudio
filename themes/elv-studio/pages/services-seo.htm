@@ -1,0 +1,199 @@
+title = "SEO-продвижение сайта"
+url = "/services/seo/"
+layout = "default"
+meta_title = "SEO-продвижение сайта — веб-студия Elv Studio"
+meta_description = "SEO-фундамент, технический аудит, структура и контент. Начинаем с проверки сайта, не обещаем «топ-1» и фиксируем объём работ."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set auditUrl = 'services-audit'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги · SEO</span>
+            <h1>SEO-продвижение без обещаний «топ-1»</h1>
+            <p class="lead">
+                Веб-студия Elv Studio начинает SEO с проверки сайта, а не с продажи пакета.
+                Смотрим, что мешает поиску: техническая база, структура, контент или доверие.
+                Если сайт не готов расти, сначала чиним фундамент.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ auditUrl }}">Заказать первичный аудит</a>
+                <a class="btn btn--ghost" href="#seo-work">Как проходит работа</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">С чего начинаем</span>
+                <h2>Три вопроса до первой правки</h2>
+                <p>SEO — не кнопка «включить». Сначала нужно понять, есть ли у сайта база для роста и куда вообще двигаться.</p>
+            </div>
+            <div class="grid grid--3">
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('search')|raw }}</span>
+                    <h3>Что видит поиск</h3>
+                    <p class="muted">Индексация, robots.txt, sitemap, canonical, дубли, битые ссылки и мобильная версия. Если страницы не видно, контент не спасёт.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('chart')|raw }}</span>
+                    <h3>Что ищет клиент</h3>
+                    <p class="muted">Собираем спрос по услугам и городам, разбиваем на кластеры и выбираем страницы, которые реально могут отвечать на запрос.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('seo')|raw }}</span>
+                    <h3>Что видит клиент</h3>
+                    <p class="muted">Заголовки, цены, сроки, примеры, отзывы и путь к заявке. Сайт должен отвечать на вопрос, а не только содержать ключевые слова.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper" id="seo-work">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Состав работы</span>
+                <h2>Что входит в SEO-сопровождение</h2>
+                <p>Объём зависит от сайта и конкуренции. Ниже — блоки, из которых собирается смета. Не все нужны каждому проекту.</p>
+            </div>
+            <div class="grid grid--2">
+                <div class="card">
+                    <b>01</b>
+                    <h3>Технический аудит</h3>
+                    <p class="muted">Индексация, скорость, дубли, canonical, пагинация, фильтры, ошибки сервера и мобильная версия. На выходе — список причин, а не «оценка 43 из 100».</p>
+                </div>
+                <div class="card">
+                    <b>02</b>
+                    <h3>Семантика и структура</h3>
+                    <p class="muted">Собираем запросы, группируем по смыслу и раскладываем по страницам. Одна страница — один кластер, без каннибализации и пустых разделов.</p>
+                </div>
+                <div class="card">
+                    <b>03</b>
+                    <h3>Контент и мета-теги</h3>
+                    <p class="muted">Заголовки, описания, тексты и FAQ. Не «ключи ради ключей»: отвечаем на вопросы клиента и показываем, что входит в услугу.</p>
+                </div>
+                <div class="card">
+                    <b>04</b>
+                    <h3>Коммерческие факторы</h3>
+                    <p class="muted">Контакты, документы, отзывы, фото, цены или понятный способ их узнать, доставка и оплата. Без этого информационная страница не становится продающей.</p>
+                </div>
+                <div class="card">
+                    <b>05</b>
+                    <h3>Аналитика</h3>
+                    <p class="muted">Search Console, Яндекс.Вебмастер, цели и события. Смотрим не только позиции, но и заявки: иначе SEO превращается в отчёт ради отчёта.</p>
+                </div>
+                <div class="card">
+                    <b>06</b>
+                    <h3>AI-поиск и GEO</h3>
+                    <p class="muted">Понятная структура, факты, разметка и llms.txt. Помогаем поисковым системам и языковым моделям корректно прочитать страницу.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Границы</span>
+                    <h2>Чего мы не обещаем</h2>
+                    <p>
+                        SEO-студия, которая гарантирует первое место, продаёт не работу, а надежду.
+                        Выдача меняется, конкуренты тоже не стоят на месте. Мы отвечаем за процесс,
+                        прозрачные отчёты и понятный план — но не за позиции, которые нам не принадлежат.
+                    </p>
+                </div>
+                <div class="card card--flat">
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} «Топ-1» и конкретный трафик в договоре</li>
+                        <li>{{ elv_icon('close')|raw }} Спамные ссылки и накрутку поведенческих факторов</li>
+                        <li>{{ elv_icon('close')|raw }} «Секретную методику» без объяснения шагов</li>
+                        <li>{{ elv_icon('close')|raw }} Отчёт из графиков без источника данных</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Порядок</span>
+                <h2>Как проходит работа</h2>
+            </div>
+            <div class="grid grid--3">
+                <div class="card">
+                    <b>01</b>
+                    <h3>Аудит и бриф</h3>
+                    <p class="muted">Смотрим сайт, конкурентов и текущую аналитику. Уточняем услуги, географию и то, что считаем результатом.</p>
+                </div>
+                <div class="card">
+                    <b>02</b>
+                    <h3>План и смета</h3>
+                    <p class="muted">Фиксируем этапы, объём и границы. Отдельно показываем, что делаем мы, что остаётся на стороне клиента и что зависит от подрядчиков.</p>
+                </div>
+                <div class="card">
+                    <b>03</b>
+                    <h3>Работа и отчёт</h3>
+                    <p class="muted">Вносим правки, публикуем страницы, следим за индексацией. В отчёте — что сделано, что изменилось и что делать дальше.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Стоимость</span>
+                    <h2>Почему нет цены «из прайса»</h2>
+                    <p>
+                        Два сайта с одинаковым количеством страниц могут требовать разной работы:
+                        один тормозит и не индексируется, другому нужен только контент.
+                        Поэтому сначала аудит и бриф, потом смета по этапам.
+                    </p>
+                    <p class="calc-note">
+                        Не продаём «продвижение под ключ» без описания объёма. Если после аудита
+                        видно, что сначала нужен новый сайт, скажем об этом прямо.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Что подготовить к разговору</h3>
+                    <ul class="list-check mt-24">
+                        <li>Список услуг и городов, где ищут клиенты</li>
+                        <li>Ссылки на 3–5 конкурентов</li>
+                        <li>Доступ к Search Console и Яндекс.Вебмастеру</li>
+                        <li>Что уже пробовали и что не сработало</li>
+                        <li>Кто согласует правки и контент</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="seo-faq">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Коротко о границах и результате</h2>
+            </div>
+            <div class="faq">
+                {% for item in elv_seo_faq() %}
+                    <details>
+                        <summary>{{ item.q }}</summary>
+                        <div><p>{{ item.a }}</p></div>
+                    </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Начнём с проверки, а не с обещаний' text='Пришлите ссылку на сайт и одну-две задачи. Посмотрим, что мешает поиску и с чего начать.' cta_url=auditUrl cta_label='Заказать аудит' %}
+        </div>
+    </section>
+</main>

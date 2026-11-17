@@ -231,6 +231,9 @@ class Plugin extends PluginBase
                 'elv_service_faq' => function () {
                     return Faq::items('services');
                 },
+                'elv_seo_faq' => function () {
+                    return Faq::items('seo');
+                },
                 'elv_compare' => function () {
                     return Catalog::comparison();
                 },

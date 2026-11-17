@@ -6,6 +6,47 @@
 
 ---
 
+(Stage 38 — 17.11.2026) — **Коммерческий SEO-кластер: страница услуги и две статьи.**
+
+- `themes/elv-studio/pages/services-seo.htm` — новая страница `/services/seo/`:
+  что входит в SEO-сопровождение, границы «не обещаем топ-1», порядок работы,
+  что подготовить, FAQ и CTA на аудит. Цены не выдуманы: сначала аудит и бриф,
+  потом смета по этапам.
+- `plugins/elv/kit/config/seo.php` + Twig-хелпер `elv_seo_faq` — шесть
+  вопросов про гарантии, стоимость, сроки, доступы, ссылки и конструкторы.
+- `plugins/elv/kit/classes/Seo.php` — `FAQPage` для `/services/seo/`
+  (`#seo-faq`), подпись вложенной страницы, строка в `llms.txt`.
+- `themes/elv-studio/pages/services.htm` — шестое направление «SEO-продвижение»;
+  header, footer и `/sitemap/` получили ссылку.
+- `plugins/elv/kit/classes/BlogContent.php` — две новые статьи:
+  «Как выбрать SEO-студию: 12 вопросов и красные флаги» и
+  «SEO-аудит сайта: что проверяют и как читать отчёт». Переписаны опорные
+  «SEO-фундамент сайта» и «SEO для Google и ИИ-поиска»; обновлён
+  `sitemap-robots-llms`; CTA «SEO-аудит» исправлен с `/order/` на
+  `/services/audit/`.
+- `themes/elv-studio/pages/blog.htm` — блок «SEO-гид» со ссылками на
+  фундамент, AI-поиск, выбор студии, аудит и страницу услуги.
+- `tools/check-urls.mjs`, `tools/check-budget.mjs`,
+  `tools/blog-content-audit.php` — новые URL в критичных, бюджет
+  `/services/seo/` и статьи, CTA-пути `/services/audit/` и `/services/seo/`.
+- `demo-static/` — пересобран: **89 страниц, 79 URL в sitemap**.
+- `docs/blog-content-plan.md`, `docs/studio-features-roadmap.md`,
+  `Что доделать.txt`, `test/Для анализа.txt` — срез Stage 38: 52 статьи,
+  37 тегов, 18 тем плана осталось.
+
+Чем проверено: `php -l` по изменённым PHP; `php tools/blog-content-audit.php`
+— 52 статьи, 0 коротких, 0 без ссылок и CTA, 0 `meta = excerpt`;
+`php tools/calculator-check.php` — OK; `node tools/gate.mjs` — зелёный
+(83 внутренних URL, 79 URL sitemap, бюджет, сироты, консоль 89/89).
+Локальный Chrome-прогон новых страниц — 200, FAQ и разметка на месте,
+ошибок консоли нет.
+
+Что **не** проверено: Rich Results и Яндекс.Вебмастер (нужны аккаунты);
+реальные кейсы с метриками и согласием клиентов; цены на SEO, хостинг
+и поддержку (в прайсе их нет); поведение на реальном телефоне и в Safari.
+
+---
+
 (Stage 37 — 17.11.2026) — **Калькулятор Elv Kit и страницы услуг.**
 
 - `plugins/elv/kit/classes/Calculator.php` — единый расчёт: тариф + модули,

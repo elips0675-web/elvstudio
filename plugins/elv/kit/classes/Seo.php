@@ -186,6 +186,7 @@ class Seo
             'plugins' => 'Плагины для October CMS',
             'booking' => 'Сайт с онлайн-записью',
             'audit' => 'Бесплатный аудит сайта',
+            'seo' => 'SEO-продвижение сайта',
         ];
 
         if (isset($sections[$slug])) {
@@ -250,6 +251,10 @@ class Seo
 
         if ($pageId === 'services') {
             $graph[] = static::faqNode(static::canonical() . '#services-faq', 'services');
+        }
+
+        if ($pageId === 'services-seo') {
+            $graph[] = static::faqNode(static::canonical() . '#seo-faq', 'seo');
         }
 
         if ($pageId === 'kit') {
@@ -432,7 +437,8 @@ class Seo
             '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
             '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
             '- [Калькулятор](' . static::base() . '/calculator/): лицензия и модули, три суммы и разбивка без скрытых платежей.',
-            '- [Услуги](' . static::base() . '/services/): хостинг, поддержка, плагины, онлайн-запись и бесплатный аудит.',
+            '- [Услуги](' . static::base() . '/services/): хостинг, поддержка, плагины, онлайн-запись, SEO и бесплатный аудит.',
+            '- [SEO-продвижение](' . static::base() . '/services/seo/): техническая база, структура, контент и аналитика без обещаний «топ-1».',
             '',
             '## Помощь',
             '- [Инструкция](' . static::base() . '/docs/): запуск на своём домене по шагам, без команд.',
