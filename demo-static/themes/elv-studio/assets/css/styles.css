@@ -155,7 +155,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 }
 .card__icon .elv-icon { width: 22px; height: 22px; }
 .card--flat { box-shadow: none; }
-.link-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 14px; font-weight: 650; }
+.link-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 14px; font-weight: 650; text-decoration: none; }
 .link-more .elv-icon { width: 16px; height: 16px; }
 .card--link { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
 .card--link:hover { border-color: var(--brand); box-shadow: var(--shadow); color: inherit; }
@@ -370,6 +370,8 @@ table.compare tbody tr:hover td { background: #fafbff; }
 .article { max-width: 780px; margin: 0 auto; }
 .article__head { margin-bottom: 24px; }
 .article__meta { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 13.5px; }
+.article__meta a { color: var(--muted); text-decoration: none; }
+.article__meta a:hover { color: var(--brand); }
 .article__body { font-size: 17px; line-height: 1.7; }
 .article__body h2 { margin-top: 34px; font-size: 26px; }
 .article__body h3 { margin-top: 26px; }

@@ -6,6 +6,35 @@
 
 ---
 
+(Stage 47 — 17.11.2026) — **Убраны подчёркивания у ссылок-карточек.**
+
+- `themes/elv-studio/pages/services.htm` — шесть кликабельных карточек услуг
+  получили класс `card--link`: раньше у них был только `card`, поэтому
+  глобальное подчёркивание ссылок рисовало линию под заголовком, описанием
+  и CTA.
+- `themes/elv-studio/pages/services-plugins.htm` — та же правка для карточек
+  модулей.
+- `themes/elv-studio/assets/css/styles.css` — `.link-more` больше не
+  подчёркивается (это одиночные ссылки «Обсудить продление» и «Подробнее
+  о модуле»); ссылка категории в `.article__meta` оформлена как метаданные:
+  без подчёркивания, с фирменным цветом на hover. Подчёркивание осталось
+  только у ссылок внутри текста статьи.
+- `plugins/elv/kit/assets/widget.css` — пункты плавающего меню контактов
+  (`.fab__item`) без подчёркивания.
+- `demo-static/` пересобран через `php tools/export-static.php`;
+  `node tools/gate.mjs` — зелёный (99 внутренних URL, 94 sitemap,
+  консоль 106/106, бюджет CSS 34,6 КБ).
+
+Чем проверено: live-страницы на `127.0.0.1:8090` в Chrome — computed style
+`text-decoration-line: none` у карточек `/services` и `/services/plugins`,
+у `.link-more` на `/services/support`, у категории в `.article__meta`
+и у пунктов открытого `.fab`; при этом ссылки внутри `.article__body`
+по-прежнему подчёркнуты. Пройдены главная, kit, modules, pricing, demo,
+booking, feedback, contacts, calculator, все шесть страниц услуг, блог,
+privacy, terms и sitemap — лишних подчёркиваний не осталось.
+
+---
+
 (Stage 46 — 17.11.2026) — **Технический кейс LCP на демо и исправление audience.**
 
 - `plugins/elv/kit/classes/BlogContent.php` — новая tech-статья
