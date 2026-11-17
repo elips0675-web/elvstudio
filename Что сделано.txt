@@ -6,6 +6,40 @@
 
 ---
 
+(Stage 46 — 17.11.2026) — **Технический кейс LCP на демо и исправление audience.**
+
+- `plugins/elv/kit/classes/BlogContent.php` — новая tech-статья
+  `kejs-lcp-12-skriptov` (6,9 тыс. символов HTML): 12 синхронных скриптов
+  в `head`, замер Lighthouse 13.6.0 в мобильном профиле, два прогона.
+  LCP **2,9 → 1,6 с**, FCP **2,9 → 1,6 с**, Performance **90 → 99**.
+  Для контекста: живое демо без этих скриптов даёт 100 и LCP около 1,2 с.
+  Это не клиентский кейс — цифры относятся только к статической копии демо.
+- `plugins/elv/kit/classes/Demo.php` — `techPostSlugs()` дополнен новым
+  slug и четырьмя ранее потерянными tech-статьями (`llms-txt`,
+  `logi-i-monitoring-october-cms`, `testirovanie-form-i-oplaty`,
+  `plugin-october-cms`). После `--refresh-posts` в БД **67 статей**
+  (47 `business` / 20 `tech`), 37 канонических тегов.
+- `BlogContent::extras()` — ссылки на кейс из
+  `pochemu-sajt-medlenno-gruzitsya` и `core-web-vitals-lcp`.
+- `tools/check-urls.mjs`, `tools/check-budget.mjs` — новый URL в проверках.
+- `demo-static/` — пересобран: **106 страниц, 94 URL sitemap**;
+  устаревшая страница `blog/category/engineering/page/3/` удалена,
+  кейс добавлен в блог и tech-хаб.
+- `docs/blog-content-plan.md` — тема №7 закрыта, осталось 3 темы
+  (1 коммерческая и 2 кейса); `docs/blog-audit.md`, `Что доделать.txt`,
+  `test/Для анализа.txt` — срез 67 статей.
+
+Чем проверено: `php -l` изменённых PHP-файлов; `php artisan elv:kit:demo
+--refresh-posts`; `php tools/blog-content-audit.php` — 67 статей, 0 коротких,
+0 без ссылок, 0 без CTA, 0 `meta = excerpt`; `node tools/gate.mjs` — зелёный
+(99 внутренних URL, 94 sitemap, бюджет, сироты, консоль 106/106); бюджет
+`/blog/kejs-lcp-12-skriptov/` — HTML 89,4 КБ, CSS 34,4 КБ, JS 16,4 КБ.
+Что **не** проверено: замер снят на локальной копии демо, а не на полевых
+данных и не на реальном телефоне; клиентских метрик в кейсе нет; FAQ и
+изображений у статьи нет.
+
+---
+
 (Stage 45 — 17.11.2026) — **Серверный PDF сметы, рекомендуемый пакет и E2E калькулятора.**
 
 - `plugins/elv/kit/classes/Calculator.php` — `recommendations()` для четырёх

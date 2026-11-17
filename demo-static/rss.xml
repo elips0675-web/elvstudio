@@ -5,6 +5,13 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Кейс на демо: 12 синхронных скриптов — LCP 2,9 → 1,6 с</title>
+      <link>https://elvstudio.vercel.app/blog/kejs-lcp-12-skriptov</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kejs-lcp-12-skriptov</guid>
+      <description>Технический кейс на копии демо: 12 блокирующих скриптов в head подняли LCP с 1,6 до 2,9 с. Условия замера, объяснение и чек-лист.</description>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Сайт для клиники: запись, доверие и осторожность с данными</title>
       <link>https://elvstudio.vercel.app/blog/sajt-dlya-kliniki</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-kliniki</guid>
@@ -346,12 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/october-migrations-discipline</guid>
       <description>Миграция выполнится на проде однажды и откатить её нельзя. Правила, которые дешевле восстановления из бэкапа.</description>
       <pubDate>Fri, 30 Oct 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Очередь на database без Redis: когда этого хватает</title>
-      <link>https://elvstudio.vercel.app/blog/laravel-queue-without-redis</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/laravel-queue-without-redis</guid>
-      <description>Письмо не должно задерживать ответ формы. Redis для этого не обязателен — хватает таблицы jobs и планировщика.</description>
-      <pubDate>Wed, 28 Oct 2026 09:30:00 +0000</pubDate>
     </item>
 </channel></rss>

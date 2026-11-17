@@ -45,6 +45,7 @@ const critical = [
   '/blog/teplovye-karty-i-privatnost/',
   '/blog/sajt-dlya-avtoservisa/',
   '/blog/sajt-dlya-kliniki/',
+  '/blog/kejs-lcp-12-skriptov/',
   '/order/',
   '/booking/',
   '/feedback/',
