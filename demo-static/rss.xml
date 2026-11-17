@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Плагин October CMS: как устроен и когда писать свой</title>
+      <link>https://elvstudio.vercel.app/blog/plugin-october-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/plugin-october-cms</guid>
+      <description>Из чего состоит плагин October CMS, чем он отличается от темы и когда хватит готового решения. Без кода ради кода.</description>
+      <pubDate>Mon, 16 Nov 2026 17:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Тестирование форм и оплаты: что проверять до запуска</title>
+      <link>https://elvstudio.vercel.app/blog/testirovanie-form-i-oplaty</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/testirovanie-form-i-oplaty</guid>
+      <description>Чек-лист проверки форм, писем и оплаты: тестовые сценарии, ошибки, повторные отправки и безопасность. Без «нажмите и вроде работает».</description>
+      <pubDate>Mon, 16 Nov 2026 16:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Логи и мониторинг October CMS: что смотреть каждый день</title>
+      <link>https://elvstudio.vercel.app/blog/logi-i-monitoring-october-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/logi-i-monitoring-october-cms</guid>
+      <description>Какие логи и метрики нужны сайту на October CMS, чтобы узнавать о падении раньше клиента. Без бесконечных дашбордов.</description>
+      <pubDate>Mon, 16 Nov 2026 15:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Договор на разработку сайта: что проверить в ТЗ</title>
       <link>https://elvstudio.vercel.app/blog/dogovor-na-razrabotku-sajta</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/dogovor-na-razrabotku-sajta</guid>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kontent-marketing</guid>
       <description>Сайт без контента — как магазин без товара. Контент работает на SEO, доверие и конверсию годами. Это не «тексты ради текстов», а система, встроенная в воронку продаж.…</description>
       <pubDate>Thu, 24 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>AI-инструменты для сайта и бизнеса</title>
-      <link>https://elvstudio.vercel.app/blog/ai-instrumenty-dlya-sajta</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/ai-instrumenty-dlya-sajta</guid>
-      <description>В 2025–2026 AI перестал быть «вау-фичей» и стал стандартом. Сайты без AI-элементов начинают проигрывать конкурентам по скорости обслуживания и конверсии. Разберём,…</description>
-      <pubDate>Mon, 21 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Юридические аспекты сайта: что нужно знать владельцу</title>
-      <link>https://elvstudio.vercel.app/blog/yuridicheskie-aspekty-sajta</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/yuridicheskie-aspekty-sajta</guid>
-      <description>Юридические ошибки обходятся дороже, чем хостинг за год. Штрафы по 152-ФЗ для юрлиц — до 500 тыс. ₽ за инцидент, а блокировка сайта Роскомнадзором — это остановка…</description>
-      <pubDate>Fri, 18 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Поддержка сайта после запуска: что делать, чтобы он не устарел</title>
-      <link>https://elvstudio.vercel.app/blog/podderzhka-sajta-posle-zapuska</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/podderzhka-sajta-posle-zapuska</guid>
-      <description>Запуск — это 20% работы. 80% — это то, что происходит после. Сайт без поддержки устаревает за 6–12 месяцев: ломается, теряет позиции, перестаёт конвертировать.…</description>
-      <pubDate>Sat, 12 Sep 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>
