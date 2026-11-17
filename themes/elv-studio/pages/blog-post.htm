@@ -8,6 +8,7 @@ layout = "default"
 {% endif %}
 {% set crumbs = elv_breadcrumbs() %}
 {% set related = elv_related(post, 3) %}
+{% set postFaq = elv_post_faq(post.slug) %}
 
 <main id="main">
     <section class="page-hero">
@@ -48,6 +49,20 @@ layout = "default"
                 <div class="article__body">
                     {{ post.body|raw }}
                 </div>
+
+                {% if postFaq|length %}
+                    <section class="mt-32" id="post-faq">
+                        <h2>Вопросы по теме</h2>
+                        <div class="faq">
+                            {% for item in postFaq %}
+                                <details>
+                                    <summary>{{ item.q }}</summary>
+                                    <div><p>{{ item.a }}</p></div>
+                                </details>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
 
                 <div class="card mt-32">
                     <div class="split">

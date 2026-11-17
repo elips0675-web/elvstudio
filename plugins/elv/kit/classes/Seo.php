@@ -263,6 +263,12 @@ class Seo
 
         if (static::$post) {
             $graph[] = static::articleNode(static::$post);
+
+            $postFaq = Faq::post((string) static::$post->slug);
+
+            if ($postFaq !== []) {
+                $graph[] = static::faqNodeFromItems(static::canonical() . '#post-faq', $postFaq);
+            }
         }
 
         if (static::$product) {
@@ -324,9 +330,18 @@ class Seo
 
     protected static function faqNode(?string $id = null, string $source = 'faq'): array
     {
+        return static::faqNodeFromItems($id, Faq::items($source));
+    }
+
+    protected static function faqNodeFromItems(?string $id, array $source): array
+    {
         $items = [];
 
-        foreach (Faq::items($source) as $item) {
+        foreach ($source as $item) {
+            if (!isset($item['q'], $item['a'])) {
+                continue;
+            }
+
             $items[] = [
                 '@type' => 'Question',
                 'name' => $item['q'],

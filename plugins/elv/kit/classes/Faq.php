@@ -18,4 +18,12 @@ class Faq
 
         return is_array($items) ? $items : [];
     }
+
+    public static function post(string $slug): array
+    {
+        $slug = preg_replace('/[^a-z0-9-]/', '', strtolower($slug)) ?: '';
+        $all = static::items('post-faq');
+
+        return $slug !== '' && isset($all[$slug]) && is_array($all[$slug]) ? $all[$slug] : [];
+    }
 }

@@ -6,6 +6,33 @@
 
 ---
 
+(Stage 39 — 17.11.2026) — **FAQ в десяти статьях и разметка `FAQPage`.**
+
+- `plugins/elv/kit/config/post-faq.php` (новый) — 10 slug'ов по 3 вопроса:
+  SEO-фундамент, AI-поиск, выбор SEO-студии, SEO-аудит, сайт с записью,
+  оплата на сайте, сайт салона, сайт мастера, неявки на запись,
+  «заявки есть, продаж нет».
+- `plugins/elv/kit/classes/Faq.php` — `post($slug)` читает `post-faq.php`,
+  не смешивая FAQ услуг и статей.
+- `plugins/elv/kit/Plugin.php` — Twig-хелпер `elv_post_faq`.
+- `plugins/elv/kit/classes/Seo.php` — `faqNodeFromItems()` и `FAQPage`
+  с `#post-faq` для статьи, если для неё есть вопросы.
+- `themes/elv-studio/pages/blog-post.htm` — блок «Вопросы по теме» после
+  тела статьи; на страницах без FAQ блок не выводится.
+- `demo-static/` — пересобран: 89 страниц, 79 URL sitemap; у 10 статей
+  по 3 `<summary>` и один `FAQPage`, у остальных FAQ нет.
+- `Что доделать.txt` — пункт про FAQ закрыт, открытых пунктов 35.
+
+Чем проверено: `php -l` по изменённым PHP; `node tools/gate.mjs` — зелёный
+(83 внутренних URL, 79 sitemap, бюджет, сироты, консоль 89/89); выборочная
+проверка HTML: `seo-fundament-sajta`, `seo-audit-sajta`, `sajt-dlya-mastera`
+— по 3 вопроса и `FAQPage`; `why-october-cms` — без FAQ.
+
+Что **не** проверено: Rich Results и Яндекс.Вебмастер (нужны аккаунты);
+изображения в теле статей не добавлялись.
+
+---
+
 (Stage 38 — 17.11.2026) — **Коммерческий SEO-кластер: страница услуги и две статьи.**
 
 - `themes/elv-studio/pages/services-seo.htm` — новая страница `/services/seo/`:
