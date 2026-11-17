@@ -7,6 +7,7 @@ use Elv\Kit\Classes\Http\FeedbackController;
 use Elv\Kit\Classes\Http\LicenseController;
 use Elv\Kit\Classes\Http\OrderController;
 use Elv\Kit\Classes\Http\PaymentController;
+use Elv\Kit\Classes\Http\QuoteController;
 use Elv\Kit\Classes\Http\SeoController;
 use Elv\Kit\Classes\Http\SubscribeController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
 Route::middleware('throttle:30,1')->group(function () {
     Route::post('payment/yookassa', [PaymentController::class, 'yookassa']);
     Route::post('payment/stripe', [PaymentController::class, 'stripe']);
+});
+
+Route::middleware(['web', 'throttle:20,1'])->group(function () {
+    Route::get('calculator/quote.pdf', [QuoteController::class, 'pdf'])->name('elv.kit.calculator.pdf');
 });
 
 Route::middleware('throttle:120,1')->group(function () {

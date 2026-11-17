@@ -46,7 +46,7 @@ meta_description = "Соберите смету за две минуты: тар
     {% else %}
         <section class="section">
             <div class="container">
-                <div class="calc" data-calculator data-symbol="{{ calc.symbol }}" data-currency="{{ calc.currency }}" data-updated="{{ calc.prices_updated_at }}">
+                <div class="calc" data-calculator data-symbol="{{ calc.symbol }}" data-currency="{{ calc.currency }}" data-updated="{{ calc.prices_updated_at }}" data-quote-url="/calculator/quote.pdf" data-recommendations="{{ calc.recommendations|json_encode }}">
                     <div class="calc__main">
                         <div class="calc-progress" aria-label="Шаги калькулятора">
                             <button type="button" class="calc-progress__item is-active" data-calc-go="0"><span>1</span> Задача</button>
@@ -115,6 +115,14 @@ meta_description = "Соберите смету за две минуты: тар
                                         </label>
                                     {% endfor %}
                                 </div>
+                            </div>
+
+                            <div class="calc-recommend" data-calc-recommend>
+                                <div>
+                                    <span class="calc-label">Рекомендуемый набор</span>
+                                    <p data-recommend-text>Выберите тип сайта — покажем стартовый набор.</p>
+                                </div>
+                                <button type="button" class="btn btn--ghost" data-calc-apply-recommend>Подставить</button>
                             </div>
 
                             <div class="calc-actions">
@@ -299,11 +307,11 @@ meta_description = "Соберите смету за две минуты: тар
                 </div>
 
                 <div class="calc-result__actions">
-                    <button type="button" class="btn btn--primary" data-calc-print>{{ elv_icon('download')|raw }} Скачать PDF</button>
+                    <a class="btn btn--primary" href="/calculator/quote.pdf" data-calc-pdf>{{ elv_icon('download')|raw }} Скачать PDF</a>
                     <a class="btn btn--ghost" href="#calculator-request">Отправить смету</a>
                     <a class="btn btn--ghost" href="{{ 'booking'|page }}">Записаться на 30 минут</a>
                 </div>
-                <p class="calc-note">Откроется печать — выберите «Сохранить как PDF». Это не оферта: точная сумма фиксируется после брифа.</p>
+                <p class="calc-note">Скачается PDF с номером и сроком действия. Если серверный PDF недоступен, откроется печать браузера. Это не оферта: точная сумма фиксируется после брифа.</p>
 
                 <div class="card calc-request" id="calculator-request">
                     <h3>Отправить смету</h3>

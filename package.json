@@ -10,6 +10,7 @@
     "check:headers": "node tools/check-headers.mjs",
     "check:budget": "node tools/check-budget.mjs",
     "check:orphans": "node tools/check-orphans.mjs",
-    "check:console": "node tools/check-console.mjs"
+    "check:console": "node tools/check-console.mjs",
+    "test:calculator": "node tools/calculator-e2e.mjs"
   }
 }

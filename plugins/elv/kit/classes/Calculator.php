@@ -59,6 +59,101 @@ class Calculator
             'support_note' => (string) (Settings::get('calculator_support_note') ?: 'Поддержка уже входит в тариф на указанный срок. Продление после него считается отдельно по объёму работ.'),
             'plans' => $plans,
             'modules' => $modules,
+            'recommendations' => static::recommendations(),
+            'quote_valid_days' => 14,
+        ];
+    }
+
+    /**
+     * recommendations — рекомендуемый набор для задачи.
+     *
+     * Это не «лучший тариф», а стартовая точка: один сайт и модули, которые
+     * чаще всего нужны для выбранного типа проекта. Цены остаются из каталога.
+     *
+     * @return array<string, array{plan:string, modules:array<int, string>, reason:string}>
+     */
+    public static function recommendations(): array
+    {
+        return [
+            'landing' => [
+                'plan' => 'single',
+                'modules' => [],
+                'reason' => 'Один сайт, блог уже включён. Если сайтов несколько — выберите Multi.',
+            ],
+            'services' => [
+                'plan' => 'single',
+                'modules' => ['booking', 'feedback'],
+                'reason' => 'Запись и обратная связь для сайта услуг. Один сайт; для 2–5 сайтов есть Multi.',
+            ],
+            'shop' => [
+                'plan' => 'single',
+                'modules' => ['shop', 'feedback'],
+                'reason' => 'Магазин и обратная связь. Оплата и доставка настраиваются отдельно.',
+            ],
+            'booking' => [
+                'plan' => 'single',
+                'modules' => ['booking', 'feedback'],
+                'reason' => 'Онлайн-запись и обратная связь. Один сайт; для сети — Multi.',
+            ],
+        ];
+    }
+
+    /**
+     * quote — серверная смета с номером и сроком действия.
+     *
+     * @param  array<int, string>|string  $moduleSlugs
+     * @return array<string, mixed>
+     */
+    public static function quote(string $planKey, $moduleSlugs = [], string $task = 'landing', string $hosting = 'own'): array
+    {
+        $estimate = static::estimate($planKey, $moduleSlugs);
+
+        $taskLabels = [
+            'landing' => 'Лендинг',
+            'services' => 'Сайт услуг',
+            'shop' => 'Магазин',
+            'booking' => 'Онлайн-запись',
+        ];
+        $hostingLabels = [
+            'own' => 'Свой хостинг',
+            'need' => 'Нужен хостинг',
+            'help' => 'Нужна помощь с выбором',
+        ];
+        $issuedAt = date('d.m.Y H:i');
+        $validUntil = date('d.m.Y', strtotime('+14 days'));
+        $number = 'ELV-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+
+        $breakdown = array_map(function (array $row): array {
+            $row['price_label'] = Money::format((int) $row['price']);
+
+            return $row;
+        }, $estimate['breakdown']);
+
+        return [
+            'number' => $number,
+            'issued_at' => $issuedAt,
+            'valid_until' => $validUntil,
+            'valid_days' => 14,
+            'task' => $task,
+            'task_label' => $taskLabels[$task] ?? $task,
+            'hosting' => $hosting,
+            'hosting_label' => $hostingLabels[$hosting] ?? $hosting,
+            'plan' => $estimate['plan'],
+            'modules' => $estimate['modules'],
+            'breakdown' => $breakdown,
+            'launch' => $estimate['launch'],
+            'launch_label' => Money::format($estimate['launch']),
+            'annual' => $estimate['annual'],
+            'annual_label' => Money::format($estimate['annual']),
+            'monthly' => $estimate['monthly'],
+            'monthly_label' => Money::format($estimate['monthly']),
+            'first_year' => $estimate['first_year'],
+            'first_year_label' => Money::format($estimate['first_year']),
+            'next_year' => $estimate['next_year'],
+            'next_year_label' => Money::format($estimate['next_year']),
+            'is_offer' => false,
+            'email' => (string) Settings::get('email', ''),
+            'telegram' => (string) Settings::get('telegram', ''),
         ];
     }
 

@@ -225,6 +225,9 @@ class Plugin extends PluginBase
                 'elv_calculator_estimate' => function ($plan, $modules = []) {
                     return Calculator::estimate((string) $plan, $modules);
                 },
+                'elv_calculator_quote' => function ($plan, $modules = [], $task = 'landing', $hosting = 'own') {
+                    return Calculator::quote((string) $plan, $modules, (string) $task, (string) $hosting);
+                },
                 'elv_calculator_faq' => function () {
                     return Faq::items('calculator');
                 },

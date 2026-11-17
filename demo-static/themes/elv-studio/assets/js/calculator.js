@@ -20,8 +20,19 @@
     }
 
     var symbol = root.getAttribute('data-symbol') || '$';
+    var quoteUrl = root.getAttribute('data-quote-url') || '/calculator/quote.pdf';
+    var recommendations = {};
+    var recommendText = root.querySelector('[data-recommend-text]');
+    var applyRecommendButton = root.querySelector('[data-calc-apply-recommend]');
+    var pdfLink = document.querySelector('[data-calc-pdf]');
     var current = 0;
     var touched = false;
+
+    try {
+        recommendations = JSON.parse(root.getAttribute('data-recommendations') || '{}');
+    } catch (error) {
+        recommendations = {};
+    }
 
     function money(cents) {
         var value = Number(cents || 0) / 100;
@@ -59,6 +70,145 @@
         var input = root.querySelector('input[name="' + name + '"]:checked');
 
         return input ? input.value : fallback;
+    }
+
+    function currentRecommendation() {
+        return recommendations[checkedValue('task', 'landing')] || null;
+    }
+
+    function planLabel(key) {
+        for (var i = 0; i < planInputs.length; i += 1) {
+            if (planInputs[i].value === key) {
+                return planInputs[i].getAttribute('data-label') || key;
+            }
+        }
+
+        return key;
+    }
+
+    function moduleLabel(slug) {
+        for (var i = 0; i < moduleInputs.length; i += 1) {
+            if (moduleInputs[i].value === slug) {
+                return moduleInputs[i].getAttribute('data-label') || slug;
+            }
+        }
+
+        return slug;
+    }
+
+    function renderRecommendation() {
+        var recommendation = currentRecommendation();
+
+        if (!recommendText) {
+            return;
+        }
+
+        if (!recommendation) {
+            recommendText.textContent = 'Для этой задачи рекомендация появится позже.';
+            if (applyRecommendButton) {
+                applyRecommendButton.disabled = true;
+            }
+            return;
+        }
+
+        var labels = (recommendation.modules || []).map(moduleLabel);
+        var composition = planLabel(recommendation.plan) + (labels.length ? ' + ' + labels.join(', ') : ' без платных модулей');
+
+        recommendText.textContent = composition + '. ' + (recommendation.reason || '');
+
+        if (applyRecommendButton) {
+            applyRecommendButton.disabled = false;
+        }
+    }
+
+    function applyRecommendation() {
+        var recommendation = currentRecommendation();
+
+        if (!recommendation) {
+            return;
+        }
+
+        planInputs.forEach(function (input) {
+            input.checked = input.value === recommendation.plan;
+        });
+
+        if (!planInputs.some(function (input) {
+            return input.checked;
+        })) {
+            planInputs[0].checked = true;
+        }
+
+        moduleInputs.forEach(function (input) {
+            input.checked = (recommendation.modules || []).indexOf(input.value) !== -1;
+        });
+
+        touched = true;
+        update();
+        track('calculator_recommend', {
+            task: checkedValue('task', 'landing'),
+            plan: recommendation.plan,
+            modules: (recommendation.modules || []).join(',')
+        });
+    }
+
+    function syncPdfLink() {
+        if (!pdfLink) {
+            return;
+        }
+
+        var plan = checkedPlan();
+
+        if (!plan) {
+            return;
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        params.set('plan', plan.value);
+        params.set('modules', selectedModules().map(function (module) {
+            return module.slug;
+        }).join(','));
+        params.set('task', checkedValue('task', 'landing'));
+        params.set('hosting', checkedValue('hosting', 'own'));
+        pdfLink.href = quoteUrl + '?' + params.toString();
+    }
+
+    function downloadPdf() {
+        var totals = update();
+        var url = pdfLink ? pdfLink.href : quoteUrl;
+
+        track('calculator_pdf', { total: totals.launch });
+
+        if (!window.fetch) {
+            window.print();
+            return;
+        }
+
+        fetch(url, { headers: { Accept: 'application/pdf' } })
+            .then(function (response) {
+                var type = response.headers.get('Content-Type') || '';
+
+                if (!response.ok || type.indexOf('application/pdf') === -1) {
+                    throw new Error('PDF is not available');
+                }
+
+                return response.blob();
+            })
+            .then(function (blob) {
+                var objectUrl = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+
+                link.href = objectUrl;
+                link.download = 'elv-quote.pdf';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(function () {
+                    URL.revokeObjectURL(objectUrl);
+                }, 1000);
+            })
+            .catch(function () {
+                window.print();
+            });
     }
 
     function applyUrlState() {
@@ -284,6 +434,8 @@
             syncUrl();
         }
 
+        syncPdfLink();
+
         return { plan: plan, modules: modules, launch: launch, year: year };
     }
 
@@ -333,6 +485,11 @@
 
     root.addEventListener('change', function (event) {
         var target = event.target;
+
+        if (['plan', 'modules', 'task', 'hosting'].indexOf(target.name) === -1) {
+            return;
+        }
+
         touched = true;
 
         if (target.name === 'plan') {
@@ -348,6 +505,8 @@
         if (target.name !== 'plan' && target.name !== 'modules') {
             update();
         }
+
+        renderRecommendation();
     });
 
     root.addEventListener('click', function (event) {
@@ -355,6 +514,7 @@
         var back = event.target.closest('[data-calc-back]');
         var jump = event.target.closest('[data-calc-go]');
         var resultButton = event.target.closest('[data-calc-show-result]');
+        var recommendButton = event.target.closest('[data-calc-apply-recommend]');
 
         if (next) {
             go(current + 1);
@@ -371,25 +531,29 @@
         if (resultButton) {
             showResult();
         }
+
+        if (recommendButton) {
+            applyRecommendation();
+        }
     });
 
-    Array.prototype.slice.call(document.querySelectorAll('[data-calc-print]')).forEach(function (button) {
-        button.addEventListener('click', function () {
-            update();
-            track('calculator_print', { total: update().launch });
-            window.print();
+    if (pdfLink) {
+        pdfLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            downloadPdf();
         });
-    });
+    }
 
     if (requestForm) {
         requestForm.addEventListener('submit', function () {
-            update();
-            track('calculator_request', { total: update().launch });
+            var totals = update();
+            track('calculator_request', { total: totals.launch });
         }, true);
     }
 
     applyUrlState();
     update();
+    renderRecommendation();
     go(0);
     track('calculator_open', {});
 })();

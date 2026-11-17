@@ -73,6 +73,10 @@ class Sitemap
                 continue;
             }
 
+            if (str_contains(strtolower((string) ($page->meta_robots ?? '')), 'noindex')) {
+                continue;
+            }
+
             $file = method_exists($page, 'getFilePath') ? $page->getFilePath() : null;
             $mtime = $file && is_file($file) ? filemtime($file) : time();
 

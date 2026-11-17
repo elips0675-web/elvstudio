@@ -6,6 +6,55 @@
 
 ---
 
+(Stage 45 — 17.11.2026) — **Серверный PDF сметы, рекомендуемый пакет и E2E калькулятора.**
+
+- `plugins/elv/kit/classes/Calculator.php` — `recommendations()` для четырёх
+  задач (`landing`, `services`, `shop`, `booking`) и `quote()`: номер
+  `ELV-ГГГГММДД-XXXXXX` (шесть hex-символов из `random_bytes`), дата выдачи,
+  срок действия 14 дней, разбивка с подписями сумм, `is_offer = false`.
+  Номер теперь уникален для каждой выдачи, а не пересчитывается из параметров.
+- `plugins/elv/kit/classes/Http/QuoteController.php` и
+  `plugins/elv/kit/views/quote-pdf.htm` — серверный PDF: Blade-шаблон
+  рендерится во временный HTML в `storage/app/tmp`, локальный
+  Chrome/Chromium печатает его по `file://`, HTML и профиль удаляются.
+  Второго HTTP-запроса к однопоточному PHP-серверу нет. Путь к браузеру —
+  `ELV_CHROME_BIN` или стандартные места; без браузера API отдаёт
+  `503 PDF_UNAVAILABLE`, фронт печатает страницу через `window.print()`.
+- `plugins/elv/kit/routes.php`, `Plugin.php` — маршрут
+  `GET calculator/quote.pdf` и Twig-функция `elv_calculator_quote`;
+  `Sitemap` не включает страницы с `noindex`.
+- `themes/elv-studio/pages/calculator.htm`, `assets/js/calculator.js`,
+  `assets/css/calculator.css` — карточка рекомендации с кнопкой
+  «Применить», PDF-ссылка с параметрами расчёта, восстановление состояния
+  из URL. PDF-ссылка относительная (`/calculator/quote.pdf`), поэтому
+  работает и на локальном сервере, и в статике. Отдельная страница
+  `/calculator/print/` удалена: PDF собирается из Blade, дубль не нужен.
+  Исправлено: ввод в поля заявки больше не пересчитывает смету и не трогает
+  URL — обработчик `change` слушает только `plan`, `modules`, `task`
+  и `hosting`; отправка формы считает итог один раз.
+- `tools/calculator-check.php` — проверяет рекомендации, формулу, номер,
+  срок, разбивку и рендер PDF-шаблона. `tools/calculator-e2e.mjs` — Chrome
+  CDP-сценарий: `$79` по умолчанию → рекомендация `$157` → расширенный
+  тариф с модулями `$587`, URL-state, валидность формы, ответ PDF
+  `200`/`%PDF`. `package.json` — скрипт `test:calculator`.
+- `.env.example` — `ELV_CHROME_BIN` с пояснением про серверный PDF.
+- `Что доделать.txt` — серверный PDF, рекомендация и E2E закрыты; открытых
+  пунктов **33**.
+- `demo-static/` — пересобран: **106 страниц, 93 URL sitemap**.
+
+Чем проверено: `php -l` изменённых PHP-файлов; `php tools/calculator-check.php`
+— OK (3 тарифа, 4 модуля, 4 рекомендации, база `7900`, с модулями `16700`);
+`node tools/calculator-e2e.mjs` — OK (`$79` → `$157` → `$587`, PDF ~73 КБ);
+`node tools/gate.mjs` — зелёный (98 внутренних URL, 93 sitemap, бюджет,
+сироты, консоль 106/106); бюджет `/calculator/` — HTML 122,7 КБ,
+CSS 34,4 КБ, JS 17,4 КБ (лимиты 150/36/20).
+Что **не** проверено: PDF не открывали на реальном принтере и в Adobe
+Reader — вёрстка, шрифты и разрывы страниц; в прод-окружении нужен
+Chrome/Chromium (иначе остаётся печать браузера); на Vercel-статике
+PDF-маршрута нет, кнопка откатывается на `window.print()`.
+
+---
+
 (Stage 44 — 17.11.2026) — **Две отраслевые статьи: автосервис и клиника.**
 
 - `plugins/elv/kit/classes/BlogContent.php` — статьи

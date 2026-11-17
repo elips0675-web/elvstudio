@@ -95,8 +95,10 @@ php artisan serve --port=8090
 
 ```bash
 npm run check                       # ссылки, SEO, заголовки, бюджет, сироты, консоль
-npm run check:console               # 78 статических страниц: консоль, 5xx, 360 px
+npm run check:console               # 106 статических страниц: консоль, 5xx, 360 px
 php tools/blog-content-audit.php    # срез блога: объём, ссылки, CTA, FAQ, meta
+php tools/calculator-check.php      # формула, рекомендации, шаблон PDF
+npm run test:calculator             # Chrome E2E: выбор → результат → PDF
 php tools/production-check.php      # прод-чек: права, БД, .htaccess, ключи, очередь
 php tools/production-check.php --strict  # предупреждения считаются ошибками
 php artisan elv:kit:demo            # демо-каталог, статьи, слоты

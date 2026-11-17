@@ -47,7 +47,7 @@ description = "Основной макет: шапка, подвал, инлай
     <style nonce="{{ elv_csp_nonce() }}">{{ elv_css('assets/css/styles.css')|raw }}</style>
     <style nonce="{{ elv_csp_nonce() }}">{{ elv_kit_css()|raw }}</style>
     {% if this.page.id == 'calculator' %}
-        <link rel="stylesheet" href="{{ 'assets/css/calculator.css'|theme }}?v=20261117">
+        <link rel="stylesheet" href="{{ 'assets/css/calculator.css'|theme }}?v=20261117-2">
     {% endif %}
 </head>
 <body>
@@ -63,7 +63,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 <script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
 {% if this.page.id == 'calculator' %}
-    <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117" defer></script>
+    <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117-2" defer></script>
 {% endif %}
 <script nonce="{{ elv_csp_nonce() }}">{{ elv_kit_js()|raw }}</script>
 {% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
