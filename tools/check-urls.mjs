@@ -43,6 +43,8 @@ const critical = [
   '/blog/ab-testy-na-malom-trafike/',
   '/blog/email-posle-zayavki/',
   '/blog/teplovye-karty-i-privatnost/',
+  '/blog/sajt-dlya-avtoservisa/',
+  '/blog/sajt-dlya-kliniki/',
   '/order/',
   '/booking/',
   '/feedback/',
