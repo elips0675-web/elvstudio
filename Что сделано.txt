@@ -6,6 +6,30 @@
 
 ---
 
+(Stage 43 — 17.11.2026) — **Три статьи про конверсию.**
+
+- `plugins/elv/kit/classes/BlogContent.php` — новые статьи:
+  `ab-testy-na-malom-trafike` (честные проверки без ложной статистики,
+  2.8 тыс. символов HTML), `email-posle-zayavki` (письма после заявки,
+  согласие и 152-ФЗ, 3.2 тыс.) и `teplovye-karty-i-privatnost`
+  (что смотреть в картах и как не собирать лишние данные, 3.1 тыс.).
+- `php artisan elv:kit:demo --refresh-posts` — в БД **64 статьи**
+  (45 `business` / 19 `tech`), 37 канонических тегов.
+- `tools/check-urls.mjs` — три новых URL; `tools/check-budget.mjs` —
+  `/blog/ab-testy-na-malom-trafike/` в замер.
+- `demo-static/` — пересобран: **103 страницы, 91 URL sitemap**.
+- `docs/blog-content-plan.md` — темы 14–16 закрыты, в блоге осталось 6 тем.
+- `Что доделать.txt` — срез 64 статьи; открытых пунктов 35.
+
+Чем проверено: `php -l`; `php tools/blog-content-audit.php` — 64 статьи,
+0 коротких, 0 без ссылок, 0 без CTA, 0 `meta = excerpt`; `node tools/gate.mjs`
+— зелёный (95 внутренних URL, 91 sitemap, бюджет, сироты, консоль 103/103);
+выборочно проверены HTML новых статей. Что **не** проверено: Rich Results,
+Яндекс.Вебмастер, реальный телефон и Safari; изображений и FAQ у новых
+статей нет.
+
+---
+
 (Stage 42 — 17.11.2026) — **Три материала про AI-поиск.**
 
 - `plugins/elv/kit/classes/BlogContent.php` — новые статьи:

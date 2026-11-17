@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Тепловые карты и записи сессий: что смотреть и как не нарушить приватность</title>
+      <link>https://elvstudio.vercel.app/blog/teplovye-karty-i-privatnost</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/teplovye-karty-i-privatnost</guid>
+      <description>Как читать тепловые карты, какие выводы не делать и что проверить, чтобы не собирать лишние персональные данные.</description>
+      <pubDate>Mon, 16 Nov 2026 23:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Email-маркетинг после заявки: 5 писем без спама</title>
+      <link>https://elvstudio.vercel.app/blog/email-posle-zayavki</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/email-posle-zayavki</guid>
+      <description>Что отправить после заявки, как получить согласие и не превратить полезные письма в рассылку, от которой отписываются.</description>
+      <pubDate>Mon, 16 Nov 2026 22:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>A/B-тесты на малом трафике: что можно проверить честно</title>
+      <link>https://elvstudio.vercel.app/blog/ab-testy-na-malom-trafike</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/ab-testy-na-malom-trafike</guid>
+      <description>Как проверять гипотезы, когда посетителей мало: что тестировать, как не обмануть себя и почему «+30%» из чужого кейса не работают.</description>
+      <pubDate>Mon, 16 Nov 2026 21:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Как попасть в ответы ChatGPT, Perplexity и Яндекс Нейро</title>
       <link>https://elvstudio.vercel.app/blog/kak-popast-v-otvety-chatgpt</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-popast-v-otvety-chatgpt</guid>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/content-plan-20</guid>
       <description>Двадцать статей не пишутся потоком вдохновения. Сетка из четырёх направлений, один вопрос на текст и честный ритм.</description>
       <pubDate>Sat, 24 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Почему October CMS, а не конструктор</title>
-      <link>https://elvstudio.vercel.app/blog/why-october-cms</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/why-october-cms</guid>
-      <description>Конструктор даёт скорость старта, October — владение кодом, транзакциями и ценой владения. Разбираем на цифрах.</description>
-      <pubDate>Tue, 20 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Почему сайт медленно грузится и как это исправить</title>
-      <link>https://elvstudio.vercel.app/blog/pochemu-sajt-medlenno-gruzitsya</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pochemu-sajt-medlenno-gruzitsya</guid>
-      <description>Скорость влияет на отказы, конверсию и позиции в поиске. Core Web Vitals — официальный фактор ранжирования Google. При этом «виновата» обычно не CMS, а инфраструктура…</description>
-      <pubDate>Mon, 12 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>SEO-фундамент сайта: техническая база, структура и контент</title>
-      <link>https://elvstudio.vercel.app/blog/seo-fundament-sajta</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-fundament-sajta</guid>
-      <description>Что заложить до запуска и проверить после: индексация, скорость, структура, семантика, контент, доверие и аналитика. Чек-лист из 12 пунктов.</description>
-      <pubDate>Fri, 09 Oct 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>
