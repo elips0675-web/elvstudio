@@ -66,6 +66,8 @@ function auditCell(string $value): string
     return str_replace(['|', "\r", "\n"], ['\\|', ' ', ' '], $value);
 }
 
+$postFaqPath = __DIR__ . '/../plugins/elv/kit/config/post-faq.php';
+$postFaq = is_file($postFaqPath) ? require $postFaqPath : [];
 $posts = Post::with('category')->orderByDesc('published_at')->orderByDesc('id')->get();
 $rows = [];
 
@@ -112,6 +114,10 @@ foreach ($posts as $post) {
     }
 
     if (str_contains($body, '<details')) {
+        $faq = true;
+    }
+
+    if (isset($postFaq[$post->slug]) && is_array($postFaq[$post->slug]) && $postFaq[$post->slug] !== []) {
         $faq = true;
     }
 

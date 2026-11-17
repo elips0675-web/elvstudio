@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Договор на разработку сайта: что проверить в ТЗ</title>
+      <link>https://elvstudio.vercel.app/blog/dogovor-na-razrabotku-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/dogovor-na-razrabotku-sajta</guid>
+      <description>Что должно быть в договоре и техническом задании, чтобы сайт не превратился в бесконечную доработку. Пункты, которые стоит обсудить до оплаты.</description>
+      <pubDate>Mon, 16 Nov 2026 14:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Миграция с Tilda или WordPress на October CMS: что проверить</title>
+      <link>https://elvstudio.vercel.app/blog/migraciya-s-tilda-na-october-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/migraciya-s-tilda-na-october-cms</guid>
+      <description>Когда переезд оправдан, что теряется и как не потерять адреса, SEO и заявки. Пошаговый план без обещаний «переедем за один вечер».</description>
+      <pubDate>Mon, 16 Nov 2026 13:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Сайт для кафе или ресторана: меню, брони и заказы</title>
+      <link>https://elvstudio.vercel.app/blog/sajt-dlya-kafe</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-kafe</guid>
+      <description>Что должно быть на сайте кафе: меню, бронирование, заказы, доставка и доверие. Без лишних страниц и выдуманных цен.</description>
+      <pubDate>Mon, 16 Nov 2026 12:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Как выбрать SEO-студию: 12 вопросов и красные флаги</title>
       <link>https://elvstudio.vercel.app/blog/kak-vybrat-seo-studiyu</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-seo-studiyu</guid>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/podderzhka-sajta-posle-zapuska</guid>
       <description>Запуск — это 20% работы. 80% — это то, что происходит после. Сайт без поддержки устаревает за 6–12 месяцев: ломается, теряет позиции, перестаёт конвертировать.…</description>
       <pubDate>Sat, 12 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Зачем бизнесу нужен свой сайт, если есть соцсети</title>
-      <link>https://elvstudio.vercel.app/blog/zachem-biznesu-nuzhen-sajt</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/zachem-biznesu-nuzhen-sajt</guid>
-      <description>Частый вопрос от малого бизнеса: «Зачем тратить деньги на сайт, если клиенты сидят в Telegram и ВКонтакте?» Короткий ответ: соцсети — это канал, а сайт — это ваша…</description>
-      <pubDate>Wed, 09 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Онлайн-бронирование на сайте: как настроить приём заказов</title>
-      <link>https://elvstudio.vercel.app/blog/onlajn-bronirovanie-na-sajte</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/onlajn-bronirovanie-na-sajte</guid>
-      <description>Возможность записаться или оформить заказ в три часа ночи — это не «удобная фича», а базовое требование 2026 года. Клиент не будет ждать утра, он уйдёт к конкуренту,…</description>
-      <pubDate>Sun, 06 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Виджеты обратной связи: типы и как выбрать</title>
-      <link>https://elvstudio.vercel.app/blog/vidzhety-obratnoj-svyazi</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/vidzhety-obratnoj-svyazi</guid>
-      <description>Виджет обратной связи — это мост между сайтом и клиентом. Правильно подобранный виджет увеличивает конверсию на 15–30%, неправильно выбранный — раздражает и…</description>
-      <pubDate>Thu, 03 Sep 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>
