@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Как попасть в ответы ChatGPT, Perplexity и Яндекс Нейро</title>
+      <link>https://elvstudio.vercel.app/blog/kak-popast-v-otvety-chatgpt</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-popast-v-otvety-chatgpt</guid>
+      <description>Что реально влияет на упоминание в AI-ответах, а что остаётся лотереей. Без гарантий «топ-1 в ChatGPT» и выдуманных процентов.</description>
+      <pubDate>Mon, 16 Nov 2026 20:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>llms.txt: карта сайта для ИИ-моделей</title>
+      <link>https://elvstudio.vercel.app/blog/llms-txt</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/llms-txt</guid>
+      <description>Что такое llms.txt, чем он отличается от sitemap и robots, как собрать файл и когда он не нужен.</description>
+      <pubDate>Mon, 16 Nov 2026 19:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Что AI-поиск берёт в ответы, а что игнорирует</title>
+      <link>https://elvstudio.vercel.app/blog/chto-ai-poisk-beret-v-otvety</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/chto-ai-poisk-beret-v-otvety</guid>
+      <description>Почему одни страницы попадают в ответы моделей, а другие нет. Разбор структуры без обещаний и выдуманных исследований.</description>
+      <pubDate>Mon, 16 Nov 2026 18:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Плагин October CMS: как устроен и когда писать свой</title>
       <link>https://elvstudio.vercel.app/blog/plugin-october-cms</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/plugin-october-cms</guid>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-fundament-sajta</guid>
       <description>Что заложить до запуска и проверить после: индексация, скорость, структура, семантика, контент, доверие и аналитика. Чек-лист из 12 пунктов.</description>
       <pubDate>Fri, 09 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>UX/UI и адаптивность: почему посетители уходят без заявки</title>
-      <link>https://elvstudio.vercel.app/blog/ux-ui-i-adaptivnost</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/ux-ui-i-adaptivnost</guid>
-      <description>Самый быстрый сайт с идеальным SEO не продаст, если посетитель не понимает, куда нажать. Конверсия — это про удобство, а не про красоту. Разберём, как UX/UI и…</description>
-      <pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Веб-аналитика: как понять, что сайт работает эффективно</title>
-      <link>https://elvstudio.vercel.app/blog/veb-analitika</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/veb-analitika</guid>
-      <description>Без аналитики развитие сайта — гадание на кофейной гуще. Владелец должен видеть, какая реклама окупается, а какая сливает бюджет. Разберём, какие инструменты…</description>
-      <pubDate>Sun, 27 Sep 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Контент-маркетинг: главный актив сайта</title>
-      <link>https://elvstudio.vercel.app/blog/kontent-marketing</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kontent-marketing</guid>
-      <description>Сайт без контента — как магазин без товара. Контент работает на SEO, доверие и конверсию годами. Это не «тексты ради текстов», а система, встроенная в воронку продаж.…</description>
-      <pubDate>Thu, 24 Sep 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>
