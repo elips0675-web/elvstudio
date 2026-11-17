@@ -8,7 +8,7 @@ const budgets = {
   js: 20 * KB,
   gzip: 30 * KB,
 };
-const pages = ['/', '/kit/', '/pricing/', '/blog/', '/modules/booking/'];
+const pages = ['/', '/kit/', '/pricing/', '/calculator/', '/services/', '/blog/', '/modules/booking/'];
 const errors = [];
 
 function kb(bytes) {

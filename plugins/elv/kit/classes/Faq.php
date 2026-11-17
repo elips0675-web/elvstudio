@@ -1,13 +1,14 @@
 <?php namespace Elv\Kit\Classes;
 
 /**
- * Faq — список вопросов из config/faq.php.
+ * Faq — читает FAQ из config/<name>.php.
  */
 class Faq
 {
-    public static function items(): array
+    public static function items(string $name = 'faq'): array
     {
-        $path = base_path('plugins/elv/kit/config/faq.php');
+        $name = preg_replace('/[^a-z0-9-]/', '', strtolower($name)) ?: 'faq';
+        $path = base_path('plugins/elv/kit/config/' . $name . '.php');
 
         if (!is_file($path)) {
             return [];

@@ -39,6 +39,9 @@ class Catalog
                 'label' => 'Один сайт',
                 'price' => (int) $product->price_cents,
                 'period' => 'разово · 1 сайт',
+                'sites' => '1 сайт',
+                'support' => '30 дней',
+                'updates' => '12 месяцев',
                 'featured' => false,
                 'features' => [
                     'Все разделы и функции',
@@ -52,6 +55,9 @@ class Catalog
                 'label' => 'До 5 сайтов',
                 'price' => (int) ($product->price_multi_cents ?: $product->price_cents),
                 'period' => 'разово · до 5 сайтов',
+                'sites' => 'до 5 сайтов',
+                'support' => '90 дней',
+                'updates' => '12 месяцев',
                 'featured' => true,
                 'features' => [
                     'Все разделы и функции',
@@ -66,6 +72,9 @@ class Catalog
                 'label' => 'Без ограничений',
                 'price' => (int) ($product->price_extended_cents ?: $product->price_cents),
                 'period' => 'разово · без ограничений',
+                'sites' => 'без ограничений',
+                'support' => '1 год',
+                'updates' => 'навсегда',
                 'featured' => false,
                 'features' => [
                     'Все разделы и функции',

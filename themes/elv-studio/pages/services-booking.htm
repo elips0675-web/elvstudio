@@ -1,0 +1,110 @@
+title = "Сайт с онлайн-записью"
+url = "/services/booking/"
+layout = "default"
+meta_title = "Сайт с онлайн-записью на Elv Kit — модуль бронирования"
+meta_description = "Модуль онлайн-записи для Elv Kit: услуги, слоты, подтверждения и письма. Цена модуля из каталога, установка и кастомные интеграции считаются отдельно."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set calcUrl = 'calculator'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги · Онлайн-запись</span>
+            <h1>Запись без переписки на полдня</h1>
+            <p class="lead">
+                Клиент выбирает услугу и свободное время, а вы получаете заявку и подтверждение.
+                Модуль бронирования подключается к Elv Kit и не требует отдельного сайта.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">Добавить в смету</a>
+                <a class="btn btn--ghost" href="{{ 'demo'|page }}">Посмотреть демо</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Цена</span>
+                    <h2>Модуль из каталога, без «звоните»</h2>
+                    {% for module in elv_modules() %}
+                        {% if module.slug == 'booking' %}
+                            <p class="lead">{{ module.price_label }} — разово. Дальше модуль работает на вашем сайте и хостинге.</p>
+                            <p class="muted">{{ module.tagline }}</p>
+                            <p><a class="link-more" href="{{ module.url }}">Подробнее о модуле {{ elv_icon('arrow-right')|raw }}</a></p>
+                        {% endif %}
+                    {% endfor %}
+                    <p class="calc-note">Установка, перенос услуг и нестандартные правила записи считаются отдельно. Хостинг оплачивается провайдеру.</p>
+                </div>
+                <div class="card card--flat">
+                    <h3>Что умеет</h3>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Услуги, длительность и цена</li>
+                        <li>{{ elv_icon('check')|raw }} Свободные слоты и занятое время</li>
+                        <li>{{ elv_icon('check')|raw }} Заявка с контактами и комментарием</li>
+                        <li>{{ elv_icon('check')|raw }} Подтверждение и письма</li>
+                        <li>{{ elv_icon('check')|raw }} Управление записями в админке</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Кому подходит</span>
+                <h2>Когда запись реально нужна</h2>
+            </div>
+            <div class="grid grid--3">
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('calendar')|raw }}</span>
+                    <h3>Услуги по времени</h3>
+                    <p class="muted">Консультации, мастера, студии и кабинеты, где важен слот, а не просто заявка.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('users')|raw }}</span>
+                    <h3>Несколько специалистов</h3>
+                    <p class="muted">Когда у каждого своё расписание и нельзя записать двух клиентов на одно время.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('message')|raw }}</span>
+                    <h3>Меньше переписки</h3>
+                    <p class="muted">Клиент видит условия и свободные окна, а не ждёт ответа в мессенджере.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Запись и деньги</h2>
+            </div>
+            <div class="faq">
+                <details>
+                    <summary>Можно принимать предоплату?</summary>
+                    <div><p>Зависит от платёжного провайдера и правил бизнеса. В базовом модуле запись и заявка; онлайн-оплата — отдельная интеграция, если она нужна.</p></div>
+                </details>
+                <details>
+                    <summary>Сколько стоит установка?</summary>
+                    <div><p>Если Elv Kit уже установлен, модуль подключается к нему. Перенос услуг, настройка расписания и нестандартные правила считаются отдельно после брифа.</p></div>
+                </details>
+                <details>
+                    <summary>Можно перенести записи из другого сервиса?</summary>
+                    <div><p>Зависит от формата выгрузки. Если есть CSV или API, обсудим импорт. Если данные только вручную — это отдельная работа.</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Посчитайте сайт с записью' text='Выберите тариф, добавьте модуль бронирования и посмотрите три суммы раздельно.' cta_url=calcUrl cta_label='Открыть калькулятор' %}
+        </div>
+    </section>
+</main>

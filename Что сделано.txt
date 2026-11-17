@@ -6,6 +6,52 @@
 
 ---
 
+(Stage 37 — 17.11.2026) — **Калькулятор Elv Kit и страницы услуг.**
+
+- `plugins/elv/kit/classes/Calculator.php` — единый расчёт: тариф + модули,
+  годовая и месячная строки у студии, «первый год» и «дальше в год»;
+  цены читаются из `Product`/`Settings`, не из шаблона.
+- `plugins/elv/kit/classes/Catalog.php` — в тарифы добавлены `sites`,
+  `support`, `updates`; цены не менялись ($79 / $249 / $499).
+- `plugins/elv/kit/Plugin.php` — Twig-хелперы `elv_calculator`,
+  `elv_calculator_estimate`, `elv_calculator_faq`, `elv_service_faq`.
+- `plugins/elv/kit/classes/Faq.php` — источник FAQ выбирается по имени;
+  добавлены `config/calculator.php` и `config/services.php`.
+- `plugins/elv/kit/classes/Seo.php` — разделы «Услуги» и «Калькулятор»,
+  подписи вложенных страниц, `FAQPage` для `/calculator/` и `/services/`,
+  ссылки в `llms.txt`.
+- `plugins/elv/kit/models/settings/fields.yaml` — флаг калькулятора, дата
+  актуальности цен, пометки про хостинг и поддержку.
+- Новые страницы: `/calculator/` (мастер из 4 шагов, три суммы, разбивка,
+  «что входит / что не входит», печать, заявка, FAQ), `/services/`,
+  `/services/hosting/`, `/services/support/`, `/services/plugins/`,
+  `/services/booking/`, `/services/audit/`.
+- `themes/elv-studio/assets/css/calculator.css` и
+  `themes/elv-studio/assets/js/calculator.js` — вынесены отдельно, чтобы не
+  раздувать inline-бюджет; JS обновляет суммы, состояние в URL, печать и текст
+  заявки, отправляет события аналитики.
+- `themes/elv-studio/pages/pricing.htm`, `index.htm`, `sitemap.htm`,
+  `partials/header.htm`, `partials/footer.htm` — ссылки на калькулятор и услуги.
+- Цены взяты с опубликованной `/pricing/` 17.11.2026: тарифы `$79` / `$249` /
+  `$499`, модули `$49` / `$39` / `$29` / `$0`. Хостинг, домен и сторонние
+  плагины в сумму студии не входят и не выдуманы.
+- `php tools/calculator-check.php` — OK: 3 тарифа, 4 модуля, пустой расчёт
+  `7900`, с двумя модулями `16700`.
+- Локальный Chrome-прогон: `$79` → тариф «До 5 сайтов» + «Онлайн-запись» =
+  `$298`, результат открывается, ошибок в консоли нет.
+- `demo-static/` пересобран: 85 страниц; `node tools/gate.mjs` зелёный:
+  URL (80 внутренних), SEO (76 URL в sitemap), заголовки, бюджет, сироты,
+  консоль (85/85).
+- `docs/studio-features-roadmap.md`, `Что доделать.txt` — статус этапов A/B,
+  границы и оставшиеся блокеры обновлены.
+
+Что **не** проверено и не сделано: серверный PDF с номером и сроком действия
+(сейчас печать браузера), версионность прайса и лог изменений цен, реальные
+тарифы хостинга/поддержки, кейсы с метриками, этап C (кабинет, статус-страница,
+партнёрка). Внешние Rich Results и Яндекс.Вебмастер по-прежнему требуют аккаунтов.
+
+---
+
 (Stage 36 — 16.11.2026) — **Блог: 109 тегов сведены к 37 каноническим.**
 
 - `plugins/elv/kit/classes/BlogContent.php`, `plugins/elv/kit/classes/Demo.php` —
@@ -32,8 +78,8 @@ Search Console) и реальный телефон/Safari — нужны акк�
 (Stage 35 — 16.11.2026) — **Документация: актуальный срез и ссылка на `faqNode()`.**
 
 - `Что доделать.txt` — «Срез после Stage 27» заменён на «Срез после Stage 34».
-- `docs/blog-content-plan.md` — ссылка на `FAQPage` обновлена с
-  `Seo.php:294-307` на `Seo.php:298-311`; код не менялся, только документация.
+- `docs/blog-content-plan.md` — ссылка на `FAQPage` приведена к `faqNode()`
+  в `Seo.php`; код не менялся, только документация.
 
 Проверено: ссылки открыты по фактическим строкам; `node tools/gate.mjs` не
 запускался — правки не касаются шаблонов, статики и PHP-кода.

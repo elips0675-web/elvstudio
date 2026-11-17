@@ -1,0 +1,148 @@
+title = "Услуги"
+url = "/services/"
+layout = "default"
+meta_title = "Услуги Elv Studio: хостинг, поддержка и аудит — Elv Kit"
+meta_description = "Помогаем с хостингом, поддержкой, плагинами и запуском Elv Kit. Не продаём чужой хостинг как свой: показываем, что входит в цену, а что оплачивается провайдеру."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set calcUrl = 'calculator'|page %}
+{% set auditUrl = 'services-audit'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги</span>
+            <h1>Запуск, хостинг и поддержка без тёмных строк</h1>
+            <p class="lead">
+                Elv Kit — это лицензия и модули. Вокруг неё есть вещи, которые нельзя честно
+                записать в цену продукта: хостинг, домен, сторонние плагины и объём поддержки.
+                Мы показываем их отдельно.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">Собрать смету</a>
+                <a class="btn btn--ghost" href="{{ auditUrl }}">Бесплатный аудит</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Что можно заказать</span>
+                <h2>Пять направлений — без пакета «всё включено»</h2>
+                <p>Каждое можно взять отдельно. Цены на лицензии и модули живут в каталоге, а не в тексте страницы.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <a class="card" href="{{ 'services-hosting'|page }}">
+                    <span class="contact-card__icon">{{ elv_icon('globe')|raw }}</span>
+                    <h3>Хостинг и запуск</h3>
+                    <p class="muted">Проверим требования October CMS, поможем выбрать провайдера, настроим HTTPS, cron и резервные копии. Хостинг оплачивается напрямую.</p>
+                    <span class="link-more">Что проверить у провайдера {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+
+                <a class="card" href="{{ 'services-support'|page }}">
+                    <span class="contact-card__icon">{{ elv_icon('wrench')|raw }}</span>
+                    <h3>Поддержка сайта</h3>
+                    <p class="muted">Поддержка уже входит в тариф Elv Kit на 30, 90 или 365 дней. После срока продление считается по объёму работ, а не по «среднему чеку».</p>
+                    <span class="link-more">Что входит в поддержку {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+
+                <a class="card" href="{{ 'services-plugins'|page }}">
+                    <span class="contact-card__icon">{{ elv_icon('puzzle')|raw }}</span>
+                    <h3>Модули и плагины</h3>
+                    <p class="muted">Свои модули — из каталога. Сторонние плагины — лицензия правообладателю. Не накручиваем чужую цену и показываем, за что платит клиент.</p>
+                    <span class="link-more">Как считаются плагины {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+
+                <a class="card" href="{{ 'services-booking'|page }}">
+                    <span class="contact-card__icon">{{ elv_icon('calendar-check')|raw }}</span>
+                    <h3>Сайт с онлайн-записью</h3>
+                    <p class="muted">Модуль записи, слоты, услуги и подтверждения. Подходит для студий, мастеров и консультаций. Цена модуля — в каталоге.</p>
+                    <span class="link-more">Посмотреть сценарий {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+
+                <a class="card" href="{{ 'services-audit'|page }}">
+                    <span class="contact-card__icon">{{ elv_icon('search')|raw }}</span>
+                    <h3>Бесплатный аудит</h3>
+                    <p class="muted">Первичная проверка скорости, SEO-основы, безопасности и мобильной версии. Короткий отчёт на 1–2 страницы и понятный следующий шаг.</p>
+                    <span class="link-more">Заказать аудит {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Границы</span>
+                    <h2>Что мы не делаем</h2>
+                    <p>
+                        Не продаём хостинг под видом своего, не обещаем «первые места в Google»
+                        и не называем срок поддержки бесконечным. Если для задачи нужен сторонний
+                        сервис, клиент платит ему напрямую и остаётся владельцем аккаунта.
+                    </p>
+                </div>
+                <div class="card card--flat">
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} Не выдаём чужой хостинг за собственный</li>
+                        <li>{{ elv_icon('close')|raw }} Не прячем стоимость домена и SSL</li>
+                        <li>{{ elv_icon('close')|raw }} Не продаём поддержку без описания задач</li>
+                        <li>{{ elv_icon('close')|raw }} Не обещаем позиции и трафик без данных</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Порядок</span>
+                <h2>Как проходит работа</h2>
+            </div>
+            <div class="grid grid--3">
+                <div class="card">
+                    <b>01</b>
+                    <h3>Короткий бриф</h3>
+                    <p class="muted">Что за бизнес, какие разделы нужны, кто принимает решения. Без 40 полей и созвонов на два часа.</p>
+                </div>
+                <div class="card">
+                    <b>02</b>
+                    <h3>Смета и границы</h3>
+                    <p class="muted">Фиксируем, что входит, что оплачивается отдельно и что зависит от провайдера. Смета не превращается в «уточним потом».</p>
+                </div>
+                <div class="card">
+                    <b>03</b>
+                    <h3>Запуск и передача</h3>
+                    <p class="muted">Доступы, домен и аккаунты остаются у клиента. Показываем, как обновлять контент и что делать при сбое.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="services-faq">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Коротко о деньгах и границах</h2>
+            </div>
+            <div class="faq">
+                {% for item in elv_service_faq() %}
+                    <details>
+                        <summary>{{ item.q }}</summary>
+                        <div><p>{{ item.a }}</p></div>
+                    </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Соберём смету без скрытых строк' text='Покажем, что относится к Elv Kit, что оплачивается провайдеру и где начинается отдельная работа.' cta_url=calcUrl cta_label='Открыть калькулятор' %}
+        </div>
+    </section>
+</main>

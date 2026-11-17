@@ -1,0 +1,141 @@
+title = "Хостинг и запуск"
+url = "/services/hosting/"
+layout = "default"
+meta_title = "Хостинг для October CMS: требования и запуск — Elv Kit"
+meta_description = "Что проверить у хостинга для October CMS: PHP 8.2+, MySQL 8, public, SSH, cron, HTTPS и бэкапы. Поможем с запуском, но хостинг оплачивается провайдеру напрямую."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set calcUrl = 'calculator'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги · Хостинг</span>
+            <h1>Хостинг для October CMS без наценки</h1>
+            <p class="lead">
+                Мы не продаём хостинг и не выдаём чужой тариф за свой. Помогаем выбрать
+                провайдера, проверить требования и настроить запуск. Оплата и аккаунт остаются у вас.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">Посчитать запуск</a>
+                <a class="btn btn--ghost" href="{{ 'services-audit'|page }}">Проверить текущий сайт</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Требования</span>
+                    <h2>Что должно быть у провайдера</h2>
+                    <p>
+                        October CMS — это PHP-приложение. Дешёвый «сайт-конструктор» с закрытым
+                        доступом к файлам не подойдёт: нужны SSH, composer и записываемая папка
+                        <code>storage</code>. Проверяем это до оплаты, а не после.
+                    </p>
+                </div>
+                <div class="card card--flat">
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} PHP 8.2+ и необходимые расширения</li>
+                        <li>{{ elv_icon('check')|raw }} MySQL 8 или совместимая база</li>
+                        <li>{{ elv_icon('check')|raw }} Корень сайта в <code>public/</code></li>
+                        <li>{{ elv_icon('check')|raw }} SSH, composer и записываемый <code>storage</code></li>
+                        <li>{{ elv_icon('check')|raw }} HTTPS, cron и резервные копии</li>
+                        <li>{{ elv_icon('check')|raw }} Доступ к логам и настройкам почты</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Деньги</span>
+                <h2>Кто кому платит</h2>
+                <p>Три отдельные строки, которые нельзя смешивать в одну цену.</p>
+            </div>
+            <div class="grid grid--3">
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('globe')|raw }}</span>
+                    <h3>Хостинг</h3>
+                    <p class="muted">Клиент платит провайдеру по его тарифу. Мы не добавляем наценку и не получаем скрытую комиссию.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('lock')|raw }}</span>
+                    <h3>Домен и SSL</h3>
+                    <p class="muted">Домен оформляется на клиента. SSL обычно входит в хостинг или выпускается бесплатно; условия зависят от провайдера.</p>
+                </div>
+                <div class="card">
+                    <span class="contact-card__icon">{{ elv_icon('wrench')|raw }}</span>
+                    <h3>Запуск</h3>
+                    <p class="muted">Проверка требований, установка, HTTPS, cron и бэкапы. Если нужна помощь — считается отдельно после проверки.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Запуск</span>
+                    <h2>Что делаем на стороне сайта</h2>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Проверяем версию PHP, базу и права на файлы</li>
+                        <li>{{ elv_icon('check')|raw }} Разворачиваем Elv Kit и подключаем домен</li>
+                        <li>{{ elv_icon('check')|raw }} Настраиваем HTTPS, редиректы и почту</li>
+                        <li>{{ elv_icon('check')|raw }} Включаем cron для очередей и резервных копий</li>
+                        <li>{{ elv_icon('check')|raw }} Проверяем формы, оплату и основные страницы</li>
+                        <li>{{ elv_icon('check')|raw }} Передаём доступы и короткую инструкцию</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Чего не обещаем</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} «Идеальный хостинг» без проверки нагрузки</li>
+                        <li>{{ elv_icon('close')|raw }} Бесплатный домен навсегда</li>
+                        <li>{{ elv_icon('close')|raw }} Круглосуточный SLA у провайдера</li>
+                        <li>{{ elv_icon('close')|raw }} Сохранность данных без бэкапов</li>
+                    </ul>
+                    <p class="muted mt-24">Если у провайдера нет нужных функций, честно скажем до оплаты.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Хостинг и запуск</h2>
+            </div>
+            <div class="faq">
+                <details>
+                    <summary>Можно остаться на своём хостинге?</summary>
+                    <div><p>Да. Пришлите доступ к панели или список характеристик — проверим PHP, MySQL, SSH, cron и права на файлы. Если чего-то не хватает, покажем, что именно.</p></div>
+                </details>
+                <details>
+                    <summary>Вы продаёте хостинг?</summary>
+                    <div><p>Нет. Мы не перепродаём хостинг и не добавляем наценку. Клиент платит провайдеру напрямую и остаётся владельцем аккаунта.</p></div>
+                </details>
+                <details>
+                    <summary>Сколько стоит помощь с запуском?</summary>
+                    <div><p>Зависит от состояния хостинга, домена и почты. После короткой проверки называем сумму и границы. В калькуляторе этой строки нет, потому что без проверки это было бы выдуманное число.</p></div>
+                </details>
+                <details>
+                    <summary>Кто отвечает за бэкапы?</summary>
+                    <div><p>Провайдер отвечает за инфраструктуру, сайт — за свои данные. Мы настраиваем регулярный бэкап и показываем, где он лежит. Проверка восстановления — отдельный шаг.</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Проверим хостинг до оплаты' text='Пришлите тариф провайдера или доступ к панели. Скажем, подходит ли он для October CMS, и что нужно поправить.' cta_url=calcUrl cta_label='Открыть калькулятор' %}
+        </div>
+    </section>
+</main>

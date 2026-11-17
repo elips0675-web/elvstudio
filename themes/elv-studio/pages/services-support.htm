@@ -1,0 +1,131 @@
+title = "Поддержка сайта"
+url = "/services/support/"
+layout = "default"
+meta_title = "Поддержка сайта на Elv Kit: что входит и сколько длится"
+meta_description = "Поддержка входит в тариф Elv Kit на 30, 90 или 365 дней. Показываем, что входит, что считается отдельно и почему нет «среднего чека» на продление без описания задач."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set calc = elv_calculator() %}
+{% set calcUrl = 'calculator'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги · Поддержка</span>
+            <h1>Поддержка, которая входит в тариф</h1>
+            <p class="lead">
+                Не продаём «бесконечную поддержку» и не прячем срок в мелком шрифте.
+                В тарифе Elv Kit уже есть поддержка и обновления — на конкретный срок.
+                Дальше продление считается по объёму работ.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">Посмотреть срок в смете</a>
+                <a class="btn btn--ghost" href="{{ 'services-audit'|page }}">Проверить сайт</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">По тарифам</span>
+                <h2>Срок поддержки и обновлений</h2>
+                <p>Цены и сроки берутся из каталога, а не из текста этой страницы.</p>
+            </div>
+            <div class="grid grid--3">
+                {% for plan in calc.plans %}
+                    <div class="card">
+                        <span class="eyebrow">{{ plan.label }}</span>
+                        <h3>{{ plan.price_label }}</h3>
+                        <p class="muted">{{ plan.period }}</p>
+                        <ul class="list-check mt-24">
+                            <li>{{ elv_icon('check')|raw }} Поддержка {{ plan.support }}</li>
+                            <li>{{ elv_icon('check')|raw }} Обновления {{ plan.updates }}</li>
+                            <li>{{ elv_icon('check')|raw }} {{ plan.sites }}</li>
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Что входит</span>
+                    <h2>Помощь по продукту, а не «любая задача»</h2>
+                    <p>
+                        Поддержка — это вопросы по установке, обновлениям и ошибкам Elv Kit,
+                        а также консультации по настройке. Новые разделы, перенос контента
+                        и кастомные интеграции — отдельная работа.
+                    </p>
+                </div>
+                <div class="card card--flat">
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Обновления и исправления Elv Kit</li>
+                        <li>{{ elv_icon('check')|raw }} Помощь с установкой и настройкой</li>
+                        <li>{{ elv_icon('check')|raw }} Разбор ошибок в рамках продукта</li>
+                        <li>{{ elv_icon('check')|raw }} Консультации по возможностям модулей</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Отдельно</span>
+                    <h2>Что считается отдельной работой</h2>
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} Новые страницы и разделы под задачу</li>
+                        <li>{{ elv_icon('close')|raw }} Перенос контента и обучение команды</li>
+                        <li>{{ elv_icon('close')|raw }} Интеграции с чужими сервисами</li>
+                        <li>{{ elv_icon('close')|raw }} Срочные правки и работа в выходные</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Почему нет месячного тарифа</h3>
+                    <p class="muted">
+                        Месячная цена без описания задач — это лотерея. Одному нужно два письма,
+                        другому — десять правок и интеграция. Мы считаем продление после короткого
+                        списка работ, чтобы не закладывать в тариф чужие задачи.
+                    </p>
+                    <a class="link-more" href="{{ 'booking'|page }}">Обсудить продление {{ elv_icon('arrow-right')|raw }}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Поддержка без мелкого шрифта</h2>
+            </div>
+            <div class="faq">
+                <details>
+                    <summary>Что будет после окончания срока?</summary>
+                    <div><p>Сайт продолжит работать. Обновления и новые исправления перестанут входить в тариф. Продление считается отдельно по списку задач; если поддержка не нужна, ничего навязывать не будем.</p></div>
+                </details>
+                <details>
+                    <summary>Можно продлить только обновления?</summary>
+                    <div><p>Да, если это возможно для вашей версии. Скажем, какие обновления нужны и что они затронут. Это отдельная смета.</p></div>
+                </details>
+                <details>
+                    <summary>Есть ли срочная поддержка?</summary>
+                    <div><p>Срочность обсуждается отдельно. Мы не обещаем круглосуточный SLA, если его нет в договоре. Лучше честно сказать «завтра», чем изображать «через 15 минут».</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Посчитайте поддержку в смете' text='Калькулятор покажет, сколько дней поддержки входит в тариф и что оплачивается отдельно.' cta_url=calcUrl cta_label='Открыть калькулятор' %}
+        </div>
+    </section>
+</main>

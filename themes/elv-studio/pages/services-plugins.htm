@@ -1,0 +1,101 @@
+title = "Модули и плагины"
+url = "/services/plugins/"
+layout = "default"
+meta_title = "Модули и плагины для Elv Kit: свои и сторонние"
+meta_description = "Свои модули Elv Kit продаются по отдельности, блог уже входит. Сторонние плагины оплачиваются правообладателю: показываем, что входит в цену, а что нет."
+==
+{% set crumbs = elv_breadcrumbs() %}
+{% set modules = elv_modules() %}
+{% set calcUrl = 'calculator'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Услуги · Плагины</span>
+            <h1>Свои модули и чужие лицензии — раздельно</h1>
+            <p class="lead">
+                Модули Elv Kit можно купить по отдельности. Сторонние плагины живут по своим
+                лицензиям: их стоимость оплачивается правообладателю, а не нам.
+                В смете это разные строки.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">Собрать смету</a>
+                <a class="btn btn--ghost" href="{{ 'pricing'|page }}">Смотреть цены</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Свои модули</span>
+                <h2>Что можно добавить к Elv Kit</h2>
+                <p>Цены — из каталога. Блог уже включён, отдельно за него платить не нужно.</p>
+            </div>
+            <div class="grid grid--2">
+                {% for module in modules %}
+                    <a class="card" href="{{ module.url }}">
+                        <span class="contact-card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</span>
+                        <h3>{{ module.name }}</h3>
+                        <p class="muted">{{ module.tagline }}</p>
+                        <b>{{ module.price_label }}</b>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Сторонние</span>
+                    <h2>Плагин — не наш продукт</h2>
+                    <p>
+                        Если для задачи нужен сторонний плагин, клиент покупает лицензию
+                        у правообладателя. Мы не прячем чужую цену в своей и не продаём
+                        «вечную лицензию», которой у нас нет.
+                    </p>
+                </div>
+                <div class="card card--flat">
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Показываем, где покупается лицензия</li>
+                        <li>{{ elv_icon('check')|raw }} Не добавляем скрытую наценку</li>
+                        <li>{{ elv_icon('check')|raw }} Установку и настройку считаем отдельно</li>
+                        <li>{{ elv_icon('check')|raw }} Проверяем совместимость до покупки</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопросы</span>
+                <h2>Лицензии и совместимость</h2>
+            </div>
+            <div class="faq">
+                <details>
+                    <summary>Можно поставить свой плагин?</summary>
+                    <div><p>Да, если он совместим с October CMS и не конфликтует с Elv Kit. Пришлите название и ссылку — проверим до установки.</p></div>
+                </details>
+                <details>
+                    <summary>Кто отвечает за сторонний плагин?</summary>
+                    <div><p>Правообладатель. Мы можем помочь с установкой и настройкой, но не выдаём чужой код за свой и не обещаем его поддержку навсегда.</p></div>
+                </details>
+                <details>
+                    <summary>Обновления модулей входят в тариф?</summary>
+                    <div><p>Обновления Elv Kit и его модулей входят на срок тарифа. Обновления сторонних плагинов зависят от их автора и лицензии.</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Подберём модули под задачу' text='Не нужно покупать всё сразу. Соберём минимальный набор и покажем, что можно добавить позже.' cta_url=calcUrl cta_label='Открыть калькулятор' %}
+        </div>
+    </section>
+</main>

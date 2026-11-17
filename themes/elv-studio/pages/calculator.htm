@@ -1,0 +1,439 @@
+title = "Калькулятор"
+url = "/calculator/"
+layout = "default"
+meta_title = "Калькулятор стоимости сайта на Elv Kit — Elv Studio"
+meta_description = "Соберите смету за две минуты: тариф Elv Kit, модули, поддержка и хостинг. Три суммы раздельно, разбивка и дата актуальности цен. Без скрытых платежей."
+==
+{% set calc = elv_calculator() %}
+{% set crumbs = elv_breadcrumbs() %}
+{% set bookingUrl = 'booking'|page %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Калькулятор</span>
+            <h1>Соберите смету за две минуты</h1>
+            <p class="lead">
+                Выберите тариф и модули. Калькулятор покажет запуск, годовую часть и поддержку
+                раздельно — чтобы было видно, за что вы платите, а что оплачивается провайдеру.
+            </p>
+            <div class="stack-actions">
+                <a class="btn btn--ghost" href="{{ 'pricing'|page }}">Смотреть все тарифы</a>
+                <a class="btn btn--ghost" href="{{ 'services'|page }}">Услуги вокруг запуска</a>
+            </div>
+        </div>
+    </section>
+
+    {% if not calc.enabled %}
+        <section class="section">
+            <div class="container">
+                <div class="empty">
+                    <h2>Калькулятор временно выключен</h2>
+                    <p>Цены и условия можно посмотреть на странице <a href="{{ 'pricing'|page }}">«Цены»</a>, а задачу обсудить на <a href="{{ 'booking'|page }}">30-минутном разборе</a>.</p>
+                </div>
+            </div>
+        </section>
+    {% elseif calc.plans is empty %}
+        <section class="section">
+            <div class="container">
+                <div class="empty">
+                    <h2>Прайс пока пуст</h2>
+                    <p>Мы не показываем выдуманные числа. Напишите на <a href="{{ 'contacts'|page }}">контакты</a>, и мы пришлём актуальную смету вручную.</p>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        <section class="section">
+            <div class="container">
+                <div class="calc" data-calculator data-symbol="{{ calc.symbol }}" data-currency="{{ calc.currency }}" data-updated="{{ calc.prices_updated_at }}">
+                    <div class="calc__main">
+                        <div class="calc-progress" aria-label="Шаги калькулятора">
+                            <button type="button" class="calc-progress__item is-active" data-calc-go="0"><span>1</span> Задача</button>
+                            <button type="button" class="calc-progress__item" data-calc-go="1"><span>2</span> Модули</button>
+                            <button type="button" class="calc-progress__item" data-calc-go="2"><span>3</span> Хостинг</button>
+                            <button type="button" class="calc-progress__item" data-calc-go="3"><span>4</span> Запуск</button>
+                        </div>
+
+                        <div class="calc-step is-active" data-calc-step="0">
+                            <div class="calc-step__head">
+                                <span class="eyebrow">Шаг 1</span>
+                                <h2>Что запускаем</h2>
+                                <p>Тип сайта помогает не забыть модули. Цену определяет тариф.</p>
+                            </div>
+
+                            <div class="calc-fieldset">
+                                <span class="calc-label">Тип сайта</span>
+                                <div class="calc-grid calc-grid--2">
+                                    <label class="calc-choice">
+                                        <input type="radio" name="task" value="landing" checked>
+                                        <span><b>Лендинг</b><small>Одна услуга или продукт</small></span>
+                                    </label>
+                                    <label class="calc-choice">
+                                        <input type="radio" name="task" value="services">
+                                        <span><b>Сайт услуг</b><small>Несколько направлений и запись</small></span>
+                                    </label>
+                                    <label class="calc-choice">
+                                        <input type="radio" name="task" value="shop">
+                                        <span><b>Магазин</b><small>Товары, корзина и оплата</small></span>
+                                    </label>
+                                    <label class="calc-choice">
+                                        <input type="radio" name="task" value="booking">
+                                        <span><b>Онлайн-запись</b><small>Слоты, услуги и подтверждения</small></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="calc-fieldset">
+                                <span class="calc-label">Тариф Elv Kit</span>
+                                <div class="calc-plans">
+                                    {% for plan in calc.plans %}
+                                        <label class="calc-plan{% if plan.featured %} calc-plan--featured{% endif %}">
+                                            <input
+                                                type="radio"
+                                                name="plan"
+                                                value="{{ plan.key }}"
+                                                data-price="{{ plan.price }}"
+                                                data-label="{{ plan.label }}"
+                                                data-support="{{ plan.support }}"
+                                                data-updates="{{ plan.updates }}"
+                                                data-sites="{{ plan.sites }}"
+                                                {% if plan.key == 'single' %}checked{% endif %}>
+                                            <span class="calc-plan__body">
+                                                <span class="calc-plan__top">
+                                                    <span class="calc-plan__name">{{ plan.label }}</span>
+                                                    {% if plan.featured %}<span class="badge">Выбирают чаще</span>{% endif %}
+                                                </span>
+                                                <b class="calc-plan__price">{{ plan.price_label }}</b>
+                                                <small>{{ plan.period }}</small>
+                                                <ul>
+                                                    {% for feature in plan.features %}
+                                                        <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="calc-actions">
+                                <button type="button" class="btn btn--primary" data-calc-next>Далее: модули</button>
+                            </div>
+                        </div>
+
+                        <div class="calc-step" data-calc-step="1">
+                            <div class="calc-step__head">
+                                <span class="eyebrow">Шаг 2</span>
+                                <h2>Модули</h2>
+                                <p>Блог уже входит в Elv Kit. Остальные модули можно добавить к лицензии.</p>
+                            </div>
+
+                            <div class="calc-modules">
+                                {% for module in calc.modules %}
+                                    <label class="calc-module">
+                                        <input
+                                            type="checkbox"
+                                            name="modules"
+                                            value="{{ module.slug }}"
+                                            data-price="{{ module.price }}"
+                                            data-label="{{ module.label }}">
+                                        <span class="calc-module__icon">{{ elv_icon(module.icon)|raw }}</span>
+                                        <span class="calc-module__body">
+                                            <b>{{ module.label }}</b>
+                                            <small>{{ module.tagline }}</small>
+                                        </span>
+                                        <span class="calc-module__price">{{ module.price_label }}</span>
+                                    </label>
+                                {% else %}
+                                    <div class="empty">
+                                        <p>Отдельных модулей сейчас нет — Elv Kit уже включает все разделы.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <p class="calc-note">Сторонние плагины в эту сумму не входят: их лицензии оплачиваются правообладателю. Поможем с установкой отдельно, если нужно.</p>
+
+                            <div class="calc-actions">
+                                <button type="button" class="btn btn--ghost" data-calc-back>Назад</button>
+                                <button type="button" class="btn btn--primary" data-calc-next>Далее: хостинг</button>
+                            </div>
+                        </div>
+
+                        <div class="calc-step" data-calc-step="2">
+                            <div class="calc-step__head">
+                                <span class="eyebrow">Шаг 3</span>
+                                <h2>Хостинг</h2>
+                                <p>Хостинг и домен студия не продаёт. Клиент платит провайдеру напрямую.</p>
+                            </div>
+
+                            <div class="calc-fieldset">
+                                <span class="calc-label">Что уже есть</span>
+                                <div class="calc-grid calc-grid--1">
+                                    <label class="calc-choice">
+                                        <input type="radio" name="hosting" value="own" checked>
+                                        <span><b>Свой хостинг</b><small>Проверим требования и поможем с запуском</small></span>
+                                    </label>
+                                    <label class="calc-choice">
+                                        <input type="radio" name="hosting" value="need">
+                                        <span><b>Нужен хостинг</b><small>Подскажем 2–3 варианта под October CMS</small></span>
+                                    </label>
+                                    <label class="calc-choice">
+                                        <input type="radio" name="hosting" value="help">
+                                        <span><b>Нужна помощь с выбором</b><small>Разберём нагрузку, почту, бэкапы и cron</small></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="calc-note">
+                                <b>Что проверить у провайдера:</b> PHP 8.2+, MySQL 8, корень сайта в <code>public/</code>,
+                                SSH и composer, записываемый <code>storage</code>, HTTPS, cron и резервные копии.
+                                <br>{{ calc.hosting_note }}
+                            </div>
+
+                            <div class="calc-actions">
+                                <button type="button" class="btn btn--ghost" data-calc-back>Назад</button>
+                                <button type="button" class="btn btn--primary" data-calc-next>Далее: запуск</button>
+                            </div>
+                        </div>
+
+                        <div class="calc-step" data-calc-step="3">
+                            <div class="calc-step__head">
+                                <span class="eyebrow">Шаг 4</span>
+                                <h2>Запуск и поддержка</h2>
+                                <p>Проверьте состав и покажите смету. Точная сумма фиксируется после брифа.</p>
+                            </div>
+
+                            <div class="calc-review">
+                                <div class="calc-review__row"><span>Тариф</span><b data-review-plan>Один сайт</b></div>
+                                <div class="calc-review__row"><span>Сайтов</span><span data-review-sites>1 сайт</span></div>
+                                <div class="calc-review__row"><span>Поддержка в тарифе</span><span data-review-support>30 дней</span></div>
+                                <div class="calc-review__row"><span>Обновления</span><span data-review-updates>12 месяцев</span></div>
+                                <div class="calc-review__row"><span>Модули</span><span data-review-modules>не выбраны</span></div>
+                            </div>
+
+                            <div class="calc-note">{{ calc.support_note }}</div>
+
+                            <div class="calc-actions">
+                                <button type="button" class="btn btn--ghost" data-calc-back>Назад</button>
+                                <button type="button" class="btn btn--primary" data-calc-show-result>Показать смету</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="calc-summary card" aria-live="polite">
+                        <span class="eyebrow">Смета</span>
+                        <h2>Предварительно</h2>
+                        <div class="calc-summary__rows">
+                            <div class="calc-summary__row"><span>Запуск, разово</span><b data-total-launch>$79</b></div>
+                            <div class="calc-summary__row"><span>Хостинг и лицензии, в год</span><b data-total-annual>$0</b></div>
+                            <p class="calc-summary__hint">у студии; хостинг и домен — провайдеру</p>
+                            <div class="calc-summary__row"><span>Поддержка, в месяц</span><b data-total-monthly>$0</b></div>
+                            <p class="calc-summary__hint">включена в тариф на <span data-total-support>30 дней</span></p>
+                            <div class="calc-summary__row"><span>Дальше в год</span><b data-total-next>$0</b></div>
+                            <p class="calc-summary__hint">без хостинга провайдера</p>
+                        </div>
+                        <div class="calc-summary__total"><span>Первый год, студии</span><b data-total-year>$79</b></div>
+                        <button type="button" class="btn btn--primary btn--block" data-calc-show-result>Показать смету</button>
+                        <a class="btn btn--ghost btn--block" href="{{ 'booking'|page }}">Записаться на 30 минут</a>
+                        <p class="calc-date">Цены обновлены {{ calc.prices_updated_at }}. Не оферта.</p>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="calculator-result" hidden>
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Результат</span>
+                    <h2>Смета на запуск</h2>
+                    <p>Три суммы раздельно. Хостинг и домен в сумму студии не входят.</p>
+                </div>
+
+                <div class="calc-result">
+                    <article class="card calc-result__card">
+                        <span class="calc-result__label">Запуск</span>
+                        <b data-result-launch>$79</b>
+                        <small>разово</small>
+                    </article>
+                    <article class="card calc-result__card">
+                        <span class="calc-result__label">Хостинг и лицензии</span>
+                        <b data-result-annual>$0</b>
+                        <small>в год у студии</small>
+                    </article>
+                    <article class="card calc-result__card">
+                        <span class="calc-result__label">Поддержка</span>
+                        <b data-result-monthly>$0</b>
+                        <small>в месяц, включена</small>
+                    </article>
+                    <article class="card calc-result__card calc-result__card--total">
+                        <span class="calc-result__label">Первый год</span>
+                        <b data-result-year>$79</b>
+                        <small>итого студии</small>
+                    </article>
+                </div>
+
+                <div class="calc-result__grid">
+                    <div class="card">
+                        <h3>Разбивка</h3>
+                        <table class="calc-breakdown">
+                            <tbody data-breakdown></tbody>
+                        </table>
+                        <p class="calc-note">Хостинг и домен оплачиваются провайдеру. Сторонние плагины — правообладателю.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Что входит</h3>
+                        <ul class="list-check mt-24">
+                            {% for item in elv_includes() %}
+                                <li>{{ elv_icon('check')|raw }} {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                        <h3 class="mt-32">Что оплачивается отдельно</h3>
+                        <ul class="list-check list-check--no mt-24">
+                            {% for item in elv_excludes() %}
+                                <li>{{ elv_icon('close')|raw }} {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="calc-result__actions">
+                    <button type="button" class="btn btn--primary" data-calc-print>{{ elv_icon('download')|raw }} Скачать PDF</button>
+                    <a class="btn btn--ghost" href="#calculator-request">Отправить смету</a>
+                    <a class="btn btn--ghost" href="{{ 'booking'|page }}">Записаться на 30 минут</a>
+                </div>
+                <p class="calc-note">Откроется печать — выберите «Сохранить как PDF». Это не оферта: точная сумма фиксируется после брифа.</p>
+
+                <div class="card calc-request" id="calculator-request">
+                    <h3>Отправить смету</h3>
+                    <p class="muted">Сохраним состав, сумму и UTM-метки. Пароли и карточные данные не нужны.</p>
+
+                    <form
+                        class="form"
+                        id="calculator-request-form"
+                        method="post"
+                        action="{{ url('/feedback') }}"
+                        data-elv-form
+                        data-calc-request
+                        data-success="Смета отправлена. Ответим на указанный e-mail.">
+                        {{ elv_csrf()|raw }}
+                        <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <input type="hidden" name="source" value="calculator">
+                        <input type="hidden" name="subject" value="Смета Elv Kit">
+                        <input type="hidden" name="message" id="calc-message" value="Запрос сметы Elv Kit">
+
+                        <div class="form__row">
+                            <div class="field">
+                                <label for="calc-name">Имя</label>
+                                <input class="input" id="calc-name" type="text" name="name" required maxlength="160" autocomplete="name">
+                            </div>
+                            <div class="field">
+                                <label for="calc-email">E-mail</label>
+                                <input class="input" id="calc-email" type="email" name="email" required maxlength="191" autocomplete="email">
+                            </div>
+                        </div>
+                        <div class="form__row">
+                            <div class="field">
+                                <label for="calc-phone">Телефон <span class="muted">— необязательно</span></label>
+                                <input class="input" id="calc-phone" type="tel" name="phone" maxlength="32" autocomplete="tel">
+                            </div>
+                            <div class="field">
+                                <label for="calc-site">Сайт <span class="muted">— необязательно</span></label>
+                                <input class="input" id="calc-site" type="url" name="site" maxlength="191" placeholder="https://">
+                            </div>
+                        </div>
+
+                        <label class="check">
+                            <input type="checkbox" name="consent" value="1" required>
+                            <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                        </label>
+
+                        <div>
+                            <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить смету</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--paper">
+            <div class="container">
+                <div class="split">
+                    <div>
+                        <span class="eyebrow">Как считается</span>
+                        <h2>Без «от 100 рублей» и скрытых строк</h2>
+                        <p>
+                            Запуск — это лицензия Elv Kit и выбранные модули. Годовая часть у студии равна нулю:
+                            обновления уже входят в тариф, а хостинг оплачивается провайдеру. Поддержка входит
+                            на срок тарифа; продление после него считается отдельно по объёму работ.
+                        </p>
+                        <ul class="list-check mt-24">
+                            <li>{{ elv_icon('check')|raw }} Цены — из каталога и настроек, без чисел в шаблоне</li>
+                            <li>{{ elv_icon('check')|raw }} Дата актуальности и пометка «не оферта»</li>
+                            <li>{{ elv_icon('check')|raw }} Хостинг, домен и сторонние лицензии — отдельно</li>
+                        </ul>
+                    </div>
+                    <div class="card card--flat">
+                        <h3>Что это не значит</h3>
+                        <ul class="list-check list-check--no mt-24">
+                            <li>{{ elv_icon('close')|raw }} Это не финальная цена кастомной разработки</li>
+                            <li>{{ elv_icon('close')|raw }} Это не SLA и не обещание срока без брифа</li>
+                            <li>{{ elv_icon('close')|raw }} Это не продажа хостинга и чужих плагинов</li>
+                            <li>{{ elv_icon('close')|raw }} Это не скидка, которая сгорит через час</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="calculator-faq">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Вопросы</span>
+                    <h2>Что уточняют до оплаты</h2>
+                </div>
+                <div class="faq">
+                    {% for item in elv_calculator_faq() %}
+                        <details>
+                            <summary>{{ item.q }}</summary>
+                            <div><p>{{ item.a }}</p></div>
+                        </details>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <div class="calc-print" id="calculator-print" aria-hidden="true">
+            <h2>Смета Elv Kit</h2>
+            <p>Дата: {{ calc.prices_updated_at }}. Смета не является офертой.</p>
+            <p><b>Тариф:</b> <span data-print-plan></span></p>
+            <p><b>Модули:</b> <span data-print-modules></span></p>
+            <table class="calc-breakdown">
+                <tbody data-print-breakdown></tbody>
+            </table>
+            <p><b>Запуск:</b> <span data-print-launch></span></p>
+            <p><b>Хостинг и лицензии, в год:</b> <span data-print-annual></span> (у студии; хостинг — провайдеру)</p>
+            <p><b>Поддержка, в месяц:</b> <span data-print-monthly></span> (включена в тариф)</p>
+            <p><b>Первый год, студии:</b> <span data-print-year></span></p>
+            <p><b>Дальше в год, студии:</b> <span data-print-next></span></p>
+            <hr>
+            <p>Хостинг, домен и лицензии сторонних плагинов оплачиваются напрямую провайдеру и правообладателю.</p>
+            <p>Контакты: {{ elv_setting('email') }}{% if elv_setting('telegram') %} · {{ elv_setting('telegram') }}{% endif %}</p>
+        </div>
+
+        <noscript>
+            <section class="section">
+                <div class="container">
+                    <div class="alert alert--warn" role="status">Для расчёта нужен JavaScript. Цены тарифов и модулей видны выше, а смету можно запросить на <a href="{{ 'contacts'|page }}">контактах</a>.</div>
+                </div>
+            </section>
+        </noscript>
+    {% endif %}
+
+    <section class="section">
+        <div class="container">
+            {% partial 'cta' title='Нужен разбор, а не догадки' text='Покажем, что входит в смету, что оплачивается отдельно и где начинается кастомная работа.' cta_url=bookingUrl cta_label='Записаться на 30 минут' %}
+        </div>
+    </section>
+</main>

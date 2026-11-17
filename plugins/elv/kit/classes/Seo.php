@@ -17,6 +17,8 @@ class Seo
     public const SECTIONS = [
         'kit' => 'Возможности',
         'modules' => 'Разделы',
+        'services' => 'Услуги',
+        'calculator' => 'Калькулятор',
         'pricing' => 'Цены',
         'demo' => 'Демо',
         'blog' => 'Блог',
@@ -178,6 +180,18 @@ class Seo
             return (string) $product->name;
         }
 
+        $sections = [
+            'hosting' => 'Хостинг сайта',
+            'support' => 'Поддержка сайта',
+            'plugins' => 'Плагины для October CMS',
+            'booking' => 'Сайт с онлайн-записью',
+            'audit' => 'Бесплатный аудит сайта',
+        ];
+
+        if (isset($sections[$slug])) {
+            return $sections[$slug];
+        }
+
         return ucfirst(str_replace('-', ' ', $slug));
     }
 
@@ -227,7 +241,15 @@ class Seo
         }
 
         if ($pageId === 'pricing') {
-            $graph[] = static::faqNode(static::canonical() . '#faq');
+            $graph[] = static::faqNode(static::canonical() . '#pricing-faq');
+        }
+
+        if ($pageId === 'calculator') {
+            $graph[] = static::faqNode(static::canonical() . '#calculator-faq', 'calculator');
+        }
+
+        if ($pageId === 'services') {
+            $graph[] = static::faqNode(static::canonical() . '#services-faq', 'services');
         }
 
         if ($pageId === 'kit') {
@@ -295,11 +317,11 @@ class Seo
         ]);
     }
 
-    protected static function faqNode(?string $id = null): array
+    protected static function faqNode(?string $id = null, string $source = 'faq'): array
     {
         $items = [];
 
-        foreach (Faq::items() as $item) {
+        foreach (Faq::items($source) as $item) {
             $items[] = [
                 '@type' => 'Question',
                 'name' => $item['q'],
@@ -409,6 +431,8 @@ class Seo
             '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка; цена от ' . Money::format($kit ? $kit->price_cents : 7900) . '.',
             '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
             '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
+            '- [Калькулятор](' . static::base() . '/calculator/): лицензия и модули, три суммы и разбивка без скрытых платежей.',
+            '- [Услуги](' . static::base() . '/services/): хостинг, поддержка, плагины, онлайн-запись и бесплатный аудит.',
             '',
             '## Помощь',
             '- [Инструкция](' . static::base() . '/docs/): запуск на своём домене по шагам, без команд.',

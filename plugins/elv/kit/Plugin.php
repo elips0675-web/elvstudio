@@ -2,6 +2,7 @@
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
@@ -217,6 +218,18 @@ class Plugin extends PluginBase
                 },
                 'elv_plans' => function ($product = null) {
                     return Catalog::plans($product instanceof Product ? $product : null);
+                },
+                'elv_calculator' => function () {
+                    return Calculator::data();
+                },
+                'elv_calculator_estimate' => function ($plan, $modules = []) {
+                    return Calculator::estimate((string) $plan, $modules);
+                },
+                'elv_calculator_faq' => function () {
+                    return Faq::items('calculator');
+                },
+                'elv_service_faq' => function () {
+                    return Faq::items('services');
                 },
                 'elv_compare' => function () {
                     return Catalog::comparison();

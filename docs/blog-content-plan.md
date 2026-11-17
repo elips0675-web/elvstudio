@@ -134,9 +134,9 @@ Laragon).
 ### 4.4. FAQ, изображения, схема
 
 - FAQ-блока нет ни в одной статье.
-- `FAQPage` в `Seo.php:298-311` собирается только из общего FAQ сайта, не из
-  статьи.
-- `BlogPosting` (`Seo.php:336-356`) с 16.11.2026 содержит `image`,
+- `FAQPage` в `Seo.php` (`faqNode()`) собирается из `config/faq.php`, а также
+  из `config/calculator.php` и `config/services.php`; для статьи не строится.
+- `BlogPosting` (`Seo.php`, `articleNode()`) с 16.11.2026 содержит `image`,
   `wordCount`, `keywords`, `articleSection`; `image` — общий `og-default.png`.
   `dateModified` есть, видимая дата обновления добавлена 16.11.2026.
 

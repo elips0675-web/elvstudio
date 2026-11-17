@@ -8,6 +8,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 {% set plans = elv_plans(kit) %}
 {% set crumbs = elv_breadcrumbs() %}
 {% set orderUrl = 'order'|page %}
+{% set calcUrl = 'calculator'|page %}
 
 <main id="main">
     <section class="page-hero">
@@ -20,10 +21,14 @@ meta_description = "Сколько стоит готовый сайт: тари�
                 по выбранному тарифу. Хостинг и домен оплачиваются отдельно провайдеру.
             </p>
             <div class="stack-actions">
+                <a class="btn btn--primary" href="{{ calcUrl }}">
+                    {{ elv_icon('wallet')|raw }} Рассчитать стоимость
+                </a>
                 <a class="btn btn--ghost" href="{{ 'booking'|page }}">
                     {{ elv_icon('calendar-check')|raw }} Записаться на 30 минут
                 </a>
             </div>
+            <p class="muted"><small>Цены обновлены {{ elv_setting('prices_updated_at', '17.11.2026') }}. Не оферта.</small></p>
         </div>
     </section>
 
