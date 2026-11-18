@@ -27,16 +27,26 @@ foreach (['хутор', 'нормальный вопрос', 'установка
 $refusal = Chat::answer('хуй');
 $check($refusal['answer'] === TextFilter::REFUSAL, 'profanity refusal is not returned');
 $check($refusal['sources'] === [], 'profanity refusal must not expose search sources');
+$check($refusal['rejected'] === true, 'profanity message must be rejected');
+
+foreach (['абырвалг', 'фывап', 'абырвалг абырвалг'] as $nonsense) {
+    $reply = Chat::answer($nonsense);
+    $check($reply['rejected'] === true, 'nonsense message is not rejected: ' . $nonsense);
+    $check(str_contains($reply['answer'], 'Не понял'), 'nonsense answer is missing: ' . $nonsense);
+    $check($reply['sources'] === [], 'nonsense answer must not expose sources: ' . $nonsense);
+}
 
 $pricing = Chat::answer('сколько стоит');
 $check(str_contains($pricing['answer'], 'Тарифы Elv Kit'), 'pricing answer is missing');
 $check(($pricing['link']['label'] ?? '') === 'Сравнить тарифы', 'pricing link is missing');
 $check($pricing['sources'] === [], 'pricing answer must not add unrelated sources');
+$check($pricing['rejected'] === false, 'valid pricing question must not be rejected');
 
 $search = Chat::answer('найди статью про оплату');
 $check(str_contains($search['answer'], 'Нашёл материалы'), 'explicit search answer is missing');
 $check(count($search['sources']) >= 1, 'explicit search returns no sources');
 $check(count($search['sources']) <= 3, 'explicit search returns more than three sources');
+$check($search['rejected'] === false, 'valid search must not be rejected');
 
 $urls = [];
 
@@ -51,6 +61,7 @@ $check(count($urls) === count(array_unique($urls)), 'search sources contain dupl
 $fallback = Chat::answer('как настроить CRM');
 $check(str_contains($fallback['answer'], 'Точного ответа нет'), 'fallback did not use site search');
 $check(count($fallback['sources']) >= 1, 'fallback search returns no sources');
+$check($fallback['rejected'] === false, 'fallback with sources must not be rejected');
 
 $nothing = Chat::answer('найди абракадабру без совпадений');
 $check(str_contains($nothing['answer'], 'ничего не нашёл'), 'empty search does not report the miss');

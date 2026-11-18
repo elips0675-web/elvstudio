@@ -20,7 +20,11 @@ class Chat
         if (TextFilter::has($message)) {
             return static::reply(
                 TextFilter::REFUSAL,
-                ['Сколько стоит Elv Kit?', 'Какие разделы есть?', 'Как установить?']
+                ['Сколько стоит Elv Kit?', 'Какие разделы есть?', 'Как установить?'],
+                null,
+                null,
+                [],
+                true
             );
         }
 
@@ -29,7 +33,11 @@ class Chat
         if (mb_strlen($text) < 2) {
             return static::reply(
                 'Напишите вопрос подробнее — например: «сколько стоит», «как установить», «какие разделы».',
-                ['Сколько стоит Elv Kit?', 'Как установить?', 'Какие разделы есть?']
+                ['Сколько стоит Elv Kit?', 'Как установить?', 'Какие разделы есть?'],
+                null,
+                null,
+                [],
+                true
             );
         }
 
@@ -201,6 +209,17 @@ class Chat
             return static::searchReply($results, true);
         }
 
+        if (static::isNonsense($text)) {
+            return static::reply(
+                'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
+                ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
+                null,
+                'feedback',
+                [],
+                true
+            );
+        }
+
         return static::reply(
             'Не нашёл ответа на этот вопрос. Уточните формулировку — или напишите нам, ответим на e-mail в течение рабочего дня.',
             ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
@@ -209,7 +228,7 @@ class Chat
         );
     }
 
-    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null, array $sources = []): array
+    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null, array $sources = [], bool $rejected = false): array
     {
         return [
             'answer' => $answer,
@@ -217,7 +236,24 @@ class Chat
             'link' => $link,
             'open' => $open,
             'sources' => array_values($sources),
+            'rejected' => $rejected,
         ];
+    }
+
+    /**
+     * isNonsense — не пропускает одиночный набор букв и текст без знакомых слов.
+     */
+    protected static function isNonsense(string $text): bool
+    {
+        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        foreach ($words as $word) {
+            if (mb_strlen($word) >= 3 && Search::query($word, Search::TYPE_ALL, 1) !== []) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

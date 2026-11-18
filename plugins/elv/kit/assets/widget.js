@@ -1,4 +1,3 @@
-/* Виджет Elv Kit: меню контактов, обратная связь, Консультант, «наверх». */
 (function () {
     'use strict';
 
@@ -183,7 +182,7 @@
             }
 
             showError('');
-            bubble('user', message);
+            var user = bubble('user', message);
 
             if (chatInput) {
                 chatInput.value = '';
@@ -215,12 +214,10 @@
                     typing.row.remove();
 
                     if (result.status === 200 && result.data && result.data.ok) {
+                        if (result.data.rejected) user.row.remove();
                         bubble('bot', result.data.answer || '');
 
-                        if (result.data.sources && result.data.sources.length) {
-                            result.data.sources.forEach(addLink);
-                        }
-
+                        if (result.data.sources) result.data.sources.forEach(addLink);
                         addLink(result.data.link);
 
                         if (result.data.open === 'feedback' && typeof openFeedback === 'function') {

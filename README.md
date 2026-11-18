@@ -99,6 +99,7 @@ npm run check                       # ссылки, SEO, заголовки, б�
 npm run check:console               # 107 статических страниц: консоль, 5xx, 360 px
 php tools/blog-content-audit.php    # срез блога: объём, ссылки, CTA, FAQ, meta
 php tools/calculator-check.php      # формула, рекомендации, шаблон PDF
+php tools/chat-check.php            # Консультант: ответы, ссылки, фильтр слов
 npm run test:calculator             # Chrome E2E: выбор → результат → PDF
 php tools/production-check.php      # прод-чек: права, БД, .htaccess, ключи, очередь
 php tools/production-check.php --strict  # предупреждения считаются ошибками

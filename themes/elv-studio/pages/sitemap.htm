@@ -2,31 +2,12 @@ title = "Карта сайта"
 url = "/sitemap/"
 layout = "default"
 meta_title = "Карта сайта — Elv Kit"
-meta_description = "Все разделы сайта Elv Kit: возможности, цены, демо, инструкция, блог, контакты и правовые документы. Быстрый переход в нужный раздел."
+meta_description = "Все разделы сайта Elv Kit: возможности, цены, демо, инструкция, услуги, блог, контакты и правовые документы. Быстрый переход в нужный раздел."
 ==
 {% set crumbs = elv_breadcrumbs() %}
-{% set sections = [
-    { 'name': 'Главная', 'url': 'index'|page },
-    { 'name': 'Возможности', 'url': 'kit'|page },
-    { 'name': 'Разделы', 'url': 'modules'|page },
-    { 'name': 'Услуги', 'url': 'services'|page },
-    { 'name': 'Хостинг и запуск', 'url': 'services-hosting'|page },
-    { 'name': 'Поддержка', 'url': 'services-support'|page },
-    { 'name': 'Модули и плагины', 'url': 'services-plugins'|page },
-    { 'name': 'Онлайн-запись', 'url': 'services-booking'|page },
-    { 'name': 'Бесплатный аудит', 'url': 'services-audit'|page },
-    { 'name': 'SEO-продвижение', 'url': 'services-seo'|page },
-    { 'name': 'Калькулятор', 'url': 'calculator'|page },
-    { 'name': 'Цены', 'url': 'pricing'|page },
-    { 'name': 'Демо', 'url': 'demo'|page },
-    { 'name': 'Инструкция', 'url': 'docs'|page },
-    { 'name': 'Заказать', 'url': 'order'|page },
-    { 'name': 'Запись', 'url': 'booking'|page },
-    { 'name': 'Обратная связь', 'url': 'feedback'|page },
-    { 'name': 'Контакты', 'url': 'contacts'|page },
-    { 'name': 'Оферта', 'url': 'terms'|page },
-    { 'name': 'Политика конфиденциальности', 'url': 'privacy'|page }
-] %}
+{% set categories = elv_categories('all') %}
+{% set latest = elv_posts(6, null, 'all') %}
+{% set totalPosts = elv_posts(500, null, 'all')|length %}
 
 <main id="main">
     <section class="page-hero">
@@ -34,34 +15,71 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <span class="eyebrow">Навигация</span>
             <h1>Карта сайта</h1>
-            <p class="lead">Все страницы в одном месте. Машиночитаемая версия — <a href="{{ url('/sitemap.xml') }}">карта сайта</a>, лента статей — <a href="{{ url('/rss.xml') }}">RSS</a>.</p>
+            <p class="lead">Все разделы в одном месте: начните с возможностей и цен, выберите услугу или найдите ответ в блоге. Машиночитаемая версия — <a href="{{ url('/sitemap.xml') }}">sitemap.xml</a>, лента статей — <a href="{{ url('/rss.xml') }}">RSS</a>.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container">
-            <div class="grid grid--2">
+            <div class="grid grid--3">
                 <div class="card">
-                    <h2>Разделы</h2>
-                    <ul class="anchor-list mt-24">
-                        {% for item in sections %}
-                            <li><a href="{{ item.url }}">{{ item.name }}</a></li>
-                        {% endfor %}
+                    <h2>Сайт</h2>
+                    <ul class="mt-24">
+                        <li><a href="{{ 'index'|page }}">Главная</a></li>
+                        <li><a href="{{ 'kit'|page }}">Возможности Elv Kit</a></li>
+                        <li><a href="{{ 'modules'|page }}">Разделы Elv Kit</a></li>
+                        <li><a href="{{ 'calculator'|page }}">Калькулятор стоимости</a></li>
+                        <li><a href="{{ 'pricing'|page }}">Цены и тарифы</a></li>
+                        <li><a href="{{ 'demo'|page }}">Демо</a></li>
+                        <li><a href="{{ 'docs'|page }}">Инструкция</a></li>
+                        <li><a href="{{ url('/search') }}/">Поиск по сайту</a></li>
                     </ul>
                 </div>
 
                 <div class="card">
-                    <h2>Разделы</h2>
+                    <h2>Услуги</h2>
+                    <ul class="mt-24">
+                        <li><a href="{{ 'services'|page }}">Все услуги</a></li>
+                        <li><a href="{{ 'services-hosting'|page }}">Хостинг и запуск</a></li>
+                        <li><a href="{{ 'services-support'|page }}">Поддержка сайта</a></li>
+                        <li><a href="{{ 'services-plugins'|page }}">Модули и плагины</a></li>
+                        <li><a href="{{ 'services-booking'|page }}">Онлайн-запись</a></li>
+                        <li><a href="{{ 'services-audit'|page }}">Бесплатный аудит</a></li>
+                        <li><a href="{{ 'services-seo'|page }}">SEO-продвижение</a></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>Разделы Elv Kit</h2>
                     <ul class="mt-24">
                         {% for product in elv_modules() %}
-                            <li><a href="{{ 'module'|page({ slug: product.slug }) }}">{{ product.name }}</a></li>
+                            <li><a href="{{ 'module'|page({ slug: product.slug }) }}/">{{ product.name }}</a></li>
+                        {% else %}
+                            <li class="muted">Разделы пока не заполнены.</li>
                         {% endfor %}
-                        <li><a href="{{ 'pricing'|page }}">Цены и тарифы</a></li>
                     </ul>
+                    <p class="muted small mt-24">Онлайн-запись, заказы и оплата, обратная связь и блог подключаются к сайту отдельно.</p>
+                </div>
+            </div>
 
-                    <h2 class="mt-32">Служебные</h2>
+            <div class="grid grid--2 mt-32">
+                <div class="card">
+                    <h2>Купить и связаться</h2>
                     <ul class="mt-24">
-                        <li><a href="{{ url('/sitemap.xml') }}">Карта сайта</a></li>
+                        <li><a href="{{ 'order'|page }}">Заказать сайт</a></li>
+                        <li><a href="{{ 'booking'|page }}">Записаться на консультацию</a></li>
+                        <li><a href="{{ 'feedback'|page }}">Обратная связь</a></li>
+                        <li><a href="{{ 'contacts'|page }}">Контакты</a></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>Правовое и служебное</h2>
+                    <ul class="mt-24">
+                        <li><a href="{{ 'terms'|page }}">Оферта</a></li>
+                        <li><a href="{{ 'privacy'|page }}">Политика конфиденциальности</a></li>
+                        <li><a href="{{ 'sitemap'|page }}">Карта сайта</a></li>
+                        <li><a href="{{ url('/sitemap.xml') }}">XML-карта для поиска</a></li>
                         <li><a href="{{ url('/robots.txt') }}">Правила для поиска</a></li>
                         <li><a href="{{ url('/llms.txt') }}">Описание для ИИ-поиска</a></li>
                         <li><a href="{{ url('/rss.xml') }}">Лента статей</a></li>
@@ -71,13 +89,40 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
 
             <div class="card mt-32">
                 <h2>Блог</h2>
-                <ul class="anchor-list mt-24">
-                    {% for post in elv_posts(50, null, 'all') %}
-                        <li><a href="{{ 'blog-post'|page({ slug: post.slug }) }}">{{ post.title }}</a></li>
-                    {% else %}
-                        <li class="muted">Статей пока нет.</li>
-                    {% endfor %}
-                </ul>
+                <p class="muted">В блоге {{ totalPosts }} материалов: практика, технологии, SEO и контент. Ниже — свежие статьи и рубрики, без длинного списка всех публикаций.</p>
+
+                <div class="grid grid--2 mt-24">
+                    <div>
+                        <h3>Свежие статьи</h3>
+                        <ul class="mt-24">
+                            {% for post in latest %}
+                                <li>
+                                    <a href="{{ 'blog-post'|page({ slug: post.slug }) }}/">{{ post.title }}</a>
+                                    {% if post.display_date %}<span class="muted small">— {{ post.display_date }}</span>{% endif %}
+                                </li>
+                            {% else %}
+                                <li class="muted">Статей пока нет.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3>Рубрики</h3>
+                        <ul class="mt-24">
+                            {% for category in categories %}
+                                <li>
+                                    <a href="{{ 'blog'|page }}/?category={{ category.slug }}">{{ category.name }}</a>
+                                    <span class="muted small">{{ category.posts_count }}</span>
+                                </li>
+                            {% else %}
+                                <li class="muted">Рубрики пока не заполнены.</li>
+                            {% endfor %}
+                        </ul>
+                        <p class="mt-24"><a href="{{ 'blog-tech'|page }}/">Технический раздел для разработчиков {{ elv_icon('arrow-right')|raw }}</a></p>
+                    </div>
+                </div>
+
+                <p class="mt-24"><a class="link-more" href="{{ 'blog'|page }}/">Все статьи блога {{ elv_icon('arrow-right')|raw }}</a></p>
             </div>
         </div>
     </section>

@@ -24,6 +24,7 @@ class ChatController extends Controller
                 'link' => null,
                 'open' => null,
                 'sources' => [],
+                'rejected' => false,
             ]);
         }
 
