@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * ChatController — ответы ИИ-консультанта по базе знаний сайта.
+ * ChatController — ответы Консультанта по базе знаний сайта.
  *
  * Внешних API нет: ответ собирается из каталога и настроек, поэтому работает
  * и на демо-контуре без ключей. Лимит запросов задан в routes.php.

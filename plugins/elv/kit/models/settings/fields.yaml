@@ -51,7 +51,7 @@ tabs:
             span: left
             default: '/demo/'
         chat_enabled:
-            label: 'ИИ-консультант в виджете'
+            label: 'Консультант в виджете'
             tab: 'Виджет'
             type: switch
             default: true

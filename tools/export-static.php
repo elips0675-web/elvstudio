@@ -179,7 +179,7 @@ $script = <<<'HTML'
         if (node.closest('[data-chat-open]')) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            note('ИИ-чат доступен в полной версии на PHP-хостинге.');
+            note('Консультант доступен в полной версии на PHP-хостинге.');
             return;
         }
 

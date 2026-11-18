@@ -1,6 +1,6 @@
 {#
     Виджет Elv Kit: кнопка связи, меню контактов, форма обратной связи,
-    ИИ-консультант и кнопка «наверх».
+    Консультант и кнопка «наверх».
 
     Разметка живёт в плагине, чтобы ехать вместе с ним при продаже модуля.
     Стили и скрипт — assets/widget.css и assets/widget.js, вшиваются инлайном.
@@ -49,7 +49,7 @@
         </button>
         {% if chatEnabled %}
             <button class="fab__item" type="button" data-chat-open aria-controls="elv-chat" aria-expanded="false">
-                <span>ИИ-консультант</span>
+                <span>Консультант</span>
                 <span class="fab__ico fab__ico--bot">{{ elv_icon('spark')|raw }}</span>
             </button>
         {% endif %}
@@ -65,7 +65,7 @@
     <div class="elv-chat" id="elv-chat" role="dialog" aria-labelledby="elv-chat-title" hidden>
         <div class="elv-chat__head">
             <span class="elv-chat__titles">
-                <span class="elv-chat__title" id="elv-chat-title">ИИ-консультант</span>
+                <span class="elv-chat__title" id="elv-chat-title">Консультант</span>
                 <span class="elv-chat__status" data-chat-status>Отвечает по базе знаний сайта</span>
             </span>
             <button class="elv-chat__icon-btn" type="button" data-chat-expand aria-pressed="false" aria-label="Развернуть окно чата">
