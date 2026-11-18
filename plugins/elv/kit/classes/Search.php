@@ -84,7 +84,7 @@ class Search
         $pages = [
             ['title' => 'Главная', 'url' => '/', 'description' => 'Готовый сайт для бизнеса с онлайн-записью, заказами и оплатой.', 'keywords' => 'главная elv kit сайт для бизнеса запись оплата'],
             ['title' => 'Возможности Elv Kit', 'url' => '/kit/', 'description' => 'Что входит в готовый сайт: страницы, запись, заказы, блог и админка.', 'keywords' => 'возможности kit функции состав сайта'],
-            ['title' => 'Разделы Elv Kit', 'url' => '/modules/', 'description' => 'Онлайн-запись, заказы и оплата, обратная связь и блог.', 'keywords' => 'разделы модули плагины booking shop feedback blog'],
+            ['title' => 'Модули Elv Kit', 'url' => '/modules/', 'description' => 'Онлайн-запись, заказы и оплата, обратная связь и блог.', 'keywords' => 'разделы модули плагины booking shop feedback blog'],
             ['title' => 'Услуги Elv Studio', 'url' => '/services/', 'description' => 'Хостинг, поддержка, аудит и SEO-продвижение.', 'keywords' => 'услуги хостинг поддержка аудит seo продвижение'],
             ['title' => 'Хостинг и запуск', 'url' => '/services/hosting/', 'description' => 'Поможем выбрать хостинг, проверить требования и запустить сайт.', 'keywords' => 'хостинг запуск домен ssl почта требования october cms'],
             ['title' => 'Поддержка сайта', 'url' => '/services/support/', 'description' => 'Обновления, резервные копии и помощь после запуска.', 'keywords' => 'поддержка обновления резервные копии сопровождение'],
@@ -95,7 +95,7 @@ class Search
             ['title' => 'Калькулятор стоимости', 'url' => '/calculator/', 'description' => 'Соберите смету: запуск, годовая поддержка и работы.', 'keywords' => 'калькулятор стоимость смета цена сайта'],
             ['title' => 'Цены и тарифы', 'url' => '/pricing/', 'description' => 'Тарифы Elv Kit и что входит в каждый.', 'keywords' => 'цены тарифы стоимость оплата купить'],
             ['title' => 'Демо', 'url' => '/demo/', 'description' => 'Посмотреть сайт и админку в работе.', 'keywords' => 'демо стенд посмотреть админка пример'],
-            ['title' => 'Инструкция', 'url' => '/docs/', 'description' => 'Как установить, настроить и запустить сайт.', 'keywords' => 'инструкция установка настройка запуск документация'],
+            ['title' => 'Инструкция по установке Elv Kit', 'url' => '/docs/', 'description' => 'Как установить, настроить и запустить сайт.', 'keywords' => 'инструкция установка настройка запуск документация'],
             ['title' => 'Заказать сайт', 'url' => '/order/', 'description' => 'Оставить заявку на готовый сайт или доработку.', 'keywords' => 'заказать заказ заявка купить сайт'],
             ['title' => 'Записаться', 'url' => '/booking/', 'description' => 'Выбрать услугу, дату и свободное время.', 'keywords' => 'записаться запись услуга время'],
             ['title' => 'Обратная связь', 'url' => '/feedback/', 'description' => 'Задать вопрос или описать задачу.', 'keywords' => 'обратная связь вопрос сообщение написать'],
@@ -120,12 +120,12 @@ class Search
         foreach (Catalog::modules() as $module) {
             $items[] = [
                 'type' => self::TYPE_PAGE,
-                'group' => 'Разделы',
+                'group' => 'Модули',
                 'title' => (string) $module->name,
                 'url' => '/modules/' . $module->slug . '/',
                 'description' => trim((string) $module->tagline),
                 'keywords' => trim($module->name . ' ' . $module->slug),
-                'meta' => 'Раздел Elv Kit',
+                'meta' => 'Модуль Elv Kit',
             ];
         }
 
