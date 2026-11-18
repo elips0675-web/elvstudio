@@ -6,7 +6,43 @@
 
 ---
 
-(Stage 58 — 18.11.2026) — **`test/ai-chat` сокращён до 10 файлов.**
+(Stage 59 - 18.11.2026) - **Консультант, поиск и карта сайта: P1/P2-срез.**
+
+- `plugins/elv/kit/classes/Chat.php` — `ссылк` убран из поиска, выдача файлов
+  ловит `скач/доставк/zip/архив/токен`; `услуг` отделён от онлайн-записи,
+  добавлены услуги студии `/services/` и аудит `/services/audit/`;
+  `связ` добавлен к контактам; `настро` работает только с сайтом/Kit/хостингом.
+  `isNonsense()` проверяет все значимые слова: «абырвалг оплата» отклоняется,
+  «краудфандинг» проходит.
+- `plugins/elv/kit/classes/TextFilter.php` — латинские основы проверяются по
+  границам слова: `shitake`, `dickens`, `pussycat`, `cocktail` проходят;
+  `fuck`, `fucking`, `bitches`, `xyй`, `х у й` блокируются.
+- `plugins/elv/kit/classes/Http/ChatController.php` — лимит 15 сообщений в
+  минуту на сессию, 16-й отвечает `429` с `Retry-After`.
+- `plugins/elv/kit/classes/Search.php` — статический кэш индекса,
+  `Search::flush()`, простые основы и синонимы, тело статьи до 800 символов.
+- `themes/elv-studio/assets/js/search.js` — основы/синонимы в клиенте,
+  «Показать ещё» после 30 результатов, подсветка `<mark>` через DOM.
+- `themes/elv-studio/pages/search.htm` — кнопка «Показать ещё», `aria-busy`.
+- `plugins/elv/kit/classes/Seo.php` — `Organization.logo`, пустой `FAQPage` не
+  выводится, `Clean-param` действует на всём сайте.
+- `plugins/elv/kit/classes/Sitemap.php` — `hidden`-страницы не попадают в XML.
+- `plugins/elv/kit/classes/SecurityHeaders.php` — `upgrade-insecure-requests`
+  только для HTTPS или `APP_ENV=production`; на локальном HTTP по LAN-IP
+  Консультант больше не зависает из-за `fetch('/chat')` на `https://`.
+- `tools/check-headers.mjs` — падает, если HTTP-страница отдаёт
+  `upgrade-insecure-requests`.
+- `themes/elv-studio/pages/sitemap.htm` — якорная навигация по шести блокам.
+- `tools/chat-check.php`, `tools/search-check.php`, `tools/seo-check.php` —
+  новые проверки; `tools/check-seo.mjs` требует `Organization.logo` и якоря.
+- `docs/search.md`, `Что доделать.txt` — срез Stage 59.
+
+Проверено: `php tools/chat-check.php` — OK; `php tools/search-check.php` —
+OK; `php tools/seo-check.php` — OK; HTTP-лимит — 15×200 + 1×429.
+
+---
+
+(Stage 58 - 18.11.2026) - **`test/ai-chat` сокращён до 10 файлов.**
 
 - Разрозненные срезы свёрнуты в тематические блоки: `03-config.txt`,
   `05-chat.txt` (Chat + TextFilter + ChatController + widget),

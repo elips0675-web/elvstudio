@@ -1,6 +1,5 @@
 # Карта сайта и SEO-разметка
 
-
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
 title = "Карта сайта"
@@ -21,6 +20,15 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             <span class="eyebrow">Навигация</span>
             <h1>Карта сайта</h1>
             <p class="lead">Все разделы в одном месте: начните с возможностей и цен, выберите услугу или найдите ответ в блоге. Машиночитаемая версия — <a href="{{ url('/sitemap.xml') }}">sitemap.xml</a>, лента статей — <a href="{{ url('/rss.xml') }}">RSS</a>.</p>
+
+            <nav class="chips mt-24" aria-label="Разделы карты сайта">
+                <a class="chip" href="#sitemap-site">Сайт</a>
+                <a class="chip" href="#sitemap-services">Услуги</a>
+                <a class="chip" href="#sitemap-modules">Модули</a>
+                <a class="chip" href="#sitemap-buy">Купить и связаться</a>
+                <a class="chip" href="#sitemap-legal">Правовое</a>
+                <a class="chip" href="#sitemap-blog">Блог</a>
+            </nav>
         </div>
     </section>
 
@@ -28,7 +36,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
         <div class="container">
             <div class="grid grid--3">
                 <div class="card">
-                    <h2>Сайт</h2>
+                    <h2 id="sitemap-site">Сайт</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'index'|page }}">Главная</a></li>
                         <li><a href="{{ 'kit'|page }}">Возможности Elv Kit</a></li>
@@ -42,7 +50,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Услуги</h2>
+                    <h2 id="sitemap-services">Услуги</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'services'|page }}">Все услуги</a></li>
                         <li><a href="{{ 'services-hosting'|page }}">Хостинг и запуск</a></li>
@@ -55,7 +63,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Модули Elv Kit</h2>
+                    <h2 id="sitemap-modules">Модули Elv Kit</h2>
                     <ul class="mt-24">
                         {% for product in elv_modules() %}
                             <li><a href="{{ 'module'|page({ slug: product.slug }) }}/">{{ product.name }}</a></li>
@@ -69,7 +77,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
 
             <div class="grid grid--2 mt-32">
                 <div class="card">
-                    <h2>Купить и связаться</h2>
+                    <h2 id="sitemap-buy">Купить и связаться</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'order'|page }}">Заказать сайт</a></li>
                         <li><a href="{{ 'booking'|page }}">Записаться на консультацию</a></li>
@@ -79,7 +87,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Правовое и служебное</h2>
+                    <h2 id="sitemap-legal">Правовое и служебное</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'terms'|page }}">Оферта</a></li>
                         <li><a href="{{ 'privacy'|page }}">Политика конфиденциальности</a></li>
@@ -93,7 +101,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             </div>
 
             <div class="card mt-32">
-                <h2>Блог</h2>
+                <h2 id="sitemap-blog">Блог</h2>
                 <p class="muted">В блоге {{ totalPosts }} материалов: практика, технологии, SEO и контент. Ниже — свежие статьи и рубрики, без длинного списка всех публикаций.</p>
 
                 <div class="grid grid--2 mt-24">
@@ -346,7 +354,7 @@ class Seo
                 '@id' => $base . '/#organization',
                 'name' => static::siteName(),
                 'url' => $base . '/',
-                'description' => (string) (Settings::get('brand_description') ?: static::tagline()),
+                'logo' => $base . '/themes/elv-studio/assets/img/og-default.png',
                 'email' => (string) Settings::get('email'),
                 'sameAs' => array_values(array_filter([
                     (string) Settings::get('telegram'),
@@ -433,6 +441,8 @@ class Seo
             ];
         }
 
+        $graph = array_values(array_filter($graph));
+
         $json = json_encode(
             ['@context' => 'https://schema.org', '@graph' => $graph],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -484,6 +494,10 @@ class Seo
                 'name' => $item['q'],
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
             ];
+        }
+
+        if ($items === []) {
+            return [];
         }
 
         return ['@type' => 'FAQPage', '@id' => $id ?: (static::base() . '/#faq'), 'mainEntity' => $items];
@@ -559,7 +573,7 @@ class Seo
             'Disallow: /*?tag=',
             '',
             '# Яндекс: параметры фильтров не создают новых страниц',
-            'Clean-param: q&category&tag /blog/',
+            'Clean-param: q&category&tag',
             '',
             'User-agent: Yandex',
             'Allow: /',
@@ -714,6 +728,10 @@ class Sitemap
             $url = trim((string) ($page->url ?? ''));
 
             if ($url === '' || str_contains($url, ':') || str_contains($url, '404')) {
+                continue;
+            }
+
+            if (!empty($page->hidden)) {
                 continue;
             }
 

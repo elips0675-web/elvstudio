@@ -209,7 +209,7 @@ class Seo
                 '@id' => $base . '/#organization',
                 'name' => static::siteName(),
                 'url' => $base . '/',
-                'description' => (string) (Settings::get('brand_description') ?: static::tagline()),
+                'logo' => $base . '/themes/elv-studio/assets/img/og-default.png',
                 'email' => (string) Settings::get('email'),
                 'sameAs' => array_values(array_filter([
                     (string) Settings::get('telegram'),
@@ -296,6 +296,8 @@ class Seo
             ];
         }
 
+        $graph = array_values(array_filter($graph));
+
         $json = json_encode(
             ['@context' => 'https://schema.org', '@graph' => $graph],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -347,6 +349,10 @@ class Seo
                 'name' => $item['q'],
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
             ];
+        }
+
+        if ($items === []) {
+            return [];
         }
 
         return ['@type' => 'FAQPage', '@id' => $id ?: (static::base() . '/#faq'), 'mainEntity' => $items];
@@ -422,7 +428,7 @@ class Seo
             'Disallow: /*?tag=',
             '',
             '# Яндекс: параметры фильтров не создают новых страниц',
-            'Clean-param: q&category&tag /blog/',
+            'Clean-param: q&category&tag',
             '',
             'User-agent: Yandex',
             'Allow: /',

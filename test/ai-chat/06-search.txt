@@ -1,6 +1,5 @@
 # Поиск: серверный индекс и страница /search/
 
-
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
 <?php namespace Elv\Kit\Classes;
@@ -20,12 +19,33 @@ class Search
     public const TYPE_PAGE = 'page';
     public const TYPE_BLOG = 'blog';
 
+    /** @var array<int, array<string, mixed>>|null */
+    protected static ?array $cache = null;
+
+    /** @var array<int, array<int, string>> */
+    protected const SYNONYM_GROUPS = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии'],
+    ];
+
     /**
      * index — все записи, по которым ищет страница /search/ и Консультант.
      */
     public static function index(): array
     {
-        return array_merge(static::pages(), static::posts());
+        return static::$cache ??= array_merge(static::pages(), static::posts());
+    }
+
+    public static function flush(): void
+    {
+        static::$cache = null;
     }
 
     /**
@@ -154,7 +174,7 @@ class Search
                 'title' => (string) $post->title,
                 'url' => '/blog/' . $post->slug . '/',
                 'description' => static::limit((string) $post->excerpt, 180),
-                'text' => static::limit(static::plain((string) $post->body), 320),
+                'text' => static::limit(static::plain((string) $post->body), 800),
                 'keywords' => trim(implode(' ', array_filter([$category, $tags, (string) $post->audience_label]))),
                 'meta' => trim(implode(' · ', array_filter([$category, (string) $post->display_date]))),
             ];
@@ -175,29 +195,30 @@ class Search
         $hits = 0;
 
         foreach ($words as $word) {
+            $forms = static::forms($word);
             $hit = false;
 
-            if (str_contains($title, $word)) {
+            if (static::containsAny($title, $forms)) {
                 $score += 7;
                 $hit = true;
             }
 
-            if (str_contains($keywords, $word)) {
+            if (static::containsAny($keywords, $forms)) {
                 $score += 5;
                 $hit = true;
             }
 
-            if (str_contains($description, $word)) {
+            if (static::containsAny($description, $forms)) {
                 $score += 3;
                 $hit = true;
             }
 
-            if (str_contains($text, $word)) {
+            if (static::containsAny($text, $forms)) {
                 $score += 2;
                 $hit = true;
             }
 
-            if (str_contains($meta, $word)) {
+            if (static::containsAny($meta, $forms)) {
                 $score += 1;
                 $hit = true;
             }
@@ -247,6 +268,88 @@ class Search
         );
 
         return array_values(array_unique($words));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function forms(string $word): array
+    {
+        $forms = [$word];
+        $stem = static::stem($word);
+
+        if ($stem !== $word) {
+            $forms[] = $stem;
+        }
+
+        foreach (static::SYNONYM_GROUPS as $group) {
+            if (!in_array($word, $group, true)) {
+                continue;
+            }
+
+            foreach ($group as $item) {
+                $forms[] = $item;
+                $stem = static::stem($item);
+
+                if ($stem !== $item) {
+                    $forms[] = $stem;
+                }
+            }
+
+            break;
+        }
+
+        return array_values(array_unique(array_filter($forms, function (string $form): bool {
+            return mb_strlen($form) >= 2;
+        })));
+    }
+
+    protected static function stem(string $word): string
+    {
+        static $endings = [
+            'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+            'овать', 'евать',
+            'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+            'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+            'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь',
+        ];
+
+        if (mb_strlen($word) <= 3) {
+            return $word;
+        }
+
+        foreach ($endings as $ending) {
+            $length = mb_strlen($ending);
+            $stem = mb_substr($word, 0, -$length);
+
+            if (mb_substr($word, -$length) === $ending && mb_strlen($stem) >= 3) {
+                return $stem;
+            }
+        }
+
+        return $word;
+    }
+
+    /**
+     * @param array<int, string> $forms
+     */
+    protected static function containsAny(string $text, array $forms): bool
+    {
+        foreach ($forms as $form) {
+            if (mb_strlen($form) < 4) {
+                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (str_contains($text, $form)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected static function plain(string $html): string
@@ -316,7 +419,11 @@ meta_robots = "noindex, follow"
                 {% endif %}
             </p>
 
-            <div class="search-results" data-search-results></div>
+            <div class="search-results" data-search-results aria-busy="false"></div>
+
+            <p class="mt-24" data-search-more hidden>
+                <button class="btn btn--ghost btn--sm" type="button">Показать ещё</button>
+            </p>
 
             <div class="search-empty" data-search-empty hidden>
                 <h2>Ничего не нашлось</h2>
@@ -362,6 +469,7 @@ meta_robots = "noindex, follow"
     var statusNode = document.querySelector('[data-search-status]');
     var emptyNode = document.querySelector('[data-search-empty]');
     var popularNode = document.querySelector('[data-search-popular]');
+    var moreNode = document.querySelector('[data-search-more]');
     var filterNodes = document.querySelectorAll('[data-search-type]');
 
     if (!indexNode || !form || !input || !results || !statusNode) {
@@ -371,7 +479,7 @@ meta_robots = "noindex, follow"
     var items = [];
     var loaded = false;
 
-    var state = { type: 'all' };
+    var state = { type: 'all', limit: 30 };
     var stop = {
         'и': 1, 'в': 1, 'во': 1, 'на': 1, 'для': 1, 'с': 1, 'со': 1, 'по': 1,
         'как': 1, 'что': 1, 'это': 1, 'или': 1, 'не': 1, 'из': 1, 'у': 1,
@@ -379,6 +487,24 @@ meta_robots = "noindex, follow"
         'при': 1, 'про': 1, 'без': 1, 'же': 1, 'бы': 1, 'ли': 1, 'то': 1,
         'все': 1, 'мы': 1, 'вы': 1, 'он': 1, 'она': 1, 'они': 1, 'мне': 1, 'нам': 1
     };
+    var synonymGroups = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии']
+    ];
+    var endings = [
+        'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+        'овать', 'евать',
+        'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+        'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+        'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь'
+    ];
     var timer = null;
 
     function normalize(value) {
@@ -410,6 +536,78 @@ meta_robots = "noindex, follow"
         return list;
     }
 
+    function stem(word) {
+        if (word.length <= 3) {
+            return word;
+        }
+
+        for (var i = 0; i < endings.length; i += 1) {
+            var ending = endings[i];
+            var value = word.slice(0, -ending.length);
+
+            if (word.slice(-ending.length) === ending && value.length >= 3) {
+                return value;
+            }
+        }
+
+        return word;
+    }
+
+    function formsFor(word) {
+        var list = [word];
+        var value = stem(word);
+
+        if (value !== word) {
+            list.push(value);
+        }
+
+        for (var i = 0; i < synonymGroups.length; i += 1) {
+            var group = synonymGroups[i];
+
+            if (group.indexOf(word) === -1) {
+                continue;
+            }
+
+            group.forEach(function (item) {
+                list.push(item);
+
+                var itemStem = stem(item);
+
+                if (itemStem !== item) {
+                    list.push(itemStem);
+                }
+            });
+
+            break;
+        }
+
+        return list.filter(function (item, index, all) {
+            return item.length >= 2 && all.indexOf(item) === index;
+        });
+    }
+
+    function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function hasForm(text, value) {
+        if (value.length < 4) {
+            return new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRegExp(value) + '($|[^\\p{L}\\p{N}])', 'u').test(text);
+        }
+
+        return text.indexOf(value) !== -1;
+    }
+
+    function hasAny(text, forms) {
+        for (var i = 0; i < forms.length; i += 1) {
+            if (hasForm(text, forms[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function score(item, query, parts) {
         var title = phrase(item.title);
         var description = phrase(item.description);
@@ -418,31 +616,33 @@ meta_robots = "noindex, follow"
         var meta = phrase(item.meta);
         var total = title.indexOf(query) !== -1 ? 14 : 0;
         var hits = 0;
+        var wordForms = parts.map(formsFor);
 
-        parts.forEach(function (word) {
+        parts.forEach(function (word, index) {
+            var forms = wordForms[index];
             var hit = false;
 
-            if (title.indexOf(word) !== -1) {
+            if (hasAny(title, forms)) {
                 total += 7;
                 hit = true;
             }
 
-            if (keywords.indexOf(word) !== -1) {
+            if (hasAny(keywords, forms)) {
                 total += 5;
                 hit = true;
             }
 
-            if (description.indexOf(word) !== -1) {
+            if (hasAny(description, forms)) {
                 total += 3;
                 hit = true;
             }
 
-            if (text.indexOf(word) !== -1) {
+            if (hasAny(text, forms)) {
                 total += 2;
                 hit = true;
             }
 
-            if (meta.indexOf(word) !== -1) {
+            if (hasAny(meta, forms)) {
                 total += 1;
                 hit = true;
             }
@@ -479,7 +679,52 @@ meta_robots = "noindex, follow"
         return many;
     }
 
-    function card(item) {
+    function appendHighlighted(node, value, parts) {
+        var source = String(value || '');
+        var forms = [];
+
+        parts.forEach(function (word) {
+            forms = forms.concat(formsFor(word));
+        });
+
+        forms = forms.filter(function (form, index, all) {
+            return form.length >= 4 && all.indexOf(form) === index;
+        });
+
+        if (!forms.length) {
+            node.textContent = source;
+            return;
+        }
+
+        forms.sort(function (a, b) {
+            return b.length - a.length;
+        });
+
+        var pattern = new RegExp('(' + forms.map(escapeRegExp).join('|') + ')', 'giu');
+        var last = 0;
+        var match;
+
+        while ((match = pattern.exec(source)) !== null) {
+            if (match.index > last) {
+                node.appendChild(document.createTextNode(source.slice(last, match.index)));
+            }
+
+            var mark = document.createElement('mark');
+            mark.textContent = match[0];
+            node.appendChild(mark);
+            last = match.index + match[0].length;
+
+            if (match[0] === '') {
+                pattern.lastIndex += 1;
+            }
+        }
+
+        if (last < source.length) {
+            node.appendChild(document.createTextNode(source.slice(last)));
+        }
+    }
+
+    function card(item, parts) {
         var link = document.createElement('a');
         link.className = 'search-result';
         link.href = item.url;
@@ -502,13 +747,13 @@ meta_robots = "noindex, follow"
         link.appendChild(top);
 
         var title = document.createElement('h2');
-        title.textContent = item.title || '';
+        appendHighlighted(title, item.title || '', parts);
         link.appendChild(title);
 
         var description = item.description || item.text || '';
         if (description) {
             var lead = document.createElement('p');
-            lead.textContent = description;
+            appendHighlighted(lead, description, parts);
             link.appendChild(lead);
         }
 
@@ -533,17 +778,29 @@ meta_robots = "noindex, follow"
         var parts = words(raw);
 
         results.textContent = '';
+        results.setAttribute('aria-busy', 'false');
         emptyNode.hidden = true;
 
         if (!raw) {
             popularNode.hidden = false;
+
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
             statusNode.textContent = 'Введите запрос — покажем страницы и статьи.';
             return;
         }
 
         popularNode.hidden = true;
+        results.setAttribute('aria-busy', 'true');
 
         if (!parts.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             statusNode.textContent = 'Введите хотя бы два символа.';
             return;
         }
@@ -571,20 +828,31 @@ meta_robots = "noindex, follow"
         });
 
         if (!found.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             emptyNode.hidden = false;
             statusNode.textContent = 'Ничего не нашлось по запросу «' + raw + '».';
             return;
         }
 
-        var shown = found.slice(0, 30);
+        var shown = found.slice(0, state.limit);
         var suffix = plural(found.length, 'результат', 'результата', 'результатов');
         statusNode.textContent = found.length > shown.length
             ? 'Нашли ' + found.length + ' ' + suffix + ', показываем первые ' + shown.length + '.'
             : 'Нашли ' + found.length + ' ' + suffix + '.';
 
         shown.forEach(function (entry) {
-            results.appendChild(card(entry.item));
+            results.appendChild(card(entry.item, parts));
         });
+
+        if (moreNode) {
+            moreNode.hidden = found.length <= shown.length;
+        }
+
+        results.setAttribute('aria-busy', 'false');
     }
 
     function syncUrl() {
@@ -603,6 +871,7 @@ meta_robots = "noindex, follow"
     }
 
     input.addEventListener('input', function () {
+        state.limit = 30;
         window.clearTimeout(timer);
         timer = window.setTimeout(function () {
             syncUrl();
@@ -612,6 +881,7 @@ meta_robots = "noindex, follow"
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
+        state.limit = 30;
         syncUrl();
         render();
     });
@@ -619,6 +889,7 @@ meta_robots = "noindex, follow"
     Array.prototype.forEach.call(filterNodes, function (button) {
         button.addEventListener('click', function () {
             state.type = button.getAttribute('data-search-type') || 'all';
+            state.limit = 30;
 
             Array.prototype.forEach.call(filterNodes, function (node) {
                 node.classList.toggle('chip--active', node === button);
@@ -627,6 +898,13 @@ meta_robots = "noindex, follow"
             render();
         });
     });
+
+    if (moreNode) {
+        moreNode.addEventListener('click', function () {
+            state.limit += 30;
+            render();
+        });
+    }
 
     statusNode.textContent = 'Загружаем поиск…';
 
@@ -695,3 +973,85 @@ meta_robots = "noindex, follow"
     .search-page__form { flex-direction: column; }
     .search-page__form .btn { width: 100%; }
 }
+
+===== FILE: themes/elv-studio/layouts/default.htm =====
+
+description = "Основной макет: шапка, подвал, инлайн CSS и JS, SEO-разметка"
+==
+{% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
+{% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
+{% set seo_noindex = this.page.id in ['404', 'order-success'] %}
+{% set seo_title = seo_product
+    ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
+    : elv_seo_title(this.page) %}
+{% set seo_description = seo_product
+    ? (seo_product.description ?: seo_product.tagline)
+    : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="csrf-token" content="{{ elv_csrf_token() }}">
+
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    {% if seo_noindex %}
+        <meta name="robots" content="noindex, nofollow">
+    {% else %}
+        <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
+    {% endif %}
+    <link rel="canonical" href="{{ elv_canonical() }}">
+    <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
+
+    <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
+    <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">
+    <meta property="og:title" content="{{ seo_title }}">
+    <meta property="og:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta property="og:url" content="{{ elv_canonical() }}">
+    <meta property="og:image" content="{{ elv_og_image() }}">
+    <meta property="og:locale" content="ru_RU">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ seo_title }}">
+    <meta name="twitter:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta name="twitter:image" content="{{ elv_og_image() }}">
+
+    <link rel="icon" href="{{ 'assets/img/favicon.svg'|theme }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ 'assets/img/favicon.svg'|theme }}">
+
+    <script type="application/ld+json" nonce="{{ elv_csp_nonce() }}">{{ elv_jsonld(this.page)|raw }}</script>
+
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_css('assets/css/styles.css')|raw }}</style>
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_kit_css()|raw }}</style>
+    {% if this.page.id == 'calculator' %}
+        <link rel="stylesheet" href="{{ 'assets/css/calculator.css'|theme }}?v=20261117-2">
+    {% endif %}
+    {% if this.page.id == 'search' %}
+        <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
+    {% endif %}
+</head>
+<body>
+<a class="skip-link" href="#main">К содержимому</a>
+
+{% partial 'header' %}
+
+{% page %}
+
+{% partial 'footer' %}
+
+{{ elv_widget()|raw }}
+
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
+{% if this.page.id == 'search' %}
+    <script src="{{ 'assets/js/search.js'|theme }}?v=20261118-4" defer></script>
+{% endif %}
+{% if this.page.id == 'calculator' %}
+    <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117-2" defer></script>
+{% endif %}
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_kit_js()|raw }}</script>
+{% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
+    {% partial 'analytics' %}
+{% endif %}
+</body>
+</html>

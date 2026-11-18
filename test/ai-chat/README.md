@@ -1,6 +1,6 @@
 # `test/ai-chat` — снимок кода для AI-анализа
 
-Дата среза: 18.11.2026. Stage 56. Коммит: `70eb5b6`.
+Дата среза: 18.11.2026. Stage 59. Коммит: `см. git log`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 Этот набор закрывает пробел, который был у аудита Qwen: отчёт
@@ -22,10 +22,10 @@
 | `03-config.txt` | `composer.json`, `package.json`, `theme.yaml`, `version.yaml`, `README.md` |
 | `04-plugin.php.txt` | полный `plugins/elv/kit/Plugin.php` |
 | `05-chat.txt` | `Chat.php`, `TextFilter.php`, `ChatController.php`, `widget.js` — ответы, фильтр, HTTP-обработчик и виджет |
-| `06-search.txt` | `Search.php`, `search.htm`, `search.js`, `search.css` — индекс и страница `/search/` |
+| `06-search.txt` | `Search.php`, `search.htm`, `search.js`, `search.css`, `default.htm` — индекс, страница `/search/` и версия ассета |
 | `07-sitemap-seo.txt` | `sitemap.htm`, `Seo.php`, `Sitemap.php`, `routes.php` |
-| `08-checks-docs.txt` | `tools/chat-check.php`, `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md` |
-| `ALL-IN-ONE.txt` | всё перечисленное одним файлом (~192 КБ) |
+| `08-checks-docs.txt` | `chat-check`, `search-check`, `seo-check`, `check-seo`, `check-headers`, `SecurityHeaders.php`, `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md` |
+| `ALL-IN-ONE.txt` | всё перечисленное одним файлом |
 | `README.md` | этот манифест |
 
 ## Как загружать
@@ -40,7 +40,7 @@
 
 Пример запроса:
 
-> Ниже снимок Elv Landing (Stage 56). Проверь Консультанта и поиск:
+> Ниже снимок Elv Landing (Stage 59). Проверь Консультанта и поиск:
 > где фильтр может пропустить бессмыслицу или грубость, корректен ли
 > `rejected`-сценарий в виджете, нет ли ложных срабатываний на нормальных
 > запросах. Дай находки с `file:line`, без выдуманных метрик и без

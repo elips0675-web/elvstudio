@@ -12,6 +12,16 @@ class Chat
 {
     public const MAX_LENGTH = 500;
 
+    /** @var array<int, string> */
+    protected const KNOWN_WORDS = [
+        'привет', 'здравствуйте', 'здравствуй', 'добрый', 'доброе', 'хай', 'hello', 'hi',
+        'спасибо', 'благодарю', 'пожалуйста',
+        'человек', 'менеджер', 'оператор', 'консультант',
+        'связаться', 'написать', 'позвонить',
+        'настроить', 'настройка', 'настройки', 'настрою',
+        'краудфандинг', 'краудфандинга', 'краудфандинге', 'краудфандингом',
+    ];
+
     /**
      * answer — разбирает вопрос и возвращает ответ для виджета.
      */
@@ -41,7 +51,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать', 'ссылк'])) {
+        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать'])) {
             $results = static::search($message);
 
             if ($results !== []) {
@@ -54,6 +64,10 @@ class Chat
                 null,
                 'feedback'
             );
+        }
+
+        if (static::hasNonsenseWord($text)) {
+            return static::nonsenseReply();
         }
 
         if (preg_match('/^(привет|здравствуй|добрый|доброе|хай|hello|hi)\b/u', $text)) {
@@ -107,10 +121,18 @@ class Chat
             );
         }
 
-        if (static::has($text, ['скачать', 'доставк', 'zip', 'архив', 'токен', 'ссылк'])) {
+        if (static::has($text, ['скач', 'доставк', 'zip', 'архив', 'токен'])) {
             return static::reply(
                 'После оплаты на e-mail приходит ссылка на файлы сайта. Архив собирается из актуальной версии, ссылка действует, пока заказ существует.',
                 ['Как оплатить?', 'Что входит в Kit?', 'Написать нам']
+            );
+        }
+
+        if (static::has($text, ['настро']) && static::has($text, ['сайт', 'kit', 'хостинг', 'домен'])) {
+            return static::reply(
+                "Настройка сайта описана по шагам в разделе «Инструкция»: домен, почта, ключ и первый запуск.\n"
+                . "Если не хочется разбираться, поможем с установкой и запуском.",
+                ['Сколько стоит?', 'Как оплатить?', 'Написать нам']
             );
         }
 
@@ -137,12 +159,24 @@ class Chat
             return static::reply(static::plansText(), ['Что входит в Kit?', 'Какие разделы есть?', 'Как оплатить?'], static::link('Сравнить тарифы', '/pricing/'));
         }
 
-        if (static::has($text, ['брон', 'слот', 'запис', 'консультац', 'услуг', 'аудит'])) {
+        if (static::has($text, ['брон', 'слот', 'запис', 'консультац'])) {
             return static::reply(
-                'Онлайн-запись: клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся.' . static::servicesText(),
+                'Онлайн-запись: клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся.' . static::bookingServicesText(),
                 ['Сколько стоит онлайн-запись?', 'Что входит в Kit?', 'Написать нам'],
                 static::link('Цены', '/pricing/')
             );
+        }
+
+        if (static::has($text, ['аудит'])) {
+            return static::reply(
+                'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
+                ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+                static::link('Бесплатный аудит', '/services/audit/')
+            );
+        }
+
+        if (static::has($text, ['услуг'])) {
+            return static::reply(static::studioServicesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Услуги Elv Studio', '/services/'));
         }
 
         if (static::has($text, ['заказ', 'магазин', 'корзин', 'покупк', 'купить', 'shop'])) {
@@ -199,7 +233,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телефон', 'whatsapp', 'написать'])) {
+        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телефон', 'whatsapp', 'написать', 'связ'])) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -210,14 +244,7 @@ class Chat
         }
 
         if (static::isNonsense($text)) {
-            return static::reply(
-                'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
-                ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
-                null,
-                'feedback',
-                [],
-                true
-            );
+            return static::nonsenseReply();
         }
 
         return static::reply(
@@ -240,20 +267,100 @@ class Chat
         ];
     }
 
+    protected static function nonsenseReply(): array
+    {
+        return static::reply(
+            'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
+            ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
+            null,
+            'feedback',
+            [],
+            true
+        );
+    }
+
     /**
-     * isNonsense — не пропускает одиночный набор букв и текст без знакомых слов.
+     * isNonsense — не пропускает текст без знакомых слов и наборы букв.
      */
     protected static function isNonsense(string $text): bool
     {
-        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $known = 0;
+        $broken = false;
 
-        foreach ($words as $word) {
-            if (mb_strlen($word) >= 3 && Search::query($word, Search::TYPE_ALL, 1) !== []) {
-                return false;
+        foreach (static::meaningfulWords($text) as $word) {
+            if (static::isKnownWord($word)) {
+                $known++;
+                continue;
+            }
+
+            if (static::looksBroken($word)) {
+                $broken = true;
             }
         }
 
-        return true;
+        return $known === 0 || $broken;
+    }
+
+    /**
+     * hasNonsenseWord — отбивает бессмыслицу рядом со знакомым словом
+     * («абырвалг оплата»), не дожидаясь запасного поиска.
+     */
+    protected static function hasNonsenseWord(string $text): bool
+    {
+        $known = 0;
+        $broken = false;
+
+        foreach (static::meaningfulWords($text) as $word) {
+            if (static::isKnownWord($word)) {
+                $known++;
+                continue;
+            }
+
+            if (static::looksBroken($word)) {
+                $broken = true;
+            }
+        }
+
+        return $known > 0 && $broken;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function meaningfulWords(string $text): array
+    {
+        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return array_values(array_filter($words, function (string $word): bool {
+            return mb_strlen($word) >= 3;
+        }));
+    }
+
+    protected static function isKnownWord(string $word): bool
+    {
+        if (in_array($word, static::KNOWN_WORDS, true)) {
+            return true;
+        }
+
+        return Search::query($word, Search::TYPE_ALL, 1) !== [];
+    }
+
+    protected static function looksBroken(string $word): bool
+    {
+        if (mb_strlen($word) < 4) {
+            return false;
+        }
+
+        if (!preg_match('/[аеёиоуыэюяaeiouy]/u', $word)) {
+            return true;
+        }
+
+        if (preg_match('/(.)\1\1/u', $word)) {
+            return true;
+        }
+
+        return mb_strlen($word) >= 5
+            && !preg_match('/(а|я|о|е|ы|и|у|ю|ь|ый|ий|ая|ое|ие|ые|ость|ция|инг|изм|ист|ник|тель|ть|ться|ить|ать|ять|еть|ия)$/u', $word);
     }
 
     /**
@@ -401,7 +508,12 @@ class Chat
         return static::modulesText();
     }
 
-    protected static function servicesText(): string
+    protected static function studioServicesText(): string
+    {
+        return 'Услуги Elv Studio: хостинг и запуск, поддержка сайта, модули и плагины October CMS, сайт с онлайн-записью, бесплатный аудит и SEO-продвижение.';
+    }
+
+    protected static function bookingServicesText(): string
     {
         $services = Slots::services();
 

@@ -45,7 +45,7 @@ class TextFilter
         $latin = strtr($text, static::REVERSE);
 
         foreach (static::latinWords() as $stem) {
-            if (preg_match(static::pattern($stem), $latin)) {
+            if (preg_match(static::pattern($stem, true), $latin)) {
                 return $stem;
             }
         }
@@ -90,17 +90,28 @@ class TextFilter
     protected static function latinWords(): array
     {
         return [
-            'fuck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'dick', 'pussy', 'whore', 'slut',
+            'fuck', 'fucking', 'fucked', 'fucker', 'fuckers', 'fuckface',
+            'shit', 'shits', 'shitty', 'bullshit',
+            'bitch', 'bitches', 'bitching',
+            'cunt', 'cunts',
+            'asshole', 'assholes',
+            'bastard', 'bastards',
+            'dick', 'dicks', 'dickhead',
+            'pussy', 'pussies',
+            'whore', 'whores',
+            'slut', 'sluts', 'slutty',
         ];
     }
 
     /**
      * pattern — буквы основы через любые пробелы и знаки, повторы букв разрешены.
      */
-    protected static function pattern(string $stem): string
+    protected static function pattern(string $stem, bool $bounded = false): string
     {
-        if (isset(static::$compiled[$stem])) {
-            return static::$compiled[$stem];
+        $key = $stem . ($bounded ? ':bounded' : '');
+
+        if (isset(static::$compiled[$key])) {
+            return static::$compiled[$key];
         }
 
         $letters = preg_split('//u', $stem, -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -118,6 +129,9 @@ class TextFilter
             $parts[] = '(?:' . $quoted . '+|[\p{P}\p{S}]+)';
         }
 
-        return static::$compiled[$stem] = '/' . implode('[\s\p{P}\p{S}]*', $parts) . '/u';
+        $prefix = $bounded ? '(?<![\p{L}\p{N}])' : '';
+        $suffix = $bounded ? '(?![\p{L}\p{N}])' : '';
+
+        return static::$compiled[$key] = '/' . $prefix . implode('[\s\p{P}\p{S}]*', $parts) . $suffix . '/u';
     }
 }

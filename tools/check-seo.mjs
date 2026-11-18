@@ -164,8 +164,8 @@ for (const raw of urls) {
         errors.push(`${where}: FAQPage is empty`);
       }
 
-      if (type === 'Organization' && (!node.name || !node.url)) {
-        errors.push(`${where}: Organization misses name/url`);
+      if (type === 'Organization' && (!node.name || !node.url || !node.logo)) {
+        errors.push(`${where}: Organization misses name/url/logo`);
       }
 
       if (type === 'WebSite' && (!node.name || !node.url)) {
@@ -189,6 +189,15 @@ const assertSeo = [
 for (const path of assertSeo) {
   if (!seen.has(normalizePath(path))) {
     errors.push(`sitemap misses ${path}`);
+  }
+}
+
+const sitemapPage = await fetchPage('/sitemap/');
+const anchorTargets = ['sitemap-site', 'sitemap-services', 'sitemap-modules', 'sitemap-buy', 'sitemap-legal', 'sitemap-blog'];
+
+for (const target of anchorTargets) {
+  if (!sitemapPage.body.includes(`id="${target}"`)) {
+    errors.push(`/sitemap/: anchor target ${target} is missing`);
   }
 }
 

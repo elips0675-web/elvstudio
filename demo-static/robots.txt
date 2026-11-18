@@ -11,7 +11,7 @@ Disallow: /*?category=
 Disallow: /*?tag=
 
 # Яндекс: параметры фильтров не создают новых страниц
-Clean-param: q&category&tag /blog/
+Clean-param: q&category&tag
 
 User-agent: Yandex
 Allow: /

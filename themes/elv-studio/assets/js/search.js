@@ -9,6 +9,7 @@
     var statusNode = document.querySelector('[data-search-status]');
     var emptyNode = document.querySelector('[data-search-empty]');
     var popularNode = document.querySelector('[data-search-popular]');
+    var moreNode = document.querySelector('[data-search-more]');
     var filterNodes = document.querySelectorAll('[data-search-type]');
 
     if (!indexNode || !form || !input || !results || !statusNode) {
@@ -18,7 +19,7 @@
     var items = [];
     var loaded = false;
 
-    var state = { type: 'all' };
+    var state = { type: 'all', limit: 30 };
     var stop = {
         'и': 1, 'в': 1, 'во': 1, 'на': 1, 'для': 1, 'с': 1, 'со': 1, 'по': 1,
         'как': 1, 'что': 1, 'это': 1, 'или': 1, 'не': 1, 'из': 1, 'у': 1,
@@ -26,6 +27,24 @@
         'при': 1, 'про': 1, 'без': 1, 'же': 1, 'бы': 1, 'ли': 1, 'то': 1,
         'все': 1, 'мы': 1, 'вы': 1, 'он': 1, 'она': 1, 'они': 1, 'мне': 1, 'нам': 1
     };
+    var synonymGroups = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии']
+    ];
+    var endings = [
+        'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+        'овать', 'евать',
+        'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+        'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+        'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь'
+    ];
     var timer = null;
 
     function normalize(value) {
@@ -57,6 +76,78 @@
         return list;
     }
 
+    function stem(word) {
+        if (word.length <= 3) {
+            return word;
+        }
+
+        for (var i = 0; i < endings.length; i += 1) {
+            var ending = endings[i];
+            var value = word.slice(0, -ending.length);
+
+            if (word.slice(-ending.length) === ending && value.length >= 3) {
+                return value;
+            }
+        }
+
+        return word;
+    }
+
+    function formsFor(word) {
+        var list = [word];
+        var value = stem(word);
+
+        if (value !== word) {
+            list.push(value);
+        }
+
+        for (var i = 0; i < synonymGroups.length; i += 1) {
+            var group = synonymGroups[i];
+
+            if (group.indexOf(word) === -1) {
+                continue;
+            }
+
+            group.forEach(function (item) {
+                list.push(item);
+
+                var itemStem = stem(item);
+
+                if (itemStem !== item) {
+                    list.push(itemStem);
+                }
+            });
+
+            break;
+        }
+
+        return list.filter(function (item, index, all) {
+            return item.length >= 2 && all.indexOf(item) === index;
+        });
+    }
+
+    function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function hasForm(text, value) {
+        if (value.length < 4) {
+            return new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRegExp(value) + '($|[^\\p{L}\\p{N}])', 'u').test(text);
+        }
+
+        return text.indexOf(value) !== -1;
+    }
+
+    function hasAny(text, forms) {
+        for (var i = 0; i < forms.length; i += 1) {
+            if (hasForm(text, forms[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function score(item, query, parts) {
         var title = phrase(item.title);
         var description = phrase(item.description);
@@ -65,31 +156,33 @@
         var meta = phrase(item.meta);
         var total = title.indexOf(query) !== -1 ? 14 : 0;
         var hits = 0;
+        var wordForms = parts.map(formsFor);
 
-        parts.forEach(function (word) {
+        parts.forEach(function (word, index) {
+            var forms = wordForms[index];
             var hit = false;
 
-            if (title.indexOf(word) !== -1) {
+            if (hasAny(title, forms)) {
                 total += 7;
                 hit = true;
             }
 
-            if (keywords.indexOf(word) !== -1) {
+            if (hasAny(keywords, forms)) {
                 total += 5;
                 hit = true;
             }
 
-            if (description.indexOf(word) !== -1) {
+            if (hasAny(description, forms)) {
                 total += 3;
                 hit = true;
             }
 
-            if (text.indexOf(word) !== -1) {
+            if (hasAny(text, forms)) {
                 total += 2;
                 hit = true;
             }
 
-            if (meta.indexOf(word) !== -1) {
+            if (hasAny(meta, forms)) {
                 total += 1;
                 hit = true;
             }
@@ -126,7 +219,52 @@
         return many;
     }
 
-    function card(item) {
+    function appendHighlighted(node, value, parts) {
+        var source = String(value || '');
+        var forms = [];
+
+        parts.forEach(function (word) {
+            forms = forms.concat(formsFor(word));
+        });
+
+        forms = forms.filter(function (form, index, all) {
+            return form.length >= 4 && all.indexOf(form) === index;
+        });
+
+        if (!forms.length) {
+            node.textContent = source;
+            return;
+        }
+
+        forms.sort(function (a, b) {
+            return b.length - a.length;
+        });
+
+        var pattern = new RegExp('(' + forms.map(escapeRegExp).join('|') + ')', 'giu');
+        var last = 0;
+        var match;
+
+        while ((match = pattern.exec(source)) !== null) {
+            if (match.index > last) {
+                node.appendChild(document.createTextNode(source.slice(last, match.index)));
+            }
+
+            var mark = document.createElement('mark');
+            mark.textContent = match[0];
+            node.appendChild(mark);
+            last = match.index + match[0].length;
+
+            if (match[0] === '') {
+                pattern.lastIndex += 1;
+            }
+        }
+
+        if (last < source.length) {
+            node.appendChild(document.createTextNode(source.slice(last)));
+        }
+    }
+
+    function card(item, parts) {
         var link = document.createElement('a');
         link.className = 'search-result';
         link.href = item.url;
@@ -149,13 +287,13 @@
         link.appendChild(top);
 
         var title = document.createElement('h2');
-        title.textContent = item.title || '';
+        appendHighlighted(title, item.title || '', parts);
         link.appendChild(title);
 
         var description = item.description || item.text || '';
         if (description) {
             var lead = document.createElement('p');
-            lead.textContent = description;
+            appendHighlighted(lead, description, parts);
             link.appendChild(lead);
         }
 
@@ -180,17 +318,29 @@
         var parts = words(raw);
 
         results.textContent = '';
+        results.setAttribute('aria-busy', 'false');
         emptyNode.hidden = true;
 
         if (!raw) {
             popularNode.hidden = false;
+
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
             statusNode.textContent = 'Введите запрос — покажем страницы и статьи.';
             return;
         }
 
         popularNode.hidden = true;
+        results.setAttribute('aria-busy', 'true');
 
         if (!parts.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             statusNode.textContent = 'Введите хотя бы два символа.';
             return;
         }
@@ -218,20 +368,31 @@
         });
 
         if (!found.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             emptyNode.hidden = false;
             statusNode.textContent = 'Ничего не нашлось по запросу «' + raw + '».';
             return;
         }
 
-        var shown = found.slice(0, 30);
+        var shown = found.slice(0, state.limit);
         var suffix = plural(found.length, 'результат', 'результата', 'результатов');
         statusNode.textContent = found.length > shown.length
             ? 'Нашли ' + found.length + ' ' + suffix + ', показываем первые ' + shown.length + '.'
             : 'Нашли ' + found.length + ' ' + suffix + '.';
 
         shown.forEach(function (entry) {
-            results.appendChild(card(entry.item));
+            results.appendChild(card(entry.item, parts));
         });
+
+        if (moreNode) {
+            moreNode.hidden = found.length <= shown.length;
+        }
+
+        results.setAttribute('aria-busy', 'false');
     }
 
     function syncUrl() {
@@ -250,6 +411,7 @@
     }
 
     input.addEventListener('input', function () {
+        state.limit = 30;
         window.clearTimeout(timer);
         timer = window.setTimeout(function () {
             syncUrl();
@@ -259,6 +421,7 @@
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
+        state.limit = 30;
         syncUrl();
         render();
     });
@@ -266,6 +429,7 @@
     Array.prototype.forEach.call(filterNodes, function (button) {
         button.addEventListener('click', function () {
             state.type = button.getAttribute('data-search-type') || 'all';
+            state.limit = 30;
 
             Array.prototype.forEach.call(filterNodes, function (node) {
                 node.classList.toggle('chip--active', node === button);
@@ -274,6 +438,13 @@
             render();
         });
     });
+
+    if (moreNode) {
+        moreNode.addEventListener('click', function () {
+            state.limit += 30;
+            render();
+        });
+    }
 
     statusNode.textContent = 'Загружаем поиск…';
 

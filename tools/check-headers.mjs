@@ -57,6 +57,10 @@ for (const path of pages) {
     if (!/nonce-[a-z0-9+/=_-]+/.test(csp)) {
       errors.push(`${path}: CSP without nonce`);
     }
+
+    if (BASE.startsWith('http://') && csp.includes('upgrade-insecure-requests')) {
+      errors.push(`${path}: CSP upgrades HTTP requests on a plain-HTTP origin`);
+    }
   }
 
   if (headers.get('x-powered-by')) {

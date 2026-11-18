@@ -4,6 +4,7 @@ use Elv\Kit\Classes\AntiSpam;
 use Elv\Kit\Classes\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -43,6 +44,18 @@ class ChatController extends Controller
                 'errors' => $validator->errors()->toArray(),
             ], 422);
         }
+
+        $key = 'elv-chat:' . $request->session()->getId();
+
+        if (RateLimiter::tooManyAttempts($key, 15)) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'RATE_LIMIT',
+                'message' => 'Слишком много сообщений подряд. Подождите минуту.',
+            ], 429)->header('Retry-After', (string) RateLimiter::availableIn($key));
+        }
+
+        RateLimiter::hit($key, 60);
 
         $result = Chat::answer((string) $request->input('message'));
 

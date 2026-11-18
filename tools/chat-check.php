@@ -24,17 +24,52 @@ foreach (['хутор', 'нормальный вопрос', 'установка
     $check(!TextFilter::has($word), 'filter false positive: ' . $word);
 }
 
+foreach (['shitake', 'dickens', 'pussycat', 'cocktail'] as $word) {
+    $check(!TextFilter::has($word), 'filter latin false positive: ' . $word);
+}
+
+foreach (['fuck', 'fucking', 'bitches', 'dicks', 'xyй', 'х у й'] as $word) {
+    $check(TextFilter::has($word), 'filter latin/cyrillic miss: ' . $word);
+}
+
 $refusal = Chat::answer('хуй');
 $check($refusal['answer'] === TextFilter::REFUSAL, 'profanity refusal is not returned');
 $check($refusal['sources'] === [], 'profanity refusal must not expose search sources');
 $check($refusal['rejected'] === true, 'profanity message must be rejected');
 
-foreach (['абырвалг', 'фывап', 'абырвалг абырвалг'] as $nonsense) {
+foreach (['абырвалг', 'фывап', 'абырвалг абырвалг', 'абырвалг оплата', 'фывап тарифы'] as $nonsense) {
     $reply = Chat::answer($nonsense);
     $check($reply['rejected'] === true, 'nonsense message is not rejected: ' . $nonsense);
     $check(str_contains($reply['answer'], 'Не понял'), 'nonsense answer is missing: ' . $nonsense);
     $check($reply['sources'] === [], 'nonsense answer must not expose sources: ' . $nonsense);
 }
+
+$crowdfunding = Chat::answer('краудфандинг');
+$check($crowdfunding['rejected'] === false, 'known off-site term is rejected: краудфандинг');
+
+$empty = Chat::answer('');
+$check(str_contains($empty['answer'], 'подробнее'), 'empty message does not ask for details');
+
+$long = Chat::answer(str_repeat('а', 10000));
+$check(is_array($long) && $long['rejected'] === true, 'long nonsense is not rejected');
+
+$services = Chat::answer('какие услуги вы оказываете');
+$check(str_contains($services['answer'], 'Услуги Elv Studio'), 'studio services answer is missing');
+$check(str_contains((string) ($services['link']['url'] ?? ''), '/services'), 'studio services link is missing');
+$check(!str_contains($services['answer'], 'В демо-записи'), 'studio services answer mixes booking services');
+
+$booking = Chat::answer('записаться на услугу');
+$check(str_contains($booking['answer'], 'Онлайн-запись'), 'booking answer is missing');
+
+$audit = Chat::answer('аудит сайта');
+$check(str_contains((string) ($audit['link']['url'] ?? ''), '/services/audit'), 'audit link is missing');
+
+$contact = Chat::answer('связаться с вами');
+$check($contact['rejected'] === false, 'contact request is rejected');
+$check(!str_contains($contact['answer'], 'Не понял'), 'contact request falls into nonsense');
+
+$setup = Chat::answer('как настроить сайт');
+$check(str_contains($setup['answer'], 'Настройка сайта'), 'site setup answer is missing');
 
 $pricing = Chat::answer('сколько стоит');
 $check(str_contains($pricing['answer'], 'Тарифы Elv Kit'), 'pricing answer is missing');

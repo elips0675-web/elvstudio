@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Дата: 18.11.2026. Stage 56. Коммит: `70eb5b6`.
+Дата: 18.11.2026. Stage 59. Коммит: `см. git log`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта, проверки и документация. Файлы разделены, чтобы можно было цитировать.
 
@@ -20,7 +20,7 @@
 
 # Elv Landing — срез для AI-анализа Консультанта, поиска и карты сайта
 
-Дата среза: 18.11.2026. Стадия: 56. Коммит: `70eb5b6`.
+Дата среза: 18.11.2026. Стадия: 59. Коммит: `см. git log`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 ## Что это за проект
@@ -38,7 +38,9 @@
 1. Консультант: `Chat::answer()`, `TextFilter`, `ChatController`, `widget.js`.
 2. Поиск: `Search.php`, страница `/search/`, `search.js`, `/search-index.json`.
 3. Карта сайта: `sitemap.htm`, `Seo.php`, `Sitemap.php`.
-4. Проверки: `tools/chat-check.php`, `node tools/gate.mjs`.
+4. Проверки: `tools/chat-check.php`, `tools/search-check.php`,
+   `tools/seo-check.php`, `node tools/gate.mjs`.
+5. Периметр: `SecurityHeaders.php` — CSP и локальный HTTP.
 
 ## Текущее поведение (факты)
 
@@ -47,51 +49,79 @@
   поиск одинаково работает на PHP-хостинге и в `demo-static` на Vercel.
   Страница поиска закрыта `noindex, follow` и не попадает в XML-sitemap.
 - Индекс собирается из проверенного списка страниц и опубликованных статей;
-  тело статьи попадает в индекс только началом.
+  в записи статьи попадают заголовок, анонс, ключевые слова и первые
+  800 символов тела. На Stage 59 индекс — 94 записи, 143,5 КБ JSON,
+  35,6 КБ gzip.
+- Поиск строит простые основы и синонимы (`оплата/оплаты/оплатить`,
+  `тариф/тарифы/тарифами`, `статья/статьи`, `бронирование/бронирования`,
+  `цена/цены/стоимость`), без Левенштейна и внешних сервисов. Первые
+  30 результатов показываются сразу, остальные — по кнопке «Показать ещё».
+  Совпадения подсвечиваются `<mark>` через DOM, без вставки HTML.
 - Консультант не использует внешние сервисы и ключи. Тарифы, разделы, запуск
   и оплата берутся из каталога и настроек.
 - `Chat::answer()` сначала проверяет `TextFilter::has()`. Грубость получает
-  отказ и `rejected: true`.
+  отказ и `rejected: true`. Латинские основы проверяются по границам слова:
+  `shitake`, `dickens`, `pussycat`, `cocktail` проходят; `fuck`, `fucking`,
+  `bitches`, `xyй` и `х у й` блокируются.
 - Явный поисковый запрос («найди», «поиск», «подбери», «статья», «материал»,
-  «ссылка») отдаёт до трёх ссылок. Без явного намерения поиск работает как
-  запасной вариант.
+  «почитать») отдаёт до трёх ссылок. Без явного намерения поиск работает как
+  запасной вариант. `ссылк` в поиске больше нет: «не работает ссылка на
+  скачивание» уходит в ветку файлов (`скач`, `доставк`, `zip`, `архив`,
+  `токен`), а «ссылка на статью» — в поиск.
+- «Какие услуги вы оказываете» отвечает про услуги студии `/services/`;
+  онлайн-запись и аудит — отдельные ветки. «Связаться с вами» попадает в
+  контакты, «как настроить сайт/Kit/хостинг/домен» — в документацию, а
+  «как настроить CRM» остаётся поиском.
 - В ответе есть `sources`: `{ label, url, kind }`, где `kind` — «Статья» или
   «Страница». Старое поле `link` сохранено для совместимости.
-- Бессмыслица не остаётся в окне чата. Если после поиска в сообщении нет ни
-  одного слова, которое встречается в индексе `Search`, ответ получает
-  `rejected: true`; виджет удаляет пузырь пользователя и показывает
-  подсказку. Это ловит «абырвалг», «фывап» и повторяющуюся бессмыслицу.
-  Обычные короткие запросы «оплата», «тарифы», «CRM» проходят, потому что
-  находятся в индексе.
+- Бессмыслица не остаётся в окне чата. `isNonsense()` проверяет все значимые
+  слова: «абырвалг оплата» отклоняется, «краудфандинг» проходит как известный
+  термин вне индекса. Ответ получает `rejected: true`, виджет удаляет пузырь
+  пользователя и показывает подсказку.
 - `ChatController` отдаёт `rejected: false` в раннем ответе антиспама.
+  HTTP-лимит: 15 сообщений в минуту на сессию, 16-й — `429` с `Retry-After`;
+  плюс общий `throttle:40,1` по IP в `routes.php`.
+- CSP добавляет `upgrade-insecure-requests` только для HTTPS или
+  `APP_ENV=production`. На локальном HTTP (`localhost` и LAN-IP) директива не
+  отправляется, иначе браузер поднимает `fetch('/chat')` до `https://` и
+  Консультант зависает на «Печатает…». Это проверено по LAN-IP.
 - Карта `/sitemap/` сгруппирована по разделам: «Сайт», «Услуги», «Модули
   Elv Kit», «Купить и связаться», «Правовое и служебное», «Блог». В блоге —
   шесть свежих статей и четыре рубрики, а не плоский список 67 статей.
+  Над блоками — якоря `#sitemap-site`, `#sitemap-services`, `#sitemap-modules`,
+  `#sitemap-buy`, `#sitemap-legal`, `#sitemap-blog`.
 - `SearchAction` в `Seo.php` ведёт на `/search/?q={search_term_string}`.
+  `Organization` содержит `logo`; пустой `FAQPage` не выводится, пустые узлы
+  JSON-LD отбрасываются. `Clean-param: q&category&tag` действует на всём
+  сайте. `hidden`-страницы не попадают в XML-sitemap.
 - FAQ выводится у 12 статей; в подвале нет технической ссылки «Для ИИ-поиска»
   (`/llms.txt` остаётся доступен), а на `/kit/` инструкция по установке стоит
   в блоке «Запуск», не под кнопкой заказа.
 
 ## Чем проверено
 
-- `php tools/chat-check.php` — OK: тарифы, явный поиск, запасной поиск,
-  пустой результат, дубли, фильтр грубых слов, отказ на «абырвалг»/«фывап».
-- Прямой `Chat::answer()`: «абырвалг», «фывап», «абырвалг абырвалг» —
-  `rejected`; «оплата» — обычный ответ.
+- `php tools/chat-check.php` — OK: тарифы, явный и запасной поиск, пустой
+  результат, услуги/контакты/аудит, фильтр грубых слов, «абырвалг оплата»,
+  «краудфандинг», пустой ввод и 10 000 символов.
+- `php tools/search-check.php` — OK: кэш индекса, основы, лимит тела 800,
+  выдача `/pricing/`.
+- `php tools/seo-check.php` — OK: пустой FAQ не создаёт `FAQPage`,
+  `Clean-param` без привязки к `/blog/`.
 - `node tools/gate.mjs` — all gates passed: 100 внутренних URL, 94 URL
   sitemap, 107 статических страниц без ошибок консоли; бюджет главной
   137,9 КБ HTML / 36,0 КБ CSS / 20,0 КБ JS.
-- `node tools/check-budget.mjs` — CSS стоит ровно на лимите 36,0 КБ;
-  inline-JS главной — 20,0 КБ. Новый код в виджет без сокращения не влезет.
-- Live-`/chat` с CSRF: «найди статью про оплату» — 2 источника,
-  «как настроить CRM» — 1 источник, грубость — отказ без источников.
+- `node tools/check-headers.mjs` — CSP без `upgrade-insecure-requests` на
+  локальном HTTP; `check-seo` требует `Organization.logo` и якоря карты.
+- Live-`/chat` с CSRF: 15 ответов `200`, 16-й — `429`. На LAN-IP
+  `http://172.29.24.250:8090/` Консультант отвечает, поиск отдаёт 73
+  результата; до фикса CSP `fetch('/chat')` уходил на `https://` и падал.
 
 ## Ограничения и что не проверено
 
 - Эвристика бессмыслицы не словарь: редкое, но осмысленное слово может быть
-  отнесено к бессмыслице; наоборот, бессмыслица с известным словом пройдёт.
-- `TextFilter` ищет основы слов с пробелами, знаками и повторами, поэтому
-  возможны ложные срабатывания (например, `shitake`).
+  отнесено к бессмыслице; наоборот, бессмыслица из знакомых слов пройдёт.
+- `TextFilter` ищет основы слов с пробелами, знаками и повторами; часть
+  ложных срабатываний снята границами латинских слов, но не все.
 - Визуальное исчезновение пузыря не проверено в реальном мобильном браузере
   и Safari. Проверка была на live-странице и в прямых вызовах.
 - `demo-static` — снимок; при изменении PHP-кода его нужно пересобирать.
@@ -118,7 +148,7 @@
 
 # Структура репозитория Elv Landing
 
-Срез: 18.11.2026, Stage 56, коммит `70eb5b6`.
+Срез: 18.11.2026, Stage 59, коммит `см. git log`.
 
 Показаны только отслеживаемые файлы. `demo-static` — 107 HTML-страниц, здесь не развёрнут. `vendor/`, `modules/`, `.env` и дампы БД не включены.
 
@@ -354,7 +384,9 @@
 - `tools/export-static.php`
 - `tools/gate.mjs`
 - `tools/production-check.php`
+- `tools/search-check.php`
 - `tools/serve-static.php`
+- `tools/seo-check.php`
 
 ## docs
 
@@ -1075,7 +1107,6 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
 <?php namespace Elv\Kit\Classes;
@@ -1091,6 +1122,16 @@ use Elv\Kit\Models\Settings;
 class Chat
 {
     public const MAX_LENGTH = 500;
+
+    /** @var array<int, string> */
+    protected const KNOWN_WORDS = [
+        'привет', 'здравствуйте', 'здравствуй', 'добрый', 'доброе', 'хай', 'hello', 'hi',
+        'спасибо', 'благодарю', 'пожалуйста',
+        'человек', 'менеджер', 'оператор', 'консультант',
+        'связаться', 'написать', 'позвонить',
+        'настроить', 'настройка', 'настройки', 'настрою',
+        'краудфандинг', 'краудфандинга', 'краудфандинге', 'краудфандингом',
+    ];
 
     /**
      * answer — разбирает вопрос и возвращает ответ для виджета.
@@ -1121,7 +1162,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать', 'ссылк'])) {
+        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать'])) {
             $results = static::search($message);
 
             if ($results !== []) {
@@ -1134,6 +1175,10 @@ class Chat
                 null,
                 'feedback'
             );
+        }
+
+        if (static::hasNonsenseWord($text)) {
+            return static::nonsenseReply();
         }
 
         if (preg_match('/^(привет|здравствуй|добрый|доброе|хай|hello|hi)\b/u', $text)) {
@@ -1187,10 +1232,18 @@ class Chat
             );
         }
 
-        if (static::has($text, ['скачать', 'доставк', 'zip', 'архив', 'токен', 'ссылк'])) {
+        if (static::has($text, ['скач', 'доставк', 'zip', 'архив', 'токен'])) {
             return static::reply(
                 'После оплаты на e-mail приходит ссылка на файлы сайта. Архив собирается из актуальной версии, ссылка действует, пока заказ существует.',
                 ['Как оплатить?', 'Что входит в Kit?', 'Написать нам']
+            );
+        }
+
+        if (static::has($text, ['настро']) && static::has($text, ['сайт', 'kit', 'хостинг', 'домен'])) {
+            return static::reply(
+                "Настройка сайта описана по шагам в разделе «Инструкция»: домен, почта, ключ и первый запуск.\n"
+                . "Если не хочется разбираться, поможем с установкой и запуском.",
+                ['Сколько стоит?', 'Как оплатить?', 'Написать нам']
             );
         }
 
@@ -1217,12 +1270,24 @@ class Chat
             return static::reply(static::plansText(), ['Что входит в Kit?', 'Какие разделы есть?', 'Как оплатить?'], static::link('Сравнить тарифы', '/pricing/'));
         }
 
-        if (static::has($text, ['брон', 'слот', 'запис', 'консультац', 'услуг', 'аудит'])) {
+        if (static::has($text, ['брон', 'слот', 'запис', 'консультац'])) {
             return static::reply(
-                'Онлайн-запись: клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся.' . static::servicesText(),
+                'Онлайн-запись: клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся.' . static::bookingServicesText(),
                 ['Сколько стоит онлайн-запись?', 'Что входит в Kit?', 'Написать нам'],
                 static::link('Цены', '/pricing/')
             );
+        }
+
+        if (static::has($text, ['аудит'])) {
+            return static::reply(
+                'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
+                ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+                static::link('Бесплатный аудит', '/services/audit/')
+            );
+        }
+
+        if (static::has($text, ['услуг'])) {
+            return static::reply(static::studioServicesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Услуги Elv Studio', '/services/'));
         }
 
         if (static::has($text, ['заказ', 'магазин', 'корзин', 'покупк', 'купить', 'shop'])) {
@@ -1279,7 +1344,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телефон', 'whatsapp', 'написать'])) {
+        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телефон', 'whatsapp', 'написать', 'связ'])) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -1290,14 +1355,7 @@ class Chat
         }
 
         if (static::isNonsense($text)) {
-            return static::reply(
-                'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
-                ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
-                null,
-                'feedback',
-                [],
-                true
-            );
+            return static::nonsenseReply();
         }
 
         return static::reply(
@@ -1320,20 +1378,100 @@ class Chat
         ];
     }
 
+    protected static function nonsenseReply(): array
+    {
+        return static::reply(
+            'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
+            ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
+            null,
+            'feedback',
+            [],
+            true
+        );
+    }
+
     /**
-     * isNonsense — не пропускает одиночный набор букв и текст без знакомых слов.
+     * isNonsense — не пропускает текст без знакомых слов и наборы букв.
      */
     protected static function isNonsense(string $text): bool
     {
-        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $known = 0;
+        $broken = false;
 
-        foreach ($words as $word) {
-            if (mb_strlen($word) >= 3 && Search::query($word, Search::TYPE_ALL, 1) !== []) {
-                return false;
+        foreach (static::meaningfulWords($text) as $word) {
+            if (static::isKnownWord($word)) {
+                $known++;
+                continue;
+            }
+
+            if (static::looksBroken($word)) {
+                $broken = true;
             }
         }
 
-        return true;
+        return $known === 0 || $broken;
+    }
+
+    /**
+     * hasNonsenseWord — отбивает бессмыслицу рядом со знакомым словом
+     * («абырвалг оплата»), не дожидаясь запасного поиска.
+     */
+    protected static function hasNonsenseWord(string $text): bool
+    {
+        $known = 0;
+        $broken = false;
+
+        foreach (static::meaningfulWords($text) as $word) {
+            if (static::isKnownWord($word)) {
+                $known++;
+                continue;
+            }
+
+            if (static::looksBroken($word)) {
+                $broken = true;
+            }
+        }
+
+        return $known > 0 && $broken;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function meaningfulWords(string $text): array
+    {
+        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return array_values(array_filter($words, function (string $word): bool {
+            return mb_strlen($word) >= 3;
+        }));
+    }
+
+    protected static function isKnownWord(string $word): bool
+    {
+        if (in_array($word, static::KNOWN_WORDS, true)) {
+            return true;
+        }
+
+        return Search::query($word, Search::TYPE_ALL, 1) !== [];
+    }
+
+    protected static function looksBroken(string $word): bool
+    {
+        if (mb_strlen($word) < 4) {
+            return false;
+        }
+
+        if (!preg_match('/[аеёиоуыэюяaeiouy]/u', $word)) {
+            return true;
+        }
+
+        if (preg_match('/(.)\1\1/u', $word)) {
+            return true;
+        }
+
+        return mb_strlen($word) >= 5
+            && !preg_match('/(а|я|о|е|ы|и|у|ю|ь|ый|ий|ая|ое|ие|ые|ость|ция|инг|изм|ист|ник|тель|ть|ться|ить|ать|ять|еть|ия)$/u', $word);
     }
 
     /**
@@ -1481,7 +1619,12 @@ class Chat
         return static::modulesText();
     }
 
-    protected static function servicesText(): string
+    protected static function studioServicesText(): string
+    {
+        return 'Услуги Elv Studio: хостинг и запуск, поддержка сайта, модули и плагины October CMS, сайт с онлайн-записью, бесплатный аудит и SEO-продвижение.';
+    }
+
+    protected static function bookingServicesText(): string
     {
         $services = Slots::services();
 
@@ -1575,7 +1718,7 @@ class TextFilter
         $latin = strtr($text, static::REVERSE);
 
         foreach (static::latinWords() as $stem) {
-            if (preg_match(static::pattern($stem), $latin)) {
+            if (preg_match(static::pattern($stem, true), $latin)) {
                 return $stem;
             }
         }
@@ -1620,17 +1763,28 @@ class TextFilter
     protected static function latinWords(): array
     {
         return [
-            'fuck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'dick', 'pussy', 'whore', 'slut',
+            'fuck', 'fucking', 'fucked', 'fucker', 'fuckers', 'fuckface',
+            'shit', 'shits', 'shitty', 'bullshit',
+            'bitch', 'bitches', 'bitching',
+            'cunt', 'cunts',
+            'asshole', 'assholes',
+            'bastard', 'bastards',
+            'dick', 'dicks', 'dickhead',
+            'pussy', 'pussies',
+            'whore', 'whores',
+            'slut', 'sluts', 'slutty',
         ];
     }
 
     /**
      * pattern — буквы основы через любые пробелы и знаки, повторы букв разрешены.
      */
-    protected static function pattern(string $stem): string
+    protected static function pattern(string $stem, bool $bounded = false): string
     {
-        if (isset(static::$compiled[$stem])) {
-            return static::$compiled[$stem];
+        $key = $stem . ($bounded ? ':bounded' : '');
+
+        if (isset(static::$compiled[$key])) {
+            return static::$compiled[$key];
         }
 
         $letters = preg_split('//u', $stem, -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -1648,7 +1802,10 @@ class TextFilter
             $parts[] = '(?:' . $quoted . '+|[\p{P}\p{S}]+)';
         }
 
-        return static::$compiled[$stem] = '/' . implode('[\s\p{P}\p{S}]*', $parts) . '/u';
+        $prefix = $bounded ? '(?<![\p{L}\p{N}])' : '';
+        $suffix = $bounded ? '(?![\p{L}\p{N}])' : '';
+
+        return static::$compiled[$key] = '/' . $prefix . implode('[\s\p{P}\p{S}]*', $parts) . $suffix . '/u';
     }
 }
 
@@ -1660,6 +1817,7 @@ use Elv\Kit\Classes\AntiSpam;
 use Elv\Kit\Classes\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -1699,6 +1857,18 @@ class ChatController extends Controller
                 'errors' => $validator->errors()->toArray(),
             ], 422);
         }
+
+        $key = 'elv-chat:' . $request->session()->getId();
+
+        if (RateLimiter::tooManyAttempts($key, 15)) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'RATE_LIMIT',
+                'message' => 'Слишком много сообщений подряд. Подождите минуту.',
+            ], 429)->header('Retry-After', (string) RateLimiter::availableIn($key));
+        }
+
+        RateLimiter::hit($key, 60);
 
         $result = Chat::answer((string) $request->input('message'));
 
@@ -2151,7 +2321,6 @@ class ChatController extends Controller
 
 # Поиск: серверный индекс и страница /search/
 
-
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
 <?php namespace Elv\Kit\Classes;
@@ -2171,12 +2340,33 @@ class Search
     public const TYPE_PAGE = 'page';
     public const TYPE_BLOG = 'blog';
 
+    /** @var array<int, array<string, mixed>>|null */
+    protected static ?array $cache = null;
+
+    /** @var array<int, array<int, string>> */
+    protected const SYNONYM_GROUPS = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии'],
+    ];
+
     /**
      * index — все записи, по которым ищет страница /search/ и Консультант.
      */
     public static function index(): array
     {
-        return array_merge(static::pages(), static::posts());
+        return static::$cache ??= array_merge(static::pages(), static::posts());
+    }
+
+    public static function flush(): void
+    {
+        static::$cache = null;
     }
 
     /**
@@ -2305,7 +2495,7 @@ class Search
                 'title' => (string) $post->title,
                 'url' => '/blog/' . $post->slug . '/',
                 'description' => static::limit((string) $post->excerpt, 180),
-                'text' => static::limit(static::plain((string) $post->body), 320),
+                'text' => static::limit(static::plain((string) $post->body), 800),
                 'keywords' => trim(implode(' ', array_filter([$category, $tags, (string) $post->audience_label]))),
                 'meta' => trim(implode(' · ', array_filter([$category, (string) $post->display_date]))),
             ];
@@ -2326,29 +2516,30 @@ class Search
         $hits = 0;
 
         foreach ($words as $word) {
+            $forms = static::forms($word);
             $hit = false;
 
-            if (str_contains($title, $word)) {
+            if (static::containsAny($title, $forms)) {
                 $score += 7;
                 $hit = true;
             }
 
-            if (str_contains($keywords, $word)) {
+            if (static::containsAny($keywords, $forms)) {
                 $score += 5;
                 $hit = true;
             }
 
-            if (str_contains($description, $word)) {
+            if (static::containsAny($description, $forms)) {
                 $score += 3;
                 $hit = true;
             }
 
-            if (str_contains($text, $word)) {
+            if (static::containsAny($text, $forms)) {
                 $score += 2;
                 $hit = true;
             }
 
-            if (str_contains($meta, $word)) {
+            if (static::containsAny($meta, $forms)) {
                 $score += 1;
                 $hit = true;
             }
@@ -2398,6 +2589,88 @@ class Search
         );
 
         return array_values(array_unique($words));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function forms(string $word): array
+    {
+        $forms = [$word];
+        $stem = static::stem($word);
+
+        if ($stem !== $word) {
+            $forms[] = $stem;
+        }
+
+        foreach (static::SYNONYM_GROUPS as $group) {
+            if (!in_array($word, $group, true)) {
+                continue;
+            }
+
+            foreach ($group as $item) {
+                $forms[] = $item;
+                $stem = static::stem($item);
+
+                if ($stem !== $item) {
+                    $forms[] = $stem;
+                }
+            }
+
+            break;
+        }
+
+        return array_values(array_unique(array_filter($forms, function (string $form): bool {
+            return mb_strlen($form) >= 2;
+        })));
+    }
+
+    protected static function stem(string $word): string
+    {
+        static $endings = [
+            'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+            'овать', 'евать',
+            'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+            'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+            'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь',
+        ];
+
+        if (mb_strlen($word) <= 3) {
+            return $word;
+        }
+
+        foreach ($endings as $ending) {
+            $length = mb_strlen($ending);
+            $stem = mb_substr($word, 0, -$length);
+
+            if (mb_substr($word, -$length) === $ending && mb_strlen($stem) >= 3) {
+                return $stem;
+            }
+        }
+
+        return $word;
+    }
+
+    /**
+     * @param array<int, string> $forms
+     */
+    protected static function containsAny(string $text, array $forms): bool
+    {
+        foreach ($forms as $form) {
+            if (mb_strlen($form) < 4) {
+                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (str_contains($text, $form)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected static function plain(string $html): string
@@ -2467,7 +2740,11 @@ meta_robots = "noindex, follow"
                 {% endif %}
             </p>
 
-            <div class="search-results" data-search-results></div>
+            <div class="search-results" data-search-results aria-busy="false"></div>
+
+            <p class="mt-24" data-search-more hidden>
+                <button class="btn btn--ghost btn--sm" type="button">Показать ещё</button>
+            </p>
 
             <div class="search-empty" data-search-empty hidden>
                 <h2>Ничего не нашлось</h2>
@@ -2513,6 +2790,7 @@ meta_robots = "noindex, follow"
     var statusNode = document.querySelector('[data-search-status]');
     var emptyNode = document.querySelector('[data-search-empty]');
     var popularNode = document.querySelector('[data-search-popular]');
+    var moreNode = document.querySelector('[data-search-more]');
     var filterNodes = document.querySelectorAll('[data-search-type]');
 
     if (!indexNode || !form || !input || !results || !statusNode) {
@@ -2522,7 +2800,7 @@ meta_robots = "noindex, follow"
     var items = [];
     var loaded = false;
 
-    var state = { type: 'all' };
+    var state = { type: 'all', limit: 30 };
     var stop = {
         'и': 1, 'в': 1, 'во': 1, 'на': 1, 'для': 1, 'с': 1, 'со': 1, 'по': 1,
         'как': 1, 'что': 1, 'это': 1, 'или': 1, 'не': 1, 'из': 1, 'у': 1,
@@ -2530,6 +2808,24 @@ meta_robots = "noindex, follow"
         'при': 1, 'про': 1, 'без': 1, 'же': 1, 'бы': 1, 'ли': 1, 'то': 1,
         'все': 1, 'мы': 1, 'вы': 1, 'он': 1, 'она': 1, 'они': 1, 'мне': 1, 'нам': 1
     };
+    var synonymGroups = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии']
+    ];
+    var endings = [
+        'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+        'овать', 'евать',
+        'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+        'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+        'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь'
+    ];
     var timer = null;
 
     function normalize(value) {
@@ -2561,6 +2857,78 @@ meta_robots = "noindex, follow"
         return list;
     }
 
+    function stem(word) {
+        if (word.length <= 3) {
+            return word;
+        }
+
+        for (var i = 0; i < endings.length; i += 1) {
+            var ending = endings[i];
+            var value = word.slice(0, -ending.length);
+
+            if (word.slice(-ending.length) === ending && value.length >= 3) {
+                return value;
+            }
+        }
+
+        return word;
+    }
+
+    function formsFor(word) {
+        var list = [word];
+        var value = stem(word);
+
+        if (value !== word) {
+            list.push(value);
+        }
+
+        for (var i = 0; i < synonymGroups.length; i += 1) {
+            var group = synonymGroups[i];
+
+            if (group.indexOf(word) === -1) {
+                continue;
+            }
+
+            group.forEach(function (item) {
+                list.push(item);
+
+                var itemStem = stem(item);
+
+                if (itemStem !== item) {
+                    list.push(itemStem);
+                }
+            });
+
+            break;
+        }
+
+        return list.filter(function (item, index, all) {
+            return item.length >= 2 && all.indexOf(item) === index;
+        });
+    }
+
+    function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function hasForm(text, value) {
+        if (value.length < 4) {
+            return new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRegExp(value) + '($|[^\\p{L}\\p{N}])', 'u').test(text);
+        }
+
+        return text.indexOf(value) !== -1;
+    }
+
+    function hasAny(text, forms) {
+        for (var i = 0; i < forms.length; i += 1) {
+            if (hasForm(text, forms[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function score(item, query, parts) {
         var title = phrase(item.title);
         var description = phrase(item.description);
@@ -2569,31 +2937,33 @@ meta_robots = "noindex, follow"
         var meta = phrase(item.meta);
         var total = title.indexOf(query) !== -1 ? 14 : 0;
         var hits = 0;
+        var wordForms = parts.map(formsFor);
 
-        parts.forEach(function (word) {
+        parts.forEach(function (word, index) {
+            var forms = wordForms[index];
             var hit = false;
 
-            if (title.indexOf(word) !== -1) {
+            if (hasAny(title, forms)) {
                 total += 7;
                 hit = true;
             }
 
-            if (keywords.indexOf(word) !== -1) {
+            if (hasAny(keywords, forms)) {
                 total += 5;
                 hit = true;
             }
 
-            if (description.indexOf(word) !== -1) {
+            if (hasAny(description, forms)) {
                 total += 3;
                 hit = true;
             }
 
-            if (text.indexOf(word) !== -1) {
+            if (hasAny(text, forms)) {
                 total += 2;
                 hit = true;
             }
 
-            if (meta.indexOf(word) !== -1) {
+            if (hasAny(meta, forms)) {
                 total += 1;
                 hit = true;
             }
@@ -2630,7 +3000,52 @@ meta_robots = "noindex, follow"
         return many;
     }
 
-    function card(item) {
+    function appendHighlighted(node, value, parts) {
+        var source = String(value || '');
+        var forms = [];
+
+        parts.forEach(function (word) {
+            forms = forms.concat(formsFor(word));
+        });
+
+        forms = forms.filter(function (form, index, all) {
+            return form.length >= 4 && all.indexOf(form) === index;
+        });
+
+        if (!forms.length) {
+            node.textContent = source;
+            return;
+        }
+
+        forms.sort(function (a, b) {
+            return b.length - a.length;
+        });
+
+        var pattern = new RegExp('(' + forms.map(escapeRegExp).join('|') + ')', 'giu');
+        var last = 0;
+        var match;
+
+        while ((match = pattern.exec(source)) !== null) {
+            if (match.index > last) {
+                node.appendChild(document.createTextNode(source.slice(last, match.index)));
+            }
+
+            var mark = document.createElement('mark');
+            mark.textContent = match[0];
+            node.appendChild(mark);
+            last = match.index + match[0].length;
+
+            if (match[0] === '') {
+                pattern.lastIndex += 1;
+            }
+        }
+
+        if (last < source.length) {
+            node.appendChild(document.createTextNode(source.slice(last)));
+        }
+    }
+
+    function card(item, parts) {
         var link = document.createElement('a');
         link.className = 'search-result';
         link.href = item.url;
@@ -2653,13 +3068,13 @@ meta_robots = "noindex, follow"
         link.appendChild(top);
 
         var title = document.createElement('h2');
-        title.textContent = item.title || '';
+        appendHighlighted(title, item.title || '', parts);
         link.appendChild(title);
 
         var description = item.description || item.text || '';
         if (description) {
             var lead = document.createElement('p');
-            lead.textContent = description;
+            appendHighlighted(lead, description, parts);
             link.appendChild(lead);
         }
 
@@ -2684,17 +3099,29 @@ meta_robots = "noindex, follow"
         var parts = words(raw);
 
         results.textContent = '';
+        results.setAttribute('aria-busy', 'false');
         emptyNode.hidden = true;
 
         if (!raw) {
             popularNode.hidden = false;
+
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
             statusNode.textContent = 'Введите запрос — покажем страницы и статьи.';
             return;
         }
 
         popularNode.hidden = true;
+        results.setAttribute('aria-busy', 'true');
 
         if (!parts.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             statusNode.textContent = 'Введите хотя бы два символа.';
             return;
         }
@@ -2722,20 +3149,31 @@ meta_robots = "noindex, follow"
         });
 
         if (!found.length) {
+            if (moreNode) {
+                moreNode.hidden = true;
+            }
+
+            results.setAttribute('aria-busy', 'false');
             emptyNode.hidden = false;
             statusNode.textContent = 'Ничего не нашлось по запросу «' + raw + '».';
             return;
         }
 
-        var shown = found.slice(0, 30);
+        var shown = found.slice(0, state.limit);
         var suffix = plural(found.length, 'результат', 'результата', 'результатов');
         statusNode.textContent = found.length > shown.length
             ? 'Нашли ' + found.length + ' ' + suffix + ', показываем первые ' + shown.length + '.'
             : 'Нашли ' + found.length + ' ' + suffix + '.';
 
         shown.forEach(function (entry) {
-            results.appendChild(card(entry.item));
+            results.appendChild(card(entry.item, parts));
         });
+
+        if (moreNode) {
+            moreNode.hidden = found.length <= shown.length;
+        }
+
+        results.setAttribute('aria-busy', 'false');
     }
 
     function syncUrl() {
@@ -2754,6 +3192,7 @@ meta_robots = "noindex, follow"
     }
 
     input.addEventListener('input', function () {
+        state.limit = 30;
         window.clearTimeout(timer);
         timer = window.setTimeout(function () {
             syncUrl();
@@ -2763,6 +3202,7 @@ meta_robots = "noindex, follow"
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
+        state.limit = 30;
         syncUrl();
         render();
     });
@@ -2770,6 +3210,7 @@ meta_robots = "noindex, follow"
     Array.prototype.forEach.call(filterNodes, function (button) {
         button.addEventListener('click', function () {
             state.type = button.getAttribute('data-search-type') || 'all';
+            state.limit = 30;
 
             Array.prototype.forEach.call(filterNodes, function (node) {
                 node.classList.toggle('chip--active', node === button);
@@ -2778,6 +3219,13 @@ meta_robots = "noindex, follow"
             render();
         });
     });
+
+    if (moreNode) {
+        moreNode.addEventListener('click', function () {
+            state.limit += 30;
+            render();
+        });
+    }
 
     statusNode.textContent = 'Загружаем поиск…';
 
@@ -2847,12 +3295,93 @@ meta_robots = "noindex, follow"
     .search-page__form .btn { width: 100%; }
 }
 
+===== FILE: themes/elv-studio/layouts/default.htm =====
+
+description = "Основной макет: шапка, подвал, инлайн CSS и JS, SEO-разметка"
+==
+{% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
+{% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
+{% set seo_noindex = this.page.id in ['404', 'order-success'] %}
+{% set seo_title = seo_product
+    ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
+    : elv_seo_title(this.page) %}
+{% set seo_description = seo_product
+    ? (seo_product.description ?: seo_product.tagline)
+    : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="csrf-token" content="{{ elv_csrf_token() }}">
+
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    {% if seo_noindex %}
+        <meta name="robots" content="noindex, nofollow">
+    {% else %}
+        <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
+    {% endif %}
+    <link rel="canonical" href="{{ elv_canonical() }}">
+    <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
+
+    <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
+    <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">
+    <meta property="og:title" content="{{ seo_title }}">
+    <meta property="og:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta property="og:url" content="{{ elv_canonical() }}">
+    <meta property="og:image" content="{{ elv_og_image() }}">
+    <meta property="og:locale" content="ru_RU">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ seo_title }}">
+    <meta name="twitter:description" content="{{ seo_description|striptags|slice(0, 300) }}">
+    <meta name="twitter:image" content="{{ elv_og_image() }}">
+
+    <link rel="icon" href="{{ 'assets/img/favicon.svg'|theme }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ 'assets/img/favicon.svg'|theme }}">
+
+    <script type="application/ld+json" nonce="{{ elv_csp_nonce() }}">{{ elv_jsonld(this.page)|raw }}</script>
+
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_css('assets/css/styles.css')|raw }}</style>
+    <style nonce="{{ elv_csp_nonce() }}">{{ elv_kit_css()|raw }}</style>
+    {% if this.page.id == 'calculator' %}
+        <link rel="stylesheet" href="{{ 'assets/css/calculator.css'|theme }}?v=20261117-2">
+    {% endif %}
+    {% if this.page.id == 'search' %}
+        <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
+    {% endif %}
+</head>
+<body>
+<a class="skip-link" href="#main">К содержимому</a>
+
+{% partial 'header' %}
+
+{% page %}
+
+{% partial 'footer' %}
+
+{{ elv_widget()|raw }}
+
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
+{% if this.page.id == 'search' %}
+    <script src="{{ 'assets/js/search.js'|theme }}?v=20261118-4" defer></script>
+{% endif %}
+{% if this.page.id == 'calculator' %}
+    <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117-2" defer></script>
+{% endif %}
+<script nonce="{{ elv_csp_nonce() }}">{{ elv_kit_js()|raw }}</script>
+{% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
+    {% partial 'analytics' %}
+{% endif %}
+</body>
+</html>
+
 ==============================================================================
 07-sitemap-seo.txt
 ==============================================================================
 
 # Карта сайта и SEO-разметка
-
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -2874,6 +3403,15 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             <span class="eyebrow">Навигация</span>
             <h1>Карта сайта</h1>
             <p class="lead">Все разделы в одном месте: начните с возможностей и цен, выберите услугу или найдите ответ в блоге. Машиночитаемая версия — <a href="{{ url('/sitemap.xml') }}">sitemap.xml</a>, лента статей — <a href="{{ url('/rss.xml') }}">RSS</a>.</p>
+
+            <nav class="chips mt-24" aria-label="Разделы карты сайта">
+                <a class="chip" href="#sitemap-site">Сайт</a>
+                <a class="chip" href="#sitemap-services">Услуги</a>
+                <a class="chip" href="#sitemap-modules">Модули</a>
+                <a class="chip" href="#sitemap-buy">Купить и связаться</a>
+                <a class="chip" href="#sitemap-legal">Правовое</a>
+                <a class="chip" href="#sitemap-blog">Блог</a>
+            </nav>
         </div>
     </section>
 
@@ -2881,7 +3419,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
         <div class="container">
             <div class="grid grid--3">
                 <div class="card">
-                    <h2>Сайт</h2>
+                    <h2 id="sitemap-site">Сайт</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'index'|page }}">Главная</a></li>
                         <li><a href="{{ 'kit'|page }}">Возможности Elv Kit</a></li>
@@ -2895,7 +3433,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Услуги</h2>
+                    <h2 id="sitemap-services">Услуги</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'services'|page }}">Все услуги</a></li>
                         <li><a href="{{ 'services-hosting'|page }}">Хостинг и запуск</a></li>
@@ -2908,7 +3446,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Модули Elv Kit</h2>
+                    <h2 id="sitemap-modules">Модули Elv Kit</h2>
                     <ul class="mt-24">
                         {% for product in elv_modules() %}
                             <li><a href="{{ 'module'|page({ slug: product.slug }) }}/">{{ product.name }}</a></li>
@@ -2922,7 +3460,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
 
             <div class="grid grid--2 mt-32">
                 <div class="card">
-                    <h2>Купить и связаться</h2>
+                    <h2 id="sitemap-buy">Купить и связаться</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'order'|page }}">Заказать сайт</a></li>
                         <li><a href="{{ 'booking'|page }}">Записаться на консультацию</a></li>
@@ -2932,7 +3470,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2>Правовое и служебное</h2>
+                    <h2 id="sitemap-legal">Правовое и служебное</h2>
                     <ul class="mt-24">
                         <li><a href="{{ 'terms'|page }}">Оферта</a></li>
                         <li><a href="{{ 'privacy'|page }}">Политика конфиденциальности</a></li>
@@ -2946,7 +3484,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             </div>
 
             <div class="card mt-32">
-                <h2>Блог</h2>
+                <h2 id="sitemap-blog">Блог</h2>
                 <p class="muted">В блоге {{ totalPosts }} материалов: практика, технологии, SEO и контент. Ниже — свежие статьи и рубрики, без длинного списка всех публикаций.</p>
 
                 <div class="grid grid--2 mt-24">
@@ -3199,7 +3737,7 @@ class Seo
                 '@id' => $base . '/#organization',
                 'name' => static::siteName(),
                 'url' => $base . '/',
-                'description' => (string) (Settings::get('brand_description') ?: static::tagline()),
+                'logo' => $base . '/themes/elv-studio/assets/img/og-default.png',
                 'email' => (string) Settings::get('email'),
                 'sameAs' => array_values(array_filter([
                     (string) Settings::get('telegram'),
@@ -3286,6 +3824,8 @@ class Seo
             ];
         }
 
+        $graph = array_values(array_filter($graph));
+
         $json = json_encode(
             ['@context' => 'https://schema.org', '@graph' => $graph],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -3337,6 +3877,10 @@ class Seo
                 'name' => $item['q'],
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
             ];
+        }
+
+        if ($items === []) {
+            return [];
         }
 
         return ['@type' => 'FAQPage', '@id' => $id ?: (static::base() . '/#faq'), 'mainEntity' => $items];
@@ -3412,7 +3956,7 @@ class Seo
             'Disallow: /*?tag=',
             '',
             '# Яндекс: параметры фильтров не создают новых страниц',
-            'Clean-param: q&category&tag /blog/',
+            'Clean-param: q&category&tag',
             '',
             'User-agent: Yandex',
             'Allow: /',
@@ -3570,6 +4114,10 @@ class Sitemap
                 continue;
             }
 
+            if (!empty($page->hidden)) {
+                continue;
+            }
+
             if (str_contains(strtolower((string) ($page->meta_robots ?? '')), 'noindex')) {
                 continue;
             }
@@ -3655,7 +4203,6 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки Консультанта и документация
 
-
 ===== FILE: tools/chat-check.php =====
 
 <?php
@@ -3684,17 +4231,52 @@ foreach (['хутор', 'нормальный вопрос', 'установка
     $check(!TextFilter::has($word), 'filter false positive: ' . $word);
 }
 
+foreach (['shitake', 'dickens', 'pussycat', 'cocktail'] as $word) {
+    $check(!TextFilter::has($word), 'filter latin false positive: ' . $word);
+}
+
+foreach (['fuck', 'fucking', 'bitches', 'dicks', 'xyй', 'х у й'] as $word) {
+    $check(TextFilter::has($word), 'filter latin/cyrillic miss: ' . $word);
+}
+
 $refusal = Chat::answer('хуй');
 $check($refusal['answer'] === TextFilter::REFUSAL, 'profanity refusal is not returned');
 $check($refusal['sources'] === [], 'profanity refusal must not expose search sources');
 $check($refusal['rejected'] === true, 'profanity message must be rejected');
 
-foreach (['абырвалг', 'фывап', 'абырвалг абырвалг'] as $nonsense) {
+foreach (['абырвалг', 'фывап', 'абырвалг абырвалг', 'абырвалг оплата', 'фывап тарифы'] as $nonsense) {
     $reply = Chat::answer($nonsense);
     $check($reply['rejected'] === true, 'nonsense message is not rejected: ' . $nonsense);
     $check(str_contains($reply['answer'], 'Не понял'), 'nonsense answer is missing: ' . $nonsense);
     $check($reply['sources'] === [], 'nonsense answer must not expose sources: ' . $nonsense);
 }
+
+$crowdfunding = Chat::answer('краудфандинг');
+$check($crowdfunding['rejected'] === false, 'known off-site term is rejected: краудфандинг');
+
+$empty = Chat::answer('');
+$check(str_contains($empty['answer'], 'подробнее'), 'empty message does not ask for details');
+
+$long = Chat::answer(str_repeat('а', 10000));
+$check(is_array($long) && $long['rejected'] === true, 'long nonsense is not rejected');
+
+$services = Chat::answer('какие услуги вы оказываете');
+$check(str_contains($services['answer'], 'Услуги Elv Studio'), 'studio services answer is missing');
+$check(str_contains((string) ($services['link']['url'] ?? ''), '/services'), 'studio services link is missing');
+$check(!str_contains($services['answer'], 'В демо-записи'), 'studio services answer mixes booking services');
+
+$booking = Chat::answer('записаться на услугу');
+$check(str_contains($booking['answer'], 'Онлайн-запись'), 'booking answer is missing');
+
+$audit = Chat::answer('аудит сайта');
+$check(str_contains((string) ($audit['link']['url'] ?? ''), '/services/audit'), 'audit link is missing');
+
+$contact = Chat::answer('связаться с вами');
+$check($contact['rejected'] === false, 'contact request is rejected');
+$check(!str_contains($contact['answer'], 'Не понял'), 'contact request falls into nonsense');
+
+$setup = Chat::answer('как настроить сайт');
+$check(str_contains($setup['answer'], 'Настройка сайта'), 'site setup answer is missing');
 
 $pricing = Chat::answer('сколько стоит');
 $check(str_contains($pricing['answer'], 'Тарифы Elv Kit'), 'pricing answer is missing');
@@ -3738,58 +4320,620 @@ if ($errors !== []) {
 
 echo 'OK: chat checks passed' . PHP_EOL;
 
+===== FILE: tools/search-check.php =====
+
+<?php
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Elv\Kit\Classes\Search;
+
+$errors = [];
+
+$check = function (bool $condition, string $message) use (&$errors) {
+    if (!$condition) {
+        $errors[] = $message;
+    }
+};
+
+$index = Search::index();
+$check(count($index) >= 90, 'search index is smaller than expected');
+$check(Search::index() === $index, 'search index cache returns a different array');
+
+$longest = 0;
+$hasLongText = false;
+
+foreach ($index as $item) {
+    $length = mb_strlen((string) ($item['text'] ?? ''));
+    $longest = max($longest, $length);
+
+    if ($length > 320) {
+        $hasLongText = true;
+    }
+
+    $check($length <= 801, 'search text is longer than the index limit: ' . (string) ($item['url'] ?? ''));
+}
+
+$check($hasLongText, 'search index still truncates every article at 320 characters');
+$check($longest <= 801, 'search index text limit is not 800 characters');
+
+foreach (['оплата', 'оплатить', 'тарифами', 'цены', 'настройки', 'хостинг'] as $query) {
+    $check(Search::query($query, Search::TYPE_ALL, 10) !== [], 'search returns nothing for: ' . $query);
+}
+
+$pricing = Search::query('тарифами', Search::TYPE_ALL, 10);
+$pricingUrls = array_column($pricing, 'url');
+$check(in_array('/pricing/', $pricingUrls, true), 'morphology does not find /pricing/ for «тарифами»');
+
+$docs = Search::query('настройки', Search::TYPE_ALL, 10);
+$docsUrls = array_column($docs, 'url');
+$check(in_array('/docs/', $docsUrls, true), 'morphology does not find /docs/ for «настройки»');
+
+Search::flush();
+$check(Search::index() !== [], 'search index is empty after flush');
+
+if ($errors !== []) {
+    foreach ($errors as $error) {
+        fwrite(STDERR, 'FAIL: ' . $error . PHP_EOL);
+    }
+
+    exit(1);
+}
+
+echo 'OK: search checks passed' . PHP_EOL;
+
+===== FILE: tools/seo-check.php =====
+
+<?php
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Elv\Kit\Classes\Seo;
+
+$errors = [];
+
+$check = function (bool $condition, string $message) use (&$errors) {
+    if (!$condition) {
+        $errors[] = $message;
+    }
+};
+
+$method = new ReflectionMethod(Seo::class, 'faqNodeFromItems');
+$method->setAccessible(true);
+
+$empty = $method->invoke(null, null, []);
+$check($empty === [], 'empty FAQ source still builds a FAQPage node');
+
+$filled = $method->invoke(null, null, [
+    ['q' => 'Вопрос', 'a' => 'Ответ'],
+]);
+$check(($filled['@type'] ?? '') === 'FAQPage', 'FAQPage node is missing for a filled source');
+$check(count($filled['mainEntity'] ?? []) === 1, 'FAQPage mainEntity is empty for a filled source');
+
+$robots = Seo::robots();
+$check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
+$check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
+
+if ($errors !== []) {
+    foreach ($errors as $error) {
+        fwrite(STDERR, 'FAIL: ' . $error . PHP_EOL);
+    }
+
+    exit(1);
+}
+
+echo 'OK: SEO checks passed' . PHP_EOL;
+
+===== FILE: tools/check-seo.mjs =====
+
+import { BASE, fetchPage, first, all, plain, normalizePath } from './check-common.mjs';
+
+const errors = [];
+const sitemap = await fetchPage('/sitemap.xml');
+const urls = all(sitemap.body, /<loc>([^<]+)<\/loc>/g).map((loc) => loc.trim());
+
+if (!urls.length) {
+  console.error('sitemap.xml is empty');
+  process.exit(1);
+}
+
+const robotsTxt = (await fetchPage('/robots.txt')).body;
+
+if (/^Disallow:\s*\/\s*$/im.test(robotsTxt)) {
+  errors.push('/robots.txt: root disallow blocks the whole site');
+}
+
+const seen = new Set(urls.map((url) => normalizePath(new URL(url).pathname)));
+const titles = new Map();
+const descriptions = new Map();
+
+for (const raw of urls) {
+  const path = new URL(raw).pathname + (raw.endsWith('/') ? '' : '');
+  const page = await fetchPage(path);
+  const html = page.body;
+  const where = normalizePath(path);
+
+  if (page.status !== 200) {
+    errors.push(`${where}: status ${page.status}`);
+    continue;
+  }
+
+  if (!/<html[^>]*lang="ru"/i.test(html)) {
+    errors.push(`${where}: <html lang="ru"> missing`);
+  }
+
+  if (!/<meta\s+name="viewport"/i.test(html)) {
+    errors.push(`${where}: viewport meta missing`);
+  }
+
+  for (const attrs of all(html, /<img\b([^>]*)>/gi)) {
+    if (!/\balt\s*=/i.test(attrs)) {
+      errors.push(`${where}: img without alt`);
+    }
+  }
+
+  const title = plain(first(html, /<title>([\s\S]*?)<\/title>/i));
+
+  if (title.length < 10 || title.length > 75) {
+    errors.push(`${where}: title length ${title.length}`);
+  }
+
+  if (titles.has(title)) {
+    errors.push(`${where}: duplicate title with ${titles.get(title)}`);
+  } else {
+    titles.set(title, where);
+  }
+
+  const description = first(html, /<meta\s+name="description"\s+content="([^"]*)"/i);
+
+  if (description.length < 50 || description.length > 300) {
+    errors.push(`${where}: description length ${description.length}`);
+  }
+
+  if (descriptions.has(description)) {
+    errors.push(`${where}: duplicate description with ${descriptions.get(description)}`);
+  } else {
+    descriptions.set(description, where);
+  }
+
+  const canonical = first(html, /<link\s+rel="canonical"\s+href="([^"]+)"/i);
+
+  if (!canonical) {
+    errors.push(`${where}: canonical missing`);
+  } else {
+    if (!canonical.startsWith(BASE)) {
+      errors.push(`${where}: canonical points outside base: ${canonical}`);
+    }
+
+    if (normalizePath(new URL(canonical).pathname) !== where) {
+      errors.push(`${where}: canonical path mismatch: ${canonical}`);
+    }
+  }
+
+  const xRobots = (page.headers.get('x-robots-tag') || '').toLowerCase();
+
+  if (/noindex|none/.test(xRobots)) {
+    errors.push(`${where}: X-Robots-Tag blocks indexing (${xRobots})`);
+  }
+
+  const metaRobots = first(html, /<meta\s+name="robots"\s+content="([^"]*)"/i);
+
+  if (!/index/i.test(metaRobots) || /noindex/i.test(metaRobots)) {
+    errors.push(`${where}: meta robots is not indexable (${metaRobots || 'missing'})`);
+  }
+
+  if (!first(html, /<meta\s+property="og:title"\s+content="([^"]+)"/i)) {
+    errors.push(`${where}: og:title missing`);
+  }
+
+  if (!first(html, /<meta\s+property="og:description"\s+content="([^"]+)"/i)) {
+    errors.push(`${where}: og:description missing`);
+  }
+
+  const image = first(html, /<meta\s+property="og:image"\s+content="([^"]+)"/i);
+
+  if (!image.startsWith('http')) {
+    errors.push(`${where}: og:image missing or relative`);
+  }
+
+  if (!first(html, /<meta\s+name="twitter:card"\s+content="([^"]+)"/i)) {
+    errors.push(`${where}: twitter:card missing`);
+  }
+
+  const h1 = all(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi);
+
+  if (h1.length !== 1) {
+    errors.push(`${where}: h1 count ${h1.length}`);
+  }
+
+  const jsonld = all(html, /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi);
+
+  if (!jsonld.length) {
+    errors.push(`${where}: JSON-LD missing`);
+  }
+
+  for (const block of jsonld) {
+    let data;
+
+    try {
+      data = JSON.parse(block);
+    } catch (error) {
+      errors.push(`${where}: JSON-LD invalid (${error.message.slice(0, 60)})`);
+      continue;
+    }
+
+    if (data['@context'] !== 'https://schema.org') {
+      errors.push(`${where}: JSON-LD @context is not schema.org`);
+    }
+
+    const nodes = Array.isArray(data['@graph']) ? data['@graph'] : [data];
+
+    if (!nodes.length) {
+      errors.push(`${where}: JSON-LD graph is empty`);
+    }
+
+    for (const node of nodes) {
+      const type = node && node['@type'];
+
+      if (!type) {
+        errors.push(`${where}: JSON-LD node without @type`);
+        continue;
+      }
+
+      if (type === 'BlogPosting' && (!node.headline || !node.datePublished || !node.author || !node.image || !node.wordCount || !node.keywords || !node.articleSection)) {
+        errors.push(`${where}: BlogPosting misses headline/datePublished/author/image/wordCount/keywords/articleSection`);
+      }
+
+      if (type === 'BreadcrumbList' && !(node.itemListElement || []).length) {
+        errors.push(`${where}: BreadcrumbList is empty`);
+      }
+
+      if (type === 'FAQPage' && !(node.mainEntity || []).length) {
+        errors.push(`${where}: FAQPage is empty`);
+      }
+
+      if (type === 'Organization' && (!node.name || !node.url || !node.logo)) {
+        errors.push(`${where}: Organization misses name/url/logo`);
+      }
+
+      if (type === 'WebSite' && (!node.name || !node.url)) {
+        errors.push(`${where}: WebSite misses name/url`);
+      }
+
+      if (['Product', 'SoftwareApplication'].includes(type) && (!node.name || !node.offers)) {
+        errors.push(`${where}: ${type} misses name/offers`);
+      }
+    }
+  }
+}
+
+const assertSeo = [
+  '/blog/',
+  '/modules/',
+  '/pricing/',
+  '/kit/',
+];
+
+for (const path of assertSeo) {
+  if (!seen.has(normalizePath(path))) {
+    errors.push(`sitemap misses ${path}`);
+  }
+}
+
+const sitemapPage = await fetchPage('/sitemap/');
+const anchorTargets = ['sitemap-site', 'sitemap-services', 'sitemap-modules', 'sitemap-buy', 'sitemap-legal', 'sitemap-blog'];
+
+for (const target of anchorTargets) {
+  if (!sitemapPage.body.includes(`id="${target}"`)) {
+    errors.push(`/sitemap/: anchor target ${target} is missing`);
+  }
+}
+
+const imageUrl = first((await fetchPage('/')).body, /<meta\s+property="og:image"\s+content="([^"]+)"/i);
+const imageResponse = await fetch(imageUrl);
+
+if (imageResponse.status !== 200) {
+  errors.push(`og:image -> ${imageResponse.status}`);
+}
+
+console.log(`checked: ${urls.length} sitemap URLs`);
+
+if (errors.length) {
+  console.error(`\n${errors.length} SEO issue(s):`);
+
+  for (const error of errors) {
+    console.error('  x ' + error);
+  }
+
+  process.exit(1);
+}
+
+console.log('\nOK');
+
+===== FILE: tools/check-headers.mjs =====
+
+import { readFile } from 'node:fs/promises';
+
+const BASE = (process.env.ELV_BASE || 'http://127.0.0.1:8090').replace(/\/+$/, '');
+const errors = [];
+
+const pages = ['/', '/kit/', '/pricing/', '/blog/', '/modules/booking/'];
+const required = {
+  'x-frame-options': 'deny',
+  'x-content-type-options': 'nosniff',
+  'referrer-policy': '',
+  'permissions-policy': '',
+};
+
+for (const path of pages) {
+  const response = await fetch(BASE + path, {
+    headers: { 'Accept-Encoding': 'gzip' },
+    redirect: 'follow',
+  });
+  const headers = response.headers;
+  const body = await response.arrayBuffer();
+
+  if (response.status !== 200) {
+    errors.push(`${path}: status ${response.status}`);
+  }
+
+  const type = (headers.get('content-type') || '').toLowerCase();
+
+  if (!type.includes('text/html')) {
+    errors.push(`${path}: content-type ${type}`);
+  }
+
+  if ((headers.get('content-encoding') || '').toLowerCase() !== 'gzip') {
+    errors.push(`${path}: not gzipped`);
+  }
+
+  for (const [name, expected] of Object.entries(required)) {
+    const value = (headers.get(name) || '').toLowerCase();
+
+    if (!value) {
+      errors.push(`${path}: ${name} missing`);
+    } else if (expected && value !== expected) {
+      errors.push(`${path}: ${name}=${value}`);
+    }
+  }
+
+  const csp = (headers.get('content-security-policy') || '').toLowerCase();
+
+  if (!csp) {
+    errors.push(`${path}: CSP missing`);
+  } else {
+    for (const token of ["default-src 'self'", "frame-ancestors 'none'", "object-src 'none'"]) {
+      if (!csp.includes(token)) {
+        errors.push(`${path}: CSP without ${token}`);
+      }
+    }
+
+    if (!/nonce-[a-z0-9+/=_-]+/.test(csp)) {
+      errors.push(`${path}: CSP without nonce`);
+    }
+
+    if (BASE.startsWith('http://') && csp.includes('upgrade-insecure-requests')) {
+      errors.push(`${path}: CSP upgrades HTTP requests on a plain-HTTP origin`);
+    }
+  }
+
+  if (headers.get('x-powered-by')) {
+    errors.push(`${path}: x-powered-by leaks`);
+  }
+
+  console.log(`${path} -> ${response.status} ${body.byteLength} bytes gzip`);
+}
+
+const assets = [
+  ['/themes/elv-studio/assets/img/favicon.svg', 'image/svg+xml'],
+  ['/themes/elv-studio/assets/img/og-default.png', 'image/png'],
+];
+
+for (const [path, type] of assets) {
+  const response = await fetch(BASE + path);
+  const actual = (response.headers.get('content-type') || '').toLowerCase();
+
+  if (response.status !== 200 || !actual.includes(type)) {
+    errors.push(`${path}: ${response.status} ${actual}`);
+  }
+}
+
+const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+const globalHeaders = (vercel.headers || []).find((entry) => entry.source === '/(.*)')?.headers || [];
+const robotsHeader = globalHeaders.find((header) => String(header.key).toLowerCase() === 'x-robots-tag');
+
+if (robotsHeader && /noindex/i.test(String(robotsHeader.value))) {
+  errors.push('vercel.json: X-Robots-Tag blocks the indexed demo');
+}
+
+const staticRobots = await readFile(new URL('../demo-static/robots.txt', import.meta.url), 'utf8');
+
+if (!/User-agent:\s*\*/i.test(staticRobots) || !/^Allow:\s*\/\s*$/im.test(staticRobots) || /^Disallow:\s*\/\s*$/im.test(staticRobots)) {
+  errors.push('demo-static/robots.txt: demo must stay indexable');
+}
+
+if (errors.length) {
+  console.error(`\n${errors.length} header issue(s):`);
+
+  for (const error of errors) {
+    console.error('  x ' + error);
+  }
+
+  process.exit(1);
+}
+
+console.log('\nOK');
+
+===== FILE: plugins/elv/kit/classes/SecurityHeaders.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Closure;
+use Elv\Kit\Models\Settings;
+
+/**
+ * SecurityHeaders — CSP с nonce и базовый периметр для публичных страниц.
+ *
+ * Бэкенд October не трогаем: у него своя CSP-политика и свои inline-сценарии.
+ * Заголовки статики на cPanel отдаёт Apache — дублируются в .htaccess темы.
+ */
+class SecurityHeaders
+{
+    protected static $nonce = null;
+
+    public static function nonce(): string
+    {
+        if (static::$nonce === null) {
+            static::$nonce = rtrim(strtr(base64_encode(random_bytes(18)), '+/', '-_'), '=');
+        }
+
+        return static::$nonce;
+    }
+
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+
+        if ($request->is(
+            'admin', 'admin/*',
+            'modules/system', 'modules/system/*',
+            'modules/backend', 'modules/backend/*',
+            'modules/cms', 'modules/cms/*',
+            'modules/editor', 'modules/editor/*',
+            'modules/media', 'modules/media/*',
+            'modules/tailor', 'modules/tailor/*',
+            'modules/dashboard', 'modules/dashboard/*',
+            'system/*', 'combine/*'
+        )) {
+            return $response;
+        }
+
+        $nonce = static::nonce();
+        $analytics = $this->analyticsSources();
+
+        $cspParts = [
+            "default-src 'self'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'none'",
+            "img-src 'self' data:",
+            "font-src 'self'",
+            "style-src 'self' 'nonce-" . $nonce . "'",
+            "script-src 'self' 'nonce-" . $nonce . "'" . $analytics,
+            "connect-src 'self'" . $analytics,
+            "object-src 'none'",
+        ];
+
+        if ($request->isSecure() || app()->environment('production')) {
+            $cspParts[] = 'upgrade-insecure-requests';
+        }
+
+        $csp = implode('; ', $cspParts);
+
+        $response->headers->set('Content-Security-Policy', $csp);
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-Frame-Options', 'DENY');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+        header_remove('X-Powered-By');
+        $response->headers->remove('X-Powered-By');
+
+        if ($request->isSecure()) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+
+        return $response;
+    }
+
+    protected function analyticsSources(): string
+    {
+        $sources = '';
+
+        if (Settings::get('analytics_google')) {
+            $sources .= ' https://www.googletagmanager.com https://www.google-analytics.com';
+        }
+
+        if (Settings::get('analytics_yandex')) {
+            $sources .= ' https://mc.yandex.ru https://mc.yandex.com';
+        }
+
+        return $sources;
+    }
+}
+
 ===== FILE: docs/search.md =====
 
 # Поиск по сайту и блогу
 
-Дата среза: 18.11.2026 (Stage 51).
+Дата среза: 18.11.2026 (Stage 59).
 
 ## Что сделано
 
 - `/search/` — страница поиска по 27 страницам и 67 статьям блога.
 - В шапке каждой страницы — кнопка поиска; форма открывается в `<dialog>`.
-- Индекс: `GET /search-index.json`, собирается из `Classes\Search`.
+- Индекс: `GET /search-index.json`, собирается из `Classes\Search`; внутри
+  одного HTTP-запроса индекс кэшируется статически, `Search::flush()` сбрасывает
+  кэш в тестах.
 - Консультант ищет по тому же индексу: явный запрос («найди статью…») и
   запасной вариант, когда готового ответа нет, возвращают до трёх ссылок.
 - Фильтр грубых слов `TextFilter` стоит до поиска: сообщение с матом не
-  попадает ни в ответ, ни в поисковый запрос.
+  попадает ни в ответ, ни в поисковый запрос. Латинские основы проверяются по
+  границам слова, поэтому `shitake`, `dickens`, `pussycat` и `cocktail`
+  проходят, а `fuck`, `fucking`, `bitches`, `xyй` и `х у й` блокируются.
 - `/sitemap/` — человеческая карта сайта: три группы разделов, услуги,
   покупка и контакты, правовые документы; блог показан шестью свежими
-  статьями и четырьмя рубриками, а не плоским списком 67 статей.
+  статьями и рубриками, а не плоским списком 67 статей. Над блоками есть
+  якорная навигация `#sitemap-site`, `#sitemap-services`, `#sitemap-modules`,
+  `#sitemap-buy`, `#sitemap-legal`, `#sitemap-blog`.
 - В JSON-LD `WebSite` `SearchAction` ведёт на `/search/?q=...`, а не на
-  старую форму блога.
-- На странице есть фильтры «Всё / Блог / Страницы», пустое состояние и
-  частые запросы.
+  старую форму блога. `Organization` содержит `logo`; пустой `FAQPage` не
+  выводится.
+- В `robots.txt` `Clean-param: q&category&tag` действует на всём сайте.
+- На странице есть фильтры «Всё / Блог / Страницы», пустое состояние,
+  частые запросы, подсветка совпадений через `<mark>` и кнопка
+  «Показать ещё»: первые 30 результатов, остальные — по кнопке.
 - Страница `/search/` закрыта от индексации (`noindex, follow`), потому что
   поисковые URL с `?q=` не должны плодить дубли. Ссылка на неё есть в подвале.
 - В статической демо-копии (`demo-static/`) поиск работает: экспорт пишет
   `search-index.json` и `/search/index.html`, форма помечена
   `data-static-search`, поэтому общий перехват форм её не блокирует.
+- CSP добавляет `upgrade-insecure-requests` только для HTTPS или
+  `APP_ENV=production`. На локальном HTTP по `localhost` и по LAN-IP директива
+  не отправляется: иначе браузер поднимает `fetch('/chat')` и
+  `/search-index.json` до `https://`, и Консультант зависает на «Печатает…».
 
 ## Архитектура
 
 | Файл | Роль |
 |---|---|
-| `plugins/elv/kit/classes/Search.php` | индекс страниц и статей, нормализация, токены, ранжирование |
+| `plugins/elv/kit/classes/Search.php` | индекс страниц и статей, кэш, нормализация, основы слов, ранжирование |
 | `plugins/elv/kit/classes/Chat.php` | ответы Консультанта, поиск и массив `sources` |
-| `plugins/elv/kit/classes/Http/ChatController.php` | HTTP-ответ Консультанта, общий контракт `sources` |
+| `plugins/elv/kit/classes/Http/ChatController.php` | HTTP-ответ Консультанта, общий контракт `sources` и лимит 15 сообщений в минуту на сессию |
 | `plugins/elv/kit/assets/widget.js` | рендер ответа и ссылок Консультанта |
 | `plugins/elv/kit/classes/Http/SeoController.php` | отдаёт `/search-index.json` с кэшем 30 минут |
 | `plugins/elv/kit/routes.php` | маршрут `search-index.json` |
-| `themes/elv-studio/pages/search.htm` | разметка страницы, форма, фильтры, пустое состояние |
-| `themes/elv-studio/pages/sitemap.htm` | сгруппированная карта сайта и ссылки на поиск |
-| `plugins/elv/kit/classes/Seo.php` | JSON-LD `WebSite`/`SearchAction` на `/search/?q=` |
-| `themes/elv-studio/assets/js/search.js` | загрузка индекса, поиск, фильтр, `history.replaceState` |
+| `themes/elv-studio/pages/search.htm` | разметка страницы, форма, фильтры, кнопка «Показать ещё» |
+| `themes/elv-studio/pages/sitemap.htm` | сгруппированная карта сайта, якоря и ссылки на поиск |
+| `plugins/elv/kit/classes/Seo.php` | JSON-LD `WebSite`/`SearchAction`, `Organization.logo`, `FAQPage` |
+| `plugins/elv/kit/classes/Sitemap.php` | XML-sitemap без `hidden`-страниц |
+| `themes/elv-studio/assets/js/search.js` | загрузка индекса, поиск, основы, фильтр, пагинация, подсветка, `history.replaceState` |
 | `themes/elv-studio/assets/css/search.css` | стили страницы; подключается только на `/search/` |
 | `themes/elv-studio/partials/header.htm` | кнопка и `<dialog>` поиска |
 | `themes/elv-studio/assets/js/app.js` | открытие/закрытие диалога |
 | `tools/export-static.php` | `search-index.json`, страница `/search/`, разрешение формы |
 
 Индекс — обычный JSON-массив. Запись статьи содержит `title`, `url`,
-`description` (начало анонса), `text` (первые 320 символов тела без HTML),
+`description` (начало анонса), `text` (первые 800 символов тела без HTML),
 `keywords` (рубрика, теги, аудитория), `meta` (рубрика и дата). Полное тело
 статей в индекс не попадает: это держит страницу лёгкой и не раздувает
-`demo-static`.
+`demo-static`. На Stage 59 индекс: 94 записи, 143,5 КБ JSON, 35,6 КБ gzip.
 
 ## Как ищет
 
@@ -3797,27 +4941,42 @@ echo 'OK: chat checks passed' . PHP_EOL;
    пробелами.
 2. Слова короче двух символов и служебные слова (`и`, `в`, `на`, `для`…)
    отбрасываются.
-3. Совпадение всей фразы в заголовке даёт +14; слово в заголовке +7,
+3. Для слова строятся простые основы и синонимы: `оплата/оплаты/оплатить`,
+   `тариф/тарифы/тарифами`, `статья/статьи/статью`,
+   `бронирование/бронирования`, `цена/цены/стоимость`, `сайт/сайты/лендинг`.
+   Левенштейн и внешний морфологический сервис не используются.
+4. Совпадение всей фразы в заголовке даёт +14; слово в заголовке +7,
    в ключевых словах +5, в описании +3, в начале текста +2, в метаданных +1.
-4. Результаты сортируются по сумме; показываются первые 30. Запрос не
-   сохраняется и не уходит на сервер — поиск клиентский.
+5. Результаты сортируются по сумме; показываются первые 30, остальные — по
+   кнопке «Показать ещё». Запрос не сохраняется и не уходит на сервер —
+   поиск клиентский.
 
 ## Консультант
 
 `Chat::answer()` сначала проверяет сообщение через `TextFilter::has()`.
 Если грубости нет, явный поисковый запрос («найди», «поиск», «подбери»,
-«статья», «материал», «ссылка») отдаёт до трёх ссылок и короткую подпись
+«статья», «материал», «почитать») отдаёт до трёх ссылок и короткую подпись
 «Нашёл материалы по теме». Если точного намерения нет, тот же поиск
 срабатывает как запасной вариант: «Точного ответа нет, но на сайте есть
 материалы по теме». Пустой результат честно говорит, что ничего не нашлось,
 и предлагает форму обратной связи.
 
+Ссылка на скачивание (`скачать`, `скачивание`, `доставка`, `zip`, `архив`,
+`токен`) ведёт в отдельную ветку и не перехватывается поиском. «Связаться с
+вами» попадает в контакты, «какие услуги вы оказываете» — в услуги студии
+`/services/`, «записаться на услугу» — в онлайн-запись, «аудит сайта» — в
+`/services/audit/`, «как настроить сайт» — в инструкцию.
+
 Грубость и бессмыслица не остаются в окне чата: ответ получает
 `rejected: true`, а виджет убирает пузырь пользователя и показывает
-вежливую подсказку. Бессмыслица определяется без словаря: если в сообщении
-нет ни одного слова, которое встречается в индексе сайта (например,
-«абырвалг», «фывап»), это не вопрос по базе знаний. Обычные короткие
-запросы вроде «оплата» или «тарифы» находятся в индексе и проходят.
+вежливую подсказку. Бессмыслица определяется без словаря: слово, которого нет
+в индексе, проверяется на явные признаки набора букв (нет гласных, тройной
+повтор, неестественное окончание). Если в сообщении есть и знакомое слово, и
+такой набор («абырвалг оплата»), ответ тоже отклоняется. «Краудфандинг» —
+известный термин вне индекса и проходит.
+
+HTTP-лимит: 15 сообщений в минуту на сессию (16-й — `429`), плюс общий
+`throttle:40,1` по IP в `routes.php`.
 
 В JSON Консультанта добавлен массив `sources`: `{ label, url, kind }`,
 где `kind` — «Статья» или «Страница». Старое поле `link` сохранено для
@@ -3828,34 +4987,37 @@ echo 'OK: chat checks passed' . PHP_EOL;
 `/sitemap/` остаётся человеческой картой, а `/sitemap.xml` — машинной.
 Страница собрана из карточек: «Сайт» (включая `/search/`), «Услуги»,
 «Модули Elv Kit», «Купить и связаться», «Правовое и служебное» и «Блог».
-В блоке блога — шесть последних статей и четыре рубрики с количеством
-публикаций; полный список открывается на `/blog/`, технический — на
-`/blog/tech/`. Поисковая страница в XML-sitemap не попадает из-за
-`noindex`, но в человеческой карте ссылка на неё есть.
+В блоке блога — шесть последних статей и рубрики с количеством публикаций;
+полный список открывается на `/blog/`, технический — на `/blog/tech/`.
+Поисковая страница в XML-sitemap не попадает из-за `noindex`, но в
+человеческой карте ссылка на неё есть. `hidden`-страницы в XML-sitemap не
+попадают.
 
 ## Проверка
 
 ```bash
-node tools/check-urls.mjs      # /search/ и /search-index.json в critical
-node tools/check-budget.mjs    # /search/ в бюджете HTML/CSS/JS/gzip
-node tools/check-console.mjs   # 107 страниц demo-static, включая /search/
-php tools/chat-check.php       # ответы Консультанта, ссылки, TextFilter
+php tools/chat-check.php       # ответы Консультанта, фильтр, бессмыслица
+php tools/search-check.php     # кэш, основы, лимит тела, /pricing/
+php tools/seo-check.php        # пустой FAQPage и Clean-param
+node tools/check-seo.mjs       # живой сайт: JSON-LD, Organization.logo, якоря
+node tools/gate.mjs            # URL, SEO, заголовки, бюджет, сироты, консоль
+node tools/check-console.mjs   # 107 страниц demo-static
 php tools/export-static.php --origin=https://elvstudio.vercel.app
 ```
 
-На 18.11.2026: `check-urls` — 100 внутренних URL, OK; `check-seo` — 94 URL
-sitemap, OK; `check-budget` — `/search/` 76,5 КБ HTML, gzip 17,3 КБ, OK;
-`chat-check` — цены, поиск, пустой результат, бессмыслица и фильтр грубых слов, OK;
-`/sitemap/` — 200, ссылки на шесть свежих статей и четыре рубрики, OK.
+HTTP-лимит проверяется вручную: 16 POST `/chat` с одной сессией и CSRF —
+15 ответов `200`, 16-й `429`.
 
 ## Границы
 
 - Поиск по блогу внутри `/blog/` остаётся отдельным: он ищет по опубликованным
   статьям через `Blog::paginate()` и в статике показывает подсказку. Общий
   поиск его не заменяет.
-- Индекс не является полнотекстовым поиском по всей статье. Если понадобится
-  искать по всему телу, это отдельное решение: MySQL FULLTEXT или внешний
-  индекс, с проверкой нагрузки и приватности.
+- Индекс не является полнотекстовым поиском по всей статье. 800 символов —
+  компромисс между релевантностью и весом; полное тело — отдельное решение
+  (MySQL FULLTEXT или внешний индекс) с проверкой нагрузки и приватности.
+- Анонимная статистика нулевых запросов не включена: нужна явная проверка
+  владельца, чтобы не собирать лишние данные.
 
 ===== FILE: docs/content-policy.md =====
 
@@ -4149,5 +5311,3 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
   `/search/?q={search_term_string}`; `check-seo` пройден.
 - [ ] Решить с владельцем, как упаковывать тарифы; без решения цены не
   трогаем.
-
-==============================================================================

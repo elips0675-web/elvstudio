@@ -15,12 +15,33 @@ class Search
     public const TYPE_PAGE = 'page';
     public const TYPE_BLOG = 'blog';
 
+    /** @var array<int, array<string, mixed>>|null */
+    protected static ?array $cache = null;
+
+    /** @var array<int, array<int, string>> */
+    protected const SYNONYM_GROUPS = [
+        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
+        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
+        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
+        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
+        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
+        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
+        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
+        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
+        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии'],
+    ];
+
     /**
      * index — все записи, по которым ищет страница /search/ и Консультант.
      */
     public static function index(): array
     {
-        return array_merge(static::pages(), static::posts());
+        return static::$cache ??= array_merge(static::pages(), static::posts());
+    }
+
+    public static function flush(): void
+    {
+        static::$cache = null;
     }
 
     /**
@@ -149,7 +170,7 @@ class Search
                 'title' => (string) $post->title,
                 'url' => '/blog/' . $post->slug . '/',
                 'description' => static::limit((string) $post->excerpt, 180),
-                'text' => static::limit(static::plain((string) $post->body), 320),
+                'text' => static::limit(static::plain((string) $post->body), 800),
                 'keywords' => trim(implode(' ', array_filter([$category, $tags, (string) $post->audience_label]))),
                 'meta' => trim(implode(' · ', array_filter([$category, (string) $post->display_date]))),
             ];
@@ -170,29 +191,30 @@ class Search
         $hits = 0;
 
         foreach ($words as $word) {
+            $forms = static::forms($word);
             $hit = false;
 
-            if (str_contains($title, $word)) {
+            if (static::containsAny($title, $forms)) {
                 $score += 7;
                 $hit = true;
             }
 
-            if (str_contains($keywords, $word)) {
+            if (static::containsAny($keywords, $forms)) {
                 $score += 5;
                 $hit = true;
             }
 
-            if (str_contains($description, $word)) {
+            if (static::containsAny($description, $forms)) {
                 $score += 3;
                 $hit = true;
             }
 
-            if (str_contains($text, $word)) {
+            if (static::containsAny($text, $forms)) {
                 $score += 2;
                 $hit = true;
             }
 
-            if (str_contains($meta, $word)) {
+            if (static::containsAny($meta, $forms)) {
                 $score += 1;
                 $hit = true;
             }
@@ -242,6 +264,88 @@ class Search
         );
 
         return array_values(array_unique($words));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function forms(string $word): array
+    {
+        $forms = [$word];
+        $stem = static::stem($word);
+
+        if ($stem !== $word) {
+            $forms[] = $stem;
+        }
+
+        foreach (static::SYNONYM_GROUPS as $group) {
+            if (!in_array($word, $group, true)) {
+                continue;
+            }
+
+            foreach ($group as $item) {
+                $forms[] = $item;
+                $stem = static::stem($item);
+
+                if ($stem !== $item) {
+                    $forms[] = $stem;
+                }
+            }
+
+            break;
+        }
+
+        return array_values(array_unique(array_filter($forms, function (string $form): bool {
+            return mb_strlen($form) >= 2;
+        })));
+    }
+
+    protected static function stem(string $word): string
+    {
+        static $endings = [
+            'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
+            'овать', 'евать',
+            'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
+            'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
+            'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь',
+        ];
+
+        if (mb_strlen($word) <= 3) {
+            return $word;
+        }
+
+        foreach ($endings as $ending) {
+            $length = mb_strlen($ending);
+            $stem = mb_substr($word, 0, -$length);
+
+            if (mb_substr($word, -$length) === $ending && mb_strlen($stem) >= 3) {
+                return $stem;
+            }
+        }
+
+        return $word;
+    }
+
+    /**
+     * @param array<int, string> $forms
+     */
+    protected static function containsAny(string $text, array $forms): bool
+    {
+        foreach ($forms as $form) {
+            if (mb_strlen($form) < 4) {
+                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (str_contains($text, $form)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected static function plain(string $html): string

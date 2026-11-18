@@ -73,6 +73,10 @@ class Sitemap
                 continue;
             }
 
+            if (!empty($page->hidden)) {
+                continue;
+            }
+
             if (str_contains(strtolower((string) ($page->meta_robots ?? '')), 'noindex')) {
                 continue;
             }

@@ -48,7 +48,11 @@ meta_robots = "noindex, follow"
                 {% endif %}
             </p>
 
-            <div class="search-results" data-search-results></div>
+            <div class="search-results" data-search-results aria-busy="false"></div>
+
+            <p class="mt-24" data-search-more hidden>
+                <button class="btn btn--ghost btn--sm" type="button">Показать ещё</button>
+            </p>
 
             <div class="search-empty" data-search-empty hidden>
                 <h2>Ничего не нашлось</h2>

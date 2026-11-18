@@ -43,7 +43,7 @@ class SecurityHeaders
         $nonce = static::nonce();
         $analytics = $this->analyticsSources();
 
-        $csp = implode('; ', [
+        $cspParts = [
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -54,8 +54,13 @@ class SecurityHeaders
             "script-src 'self' 'nonce-" . $nonce . "'" . $analytics,
             "connect-src 'self'" . $analytics,
             "object-src 'none'",
-            'upgrade-insecure-requests',
-        ]);
+        ];
+
+        if ($request->isSecure() || app()->environment('production')) {
+            $cspParts[] = 'upgrade-insecure-requests';
+        }
+
+        $csp = implode('; ', $cspParts);
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
