@@ -9,6 +9,11 @@ layout = "default"
 {% set crumbs = elv_breadcrumbs() %}
 {% set related = elv_related(post, 3) %}
 {% set postFaq = elv_post_faq(post.slug) %}
+{% set isTech = post.audience == 'tech' %}
+{% set blogCategories = elv_categories(post.audience) %}
+{% set blogIndex = isTech ? ('blog-tech'|page) : ('blog'|page) %}
+{% set otherHref = isTech ? ('blog'|page) : ('blog-tech'|page) %}
+{% set otherLabel = isTech ? 'Блог для бизнеса' : 'Технический раздел' %}
 
 <main id="main">
     <section class="page-hero">
@@ -43,6 +48,8 @@ layout = "default"
 
     <section class="section">
         <div class="container">
+            <div class="blog-layout">
+                <div class="blog-main">
             <article class="article">
                 <div class="article__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
 
@@ -89,6 +96,16 @@ layout = "default"
                     </div>
                 {% endif %}
             </article>
+                </div>
+
+                {% partial 'blog-aside'
+                    categories=blogCategories
+                    activeCategory=(post.category ? post.category.slug : '')
+                    total=elv_blog_total(post.audience)
+                    indexPage=blogIndex
+                    moreHref=otherHref
+                    moreLabel=otherLabel %}
+            </div>
         </div>
     </section>
 

@@ -1,25 +1,31 @@
 {% set categories = categories ?? [] %}
 {% set activeCategory = activeCategory ?? '' %}
+{% set indexPage = indexPage ?? ('blog'|page) %}
+{% set allLabel = allLabel ?? 'Все статьи' %}
+{% set moreHref = moreHref ?? null %}
+{% set moreLabel = moreLabel ?? '' %}
 <aside class="blog-aside" aria-label="Меню блога">
     <div class="aside-card">
         <h2 class="aside-title">Разделы</h2>
         <ul class="aside-list">
             <li>
-                <a class="{{ activeCategory ? '' : 'is-active' }}" href="{{ 'blog'|page }}">
-                    Все статьи
+                <a class="{{ activeCategory ? '' : 'is-active' }}" href="{{ indexPage }}">
+                    {{ allLabel }}
                     {% if total %}<span class="aside-count">{{ total }}</span>{% endif %}
                 </a>
             </li>
             {% for category in categories %}
                 <li>
-                    <a class="{{ activeCategory == category.slug ? 'is-active' }}" href="{{ 'blog'|page }}?category={{ category.slug }}">
+                    <a class="{{ activeCategory == category.slug ? 'is-active' }}" href="{{ indexPage }}?category={{ category.slug }}">
                         {{ category.name }}
                         <span class="aside-count">{{ category.posts_count }}</span>
                     </a>
                 </li>
             {% endfor %}
         </ul>
-        <p class="aside-more"><a href="{{ 'blog-tech'|page }}">Технический раздел →</a></p>
+        {% if moreHref %}
+            <p class="aside-more"><a href="{{ moreHref }}">{{ moreLabel }} →</a></p>
+        {% endif %}
     </div>
 
     <div class="aside-card">

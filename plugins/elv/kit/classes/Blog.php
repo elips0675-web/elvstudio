@@ -82,6 +82,14 @@ class Blog
     }
 
     /**
+     * total — число опубликованных статей аудитории.
+     */
+    public static function total(string $audience = Post::AUDIENCE_BUSINESS): int
+    {
+        return Post::query()->published()->audience($audience)->count();
+    }
+
+    /**
      * categories — рубрики с числом опубликованных статей выбранной аудитории.
      */
     public static function categories(string $audience = Post::AUDIENCE_BUSINESS)

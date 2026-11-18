@@ -183,9 +183,15 @@
       скрыт, chips остаются. Стили — `themes/elv-studio/assets/css/blog.css`,
       подключены в `layouts/default.htm` по образцу `calculator.css`/`search.css`:
       инлайновый бюджет CSS стоял на 36 655 из 36 864 байт, ещё 1 968 не влезали.
-      Открыто: сайдбар не добавлен в `blog-post.htm` и `blog-tech.htm`.
+      Сайдбар стоит на всех трёх страницах блога: `blog.htm`, `blog-tech.htm`,
+      `blog-post.htm` (на статье — рядом с текстом, ссылка «Все статьи» ведёт в
+      раздел той аудитории, к которой относится статья). Партиал принимает
+      `categories`, `total`, `indexPage`, `activeCategory`, `moreHref`, `moreLabel`;
+      число статей берётся из `elv_blog_total($audience)` (`Blog::total()`), а не из
+      пагинатора — иначе при фильтре «Все статьи» показывало бы число после фильтра
+      (проверено: `/blog/tech/?category=engineering` — было 11, стало 20).
       Приёмка: `npm run check` — все гейты зелёные (бюджет 36.0 KB, console 107 стр.),
-      на 1000 px горизонтального скролла нет.
+      горизонтального скролла нет ни на 1000, ни на 568 px.
 - [ ] **Замер эффекта.** Счётчики включаются настройками `analytics_google` /
       `analytics_yandex` (`partials/analytics.htm:1-2`). Через 2–4 недели сверить
       переходы в `/kit/`, `/calculator/`, `/feedback/` и позиции по запросам

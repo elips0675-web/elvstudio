@@ -6,6 +6,8 @@ meta_description = "Как устроен сайт на October CMS: скоро�
 ==
 {% set posts = elv_blog(50, 'tech') %}
 {% set crumbs = elv_breadcrumbs() %}
+{% set categories = elv_categories('tech') %}
+{% set businessBlog = 'blog'|page %}
 
 <main id="main">
     <section class="page-hero">
@@ -23,6 +25,8 @@ meta_description = "Как устроен сайт на October CMS: скоро�
 
     <section class="section section--tight">
         <div class="container">
+            <div class="blog-layout">
+                <div class="blog-main">
             {% if posts|length %}
                 <h2 class="sr-only">Технические статьи</h2>
                 <div class="blog-grid">
@@ -50,10 +54,20 @@ meta_description = "Как устроен сайт на October CMS: скоро�
                     <h2>Технических статей пока нет</h2>
                     <p>Вернитесь в блог для бизнеса — там практические материалы о записи, оплате и продвижении.</p>
                     <div class="stack-actions">
-                        <a class="btn btn--ghost" href="{{ 'blog'|page }}">Перейти в блог</a>
+                        <a class="btn btn--ghost" href="{{ businessBlog }}">Перейти в блог</a>
                     </div>
                 </div>
             {% endif %}
+                </div>
+
+                {% partial 'blog-aside'
+                    categories=categories
+                    activeCategory=elv_query('category')
+                    total=elv_blog_total('tech')
+                    indexPage=('blog-tech'|page)
+                    moreHref=businessBlog
+                    moreLabel='Блог для бизнеса' %}
+            </div>
         </div>
     </section>
 </main>

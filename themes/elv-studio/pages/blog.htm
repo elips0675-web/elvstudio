@@ -11,6 +11,7 @@ meta_description = "Статьи о сайтах простым языком: к
 {% set query = elv_query('q') %}
 {% set crumbs = elv_breadcrumbs() %}
 {% set start = elv_blog_start(5) %}
+{% set techLink = 'blog-tech'|page %}
 
 <main id="main">
     <section class="page-hero">
@@ -134,7 +135,7 @@ meta_description = "Статьи о сайтах простым языком: к
                     {% endif %}
                 </div>
 
-                {% partial 'blog-aside' categories=categories activeCategory=activeCategory total=posts.total() %}
+                {% partial 'blog-aside' categories=categories activeCategory=activeCategory total=elv_blog_total('business') moreHref=techLink moreLabel='Технический раздел' %}
             </div>
         </div>
     </section>
