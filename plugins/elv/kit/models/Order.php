@@ -1,5 +1,6 @@
 <?php namespace Elv\Kit\Models;
 
+use Elv\Kit\Classes\Catalog;
 use Model;
 
 /**
@@ -54,11 +55,9 @@ class Order extends Model
 
     public function getPlanLabelAttribute(): string
     {
-        return match ($this->plan) {
-            'multi' => 'До 5 сайтов',
-            'extended' => 'Без ограничений',
-            default => 'Один сайт',
-        };
+        $stored = (string) ($this->meta['plan_label'] ?? '');
+
+        return $stored !== '' ? $stored : Catalog::planLabel((string) $this->plan);
     }
 
     public function getAmountAttribute(): float

@@ -231,6 +231,12 @@ class Plugin extends PluginBase
                 'elv_plans' => function ($product = null) {
                     return Catalog::plans($product instanceof Product ? $product : null);
                 },
+                'elv_plan_keys' => function () {
+                    return Catalog::planKeys();
+                },
+                'elv_plan_label' => function ($key) {
+                    return Catalog::planLabel((string) $key);
+                },
                 'elv_calculator' => function () {
                     return Calculator::data();
                 },

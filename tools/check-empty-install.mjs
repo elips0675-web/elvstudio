@@ -51,7 +51,7 @@ for (const page of pages) {
 }
 
 const pricing = bodies['/pricing/'] || '';
-const pricingCards = (pricing.match(/price-card__value/g) || []).length;
+const pricingCards = (pricing.match(/class="price-card__value"/g) || []).length;
 
 if (pricingCards === 0) {
   if (!/Прайс пока пуст/.test(pricing)) {

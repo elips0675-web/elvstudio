@@ -4,11 +4,8 @@ fields:
         type: dropdown
         span: left
         required: true
-        options:
-            single: 'Один сайт'
-            multi: 'До 5 сайтов'
-            extended: 'Без ограничений'
-        comment: 'Цены модулей ведутся в карточке товара: витрина и заказ читают одно поле.'
+        options: getPlanOptions
+        comment: 'Ключ тарифа неизменен: с него считаются цены и лицензии. Подпись задаётся в настройках плагина.'
     price_cents:
         label: 'Цена, центы'
         type: number

@@ -21,10 +21,11 @@ class OrderService
 {
     public function create(array $data, Product $product): Order
     {
-        $plan = (string) ($data['plan'] ?? 'single');
+        $plan = (string) ($data['plan'] ?? '');
+        $known = array_keys(Catalog::planLabels());
 
-        if (!in_array($plan, ['single', 'multi', 'extended'], true)) {
-            $plan = 'single';
+        if (!in_array($plan, $known, true)) {
+            $plan = (string) ($known[0] ?? 'single');
         }
 
         $amount = $product->planPrice($plan);

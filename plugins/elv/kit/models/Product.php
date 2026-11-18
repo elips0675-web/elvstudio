@@ -1,5 +1,6 @@
 <?php namespace Elv\Kit\Models;
 
+use Elv\Kit\Classes\Catalog;
 use Model;
 
 /**
@@ -75,11 +76,7 @@ class Product extends Model
 
     public function planLabel(string $plan): string
     {
-        return match ($plan) {
-            'multi' => 'До 5 сайтов',
-            'extended' => 'Без ограничений',
-            default => 'Один сайт',
-        };
+        return Catalog::planLabel($plan);
     }
 
     public static function kit(): ?self

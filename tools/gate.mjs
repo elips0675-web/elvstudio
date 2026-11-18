@@ -7,6 +7,7 @@ const scripts = [
   'check-budget.mjs',
   'check-orphans.mjs',
   'check-package.mjs',
+  'check-plans.mjs',
   'check-console.mjs',
 ];
 

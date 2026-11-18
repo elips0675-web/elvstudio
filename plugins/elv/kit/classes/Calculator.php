@@ -75,7 +75,10 @@ class Calculator
      */
     public static function recommendations(): array
     {
-        return [
+        $keys = Catalog::planKeys();
+        $fallback = (string) ($keys[0] ?? 'single');
+
+        $items = [
             'landing' => [
                 'plan' => 'single',
                 'modules' => [],
@@ -97,6 +100,15 @@ class Calculator
                 'reason' => 'Онлайн-запись и обратная связь. Один сайт; для сети — Multi.',
             ],
         ];
+
+        foreach ($items as $task => $item) {
+            if ($keys && !in_array($item['plan'], $keys, true)) {
+                $items[$task]['plan'] = $fallback;
+                $items[$task]['reason'] = 'Рекомендуем этот тариф: прежний вариант сейчас не продаётся.';
+            }
+        }
+
+        return $items;
     }
 
     /**

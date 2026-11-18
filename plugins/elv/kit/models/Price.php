@@ -1,6 +1,7 @@
 <?php namespace Elv\Kit\Models;
 
 use BackendAuth;
+use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Money;
 use Model;
 
@@ -14,12 +15,6 @@ use Model;
 class Price extends Model
 {
     use \October\Rain\Database\Traits\Validation;
-
-    public const PLANS = [
-        'single' => 'Один сайт',
-        'multi' => 'До 5 сайтов',
-        'extended' => 'Без ограничений',
-    ];
 
     public $table = 'elv_kit_price_versions';
 
@@ -74,7 +69,17 @@ class Price extends Model
 
     public function getPlanLabelAttribute(): string
     {
-        return static::PLANS[$this->plan] ?? (string) $this->plan;
+        return Catalog::planLabel((string) $this->plan);
+    }
+
+    /**
+     * getPlanOptions — подписи тарифов для выпадающего списка в админке.
+     *
+     * @return array<string, string>
+     */
+    public function getPlanOptions(): array
+    {
+        return Catalog::planLabels();
     }
 
     public function getPriceLabelAttribute(): string

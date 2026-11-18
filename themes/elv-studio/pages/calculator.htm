@@ -5,6 +5,7 @@ meta_title = "Калькулятор стоимости сайта на Elv Kit 
 meta_description = "Соберите смету за две минуты: тариф Elv Kit, модули, поддержка и хостинг. Три суммы раздельно, разбивка и дата актуальности цен. Без скрытых платежей."
 ==
 {% set calc = elv_calculator() %}
+{% set firstPlan = calc.plans|first %}
 {% set crumbs = elv_breadcrumbs() %}
 {% set bookingUrl = 'booking'|page %}
 
@@ -98,7 +99,7 @@ meta_description = "Соберите смету за две минуты: тар
                                                 data-support="{{ plan.support }}"
                                                 data-updates="{{ plan.updates }}"
                                                 data-sites="{{ plan.sites }}"
-                                                {% if plan.key == 'single' %}checked{% endif %}>
+                                                {% if loop.first %}checked{% endif %}>
                                             <span class="calc-plan__body">
                                                 <span class="calc-plan__top">
                                                     <span class="calc-plan__name">{{ plan.label }}</span>
@@ -213,7 +214,7 @@ meta_description = "Соберите смету за две минуты: тар
                             </div>
 
                             <div class="calc-review">
-                                <div class="calc-review__row"><span>Тариф</span><b data-review-plan>Один сайт</b></div>
+                                <div class="calc-review__row"><span>Тариф</span><b data-review-plan>{{ firstPlan ? firstPlan.label : '' }}</b></div>
                                 <div class="calc-review__row"><span>Сайтов</span><span data-review-sites>1 сайт</span></div>
                                 <div class="calc-review__row"><span>Поддержка в тарифе</span><span data-review-support>30 дней</span></div>
                                 <div class="calc-review__row"><span>Обновления</span><span data-review-updates>12 месяцев</span></div>

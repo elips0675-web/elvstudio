@@ -26,7 +26,7 @@ class OrderController extends FormController
     {
         return [
             'product' => 'required|string|max:160',
-            'plan' => 'required|in:single,multi,extended',
+            'plan' => 'required|in:' . implode(',', array_keys(Catalog::planLabels())),
             'customer_name' => 'required|string|max:160',
             'email' => 'required|email|max:191',
             'phone' => 'nullable|string|max:32',
@@ -56,6 +56,10 @@ class OrderController extends FormController
 
         if (!$product) {
             return $this->invalid($request, ['product' => ['Товар не найден.']]);
+        }
+
+        if ($product->kind === 'kit' && !in_array((string) $data['plan'], Catalog::planKeys(), true)) {
+            return $this->invalid($request, ['plan' => ['Этот тариф больше не продаётся. Выберите другой.']]);
         }
 
         $data['ip'] = AntiSpam::ip($request);

@@ -11,14 +11,14 @@ meta_description = "Заказ готового сайта и разделов: 
 {% endif %}
 {% set product = product ?: elv_kit() %}
 {% set plans = product ? elv_plans(product) : [] %}
-{% set selectedPlan = elv_query('plan', 'single') %}
-{% if selectedPlan not in ['single', 'multi', 'extended'] %}
-    {% set selectedPlan = 'single' %}
-{% endif %}
+{% set planKeys = elv_plan_keys() %}
+{% set selectedPlan = elv_query('plan', planKeys|first ?: 'single') %}
 {% if not product or product.kind != 'kit' %}
     {% set selectedPlan = 'single' %}
+{% elseif selectedPlan not in planKeys %}
+    {% set selectedPlan = planKeys|first ?: 'single' %}
 {% endif %}
-{% set planLabel = product and product.kind == 'kit' ? (selectedPlan == 'multi' ? 'До 5 сайтов' : (selectedPlan == 'extended' ? 'Без ограничений' : 'Один сайт')) : 'Один сайт' %}
+{% set planLabel = elv_plan_label(selectedPlan) %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -98,8 +98,8 @@ meta_description = "Заказ готового сайта и разделов: 
                                 <div class="plan-option">
                                     <label>
                                         <span>
-                                            <b>Один сайт</b>
-                                            <small>один сайт</small>
+                                            <b>{{ planLabel }}</b>
+                                            <small>{{ planLabel|lower }}</small>
                                         </span>
                                         <span class="price">{{ elv_money(product.price_cents) }}</span>
                                     </label>

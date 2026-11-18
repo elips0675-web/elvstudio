@@ -67,6 +67,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
         </div>
     </section>
 
+    {% if plans %}
     <section class="section section--paper">
         <div class="container">
             <div class="section-head">
@@ -80,16 +81,17 @@ meta_description = "Сколько стоит готовый сайт: тари�
                     <thead>
                         <tr>
                             <th>Возможность</th>
-                            <th>Один сайт</th>
-                            <th>До 5 сайтов</th>
-                            <th>Без ограничений</th>
+                            {% for plan in plans %}
+                                <th>{{ plan.label }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in elv_compare() %}
                             <tr>
                                 <td>{{ row.name }}</td>
-                                {% for value in row.values %}
+                                {% for plan in plans %}
+                                    {% set value = row.values[plan.key] ?? '' %}
                                     <td>
                                         {% if value == 'yes' %}
                                             <span class="yes" aria-label="Да">✓</span>
@@ -107,6 +109,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
             </div>
         </div>
     </section>
+    {% endif %}
 
     <section class="section">
         <div class="container">

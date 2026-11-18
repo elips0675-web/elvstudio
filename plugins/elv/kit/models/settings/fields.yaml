@@ -76,6 +76,42 @@ tabs:
                 auto: 'Авто (безопасно)'
                 live: 'Только шлюз'
                 mock: 'Mock (демо)'
+        plan_single_label:
+            label: 'Тариф 1: название'
+            tab: 'Продажи'
+            span: left
+            default: 'Один сайт'
+            comment: 'Ключ single — один сайт, поддержка 30 дней. Название видно на витрине, в калькуляторе и в заказе.'
+        plan_single_on:
+            label: 'Тариф 1: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
+        plan_multi_label:
+            label: 'Тариф 2: название'
+            tab: 'Продажи'
+            span: left
+            default: 'До 5 сайтов'
+            comment: 'Ключ multi — до 5 сайтов, приоритетная поддержка 90 дней.'
+        plan_multi_on:
+            label: 'Тариф 2: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
+        plan_extended_label:
+            label: 'Тариф 3: название'
+            tab: 'Продажи'
+            span: left
+            default: 'Без ограничений'
+            comment: 'Ключ extended — без ограничений по сайтам, поддержка 1 год. Выключенный тариф не показывается и не принимается в заказе; цены и лицензии по его ключу остаются.'
+        plan_extended_on:
+            label: 'Тариф 3: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
         order_notify_email:
             label: 'Копия заказа'
             tab: 'Продажи'
