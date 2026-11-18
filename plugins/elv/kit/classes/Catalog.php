@@ -37,7 +37,7 @@ class Catalog
             [
                 'key' => 'single',
                 'label' => 'Один сайт',
-                'price' => (int) $product->price_cents,
+                'price' => Prices::resolve($product, 'single'),
                 'period' => 'разово · 1 сайт',
                 'sites' => '1 сайт',
                 'support' => '30 дней',
@@ -53,7 +53,7 @@ class Catalog
             [
                 'key' => 'multi',
                 'label' => 'До 5 сайтов',
-                'price' => (int) ($product->price_multi_cents ?: $product->price_cents),
+                'price' => Prices::resolve($product, 'multi'),
                 'period' => 'разово · до 5 сайтов',
                 'sites' => 'до 5 сайтов',
                 'support' => '90 дней',
@@ -70,7 +70,7 @@ class Catalog
             [
                 'key' => 'extended',
                 'label' => 'Без ограничений',
-                'price' => (int) ($product->price_extended_cents ?: $product->price_cents),
+                'price' => Prices::resolve($product, 'extended'),
                 'period' => 'разово · без ограничений',
                 'sites' => 'без ограничений',
                 'support' => '1 год',

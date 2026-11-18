@@ -1,0 +1,48 @@
+fields:
+    plan:
+        label: 'Тариф'
+        type: dropdown
+        span: left
+        required: true
+        options:
+            single: 'Один сайт'
+            multi: 'До 5 сайтов'
+            extended: 'Без ограничений'
+        comment: 'Цены модулей ведутся в карточке товара: витрина и заказ читают одно поле.'
+    price_cents:
+        label: 'Цена, центы'
+        type: number
+        span: right
+        required: true
+        comment: '7900 = $79. Формат подписи берётся из валюты настроек.'
+    valid_from:
+        label: 'Действует с'
+        type: datepicker
+        span: left
+        required: true
+        mode: date
+        comment: 'С этой даты цена показывается на /pricing/ и в калькуляторе.'
+    valid_to:
+        label: 'Действует по'
+        type: datepicker
+        span: right
+        mode: date
+        comment: 'Пусто — бессрочно. Заполняйте, когда цена заменена новой версией.'
+    is_active:
+        label: 'Версия активна'
+        type: switch
+        default: true
+        span: left
+    note:
+        label: 'Заметка'
+        type: text
+        span: right
+        comment: 'Почему цена изменилась: акция, новая ставка, исправление.'
+        attributes:
+            maxlength: 255
+    created_by:
+        label: 'Кто записал'
+        type: number
+        span: left
+        disabled: true
+        comment: 'ID администратора; заполняется автоматически при создании версии.'

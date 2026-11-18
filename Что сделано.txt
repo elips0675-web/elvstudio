@@ -6,6 +6,62 @@
 
 ---
 
+(Stage 60 - 18.11.2026) - **Версионность прайса: `valid_from`, `valid_to`, `is_active` и лог изменений.**
+
+- `plugins/elv/kit/updates/create_price_versions.php` + `updates/version.yaml`
+  (`1.0.6`) — таблица `elv_kit_price_versions` (товар, тариф, цена в центах,
+  валюта, период действия, флаг, заметка, автор) и сид трёх версий из каталога
+  с `valid_from = 2026-11-17`, чтобы видимая дата цен не менялась.
+- `plugins/elv/kit/models/Price.php` — модель версии: белый список тарифов
+  `single/multi/extended`, `valid_to` не раньше `valid_from`, `$fillable`,
+  `beforeValidate()` подставляет `product_slug`/`product_id`/`currency`/
+  `created_by` до проверки, аксессоры `plan_label`, `price_label`,
+  `period_label`, `valid_from_label`, `valid_to_label`.
+- `plugins/elv/kit/classes/Prices.php` — резолвер действующей цены: кэш на
+  запрос, `Schema::hasTable` для работы до миграции, `current()`, `resolve()`
+  (действует `valid_from <= сегодня`, `valid_to` включительно, флаг включён,
+  побеждает больший `valid_from`), `updatedAt()`, `label()`, `flush()`.
+- `plugins/elv/kit/classes/Catalog.php` — `plans()` берёт цены через
+  `Prices::resolve()`; `Calculator.php` — дата `prices_updated_at` из
+  `Prices::label()`; `models/Product.php` — `planPrice()` остаётся запасным
+  источником, когда версий нет.
+- `plugins/elv/kit/controllers/Prices.php`, `controllers/prices/*` — админка
+  «Прайс» (`/admin/elv/kit/prices`): список версий, создание, правка, удаление;
+  `models/price/columns.yaml` и `fields.yaml` — колонки и форма.
+- `plugins/elv/kit/Plugin.php` — пункт меню, право `elv.kit.prices`,
+  markup-функция `elv_prices_updated_at()`; `themes/elv-studio/pages/pricing.htm`
+  печатает дату через неё; `models/settings/fields.yaml` — `prices_updated_at`
+  переименовано в запасную дату.
+- `tools/price-check.php` (+ `docs/prices.md`) — проверка в транзакции с
+  откатом: истёкшая, будущая и выключенная версии игнорируются, действующая
+  перекрывает каталог, цены и дата доходят до `/pricing/`, калькулятора, сметы
+  и Консультанта, `flush()` перечитывает строки; отдельно — конфиги админки
+  (колонка с `select`/`sortable`/`searchable` по несуществующему полю роняет
+  список) и валидация новой версии без `product_slug`.
+- Дефекты, найденные при живой проверке и исправленные: список падал 500
+  (`select: plan_label` — аксессор в SQL), `beforeSave` не успевал до
+  валидации, `type: date` печатал «17 Nov 2026» вместо `д.м.г`,
+  `MassAssignmentException` без `$fillable`, `defaultSort` по аксессору.
+
+Проверено: `php artisan october:migrate` — `1.0.5 -> 1.0.6`; `php tools/price-check.php`
+— OK (`versions=3 plans=3 base=7900 fresh=8600 label=17.11.2026`);
+`php tools/calculator-check.php`, `chat-check.php`, `search-check.php`,
+`seo-check.php` — OK; `node tools/gate.mjs` — all gates passed (включая
+check-console на 107 страницах). Живьём: `/pricing/` и `/calculator/` —
+`$79 / $249 / $499`, «Цены обновлены 17.11.2026»; админка — 3 строки;
+создание версии `multi = 25500` через форму сохранило строку, `/pricing/`
+показал `$255` и дату `18.11.2026`, после удаления цены вернулись.
+Обратная подстановка: снятый флаг, `valid_to <` вместо `<=` и битый конфиг
+колонок — каждая поломка роняет проверку.
+
+Не проверено: цены заказа и модулей — `OrderService` по-прежнему читает
+`Product.price_cents`, версионируются только три тарифа Kit (граница
+этапа). `demo-static` не пересобран в коммите: единственные отличия экспорта —
+случайные CSP-nonce, CSRF-токены и `lastmod` в `sitemap.xml`, видимый HTML
+не изменился (пункт про детерминированный экспорт — в `Что доделать.txt`).
+
+---
+
 (Stage 59 - 18.11.2026) - **Консультант, поиск и карта сайта: P1/P2-срез.**
 
 - `plugins/elv/kit/classes/Chat.php` — `ссылк` убран из поиска, выдача файлов

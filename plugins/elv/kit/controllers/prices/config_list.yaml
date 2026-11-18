@@ -1,0 +1,15 @@
+title: 'Прайс и версии цен'
+list: $/elv/kit/models/price/columns.yaml
+modelClass: Elv\Kit\Models\Price
+recordUrl: elv/kit/prices/update/:id
+recordsPerPage: 30
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Версий цен пока нет.'
+defaultSort:
+    column: created_at
+    direction: desc
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'Заметка'

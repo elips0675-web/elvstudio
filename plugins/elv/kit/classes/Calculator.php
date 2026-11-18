@@ -6,7 +6,8 @@ use Elv\Kit\Models\Settings;
 /**
  * Calculator — единый расчёт стоимости запуска на Elv Kit.
  *
- * Цены берутся только из каталога (Product/Settings), без чисел в шаблоне.
+ * Цены тарифов берутся из Classes\Prices (действующая версия прайса, иначе
+ * карточка товара), цены модулей — из каталога. Чисел в шаблоне нет.
  * Хостинг и домен студия не продаёт: они оплачиваются провайдеру напрямую.
  */
 class Calculator
@@ -54,7 +55,7 @@ class Calculator
             'enabled' => (bool) Settings::get('calculator_enabled', true),
             'currency' => Money::currency(),
             'symbol' => Money::symbol(),
-            'prices_updated_at' => (string) (Settings::get('prices_updated_at') ?: '17.11.2026'),
+            'prices_updated_at' => Prices::label(),
             'hosting_note' => (string) (Settings::get('calculator_hosting_note') ?: 'Хостинг и домен оплачиваются провайдеру напрямую. Мы не добавляем наценку и не выдаём чужой хостинг за свой.'),
             'support_note' => (string) (Settings::get('calculator_support_note') ?: 'Поддержка уже входит в тариф на указанный срок. Продление после него считается отдельно по объёму работ.'),
             'plans' => $plans,

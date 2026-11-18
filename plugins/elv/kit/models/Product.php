@@ -56,6 +56,12 @@ class Product extends Model
             : 'Бесплатно';
     }
 
+    /**
+     * planPrice — цена тарифа из карточки товара.
+     *
+     * Это запасной источник: действующую версию выбирает Classes\Prices,
+     * карточка отвечает, когда в прайсе нет подходящей строки.
+     */
     public function planPrice(string $plan): int
     {
         $map = [

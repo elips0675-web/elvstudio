@@ -1,0 +1,27 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    plan:
+        label: 'Тариф'
+        valueFrom: plan_label
+    price_cents:
+        label: 'Цена'
+        valueFrom: price_label
+    valid_from:
+        label: 'Действует с'
+        valueFrom: valid_from_label
+    valid_to:
+        label: 'Действует по'
+        valueFrom: valid_to_label
+    is_active:
+        label: 'Активна'
+        type: switch
+    note:
+        label: 'Заметка'
+        searchable: true
+    created_at:
+        label: 'Записана'
+        type: datetime
+        sortable: true

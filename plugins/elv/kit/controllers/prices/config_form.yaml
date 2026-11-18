@@ -1,0 +1,12 @@
+name: 'Версия цены'
+modelClass: Elv\Kit\Models\Price
+form: $/elv/kit/models/price/fields.yaml
+defaultRedirect: elv/kit/prices
+create:
+    title: 'Новая версия цены'
+    redirect: elv/kit/prices/update/:id
+    redirectClose: elv/kit/prices
+update:
+    title: 'Версия цены'
+    redirect: elv/kit/prices
+    redirectClose: elv/kit/prices

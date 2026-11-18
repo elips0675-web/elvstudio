@@ -9,6 +9,7 @@ use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
 use Elv\Kit\Classes\Money;
 use Elv\Kit\Classes\CompressResponse;
+use Elv\Kit\Classes\Prices;
 use Elv\Kit\Classes\SecurityHeaders;
 use Elv\Kit\Classes\Search;
 use Elv\Kit\Classes\Seo;
@@ -99,6 +100,10 @@ class Plugin extends PluginBase
                 'label' => 'Лицензии',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.prices' => [
+                'label' => 'Прайс: версии цен',
+                'tab' => 'Elv Kit',
+            ],
         ];
     }
 
@@ -166,6 +171,12 @@ class Plugin extends PluginBase
                         'url' => \Backend::url('elv/kit/licenses'),
                         'permissions' => ['elv.kit.licenses'],
                     ],
+                    'prices' => [
+                        'label' => 'Прайс',
+                        'icon' => 'icon-money',
+                        'url' => \Backend::url('elv/kit/prices'),
+                        'permissions' => ['elv.kit.prices'],
+                    ],
                 ],
             ],
         ];
@@ -222,6 +233,9 @@ class Plugin extends PluginBase
                 },
                 'elv_calculator' => function () {
                     return Calculator::data();
+                },
+                'elv_prices_updated_at' => function () {
+                    return Prices::label();
                 },
                 'elv_calculator_estimate' => function ($plan, $modules = []) {
                     return Calculator::estimate((string) $plan, $modules);

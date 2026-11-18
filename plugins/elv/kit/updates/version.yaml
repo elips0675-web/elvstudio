@@ -12,3 +12,6 @@
 1.0.5:
     - 'Аудитория статьи: пользовательский блог или технический раздел'
     - add_audience_to_posts.php
+1.0.6:
+    - 'Прайс с версиями цен: valid_from, valid_to, is_active и лог изменений'
+    - create_price_versions.php
