@@ -1,6 +1,6 @@
 # Структура репозитория Elv Landing
 
-Срез: 18.11.2026, Stage 59, коммит `7b64ccc`.
+Срез: 18.11.2026, Stage 60, коммит `b43a437`.
 
 Показаны только отслеживаемые файлы. `demo-static` — 107 HTML-страниц, здесь не развёрнут. `vendor/`, `modules/`, `.env` и дампы БД не включены.
 
@@ -69,6 +69,7 @@
 - `plugins/elv/kit/classes/Payment/Stripe.php`
 - `plugins/elv/kit/classes/Payment/YooKassa.php`
 - `plugins/elv/kit/classes/PaymentUnavailableException.php`
+- `plugins/elv/kit/classes/Prices.php`
 - `plugins/elv/kit/classes/Rss.php`
 - `plugins/elv/kit/classes/Search.php`
 - `plugins/elv/kit/classes/SecurityHeaders.php`
@@ -93,6 +94,7 @@
 - `plugins/elv/kit/controllers/Messages.php`
 - `plugins/elv/kit/controllers/Orders.php`
 - `plugins/elv/kit/controllers/Posts.php`
+- `plugins/elv/kit/controllers/Prices.php`
 - `plugins/elv/kit/controllers/Products.php`
 - `plugins/elv/kit/controllers/Subscribers.php`
 - `plugins/elv/kit/controllers/bookings/config_form.yaml`
@@ -123,6 +125,12 @@
 - `plugins/elv/kit/controllers/posts/config_list.yaml`
 - `plugins/elv/kit/controllers/posts/index.htm`
 - `plugins/elv/kit/controllers/posts/update.htm`
+- `plugins/elv/kit/controllers/prices/_list_toolbar.htm`
+- `plugins/elv/kit/controllers/prices/config_form.yaml`
+- `plugins/elv/kit/controllers/prices/config_list.yaml`
+- `plugins/elv/kit/controllers/prices/create.htm`
+- `plugins/elv/kit/controllers/prices/index.htm`
+- `plugins/elv/kit/controllers/prices/update.htm`
 - `plugins/elv/kit/controllers/products/config_form.yaml`
 - `plugins/elv/kit/controllers/products/config_list.yaml`
 - `plugins/elv/kit/controllers/products/index.htm`
@@ -136,6 +144,7 @@
 - `plugins/elv/kit/models/Message.php`
 - `plugins/elv/kit/models/Order.php`
 - `plugins/elv/kit/models/Post.php`
+- `plugins/elv/kit/models/Price.php`
 - `plugins/elv/kit/models/Product.php`
 - `plugins/elv/kit/models/Settings.php`
 - `plugins/elv/kit/models/Slot.php`
@@ -152,6 +161,8 @@
 - `plugins/elv/kit/models/order/fields.yaml`
 - `plugins/elv/kit/models/post/columns.yaml`
 - `plugins/elv/kit/models/post/fields.yaml`
+- `plugins/elv/kit/models/price/columns.yaml`
+- `plugins/elv/kit/models/price/fields.yaml`
 - `plugins/elv/kit/models/product/columns.yaml`
 - `plugins/elv/kit/models/product/fields.yaml`
 - `plugins/elv/kit/models/settings/fields.yaml`
@@ -159,6 +170,7 @@
 - `plugins/elv/kit/routes.php`
 - `plugins/elv/kit/updates/add_audience_to_posts.php`
 - `plugins/elv/kit/updates/create_kit_tables.php`
+- `plugins/elv/kit/updates/create_price_versions.php`
 - `plugins/elv/kit/updates/seed_kit_blog.php`
 - `plugins/elv/kit/updates/seed_kit_demo.php`
 - `plugins/elv/kit/updates/version.yaml`
@@ -235,6 +247,7 @@
 - `tools/export-blog-articles.php`
 - `tools/export-static.php`
 - `tools/gate.mjs`
+- `tools/price-check.php`
 - `tools/production-check.php`
 - `tools/search-check.php`
 - `tools/serve-static.php`
@@ -246,6 +259,7 @@
 - `docs/blog-audit.md`
 - `docs/blog-content-plan.md`
 - `docs/content-policy.md`
+- `docs/prices.md`
 - `docs/qa/README.md`
 - `docs/qa/firefox-360-blog-article.png`
 - `docs/qa/firefox-360-blog-tech.png`
@@ -267,4 +281,4 @@
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок для этого анализа (Stage 56, создан отдельно)
+- `test/ai-chat/` — снимок для этого анализа (Stage 60, создан отдельно)

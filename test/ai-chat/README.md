@@ -1,6 +1,6 @@
 # `test/ai-chat` — снимок кода для AI-анализа
 
-Дата среза: 18.11.2026. Stage 59. Коммит: `7b64ccc`.
+Дата среза: 18.11.2026. Stage 60. Коммит: `b43a437`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 Этот набор закрывает пробел, который был у аудита Qwen: отчёт
@@ -24,7 +24,7 @@
 | `05-chat.txt` | `Chat.php`, `TextFilter.php`, `ChatController.php`, `widget.js` — ответы, фильтр, HTTP-обработчик и виджет |
 | `06-search.txt` | `Search.php`, `search.htm`, `search.js`, `search.css`, `default.htm` — индекс, страница `/search/` и версия ассета |
 | `07-sitemap-seo.txt` | `sitemap.htm`, `Seo.php`, `Sitemap.php`, `routes.php` |
-| `08-checks-docs.txt` | `chat-check`, `search-check`, `seo-check`, `check-seo`, `check-headers`, `SecurityHeaders.php`, `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md` |
+| `08-checks-docs.txt` | `chat-check`, `search-check`, `seo-check`, `price-check`, `check-seo`, `check-headers`, `SecurityHeaders.php`, `docs/search.md`, `docs/content-policy.md`, `docs/prices.md`, `docs/00-audit-documents.md` |
 | `ALL-IN-ONE.txt` | всё перечисленное одним файлом |
 | `README.md` | этот манифест |
 
@@ -40,11 +40,18 @@
 
 Пример запроса:
 
-> Ниже снимок Elv Landing (Stage 59). Проверь Консультанта и поиск:
+> Ниже снимок Elv Landing (Stage 60). Проверь Консультанта и поиск:
 > где фильтр может пропустить бессмыслицу или грубость, корректен ли
 > `rejected`-сценарий в виджете, нет ли ложных срабатываний на нормальных
 > запросах. Дай находки с `file:line`, без выдуманных метрик и без
 > предложений платных сервисов.
+
+Второй пример — про прайс:
+
+> Проверь версионность цен (`classes/Prices.php`, `models/Price.php`,
+> `tools/price-check.php`): какие граничные случаи дат и флагов не покрыты,
+> что будет при двух версиях с одинаковым `valid_from`, и достаточно ли
+> строки версии вместо отдельного аудита правок цен.
 
 ## Что здесь **не** лежит
 

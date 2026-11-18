@@ -1,4 +1,4 @@
-# Проверки Консультанта и документация
+# Проверки, версии прайса и документация
 
 ===== FILE: tools/chat-check.php =====
 
@@ -1108,3 +1108,474 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
   `/search/?q={search_term_string}`; `check-seo` пройден.
 - [ ] Решить с владельцем, как упаковывать тарифы; без решения цены не
   трогаем.
+
+===== FILE: tools/price-check.php =====
+
+<?php
+
+/**
+ * price-check — версии прайса: выбор действующей цены, дата, интеграция.
+ *
+ * Проверка идёт в транзакции с откатом: реальные версии цен не меняются.
+ * Запуск: php tools/price-check.php
+ */
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Elv\Kit\Classes\Calculator;
+use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\Prices;
+use Elv\Kit\Models\Price;
+use Elv\Kit\Models\Product;
+
+function priceFail(string $message): void
+{
+    fwrite(STDERR, 'FAIL: ' . $message . "\n");
+    exit(1);
+}
+
+function insertVersion(array $row): int
+{
+    $now = date('Y-m-d H:i:s');
+
+    return (int) Db::table('elv_kit_price_versions')->insertGetId(array_merge([
+        'product_id' => null,
+        'product_slug' => 'elv-kit',
+        'plan' => 'single',
+        'price_cents' => 0,
+        'currency' => 'USD',
+        'valid_from' => date('Y-m-d'),
+        'valid_to' => null,
+        'is_active' => true,
+        'note' => 'price-check',
+        'created_by' => null,
+        'created_at' => $now,
+        'updated_at' => $now,
+    ], $row));
+}
+
+function dropVersion(array $ids): void
+{
+    Db::table('elv_kit_price_versions')->whereIn('id', $ids)->delete();
+    Prices::flush();
+}
+
+$kit = Product::kit();
+
+if (!$kit) {
+    priceFail('в каталоге нет активной карточки Elv Kit');
+}
+
+$plans = Catalog::plans();
+
+if ($plans === []) {
+    priceFail('каталог не отдаёт тарифы');
+}
+
+$catalogPrices = [];
+
+foreach ($plans as $plan) {
+    $catalogPrices[$plan['key']] = $kit->planPrice($plan['key']);
+}
+
+if (Prices::rows() === []) {
+    priceFail('прайс пуст: миграция create_price_versions не применена');
+}
+
+foreach ($catalogPrices as $planKey => $catalogPrice) {
+    $resolved = Prices::current((string) $kit->slug, $planKey);
+
+    if ($resolved !== $catalogPrice) {
+        priceFail('стартовая версия ' . $planKey . ' = ' . var_export($resolved, true) . ', в каталоге ' . $catalogPrice);
+    }
+}
+
+$label = Prices::label();
+
+if (!preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $label)) {
+    priceFail('дата цен не в формате d.m.Y: ' . $label);
+}
+
+if (Prices::updatedAt() !== $label) {
+    priceFail('label расходится с последней версией прайса');
+}
+
+$base = (int) $catalogPrices['single'];
+$slug = (string) $kit->slug;
+$created = [];
+$today = date('Y-m-d');
+
+Db::beginTransaction();
+
+try {
+    $created[] = insertVersion(['price_cents' => $base + 1000, 'valid_from' => date('Y-m-d', strtotime('+1 day'))]);
+
+    if (Prices::current($slug, 'single') !== $base) {
+        priceFail('будущая версия уже действует');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $created[] = insertVersion([
+        'price_cents' => $base + 2000,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+        'valid_to' => date('Y-m-d', strtotime('-1 day')),
+    ]);
+
+    if (Prices::current($slug, 'single') !== $base) {
+        priceFail('истёкшая версия продолжает действовать');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $created[] = insertVersion([
+        'price_cents' => $base + 3000,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+        'is_active' => false,
+    ]);
+
+    if (Prices::current($slug, 'single') !== $base) {
+        priceFail('выключенная версия участвует в выборе');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $created[] = insertVersion([
+        'price_cents' => $base + 4000,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+        'valid_to' => $today,
+    ]);
+
+    if (Prices::current($slug, 'single') !== $base + 4000) {
+        priceFail('версия, действующая по сегодняшний день включительно, не выбрана');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $created[] = insertVersion([
+        'product_slug' => 'other-product',
+        'price_cents' => $base + 5000,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+    ]);
+
+    if (Prices::current($slug, 'single') !== $base) {
+        priceFail('цена другого товара попала в тариф Elv Kit');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $freshPrice = $base + 700;
+    $freshFrom = date('Y-m-d', strtotime('-1 day'));
+    $created[] = insertVersion(['price_cents' => $freshPrice, 'valid_from' => $freshFrom]);
+
+    if (Prices::current($slug, 'single') !== $freshPrice) {
+        priceFail('действующая версия не перекрывает каталог');
+    }
+
+    $plansNow = [];
+
+    foreach (Catalog::plans() as $plan) {
+        $plansNow[$plan['key']] = (int) $plan['price'];
+    }
+
+    if (($plansNow['single'] ?? 0) !== $freshPrice) {
+        priceFail('/pricing/ и Консультант не видят действующую версию');
+    }
+
+    if (($plansNow['multi'] ?? 0) !== $catalogPrices['multi']) {
+        priceFail('версия одного тарифа изменила соседний');
+    }
+
+    $calculator = Calculator::data();
+
+    if (($calculator['plans'][0]['price'] ?? null) !== $freshPrice) {
+        priceFail('калькулятор не видит действующую версию');
+    }
+
+    if ($calculator['prices_updated_at'] !== date('d.m.Y', strtotime($freshFrom))) {
+        priceFail('дата цен не следует за действующей версией');
+    }
+
+    $estimate = Calculator::estimate('single', []);
+
+    if ($estimate['launch'] !== $freshPrice) {
+        priceFail('смета считает по старой цене');
+    }
+
+    $quote = Calculator::quote('single', [], 'landing', 'own');
+
+    if ($quote['launch'] !== $freshPrice || $quote['first_year'] !== $freshPrice) {
+        priceFail('смета-PDF считает по старой цене');
+    }
+
+    $answer = \Elv\Kit\Classes\Chat::answer('сколько стоит Elv Kit');
+
+    if (($answer['rejected'] ?? false) !== false || mb_strpos((string) ($answer['answer'] ?? ''), Money::format($freshPrice)) === false) {
+        priceFail('Консультант отвечает старой ценой');
+    }
+
+    dropVersion($created);
+    $created = [];
+} finally {
+    dropVersion($created);
+    Db::rollBack();
+    Prices::flush();
+}
+
+$invalid = new Price([
+    'product_slug' => $slug,
+    'plan' => 'yearly',
+    'price_cents' => 100,
+    'valid_from' => $today,
+]);
+
+try {
+    $invalid->validate();
+
+    priceFail('модель приняла тариф вне списка');
+} catch (Exception $e) {
+}
+
+$backwards = new Price([
+    'product_slug' => $slug,
+    'plan' => 'single',
+    'price_cents' => 100,
+    'valid_from' => $today,
+    'valid_to' => date('Y-m-d', strtotime('-2 days')),
+]);
+
+try {
+    $backwards->validate();
+
+    priceFail('модель приняла дату окончания раньше начала');
+} catch (Exception $e) {
+}
+
+if (!class_exists(\Elv\Kit\Controllers\Prices::class)) {
+    priceFail('нет контроллера админки elv/kit/prices');
+}
+
+$fresh = new Price([
+    'plan' => 'single',
+    'price_cents' => 7900,
+    'valid_from' => $today,
+]);
+
+try {
+    $fresh->validate();
+} catch (Exception $e) {
+    priceFail('новая версия не проходит валидацию без product_slug: ' . $e->getMessage());
+}
+
+if ((string) $fresh->product_slug !== $slug) {
+    priceFail('product_slug не подставляется из каталога до валидации');
+}
+
+if ((string) $fresh->currency === '') {
+    priceFail('валюта версии не заполняется');
+}
+
+$columnsFile = base_path('plugins/elv/kit/models/price/columns.yaml');
+$columns = \Symfony\Component\Yaml\Yaml::parseFile($columnsFile)['columns'] ?? [];
+
+if ($columns === []) {
+    priceFail('columns.yaml прайса пуст');
+}
+
+foreach ($columns as $name => $config) {
+    if (!empty($config['select']) && !Schema::hasColumn('elv_kit_price_versions', (string) $config['select'])) {
+        priceFail('колонка ' . $name . ' выбирает несуществующее поле ' . $config['select']);
+    }
+
+    if (!empty($config['sortable']) && !empty($config['valueFrom'])) {
+        priceFail('колонка ' . $name . ' сортируется по аксессору: Unknown column');
+    }
+
+    if (!empty($config['searchable']) && !Schema::hasColumn('elv_kit_price_versions', (string) $name)) {
+        priceFail('колонка ' . $name . ' ищет по аксессору: Unknown column');
+    }
+
+    if (!empty($config['valueFrom'])) {
+        $accessor = 'get' . \Illuminate\Support\Str::studly((string) $config['valueFrom']) . 'Attribute';
+
+        if (!method_exists($fresh, $accessor) && !Schema::hasColumn('elv_kit_price_versions', (string) $config['valueFrom'])) {
+            priceFail('колонка ' . $name . ' ссылается на несуществующий аксессор ' . $config['valueFrom']);
+        }
+    }
+}
+
+$listConfig = \Symfony\Component\Yaml\Yaml::parseFile(base_path('plugins/elv/kit/controllers/prices/config_list.yaml'));
+$sortColumn = (string) ($listConfig['defaultSort']['column'] ?? '');
+
+if ($sortColumn !== '' && !Schema::hasColumn('elv_kit_price_versions', $sortColumn)) {
+    priceFail('список прайса сортируется по несуществующему полю ' . $sortColumn);
+}
+
+$fieldsConfig = \Symfony\Component\Yaml\Yaml::parseFile(base_path('plugins/elv/kit/models/price/fields.yaml'));
+
+foreach (array_keys((array) ($fieldsConfig['fields'] ?? [])) as $field) {
+    $accessor = 'get' . \Illuminate\Support\Str::studly((string) $field) . 'Attribute';
+
+    if (!Schema::hasColumn('elv_kit_price_versions', (string) $field) && !method_exists($fresh, $accessor)) {
+        priceFail('поле формы ' . $field . ' не существует в модели');
+    }
+}
+
+if (Db::table('elv_kit_price_versions')->where('note', 'price-check')->count() !== 0) {
+    priceFail('проверка оставила мусор в прайсе');
+}
+
+echo 'OK: versions=' . count(Prices::rows())
+    . ' plans=' . count($plans)
+    . ' base=' . $base
+    . ' fresh=' . ($base + 700)
+    . ' label=' . $label
+    . "\n";
+
+===== FILE: docs/prices.md =====
+
+# Версионность прайса Elv Kit
+
+Дата среза: 18.11.2026 (Stage 60).
+
+## Что сделано
+
+- Цены трёх тарифов Elv Kit (`single` — «Один сайт», `multi` — «До 5 сайтов»,
+  `extended` — «Без ограничений») живут версиями в таблице
+  `elv_kit_price_versions`: цена в центах, валюта, `valid_from`, `valid_to`,
+  флаг `is_active`, заметка и автор. Старая версия не переписывается — новая
+  цена добавляется новой строкой.
+- Действующую цену выбирает `Classes\Prices`: `/pricing/`, калькулятор,
+  смета-PDF и Консультант читают одно и то же значение.
+- В админке появился раздел «Прайс» (`/admin/elv/kit/prices`): список версий,
+  создание, правка, удаление. Право — `elv.kit.prices`, иконка `icon-money`.
+- Дата «Цены обновлены» на `/pricing/` и `/calculator/` берётся из прайса:
+  это самый свежий `valid_from` активной версии (markup-функция
+  `elv_prices_updated_at()`). Поле «Дата актуальности цен» в
+  `Elv Kit → Настройки` осталось запасным — на случай, когда версий ещё нет.
+- Начальные версии засеяны из карточки товара с `valid_from = 17.11.2026`,
+  поэтому видимая посетителю дата и цены после миграции не изменились.
+
+## Как выбирается цена
+
+Для товара и тарифа на дату `D` (по умолчанию — сегодня):
+
+1. Отбрасываются строки с `is_active = false`.
+2. Отбрасываются строки другого товара (`product_slug`) и другого тарифа.
+3. Отбрасывается строка, у которой `valid_from > D` (цена ещё не началась).
+4. Отбрасывается строка, у которой `valid_to` заполнен и `valid_to < D`.
+   `valid_to = D` — ещё действует: последний день включён.
+5. Из оставшихся побеждает строка с самым большим `valid_from`; при равных
+   датах начала — запись с большим `id` (более поздняя).
+
+Если действующей версии нет, цена берётся из карточки товара
+(`Product::planPrice()`) — тем же полем, по которому исторически считается
+заказ. Поэтому витрина не ломается ни до миграции, ни при пустом прайсе.
+
+`Prices::rows()` читает таблицу один раз на запрос и кэширует результат;
+`Prices::flush()` сбрасывает кэш (нужен в проверках и после правки версий из
+кода). Если таблицы ещё нет, `rows()` возвращает пустой массив, а не падает:
+сайт работает до `php artisan october:migrate`.
+
+## Границы этапа
+
+- Версионируются только три тарифа Kit. Цены модулей (`price_cents` в
+  `elv_kit_products`) остаются в карточке товара: их читают и витрина, и
+  оформление заказа, а отдельного прайса модулей в этом этапе нет.
+- Заказ (`OrderService`) по-прежнему считает сумму по `Product.price_cents`.
+  Версия прайса меняет витрину, калькулятор и смету, но не переписывает уже
+  существующие заказы и не подменяет цену в момент оплаты.
+- Налоги, скидки и курсы валют не моделируются: валюта — одна на сайт
+  (`Settings::get('currency')`, по умолчанию `USD`), налог не начисляется.
+- Лог изменений — это сами строки версий (кто и когда создал, заметка).
+  Отдельной таблицы аудита правок нет: строка версии после создания не
+  редактируется по смыслу, новая цена — новая строка.
+
+## Архитектура
+
+| Файл | Роль |
+|---|---|
+| `plugins/elv/kit/updates/create_price_versions.php` | таблица `elv_kit_price_versions`, индексы, сид трёх версий из каталога |
+| `plugins/elv/kit/models/Price.php` | модель версии: белый список тарифов, правила дат, `beforeValidate()`, аксессоры для админки |
+| `plugins/elv/kit/classes/Prices.php` | выбор действующей цены, дата обновления, кэш на запрос |
+| `plugins/elv/kit/classes/Catalog.php` | `plans()` — тарифы с ценами из `Prices::resolve()` |
+| `plugins/elv/kit/classes/Calculator.php` | `data()` — наборы, цены и `prices_updated_at` из прайса |
+| `plugins/elv/kit/classes/Chat.php` | ответ про тарифы берёт цены из `Catalog::plans()` |
+| `plugins/elv/kit/models/Product.php` | `planPrice()` — запасной источник, когда версий нет |
+| `plugins/elv/kit/controllers/Prices.php` | админка: `ListController` + `FormController`, право `elv.kit.prices` |
+| `plugins/elv/kit/controllers/prices/config_list.yaml` | сортировка по `created_at`, поиск по заметке |
+| `plugins/elv/kit/controllers/prices/config_form.yaml` | форма создания и правки версии |
+| `plugins/elv/kit/models/price/columns.yaml` | колонки списка: тариф, цена, период, флаг |
+| `plugins/elv/kit/models/price/fields.yaml` | поля формы версии |
+| `plugins/elv/kit/Plugin.php` | меню «Прайс», право `elv.kit.prices`, `elv_prices_updated_at()` |
+| `themes/elv-studio/pages/pricing.htm` | дата цен через `elv_prices_updated_at()` |
+| `tools/price-check.php` | проверка резолвера, интеграции и конфигов админки |
+
+## Как менять цену
+
+1. Открыть `/admin/elv/kit/prices` → «Новая версия».
+2. Выбрать тариф, указать цену **в центах** (7900 = `$79`), дату начала
+   действия; дату окончания можно оставить пустой.
+3. Сохранить. Новая версия начинает действовать с указанной даты, старая
+   остаётся в истории; если у старой задан `valid_to`, она закрывается сама.
+
+Если цену нужно откатить — не удаляйте историю: создайте новую версию с
+прежней ценой или выключите ошибочную (`is_active`). Удаление строки тоже
+возможно, но тогда из истории исчезает факт изменения.
+
+## Как проверить
+
+```
+php tools/price-check.php
+```
+
+Проверка идёт в транзакции с откатом, реальные версии не меняются, и падает,
+если:
+
+- прайс пуст (миграция не применена) или стартовая версия расходится с
+  карточкой товара;
+- будущая, истёкшая или выключенная версия участвует в выборе;
+- версия, действующая по сегодняшний день включительно, не выбирается
+  (граница `valid_to = сегодня`);
+- цена другого товара попадает в тариф El Kit;
+- действующая версия не доходит до `Catalog::plans()`, `Calculator::data()`,
+  сметы (`Calculator::estimate()`/`quote()`) или ответа Консультанта;
+- дата цен не следует за действующей версией;
+- новая версия не проходит валидацию без `product_slug` (значит,
+  `beforeValidate()` не подставляет товар);
+- конфиг админки ссылается на несуществующее поле: `select`/`sortable`/
+  `searchable` по аксессору дают `Unknown column` и роняют список;
+- после проверки в таблице остался мусор.
+
+Смежные проверки: `php tools/calculator-check.php` (формула и PDF),
+`php tools/chat-check.php` (ответы Консультанта), `node tools/gate.mjs`
+(страницы, вёрстка, консоль).
+
+Живая приёмка этапа: создание версии `multi = 25500` через форму админки
+показало на `/pricing/` `$255` и дату `18.11.2026`; после удаления строки
+цены и дата вернулись к `$249` и `17.11.2026`.
+
+## Питфоллы, найденные на этом этапе
+
+- `columns.yaml`: `select: plan_label` превращается в SQL `select plan_label`
+  и даёт `Unknown column`. Для аксессоров нужен `valueFrom`, а не `select`.
+- `sortable: true` вместе с `valueFrom` сортирует по имени аксессора — тот же
+  `Unknown column`. Сортировка списка идёт по реальным колонкам
+  (`created_at`), даты показываются аксессорами `valid_from_label`/
+  `valid_to_label`.
+- `beforeSave()` не спасает от валидации: `Validation` поднимает
+  `model.saveInternal` раньше события `saving`, поэтому обязательный
+  `product_slug` надо заполнять в `beforeValidate()`.
+- Без `$fillable` October бросает `MassAssignmentException` на
+  `new Price([...])`.
+- `type: date` в списке печатает `17 Nov 2026`; формат `д.м.г` задаётся
+  аксессором, а не типом колонки.
