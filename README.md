@@ -5,7 +5,8 @@
 Booking, Shop, Feedback, Blog.
 
 Контур собран так, чтобы страницы отдавались одним файлом: CSS и JS встроены в HTML,
-иконки — инлайновые SVG, растровых картинок и внешних доменов нет.
+иконки — инлайновые SVG, растровых картинок и внешних доменов нет. Исключение —
+`/search/`: её индекс и скрипт вынесены отдельно, чтобы не раздувать общий inline-бюджет.
 
 ## Репозитории
 
@@ -21,7 +22,7 @@ Booking, Shop, Feedback, Blog.
 |---|---|
 | `plugins/elv/kit` | плагин: модели, миграции, маршруты форм, оплата, лицензии, Seo, админка |
 | `themes/elv-studio` | тема лендинга: макет, партиалы, страницы, `styles.css`, `app.js` |
-| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), калькулятор и студийные функции (`docs/studio-features-roadmap.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`) и QA-снимок (`docs/qa/`) |
+| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), калькулятор и студийные функции (`docs/studio-features-roadmap.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`), поиск (`docs/search.md`) и QA-снимок (`docs/qa/`) |
 | `Что сделано.txt` / `Что доделать.txt` | журнал этапов и открытый бэклог |
 | `test/Для анализа.txt` | самодостаточный срез для внешнего AI-аудита (DeepSeek/Qwen): стек, карта кода, гейты, бэклог; `test/README.md` — как пользоваться |
 | `config/`, `app/`, `bootstrap/` | конфигурация инсталляции October CMS |
@@ -88,14 +89,14 @@ php artisan serve --port=8090
 | `/docs/` | `pages/docs.htm` |
 | `/order/`, `/order/success/:number/` | `pages/order.htm`, `pages/order-success.htm` |
 | `/booking/`, `/feedback/`, `/contacts/` | одноимённые страницы |
-| `/terms/`, `/privacy/`, `/sitemap/`, `/404/` | служебные страницы |
-| `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/rss.xml` | маршруты плагина |
+| `/terms/`, `/privacy/`, `/sitemap/`, `/search/`, `/404/` | служебные страницы |
+| `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/rss.xml`, `/search-index.json` | маршруты плагина |
 
 ## Команды
 
 ```bash
 npm run check                       # ссылки, SEO, заголовки, бюджет, сироты, консоль
-npm run check:console               # 106 статических страниц: консоль, 5xx, 360 px
+npm run check:console               # 107 статических страниц: консоль, 5xx, 360 px
 php tools/blog-content-audit.php    # срез блога: объём, ссылки, CTA, FAQ, meta
 php tools/calculator-check.php      # формула, рекомендации, шаблон PDF
 npm run test:calculator             # Chrome E2E: выбор → результат → PDF

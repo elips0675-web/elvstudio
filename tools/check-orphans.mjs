@@ -37,14 +37,19 @@ const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =
 
 const dynamic = new Set(['module', 'blog-post', 'order-success']);
 const staticUrls = new Set();
+const noindexUrls = new Set();
 
 for (const [id, url] of pageUrls) {
   if (id === '404') {
     continue;
   }
 
-  if (url && !url.includes(':')) {
-    staticUrls.add(url.replace(/\/+$/, '') || '/');
+  const head = (await source(join(THEME, 'pages', id + '.htm'))).split(/^==$/m)[0] || '';
+  const noindex = /^\s*meta_robots\s*=\s*"[^"]*noindex/m.test(head);
+  const normalized = url ? url.replace(/\/+$/, '') || '/' : null;
+
+  if (normalized && !url.includes(':')) {
+    (noindex ? noindexUrls : staticUrls).add(normalized);
   }
 
   if (!url) {
@@ -55,6 +60,12 @@ for (const [id, url] of pageUrls) {
 for (const url of staticUrls) {
   if (!sitemapPaths.includes(url)) {
     errors.push(`page url ${url} missing from sitemap`);
+  }
+}
+
+for (const url of noindexUrls) {
+  if (sitemapPaths.includes(url)) {
+    errors.push(`page url ${url} is noindex but present in sitemap`);
   }
 }
 
@@ -102,7 +113,11 @@ for (const [id] of pageUrls) {
     continue;
   }
 
-  if (!new RegExp(`['"]${id}['"]\\s*\\|\\s*page`).test(joined) && !new RegExp(`\\|\\s*page\\(`).test(joined)) {
+  if (
+    !new RegExp(`['"]${id}['"]\\s*\\|\\s*page`).test(joined) &&
+    !new RegExp(`url\\(\\s*['"]\\/${id}\\/?['"]\\s*\\)`).test(joined) &&
+    !new RegExp(`\\|\\s*page\\(`).test(joined)
+  ) {
     errors.push(`page ${id} is never linked`);
   }
 }

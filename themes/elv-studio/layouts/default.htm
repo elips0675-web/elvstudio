@@ -49,6 +49,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% if this.page.id == 'calculator' %}
         <link rel="stylesheet" href="{{ 'assets/css/calculator.css'|theme }}?v=20261117-2">
     {% endif %}
+    {% if this.page.id == 'search' %}
+        <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
+    {% endif %}
 </head>
 <body>
 <a class="skip-link" href="#main">К содержимому</a>
@@ -62,6 +65,9 @@ description = "Основной макет: шапка, подвал, инлай
 {{ elv_widget()|raw }}
 
 <script nonce="{{ elv_csp_nonce() }}">{{ elv_js('assets/js/app.js')|raw }}</script>
+{% if this.page.id == 'search' %}
+    <script src="{{ 'assets/js/search.js'|theme }}?v=20261118-3" defer></script>
+{% endif %}
 {% if this.page.id == 'calculator' %}
     <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117-2" defer></script>
 {% endif %}

@@ -1,0 +1,82 @@
+title = "Поиск по сайту"
+url = "/search/"
+layout = "default"
+meta_title = "Поиск по сайту — Elv Kit"
+meta_description = "Поиск по страницам сайта и статьям блога Elv Studio: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
+meta_robots = "noindex, follow"
+==
+{% set query = elv_query('q') %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main" data-search-index="/search-index.json">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Поиск</span>
+            <h1>Поиск по сайту</h1>
+            <p class="lead">Страницы, услуги и статьи блога в одном месте. Начните с запроса — покажем подходящее.</p>
+
+            <form class="search-page__form mt-24" method="get" action="{{ url('/search') }}/" role="search" data-search-form data-static-search>
+                <label class="sr-only" for="site-search-input">Что найти</label>
+                <input
+                    class="input"
+                    id="site-search-input"
+                    type="search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Например: оплата, хостинг, онлайн-запись"
+                    autocomplete="off"
+                    autofocus>
+                <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Найти</button>
+            </form>
+
+            <div class="chips mt-24" data-search-filters aria-label="Где искать">
+                <button class="chip chip--active" type="button" data-search-type="all">Всё</button>
+                <button class="chip" type="button" data-search-type="blog">Блог</button>
+                <button class="chip" type="button" data-search-type="page">Страницы</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <p class="search-status" data-search-status role="status" aria-live="polite">
+                {% if query %}
+                    Ищем по запросу «{{ query }}».
+                {% else %}
+                    Введите запрос — покажем страницы и статьи.
+                {% endif %}
+            </p>
+
+            <div class="search-results" data-search-results></div>
+
+            <div class="search-empty" data-search-empty hidden>
+                <h2>Ничего не нашлось</h2>
+                <p>Попробуйте короче: «оплата», «хостинг», «запись» или «SEO».</p>
+                <p class="mt-16"><a href="{{ 'sitemap'|page }}">Посмотреть карту сайта {{ elv_icon('arrow-right')|raw }}</a></p>
+            </div>
+
+            <div class="search-popular" data-search-popular>
+                <h2>Частые запросы</h2>
+                <div class="chips mt-16">
+                    <a class="chip" href="{{ url('/search') }}/?q=оплата">оплата</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=хостинг">хостинг</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=онлайн-запись">онлайн-запись</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=SEO">SEO</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=перенос">перенос</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=поддержка">поддержка</a>
+                </div>
+                <p class="muted mt-24">
+                    Или откройте <a href="{{ 'sitemap'|page }}">карту сайта</a> — там все разделы и статьи.
+                </p>
+            </div>
+
+            <noscript>
+                <div class="alert alert--warn mt-24" role="status">
+                    Поиск работает с JavaScript. Пока можно открыть <a href="{{ 'sitemap'|page }}">карту сайта</a>
+                    или <a href="{{ 'blog'|page }}">блог</a>.
+                </div>
+            </noscript>
+        </div>
+    </section>
+</main>

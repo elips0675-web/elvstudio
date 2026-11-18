@@ -10,6 +10,7 @@ use Elv\Kit\Classes\LicenseService;
 use Elv\Kit\Classes\Money;
 use Elv\Kit\Classes\CompressResponse;
 use Elv\Kit\Classes\SecurityHeaders;
+use Elv\Kit\Classes\Search;
 use Elv\Kit\Classes\Seo;
 use Elv\Kit\Classes\Slots;
 use Elv\Kit\Models\Post;
@@ -375,6 +376,15 @@ class Plugin extends PluginBase
                     $value = request()->query((string) $key, $default);
 
                     return is_scalar($value) ? (string) $value : $default;
+                },
+                'elv_search_index' => function () {
+                    return Search::index();
+                },
+                'elv_search_json' => function ($items = null) {
+                    return Search::json(is_array($items) ? $items : null);
+                },
+                'elv_search' => function ($query, $type = Search::TYPE_ALL, $limit = 20) {
+                    return Search::query((string) $query, (string) $type, (int) $limit);
                 },
                 'elv_breadcrumbs' => function () {
                     return Seo::breadcrumbs();

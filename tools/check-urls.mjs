@@ -54,9 +54,11 @@ const critical = [
   '/privacy/',
   '/sitemap/',
   '/sitemap.xml',
+  '/search/',
   '/robots.txt',
   '/llms.txt',
   '/rss.xml',
+  '/search-index.json',
 ];
 
 function collectLinks(html) {

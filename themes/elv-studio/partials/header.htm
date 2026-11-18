@@ -19,6 +19,10 @@
             <a href="{{ 'contacts'|page }}" {% if this.page.id == 'contacts' %}aria-current="page"{% endif %}>Контакты</a>
         </nav>
 
+        <button class="header__search" type="button" data-search-open aria-label="Поиск по сайту" aria-haspopup="dialog" aria-controls="site-search">
+            {{ elv_icon('search')|raw }}
+        </button>
+
         <a class="btn btn--primary btn--sm header__cta" href="{{ 'pricing'|page }}">
             {{ elv_icon('cart')|raw }} Заказать сайт
         </a>
@@ -35,3 +39,27 @@
         </button>
     </div>
 </header>
+
+<dialog class="search-modal" id="site-search" data-search-dialog aria-labelledby="site-search-title">
+    <div class="search-modal__inner">
+        <div class="search-modal__head">
+            <h2 id="site-search-title">Поиск по сайту</h2>
+            <button class="search-modal__close" type="button" data-search-close aria-label="Закрыть поиск">
+                {{ elv_icon('close')|raw }}
+            </button>
+        </div>
+
+        <form class="search-modal__form" method="get" action="{{ url('/search') }}/" role="search" data-static-search>
+            <label class="sr-only" for="header-search-input">Что найти</label>
+            <input class="input" id="header-search-input" type="search" name="q" placeholder="Статья, услуга или вопрос" autocomplete="off">
+            <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Найти</button>
+        </form>
+
+        <p class="search-modal__hint">
+            Ищем по страницам сайта и статьям блога. Например:
+            <a href="{{ url('/search') }}/?q=оплата">оплата</a>,
+            <a href="{{ url('/search') }}/?q=хостинг">хостинг</a>,
+            <a href="{{ url('/search') }}/?q=SEO">SEO</a>.
+        </p>
+    </div>
+</dialog>

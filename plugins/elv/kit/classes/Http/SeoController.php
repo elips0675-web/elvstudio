@@ -1,6 +1,7 @@
 <?php namespace Elv\Kit\Classes\Http;
 
 use Elv\Kit\Classes\Rss;
+use Elv\Kit\Classes\Search;
 use Elv\Kit\Classes\Seo;
 use Elv\Kit\Classes\Sitemap;
 use Illuminate\Support\Facades\Cache;
@@ -31,6 +32,11 @@ class SeoController
     public function rss()
     {
         return $this->text($this->cached('elv-kit-rss', fn () => Rss::xml()), 'application/rss+xml');
+    }
+
+    public function searchIndex()
+    {
+        return $this->text($this->cached('elv-kit-search-index', fn () => Search::json()), 'application/json');
     }
 
     protected function cached(string $key, callable $callback): string

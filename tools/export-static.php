@@ -196,7 +196,7 @@ $script = <<<'HTML'
 
         var form = event.target;
 
-        if (form instanceof Element && form.matches('form[role="search"]')) {
+        if (form instanceof Element && form.matches('form[role="search"]:not([data-static-search])')) {
             note('Поиск по статьям доступен в полной версии на PHP-хостинге.');
             return;
         }
@@ -229,6 +229,7 @@ foreach ($matches[1] ?? [] as $loc) {
 
 $paths['/'] = true;
 $paths['/404'] = true;
+$paths['/search'] = true;
 ksort($paths);
 
 $pages = 0;
@@ -319,7 +320,7 @@ if ($blogStatus === 200 && $blogHtml !== '') {
 
 $pages += $extra;
 
-foreach (['sitemap.xml', 'robots.txt', 'llms.txt', 'rss.xml'] as $name) {
+foreach (['sitemap.xml', 'robots.txt', 'llms.txt', 'rss.xml', 'search-index.json'] as $name) {
     [$status, $body] = staticFetch($base . '/' . $name);
 
     if ($status !== 200 || $body === '') {

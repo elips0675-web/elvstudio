@@ -3,15 +3,15 @@
 > **Что это за файл.** Самодостаточный срез витрины для AI-аудита в браузере
 > (DeepSeek, Qwen и т. п.): что за проект, на чём сделан, что от ядра и
 > магазина, где кастомный код, чем проверено, что осталось. Числа и пути
-> перепроверены 17.11.2026 (Stage 47; актуальный коммит —
-> `git log --oneline -1`); числа гейтов — прогон Stage 47.
+> перепроверены 18.11.2026 (Stage 49; актуальный коммит —
+> `git log --oneline -1`); числа гейтов — прогон Stage 49.
 >
 > **Как пользоваться.** Загрузить файл в чат и задать вопросы из раздела
 > «Что смотреть аудитору». Кода нет — только карта и факты; детали просить
 > по конкретному пути из карты.
 >
 > Первоисточники: `README.md`, `Что сделано.txt`, `Что доделать.txt`,
-> `docs/` (аудит блога, план контента, политика контактов, QA).
+> `docs/` (аудит блога, план контента, политика контактов, поиск, QA).
 
 ## 1. Что это
 
@@ -44,11 +44,12 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
 | Тема | `elv-studio` (`ACTIVE_THEME=elv-studio`) |
 | Локаль | `ru` |
 
-Фронтенд намеренно «одним файлом»: свои `styles.css` (29 КБ) и `app.js`
-(7,4 КБ), иконки — инлайновые SVG, внешних CDN и растровых картинок нет
+Фронтенд намеренно «одним файлом»: свои `styles.css` (31 КБ) и `app.js`
+(8,3 КБ), иконки — инлайновые SVG, внешних CDN и растровых картинок нет
 (README, раздел «Что в репозитории»). Bootstrap в теме не используется.
 Калькулятор вынесен в отдельные `assets/css/calculator.css` и
-`assets/js/calculator.js`, чтобы не раздувать inline-бюджет.
+`assets/js/calculator.js`, а поиск — в `assets/css/search.css` и
+`assets/js/search.js`, чтобы не раздувать inline-бюджет.
 
 ## 3. Что откуда: ядро, магазин, кастом
 
@@ -62,9 +63,9 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
 
 | Путь | Объём | Роль |
 |---|---|---|
-| `plugins/elv/kit` | 76 PHP-файлов, 43 класса | модели, миграции, маршруты, оплата, лицензии, SEO, калькулятор, админка |
-| `themes/elv-studio` | 27 страниц, `styles.css`, `calculator.css`, `app.js`, `calculator.js` | лендинг, витрина модулей, услуги, SEO и калькулятор |
-| `demo-static/` | 106 HTML + `robots.txt`, `sitemap.xml`, `rss.xml`, `llms.txt` | статический снимок для Vercel |
+| `plugins/elv/kit` | 80 PHP-файлов, 45 классов | модели, миграции, маршруты, оплата, лицензии, SEO, поиск, калькулятор, админка |
+| `themes/elv-studio` | 28 страниц, `styles.css`, `search.css`, `calculator.css`, `app.js`, `search.js`, `calculator.js` | лендинг, витрина модулей, услуги, поиск, SEO и калькулятор |
+| `demo-static/` | 107 HTML + `robots.txt`, `sitemap.xml`, `rss.xml`, `llms.txt`, `search-index.json` | статический снимок для Vercel |
 | `tools/` | 15 файлов | гейты, экспорт статики, прод-чек, аудит блога, проверка и E2E калькулятора |
 
 ## 4. Карта кастомного кода
@@ -73,12 +74,12 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
 
 - `Plugin.php` — `pluginDetails()` (`:27-31`), регистрация, компоненты;
 - `routes.php` — маршруты форм, оплаты, лицензий, скачивания, SEO;
-- `classes/` — 43 файла: `Seo`, `Sitemap`, `Rss`, `Blog`, `BlogContent`,
+- `classes/` — 45 файлов: `Seo`, `Sitemap`, `Rss`, `Blog`, `BlogContent`,
   `Faq`, `Catalog`, `Calculator`, `BookingService`, `Slots`, `OrderService`,
-  `Money`, `LicenseService`, `DownloadService`, `Chat`, `AntiSpam`, `TextFilter`,
-  `SecurityHeaders`, `CompressResponse`, `Assets`, `Icons`, `Demo`,
-  `Payment/{PaymentManager,Stripe,YooKassa}`, `Http/*` (10 контроллеров),
-  `Mail/*` (6 писем);
+  `Money`, `LicenseService`, `DownloadService`, `Chat`, `Search`, `AntiSpam`,
+  `TextFilter`, `SecurityHeaders`, `CompressResponse`, `Assets`, `Icons`,
+  `Demo`, `Payment/{PaymentManager,Stripe,YooKassa}`, `Http/*`
+  (10 контроллеров), `Mail/*` (6 писем);
 - `controllers/` — админка: Products, Categories, Orders, Bookings, Licenses,
   Messages, Posts, Subscribers + `install/`
   (`Install.php:61` — `onMigrate`, `:68` — `onDemo`);
@@ -92,9 +93,9 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
 
 - `theme.yaml` — настройки темы (SEO, контакты, бренд) — единственный файл
   в корне темы;
-- `pages/` — 27 страниц: index, kit, modules, module, pricing, demo, docs,
+- `pages/` — 28 страниц: index, kit, modules, module, pricing, demo, docs,
   blog, blog-post, blog-tech, booking, order, order-success, feedback,
-  contacts, privacy, terms, sitemap, 404, calculator, services,
+  contacts, privacy, terms, sitemap, search, 404, calculator, services,
   services-hosting, services-support, services-plugins, services-booking,
   services-audit, services-seo;
 - `partials/`, `layouts/`, `content/` — макет, блоки, демо-тексты;
@@ -114,9 +115,10 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
   ссылок и CTA, 0 SEO-описаний,
   равных краткому; FAQ выводится из `config/post-faq.php` в 10 статьях,
   размечен `FAQPage`; изображений в теле по-прежнему нет.
-- `demo-static/` — **106 HTML-страниц, 94 URL в sitemap** (Stage 47);
-  пагинация блога и рубрики сгенерированы статически, теги и поиск в статике
-  показывают подсказку «доступно в полной версии».
+- `demo-static/` — **107 HTML-страниц, 94 URL в sitemap** (Stage 49);
+  пагинация блога и рубрики сгенерированы статически; теги и поиск по блогу
+  в статике показывают подсказку «доступно в полной версии», а общий
+  `/search/` работает через `search-index.json`.
 - `/calculator/` — мастер из 4 шагов на ценах `Product`/`Settings`; шесть
   страниц услуг (`/services/…`), включая SEO-продвижение, без выдуманных
   тарифов.
@@ -128,7 +130,7 @@ kit, modules, pricing, demo; блог из 67 статей продаёт чер
 ```powershell
 $php = 'C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe'
 npm run check                 # node tools/gate.mjs: URL, SEO, заголовки, бюджет, сироты, консоль
-npm run check:console         # 106/106 страниц без ошибок консоли и 5xx
+npm run check:console         # 107/107 страниц без ошибок консоли и 5xx
 php tools/calculator-check.php            # формула, рекомендации, шаблон PDF
 node tools/calculator-e2e.mjs             # Chrome: выбор → результат → PDF
 php tools/production-check.php            # проверка прод-настроек (локально)
@@ -140,14 +142,14 @@ php -l <файл>                             # синтаксис; PHPUnit дл
 
 Живые гейты требуют запущенный сервер на `:8090`.
 
-## 7. Что проверено на HEAD (17.11.2026, Stage 47)
+## 7. Что проверено на HEAD (18.11.2026, Stage 49)
 
-- `demo-static/` пересобран: **106 страниц, 94 URL sitemap**;
-  `node tools/gate.mjs` — зелёный (99 внутренних URL, SEO, заголовки, бюджет,
-  сироты, консоль); `node tools/check-console.mjs` — 106/106; `php -l` чистый.
-- Бюджет на `/calculator/`: HTML 122,7 КБ, CSS 34,4 КБ, JS 17,4 КБ;
-  на `/services/seo/`: HTML 89,1 КБ, CSS 34,4 КБ, JS 18,5 КБ;
-  на `/` — HTML 133,4 КБ, CSS 34,4 КБ, JS 19,2 КБ (лимиты 150/36/20).
+- `demo-static/` пересобран: **107 страниц, 94 URL sitemap**;
+  `node tools/gate.mjs` — зелёный (100 внутренних URL, SEO, заголовки, бюджет,
+  сироты, консоль); `php -l` чистый.
+- Бюджет: `/` — HTML 137,9 КБ, CSS 36,0 КБ, JS 19,9 КБ; `/search/` —
+  HTML 76,4 КБ, CSS 36,0 КБ, JS 15,5 КБ; gzip `/search/` 17,2 КБ
+  (лимиты 150/36/20/30).
 - `php tools/calculator-check.php` — OK: 3 тарифа, 4 модуля, 4 рекомендации,
   пустой расчёт `7900`, с двумя модулями `16700` (в центах); номер сметы,
   срок 14 дней, разбивка и рендер PDF-шаблона проверены.
@@ -157,12 +159,15 @@ php -l <файл>                             # синтаксис; PHPUnit дл
 - Аудит блога: 67 статей, все длиннее 1 500, у всех ссылки и CTA,
   0 `meta = excerpt`, 37 канонических тегов; у 10 статей по 3 FAQ.
 - `git status` — только черновики владельца (html-заметки и `AGENTS.md`),
-  код Stage 47 закоммичен.
+  код Stage 49 закоммичен.
 
 ## 8. Что осталось доделать (кратко)
 
-`Что доделать.txt` — **33 открытых пункта** (все с чекбоксами `[ ]`):
+`Что доделать.txt` — **38 открытых пунктов** (все с чекбоксами `[ ]`):
 
+- **Поиск:** Stage 50 — поиск внутри Консультанта через `Search::query()`;
+  Stage 51 — переделать `/sitemap/` и убрать плоский список 67 статей;
+  проверить `WebSite`/`SearchAction` в JSON-LD.
 - **Внешние проверки:** прогнать JSON-LD через Google Rich Results
   и Яндекс.Вебмастер; открыть сайт на реальном телефоне (360 px) и в Safari;
   запросить переобход Vercel-демо в Search Console.
@@ -187,7 +192,8 @@ php -l <файл>                             # синтаксис; PHPUnit дл
 - Оплата в демо-контуре: без ключей `PaymentManager` — mock.
 - `demo-static` — статика для Vercel: формы, чат и оплата там отключены
   (PHP на Vercel не исполняется); кнопка PDF там откатывается на печать
-  браузера, потому что серверного маршрута в статике нет.
+  браузера, потому что серверного маршрута в статике нет. Общий поиск
+  `/search/` — исключение: он работает на клиентском `search-index.json`.
 - Упаковка витрины: ZIP собирает `elv:kit:package`, но тема и плагин
   **не оформлены как товар Marketplace** — у темы нет `composer.json`,
   `authorCode`, `version.yaml`, у плагина нет `composer.json` (проверено
@@ -217,11 +223,12 @@ php -l <файл>                             # синтаксис; PHPUnit дл
 | Файл | Зачем |
 |---|---|
 | `README.md` | состав, установка, структура |
-| `Что сделано.txt` | журнал этапов (Stage 47 — подчёркивания; Stage 46 — LCP-кейс, 67 статей) |
-| `Что доделать.txt` | 33 открытых пункта с чекбоксами |
+| `Что сделано.txt` | журнал этапов (Stage 49 — поиск; Stage 48 — переименование; 67 статей) |
+| `Что доделать.txt` | 38 открытых пунктов с чекбоксами |
 | `docs/studio-features-roadmap.md` | этапы A/B/C, формула сметы, блокеры |
 | `docs/blog-content-plan.md` | план тем, кластеры, матрица ссылок |
 | `docs/blog-audit.md` | аудит блога (исторический срез 50 статей) |
-| `docs/content-policy.md` | контакты, чат, фильтр слов |
+| `docs/search.md` | индекс, ранжирование, статика, границы поиска |
+| `docs/content-policy.md` | контакты, чат, фильтр слов, поисковая строка |
 | `docs/qa/README.md` | что и как проверялось |
 | `demo-static/llms.txt` | карта демо для AI-краулеров |

@@ -6,6 +6,56 @@
 
 ---
 
+(Stage 49 — 18.11.2026) — **Сквозной поиск по сайту и блогу.**
+
+- `plugins/elv/kit/classes/Search.php` — единый индекс: 27 страниц и
+  67 статей, нормализация `ё`, отбрасывание коротких слов и служебных
+  предлогов, ранжирование (фраза в заголовке, слово в заголовке, ключевых
+  словах, описании, начале текста). Полное тело статей в индекс не
+  попадает: только первые 320 символов.
+- `plugins/elv/kit/classes/Http/SeoController.php` и `routes.php` —
+  `GET /search-index.json` (JSON, кэш 30 минут).
+- `themes/elv-studio/pages/search.htm` — страница `/search/`: форма,
+  фильтры «Всё / Блог / Страницы», пустое состояние, частые запросы.
+  `meta_robots = "noindex, follow"`: URL с `?q=` не должны плодить дубли.
+- `themes/elv-studio/partials/header.htm` и `assets/js/app.js` — кнопка
+  поиска в шапке и `<dialog>`; `Escape` и клик по фону закрывают окно.
+- `themes/elv-studio/assets/js/search.js` — загрузка индекса, поиск,
+  фильтр, `history.replaceState`, чтение `?q=`; запрос не уходит на сервер
+  и не сохраняется. `assets/css/search.css` — стили страницы, вынесены
+  из общего inline-CSS, чтобы не раздувать бюджет.
+- `themes/elv-studio/partials/footer.htm` — ссылка «Поиск».
+- `tools/export-static.php` — экспорт `/search/` и `search-index.json`,
+  разрешение общей формы в статике; поиск по блогу внутри `/blog/` и теги
+  по-прежнему показывают подсказку «доступно в полной версии».
+- `tools/check-urls.mjs` — `/search/` и `/search-index.json` в critical;
+  `tools/check-budget.mjs` — `/search/` под бюджетом;
+  `tools/check-orphans.mjs` — страницы с `noindex` не обязаны быть в
+  sitemap, ссылка через `url('/search')` считается перелинковкой.
+- `docs/search.md` — архитектура, ранжирование, границы и команды проверки;
+  `docs/00-audit-documents.md` — разбор трёх файлов Qwen/Google AI (что
+  взято, что отклонено); `docs/content-policy.md` — почему `TextFilter`
+  не применяется к поисковой строке; `README.md`, `docs/qa/README.md`,
+  `test/Для анализа.txt`, `Что доделать.txt` — счётчики и статус.
+
+Чем проверено: `php -l` для `Search.php`, `SeoController.php`, `routes.php`,
+`export-static.php`; live `/search/?q=оплата` — 19 результатов, фильтр
+«Блог» — 14, запрос без совпадений показывает пустое состояние; диалог
+в шапке открывается, фокус в поле, `Escape`/крестик закрывают, ошибок
+в консоли нет. `demo-static` пересобран: 107 HTML-страниц, 94 URL sitemap,
+`search-index.json` 85 937 байт; поиск в статике на `/search/index.html?q=оплата`
+дал те же 19 результатов. `node tools/gate.mjs` — зелёный: 100 внутренних
+URL, 94 sitemap, 107/107 страниц без ошибок консоли, `/` 137,9 КБ HTML /
+36,0 КБ CSS / 19,9 КБ JS, `/search/` 76,4 КБ HTML / 36,0 КБ CSS /
+15,5 КБ JS / 17,2 КБ gzip.
+
+Не проверено: Lighthouse после добавления поиска, реальный телефон и Safari;
+поиск не анализирует полное тело статей и не заменяет поиск по блогу.
+CSS стоит ровно на лимите 36,0 КБ — следующий блок стилей требует
+сокращения, а не повышения бюджета.
+
+---
+
 (Stage 48 — 17.11.2026) — **«ИИ-консультант» переименован в «Консультант».**
 
 - `plugins/elv/kit/views/widget.htm` — пункт меню и заголовок окна чата

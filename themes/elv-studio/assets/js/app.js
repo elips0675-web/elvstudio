@@ -32,6 +32,34 @@
         });
     }
 
+    var searchDialog = document.querySelector('[data-search-dialog]');
+    var searchOpen = document.querySelector('[data-search-open]');
+
+    if (searchDialog && searchOpen) {
+        var searchInput = searchDialog.querySelector('input[name="q"]');
+
+        searchOpen.addEventListener('click', function () {
+            searchDialog.showModal();
+
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+
+        Array.prototype.forEach.call(searchDialog.querySelectorAll('[data-search-close]'), function (button) {
+            button.addEventListener('click', function () {
+                searchDialog.close();
+            });
+        });
+
+        searchDialog.addEventListener('click', function (event) {
+            if (event.target === searchDialog) {
+                searchDialog.close();
+            }
+        });
+    }
+
     function csrf() {
         var meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';

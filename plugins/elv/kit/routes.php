@@ -50,6 +50,7 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get('robots.txt', [SeoController::class, 'robots']);
     Route::get('llms.txt', [SeoController::class, 'llms']);
     Route::get('rss.xml', [SeoController::class, 'rss']);
+    Route::get('search-index.json', [SeoController::class, 'searchIndex']);
 });
 
 Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
