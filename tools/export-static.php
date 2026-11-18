@@ -104,6 +104,7 @@ function staticFinalize(string $html, string $base, string $origin, string $inje
     $html = (string) preg_replace('~(\b(?:href|src|action)=")' . $quoted . '"~i', '$1/"', $html);
     $html = (string) preg_replace('~(<link rel="canonical" href=")/~i', '$1' . $origin . '/', $html);
 
+    $html = (string) preg_replace('~/blog/tech/?\?category=([a-z0-9-]+)~i', '/blog/tech/category/$1/', $html);
     $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)(?:&amp;|&)page=(\d+)~i', '/blog/category/$1/page/$2/', $html);
     $html = (string) preg_replace('~/blog/?\?page=(\d+)(?:&amp;|&)category=([a-z0-9-]+)~i', '/blog/category/$2/page/$1/', $html);
     $html = (string) preg_replace('~/blog/?\?category=([a-z0-9-]+)~i', '/blog/category/$1/', $html);
@@ -315,6 +316,26 @@ if ($blogStatus === 200 && $blogHtml !== '') {
             $extra++;
             echo 'page: blog/category/' . $slug . ($page > 1 ? '/page/' . $page : '') . '/index.html' . PHP_EOL;
         }
+    }
+}
+
+$techBase = $base . '/blog/tech/';
+[$techStatus, $techHtml] = staticFetch($techBase);
+
+if ($techStatus === 200 && $techHtml !== '') {
+    preg_match_all('~/blog/tech/?\?category=([a-z0-9-]+)~i', $techHtml, $techMatches);
+
+    foreach (array_unique($techMatches[1] ?? []) as $slug) {
+        [$status, $html] = staticFetch($techBase . '?category=' . $slug);
+
+        if ($status !== 200 || $html === '') {
+            fwrite(STDERR, 'skip: /blog/tech/category/' . $slug . ' (' . $status . ')' . PHP_EOL);
+            continue;
+        }
+
+        staticWrite($out, '/blog/tech/category/' . $slug, staticFinalize($html, $base, $origin, $inject));
+        $extra++;
+        echo 'page: blog/tech/category/' . $slug . '/index.html' . PHP_EOL;
     }
 }
 
