@@ -23,6 +23,7 @@ class ChatController extends Controller
                 'chips' => ['Сколько стоит?', 'Как установить?'],
                 'link' => null,
                 'open' => null,
+                'sources' => [],
             ]);
         }
 

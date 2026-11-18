@@ -33,6 +33,21 @@ class Chat
             );
         }
 
+        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать', 'ссылк'])) {
+            $results = static::search($message);
+
+            if ($results !== []) {
+                return static::searchReply($results);
+            }
+
+            return static::reply(
+                'По этому запросу на сайте ничего не нашёл. Попробуйте сформулировать короче или напишите нам — подскажем вручную.',
+                ['Сколько стоит?', 'Какие разделы есть?', 'Написать нам'],
+                null,
+                'feedback'
+            );
+        }
+
         if (preg_match('/^(привет|здравствуй|добрый|доброе|хай|hello|hi)\b/u', $text)) {
             return static::reply(
                 'Здравствуйте! Подскажу по тарифам, разделам сайта, запуску, оплате и ключам Elv Kit. Что интересует?',
@@ -180,6 +195,12 @@ class Chat
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
+        $results = static::search($message);
+
+        if ($results !== []) {
+            return static::searchReply($results, true);
+        }
+
         return static::reply(
             'Не нашёл ответа на этот вопрос. Уточните формулировку — или напишите нам, ответим на e-mail в течение рабочего дня.',
             ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
@@ -188,14 +209,65 @@ class Chat
         );
     }
 
-    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null): array
+    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null, array $sources = []): array
     {
         return [
             'answer' => $answer,
             'chips' => array_values(array_filter($chips)),
             'link' => $link,
             'open' => $open,
+            'sources' => array_values($sources),
         ];
+    }
+
+    /**
+     * search — подбирает страницы и статьи по вопросу пользователя.
+     */
+    protected static function search(string $message): array
+    {
+        return Search::query($message, Search::TYPE_ALL, 3);
+    }
+
+    /**
+     * searchReply — отвечает ссылками на найденные материалы, не пересказывая их.
+     */
+    protected static function searchReply(array $items, bool $fallback = false): array
+    {
+        $sources = [];
+        $seen = [];
+
+        foreach ($items as $item) {
+            $label = trim((string) ($item['title'] ?? ''));
+            $path = trim((string) ($item['url'] ?? ''));
+
+            if ($label === '' || $path === '' || isset($seen[$path])) {
+                continue;
+            }
+
+            $seen[$path] = true;
+            $sources[] = [
+                'label' => $label,
+                'url' => rtrim(url($path), '/') . '/',
+                'kind' => ($item['type'] ?? '') === Search::TYPE_BLOG ? 'Статья' : 'Страница',
+            ];
+        }
+
+        if ($sources === []) {
+            return static::reply(
+                'По этому запросу на сайте ничего не нашёл. Попробуйте сформулировать короче или напишите нам — подскажем вручную.',
+                ['Сколько стоит?', 'Какие разделы есть?', 'Написать нам'],
+                null,
+                'feedback'
+            );
+        }
+
+        return static::reply(
+            ($fallback ? 'Точного ответа нет, но на сайте есть материалы по теме.' : 'Нашёл материалы по теме.') . ' Откройте нужную ссылку ниже или уточните вопрос.',
+            ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+            null,
+            null,
+            $sources
+        );
     }
 
     protected static function link(string $label, string $path): array

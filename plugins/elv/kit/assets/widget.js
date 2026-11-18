@@ -216,6 +216,11 @@
 
                     if (result.status === 200 && result.data && result.data.ok) {
                         bubble('bot', result.data.answer || '');
+
+                        if (result.data.sources && result.data.sources.length) {
+                            result.data.sources.forEach(addLink);
+                        }
+
                         addLink(result.data.link);
 
                         if (result.data.open === 'feedback' && typeof openFeedback === 'function') {
