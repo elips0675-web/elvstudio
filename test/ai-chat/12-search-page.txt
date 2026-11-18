@@ -1,0 +1,436 @@
+# Страница /search/ и клиентский поиск
+
+
+===== FILE: themes/elv-studio/pages/search.htm =====
+
+title = "Поиск по сайту"
+url = "/search/"
+layout = "default"
+meta_title = "Поиск по сайту — Elv Kit"
+meta_description = "Поиск по страницам сайта и статьям блога Elv Studio: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
+meta_robots = "noindex, follow"
+==
+{% set query = elv_query('q') %}
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main" data-search-index="/search-index.json">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Поиск</span>
+            <h1>Поиск по сайту</h1>
+            <p class="lead">Страницы, услуги и статьи блога в одном месте. Начните с запроса — покажем подходящее.</p>
+
+            <form class="search-page__form mt-24" method="get" action="{{ url('/search') }}/" role="search" data-search-form data-static-search>
+                <label class="sr-only" for="site-search-input">Что найти</label>
+                <input
+                    class="input"
+                    id="site-search-input"
+                    type="search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Например: оплата, хостинг, онлайн-запись"
+                    autocomplete="off"
+                    autofocus>
+                <button class="btn btn--primary" type="submit">{{ elv_icon('search')|raw }} Найти</button>
+            </form>
+
+            <div class="chips mt-24" data-search-filters aria-label="Где искать">
+                <button class="chip chip--active" type="button" data-search-type="all">Всё</button>
+                <button class="chip" type="button" data-search-type="blog">Блог</button>
+                <button class="chip" type="button" data-search-type="page">Страницы</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <p class="search-status" data-search-status role="status" aria-live="polite">
+                {% if query %}
+                    Ищем по запросу «{{ query }}».
+                {% else %}
+                    Введите запрос — покажем страницы и статьи.
+                {% endif %}
+            </p>
+
+            <div class="search-results" data-search-results></div>
+
+            <div class="search-empty" data-search-empty hidden>
+                <h2>Ничего не нашлось</h2>
+                <p>Попробуйте короче: «оплата», «хостинг», «запись» или «SEO».</p>
+                <p class="mt-16"><a href="{{ 'sitemap'|page }}">Посмотреть карту сайта {{ elv_icon('arrow-right')|raw }}</a></p>
+            </div>
+
+            <div class="search-popular" data-search-popular>
+                <h2>Частые запросы</h2>
+                <div class="chips mt-16">
+                    <a class="chip" href="{{ url('/search') }}/?q=оплата">оплата</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=хостинг">хостинг</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=онлайн-запись">онлайн-запись</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=SEO">SEO</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=перенос">перенос</a>
+                    <a class="chip" href="{{ url('/search') }}/?q=поддержка">поддержка</a>
+                </div>
+                <p class="muted mt-24">
+                    Или откройте <a href="{{ 'sitemap'|page }}">карту сайта</a> — там все разделы и статьи.
+                </p>
+            </div>
+
+            <noscript>
+                <div class="alert alert--warn mt-24" role="status">
+                    Поиск работает с JavaScript. Пока можно открыть <a href="{{ 'sitemap'|page }}">карту сайта</a>
+                    или <a href="{{ 'blog'|page }}">блог</a>.
+                </div>
+            </noscript>
+        </div>
+    </section>
+</main>
+
+
+===== FILE: themes/elv-studio/assets/js/search.js =====
+
+/* Страница поиска: клиентский индекс, чтобы поиск работал и в статической копии. */
+(function () {
+    'use strict';
+
+    var indexNode = document.querySelector('[data-search-index]');
+    var form = document.querySelector('[data-search-form]');
+    var input = document.getElementById('site-search-input');
+    var results = document.querySelector('[data-search-results]');
+    var statusNode = document.querySelector('[data-search-status]');
+    var emptyNode = document.querySelector('[data-search-empty]');
+    var popularNode = document.querySelector('[data-search-popular]');
+    var filterNodes = document.querySelectorAll('[data-search-type]');
+
+    if (!indexNode || !form || !input || !results || !statusNode) {
+        return;
+    }
+
+    var items = [];
+    var loaded = false;
+
+    var state = { type: 'all' };
+    var stop = {
+        'и': 1, 'в': 1, 'во': 1, 'на': 1, 'для': 1, 'с': 1, 'со': 1, 'по': 1,
+        'как': 1, 'что': 1, 'это': 1, 'или': 1, 'не': 1, 'из': 1, 'у': 1,
+        'о': 1, 'об': 1, 'от': 1, 'до': 1, 'за': 1, 'под': 1, 'над': 1,
+        'при': 1, 'про': 1, 'без': 1, 'же': 1, 'бы': 1, 'ли': 1, 'то': 1,
+        'все': 1, 'мы': 1, 'вы': 1, 'он': 1, 'она': 1, 'они': 1, 'мне': 1, 'нам': 1
+    };
+    var timer = null;
+
+    function normalize(value) {
+        var text = String(value || '').toLowerCase().replace(/ё/g, 'е');
+
+        return text.match(/[\p{L}\p{Nd}]+/gu) || [];
+    }
+
+    function phrase(value) {
+        return normalize(value).join(' ');
+    }
+
+    function words(value) {
+        var all = normalize(value);
+        var seen = {};
+        var list = [];
+
+        for (var i = 0; i < all.length; i += 1) {
+            var word = all[i];
+
+            if (word.length < 2 || stop[word] || seen[word]) {
+                continue;
+            }
+
+            seen[word] = true;
+            list.push(word);
+        }
+
+        return list;
+    }
+
+    function score(item, query, parts) {
+        var title = phrase(item.title);
+        var description = phrase(item.description);
+        var text = phrase(item.text);
+        var keywords = phrase(item.keywords);
+        var meta = phrase(item.meta);
+        var total = title.indexOf(query) !== -1 ? 14 : 0;
+        var hits = 0;
+
+        parts.forEach(function (word) {
+            var hit = false;
+
+            if (title.indexOf(word) !== -1) {
+                total += 7;
+                hit = true;
+            }
+
+            if (keywords.indexOf(word) !== -1) {
+                total += 5;
+                hit = true;
+            }
+
+            if (description.indexOf(word) !== -1) {
+                total += 3;
+                hit = true;
+            }
+
+            if (text.indexOf(word) !== -1) {
+                total += 2;
+                hit = true;
+            }
+
+            if (meta.indexOf(word) !== -1) {
+                total += 1;
+                hit = true;
+            }
+
+            if (hit) {
+                hits += 1;
+            }
+        });
+
+        if (hits === 0) {
+            return 0;
+        }
+
+        if (parts.length > 1) {
+            total += hits * 2;
+            total -= (parts.length - hits) * 2;
+        }
+
+        return total;
+    }
+
+    function plural(count, one, few, many) {
+        var last = count % 10;
+        var lastTwo = count % 100;
+
+        if (last === 1 && lastTwo !== 11) {
+            return one;
+        }
+
+        if (last >= 2 && last <= 4 && (lastTwo < 10 || lastTwo >= 20)) {
+            return few;
+        }
+
+        return many;
+    }
+
+    function card(item) {
+        var link = document.createElement('a');
+        link.className = 'search-result';
+        link.href = item.url;
+
+        var top = document.createElement('div');
+        top.className = 'search-result__top';
+
+        var type = document.createElement('span');
+        type.className = 'search-result__type';
+        type.textContent = item.type === 'blog' ? 'Статья' : 'Страница';
+        top.appendChild(type);
+
+        if (item.group) {
+            var group = document.createElement('span');
+            group.className = 'search-result__group';
+            group.textContent = item.group;
+            top.appendChild(group);
+        }
+
+        link.appendChild(top);
+
+        var title = document.createElement('h2');
+        title.textContent = item.title || '';
+        link.appendChild(title);
+
+        var description = item.description || item.text || '';
+        if (description) {
+            var lead = document.createElement('p');
+            lead.textContent = description;
+            link.appendChild(lead);
+        }
+
+        if (item.meta) {
+            var meta = document.createElement('span');
+            meta.className = 'search-result__meta';
+            meta.textContent = item.meta;
+            link.appendChild(meta);
+        }
+
+        return link;
+    }
+
+    function render() {
+        if (!loaded) {
+            statusNode.textContent = 'Загружаем поиск…';
+            return;
+        }
+
+        var raw = input.value.trim();
+        var query = phrase(raw);
+        var parts = words(raw);
+
+        results.textContent = '';
+        emptyNode.hidden = true;
+
+        if (!raw) {
+            popularNode.hidden = false;
+            statusNode.textContent = 'Введите запрос — покажем страницы и статьи.';
+            return;
+        }
+
+        popularNode.hidden = true;
+
+        if (!parts.length) {
+            statusNode.textContent = 'Введите хотя бы два символа.';
+            return;
+        }
+
+        var found = [];
+
+        items.forEach(function (item) {
+            if (state.type !== 'all' && item.type !== state.type) {
+                return;
+            }
+
+            var value = score(item, query, parts);
+
+            if (value > 0) {
+                found.push({ item: item, score: value });
+            }
+        });
+
+        found.sort(function (a, b) {
+            if (a.score === b.score) {
+                return String(a.item.title).localeCompare(String(b.item.title), 'ru');
+            }
+
+            return b.score - a.score;
+        });
+
+        if (!found.length) {
+            emptyNode.hidden = false;
+            statusNode.textContent = 'Ничего не нашлось по запросу «' + raw + '».';
+            return;
+        }
+
+        var shown = found.slice(0, 30);
+        var suffix = plural(found.length, 'результат', 'результата', 'результатов');
+        statusNode.textContent = found.length > shown.length
+            ? 'Нашли ' + found.length + ' ' + suffix + ', показываем первые ' + shown.length + '.'
+            : 'Нашли ' + found.length + ' ' + suffix + '.';
+
+        shown.forEach(function (entry) {
+            results.appendChild(card(entry.item));
+        });
+    }
+
+    function syncUrl() {
+        var value = input.value.trim();
+        var base = window.location.pathname.replace(/index\.html$/, '');
+
+        if (base.charAt(base.length - 1) !== '/') {
+            base += '/';
+        }
+
+        try {
+            window.history.replaceState(null, '', base + (value ? '?q=' + encodeURIComponent(value) : ''));
+        } catch (error) {
+            /* file:// не даёт менять адрес — поиск всё равно работает. */
+        }
+    }
+
+    input.addEventListener('input', function () {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(function () {
+            syncUrl();
+            render();
+        }, 120);
+    });
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        syncUrl();
+        render();
+    });
+
+    Array.prototype.forEach.call(filterNodes, function (button) {
+        button.addEventListener('click', function () {
+            state.type = button.getAttribute('data-search-type') || 'all';
+
+            Array.prototype.forEach.call(filterNodes, function (node) {
+                node.classList.toggle('chip--active', node === button);
+            });
+
+            render();
+        });
+    });
+
+    statusNode.textContent = 'Загружаем поиск…';
+
+    var initial = new URLSearchParams(window.location.search).get('q');
+
+    if (initial && !input.value) {
+        input.value = initial;
+    }
+
+    fetch(indexNode.getAttribute('data-search-index') || '/search-index.json', {
+        headers: { Accept: 'application/json' }
+    })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('search index ' + response.status);
+            }
+
+            return response.json();
+        })
+        .then(function (data) {
+            items = Array.isArray(data) ? data : [];
+            loaded = true;
+
+            if (input.value.trim()) {
+                render();
+                return;
+            }
+
+            statusNode.textContent = 'Введите запрос — покажем страницы и статьи.';
+            popularNode.hidden = false;
+        })
+        .catch(function () {
+            statusNode.textContent = 'Поиск временно недоступен. Откройте карту сайта.';
+        });
+})();
+
+
+===== FILE: themes/elv-studio/assets/css/search.css =====
+
+/* Страница поиска: подключается только на /search/. */
+.search-page__form { display: flex; align-items: stretch; gap: 10px; max-width: 760px; }
+.search-page__form .input { flex: 1; min-width: 0; }
+.search-page__form .btn { flex: none; }
+.search-status { margin: 0 0 18px; color: var(--muted); }
+.search-results { display: grid; gap: 12px; max-width: 880px; }
+.search-result {
+    display: block; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px;
+    background: #fff; color: inherit; text-decoration: none; box-shadow: var(--shadow-sm);
+}
+.search-result:hover { border-color: var(--brand); box-shadow: var(--shadow); }
+.search-result__top { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.search-result__type {
+    display: inline-flex; padding: 3px 9px; border-radius: 999px;
+    background: var(--brand-soft); color: var(--brand-2); font-weight: 700;
+}
+.search-result__group { color: var(--muted); }
+.search-result h2 { margin: 9px 0 6px; font-size: 20px; line-height: 1.3; }
+.search-result p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+.search-result__meta { display: block; margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+.search-empty { max-width: 680px; padding: 26px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.search-empty h2 { margin: 0 0 8px; font-size: 20px; }
+.search-empty p { margin: 0; color: var(--muted); }
+.search-popular { margin-top: 38px; }
+.search-popular h2 { margin: 0; font-size: 20px; }
+
+@media (max-width: 760px) {
+    .search-page__form { flex-direction: column; }
+    .search-page__form .btn { width: 100%; }
+}

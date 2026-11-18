@@ -24,6 +24,12 @@
   и явный поиск не отбиваются.
 - `docs/search.md` — описание `rejected` и проверки; `docs/content-policy.md`
   — бессмыслица в чате и `TextFilter` в одном разделе.
+- `test/ai-chat/` — снимок кода для внешнего AI-анализа: контекст, структура,
+  `composer.json`, `package.json`, `theme.yaml`, `Plugin.php`, `Chat.php`,
+  `Search.php`, `TextFilter.php`, `ChatController.php`, `widget.js`,
+  `chat-check.php`, `sitemap.htm`, `Seo.php`, `routes.php`, страница
+  `/search/` и документация. Один файл `ALL-IN-ONE.txt` (~189 КБ) или
+  отдельные файлы; манифест — `test/ai-chat/README.md`.
 
 Чем проверено: `php -l` для `Chat.php` и `ChatController.php`;
 `php tools/chat-check.php` — OK; прямой `Chat::answer()`: «абырвалг»,

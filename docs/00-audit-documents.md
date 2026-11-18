@@ -152,6 +152,22 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
 - **Оценки и метрики из аудита не переносятся.** Свои цифры — только после
   прогона `node tools/gate.mjs`/Lighthouse, с командой-источником.
 
+### Чего аудит Qwen не читал
+
+В отчёте нет списка прочитанных файлов: в шапке указаны только GitHub-репозиторий
+и `elvstudio.vercel.app` (`Аудит…Qwen.html:180-184`). Дальше он спрашивает,
+что внутри репозитория — HTML/CSS/JS, Vite/Webpack или исходники October
+(`:425`), и просит прислать `composer.json`, `plugins/elv/kit/Plugin.php` и
+конфигурацию темы (`:429`). Значит, полный код он не читал; `Chat.php`,
+`Search.php`, `TextFilter.php`, `ChatController.php` и `widget.js` в отчёте
+не упомянуты. Упомянутые пути — рекомендации, а не факты чтения.
+
+Чтобы закрыть этот пробел, в `test/ai-chat/` лежит снимок кода Stage 52:
+`ALL-IN-ONE.txt` или отдельные файлы с `Chat.php`, `Search.php`,
+`TextFilter.php`, `ChatController.php`, `widget.js`, `chat-check.php`,
+`Plugin.php`, `composer.json`, `theme.yaml`, `sitemap.htm`, `Seo.php`.
+Манифест — `test/ai-chat/README.md`.
+
 ### Что взято в работу
 
 - [x] Stage 49 — сквозной поиск `/search/`, кнопка в шапке, индекс
@@ -161,6 +177,10 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
   `php tools/chat-check.php`.
 - [x] Stage 51 — переделать `/sitemap/`: сгруппировать разделы и статьи, не
   выводить 67 статей плоским списком; ссылка в подвале ведёт на страницу.
+- [x] Stage 52 — не пропускать в окно Консультанта грубость и бессмыслицу:
+  `rejected: true`, удаление пузыря в `widget.js`, проверки «абырвалг»/
+  «фывап» в `tools/chat-check.php`; `docs/search.md`,
+  `docs/content-policy.md`.
 - [x] Проверить `WebSite`/`SearchAction` в JSON-LD: цель поиска ведёт на
   `/search/?q={search_term_string}`; `check-seo` пройден.
 - [ ] Решить с владельцем, сокращать ли меню и как упаковывать тарифы;
