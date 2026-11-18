@@ -360,6 +360,9 @@ class Plugin extends PluginBase
                         'q' => request()->query('q'),
                     ], (int) $perPage, (string) $audience);
                 },
+                'elv_blog_start' => function ($limit = 0) {
+                    return Blog::start((int) $limit);
+                },
                 'elv_use_post' => function ($slug) {
                     $post = Blog::find((string) $slug);
                     Seo::setPost($post);

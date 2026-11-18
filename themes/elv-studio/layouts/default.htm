@@ -52,6 +52,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% if this.page.id == 'search' %}
         <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
     {% endif %}
+    {% if this.page.id == 'blog' %}
+        <link rel="stylesheet" href="{{ 'assets/css/blog.css'|theme }}?v=20261118-5">
+    {% endif %}
 </head>
 <body>
 <a class="skip-link" href="#main">К содержимому</a>

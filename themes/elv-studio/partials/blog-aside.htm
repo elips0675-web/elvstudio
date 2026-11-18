@@ -1,0 +1,31 @@
+{% set categories = categories ?? [] %}
+{% set activeCategory = activeCategory ?? '' %}
+<aside class="blog-aside" aria-label="Меню блога">
+    <div class="aside-card">
+        <h2 class="aside-title">Разделы</h2>
+        <ul class="aside-list">
+            <li>
+                <a class="{{ activeCategory ? '' : 'is-active' }}" href="{{ 'blog'|page }}">
+                    Все статьи
+                    {% if total %}<span class="aside-count">{{ total }}</span>{% endif %}
+                </a>
+            </li>
+            {% for category in categories %}
+                <li>
+                    <a class="{{ activeCategory == category.slug ? 'is-active' }}" href="{{ 'blog'|page }}?category={{ category.slug }}">
+                        {{ category.name }}
+                        <span class="aside-count">{{ category.posts_count }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="aside-more"><a href="{{ 'blog-tech'|page }}">Технический раздел →</a></p>
+    </div>
+
+    <div class="aside-card">
+        <h2 class="aside-title">Стоимость и вопросы</h2>
+        <p class="muted">Калькулятор соберёт смету за минуту. Ответим по вашей задаче, без навязчивых звонков.</p>
+        <a class="btn btn--primary btn--sm" href="{{ 'calculator'|page }}">Калькулятор</a>
+        <a class="btn btn--ghost btn--sm" href="{{ 'feedback'|page }}">Задать вопрос</a>
+    </div>
+</aside>

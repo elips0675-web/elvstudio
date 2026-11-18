@@ -10,6 +10,7 @@ meta_description = "Статьи о сайтах простым языком: к
 {% set activeTag = elv_query('tag') %}
 {% set query = elv_query('q') %}
 {% set crumbs = elv_breadcrumbs() %}
+{% set start = elv_blog_start(5) %}
 
 <main id="main">
     <section class="page-hero">
@@ -31,88 +32,110 @@ meta_description = "Статьи о сайтах простым языком: к
 
     <section class="section section--tight">
         <div class="container">
-            {% if elv_query('subscribed') == '1' %}
-                <div class="alert alert--ok mb-24" role="status">Подписка подтверждена. Новые статьи будут приходить на почту.</div>
-            {% elseif elv_query('subscribed') == 'invalid' %}
-                <div class="alert alert--err mb-24" role="alert">Ссылка подтверждения устарела. Подпишитесь ещё раз.</div>
-            {% elseif elv_query('unsubscribed') == '1' %}
-                <div class="alert alert--warn mb-24" role="status">Вы отписаны. Вернуться можно в любой момент.</div>
-            {% endif %}
+            <div class="blog-layout">
+                <div class="blog-main">
+                    {% if elv_query('subscribed') == '1' %}
+                        <div class="alert alert--ok mb-24" role="status">Подписка подтверждена. Новые статьи будут приходить на почту.</div>
+                    {% elseif elv_query('subscribed') == 'invalid' %}
+                        <div class="alert alert--err mb-24" role="alert">Ссылка подтверждения устарела. Подпишитесь ещё раз.</div>
+                    {% elseif elv_query('unsubscribed') == '1' %}
+                        <div class="alert alert--warn mb-24" role="status">Вы отписаны. Вернуться можно в любой момент.</div>
+                    {% endif %}
 
-            <div class="chips">
-                <a class="chip{% if not activeCategory and not activeTag and not query %} chip--active{% endif %}" href="{{ 'blog'|page }}">Все статьи</a>
-                {% for category in categories %}
-                    <a
-                        class="chip{% if activeCategory == category.slug %} chip--active{% endif %}"
-                        href="{{ 'blog'|page }}?category={{ category.slug }}">
-                        {{ category.name }} <span class="muted">{{ category.posts_count }}</span>
-                    </a>
-                {% endfor %}
-            </div>
-
-            <p class="mt-24"><a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a></p>
-
-            <div class="card card--flat mt-24">
-                <p class="muted">
-                    <strong>SEO-гид:</strong>
-                    <a href="{{ 'blog-post'|page({ slug: 'seo-fundament-sajta' }) }}">фундамент сайта</a> ·
-                    <a href="{{ 'blog-post'|page({ slug: 'seo-for-google-ai' }) }}">Google и ИИ-поиск</a> ·
-                    <a href="{{ 'blog-post'|page({ slug: 'kak-vybrat-seo-studiyu' }) }}">как выбрать студию</a> ·
-                    <a href="{{ 'blog-post'|page({ slug: 'seo-audit-sajta' }) }}">SEO-аудит</a> ·
-                    <a href="{{ 'services-seo'|page }}">как мы работаем с SEO</a>
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section section--tight">
-        <div class="container">
-            {% if posts|length %}
-                <h2 class="sr-only">Статьи блога</h2>
-                <div class="blog-grid">
-                    {% for post in posts %}
-                        <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
-                            <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
-                            <div class="post-card__body">
-                                <div class="post-card__meta">
-                                    {% if post.category %}
-                                        <span>{{ post.category.name }}</span>
-                                    {% endif %}
-                                    <span>{{ post.display_date }}</span>
-                                    <span>{{ post.reading_time }} мин</span>
-                                </div>
-                                <h3>{{ post.title }}</h3>
-                                <p>{{ post.excerpt|elv_excerpt(150) }}</p>
-                                <span class="post-card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
-
-                {% if posts.lastPage() > 1 %}
-                    <nav class="pagination" aria-label="Страницы блога">
-                        {% if posts.currentPage() > 1 %}
-                            <a href="{{ posts.previousPageUrl() }}" rel="prev">← Новее</a>
-                        {% else %}
-                            <span class="is-disabled">← Новее</span>
-                        {% endif %}
-                        <span>Страница {{ posts.currentPage() }} из {{ posts.lastPage() }}</span>
-                        {% if posts.hasMorePages() %}
-                            <a href="{{ posts.nextPageUrl() }}" rel="next">Старее →</a>
-                        {% else %}
-                            <span class="is-disabled">Старее →</span>
-                        {% endif %}
-                    </nav>
-                {% endif %}
-            {% else %}
-                <div class="empty">
-                    <h2>Ничего не нашлось</h2>
-                    <p>Попробуйте другой запрос или сбросьте фильтры.</p>
-                    <div class="stack-actions">
-                        <a class="btn btn--ghost" href="{{ 'blog'|page }}">Сбросить фильтры</a>
+                    {% set hasFilters = activeCategory or activeTag or query %}
+                    <div class="chips{% if not hasFilters %} chips--aside{% endif %}">
+                        <a class="chip{% if not activeCategory and not activeTag and not query %} chip--active{% endif %}" href="{{ 'blog'|page }}">Все статьи</a>
+                        {% for category in categories %}
+                            <a
+                                class="chip{% if activeCategory == category.slug %} chip--active{% endif %}"
+                                href="{{ 'blog'|page }}?category={{ category.slug }}">
+                                {{ category.name }} <span class="muted">{{ category.posts_count }}</span>
+                            </a>
+                        {% endfor %}
                     </div>
+
+                    <p class="mt-24"><a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a></p>
+
+                    <div class="card card--flat mt-24">
+                        <p class="muted">
+                            <strong>SEO-гид:</strong>
+                            <a href="{{ 'blog-post'|page({ slug: 'seo-fundament-sajta' }) }}">фундамент сайта</a> ·
+                            <a href="{{ 'blog-post'|page({ slug: 'seo-for-google-ai' }) }}">Google и ИИ-поиск</a> ·
+                            <a href="{{ 'blog-post'|page({ slug: 'kak-vybrat-seo-studiyu' }) }}">как выбрать студию</a> ·
+                            <a href="{{ 'blog-post'|page({ slug: 'seo-audit-sajta' }) }}">SEO-аудит</a> ·
+                            <a href="{{ 'services-seo'|page }}">как мы работаем с SEO</a>
+                        </p>
+                    </div>
+
+                    {% if start|length and not hasFilters %}
+                        <section class="blog-start" aria-labelledby="blog-start-title">
+                            <h2 class="blog-start__title" id="blog-start-title">С чего начать</h2>
+                            <ol class="blog-start__list">
+                                {% for item in start %}
+                                    <li>
+                                        <a class="blog-start__item" href="{{ 'blog-post'|page({ slug: item.slug }) }}">
+                                            <span class="blog-start__num">{{ loop.index }}</span>
+                                            <span class="blog-start__body">
+                                                <span class="blog-start__name">{{ item.title }}</span>
+                                                {% if item.reading_time %}<span class="muted">{{ item.reading_time }} мин</span>{% endif %}
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </section>
+                    {% endif %}
+
+                    {% if posts|length %}
+                        <h2 class="sr-only">Статьи блога</h2>
+                        <div class="blog-grid">
+                            {% for post in posts %}
+                                <a class="post-card" href="{{ 'blog-post'|page({ slug: post.slug }) }}">
+                                    <div class="post-card__cover">{{ elv_cover_icon(post.cover)|raw }}</div>
+                                    <div class="post-card__body">
+                                        <div class="post-card__meta">
+                                            {% if post.category %}
+                                                <span>{{ post.category.name }}</span>
+                                            {% endif %}
+                                            <span>{{ post.display_date }}</span>
+                                            <span>{{ post.reading_time }} мин</span>
+                                        </div>
+                                        <h3>{{ post.title }}</h3>
+                                        <p>{{ post.excerpt|elv_excerpt(150) }}</p>
+                                        <span class="post-card__more">Читать {{ elv_icon('arrow-right')|raw }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+
+                        {% if posts.lastPage() > 1 %}
+                            <nav class="pagination" aria-label="Страницы блога">
+                                {% if posts.currentPage() > 1 %}
+                                    <a href="{{ posts.previousPageUrl() }}" rel="prev">← Новее</a>
+                                {% else %}
+                                    <span class="is-disabled">← Новее</span>
+                                {% endif %}
+                                <span>Страница {{ posts.currentPage() }} из {{ posts.lastPage() }}</span>
+                                {% if posts.hasMorePages() %}
+                                    <a href="{{ posts.nextPageUrl() }}" rel="next">Старее →</a>
+                                {% else %}
+                                    <span class="is-disabled">Старее →</span>
+                                {% endif %}
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty">
+                            <h2>Ничего не нашлось</h2>
+                            <p>Попробуйте другой запрос или сбросьте фильтры.</p>
+                            <div class="stack-actions">
+                                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Сбросить фильтры</a>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+
+                {% partial 'blog-aside' categories=categories activeCategory=activeCategory total=posts.total() %}
+            </div>
         </div>
     </section>
 

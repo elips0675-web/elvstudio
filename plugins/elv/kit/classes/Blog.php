@@ -53,6 +53,34 @@ class Blog
             ->first();
     }
 
+    public static function start(int $limit = 0): array
+    {
+        $path = base_path('plugins/elv/kit/config/blog.php');
+        $config = is_file($path) ? (array) require $path : [];
+        $slugs = array_values(array_filter(array_map('strval', (array) ($config['start'] ?? []))));
+
+        if ($slugs === []) {
+            return [];
+        }
+
+        $found = Post::query()
+            ->published()
+            ->with('category')
+            ->whereIn('slug', $slugs)
+            ->get()
+            ->keyBy('slug');
+
+        $posts = [];
+
+        foreach ($slugs as $slug) {
+            if ($found->has($slug)) {
+                $posts[] = $found->get($slug);
+            }
+        }
+
+        return $limit > 0 ? array_slice($posts, 0, $limit) : $posts;
+    }
+
     /**
      * categories — рубрики с числом опубликованных статей выбранной аудитории.
      */
