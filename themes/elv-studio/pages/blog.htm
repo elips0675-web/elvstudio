@@ -55,7 +55,10 @@ meta_description = "Статьи о сайтах простым языком: к
                         {% endfor %}
                     </div>
 
-                    <p class="mt-24"><a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a></p>
+                    <p class="mt-24">
+                        <a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a> ·
+                        <a href="{{ 'blog'|page }}#blog-start">С чего начать →</a>
+                    </p>
 
                     <div class="card card--flat mt-24">
                         <p class="muted">
@@ -69,7 +72,7 @@ meta_description = "Статьи о сайтах простым языком: к
                     </div>
 
                     {% if start|length and not hasFilters %}
-                        <section class="blog-start" aria-labelledby="blog-start-title">
+                        <section class="blog-start" id="blog-start" aria-labelledby="blog-start-title">
                             <h2 class="blog-start__title" id="blog-start-title">С чего начать</h2>
                             <ol class="blog-start__list">
                                 {% for item in start %}

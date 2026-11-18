@@ -19,7 +19,7 @@
 .aside-more a:hover { text-decoration: underline; }
 .chips--aside { display: none; }
 
-.blog-start { margin-top: 24px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.blog-start { margin-top: 24px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; scroll-margin-top: 86px; }
 .blog-start__title { margin: 0 0 14px; font-size: 20px; }
 .blog-start__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .blog-start__item { display: flex; gap: 12px; align-items: baseline; color: inherit; text-decoration: none; }
