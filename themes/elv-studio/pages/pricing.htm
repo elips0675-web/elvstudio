@@ -6,8 +6,9 @@ meta_description = "Сколько стоит готовый сайт: тари�
 ==
 {% set kit = elv_kit() %}
 {% set plans = elv_plans(kit) %}
+{% set pricesLabel = elv_prices_updated_at() %}
 {% set crumbs = elv_breadcrumbs() %}
-{% set orderUrl = 'order'|page %}
+{% set orderUrl = plans ? 'order'|page : 'booking'|page %}
 {% set calcUrl = 'calculator'|page %}
 
 <main id="main">
@@ -28,12 +29,13 @@ meta_description = "Сколько стоит готовый сайт: тари�
                     {{ elv_icon('calendar-check')|raw }} Записаться на 30 минут
                 </a>
             </div>
-            <p class="muted"><small>Цены обновлены {{ elv_prices_updated_at() }}. Не оферта. · <a href="{{ 'docs'|page }}">Инструкция по установке</a></small></p>
+            <p class="muted"><small>{% if pricesLabel %}Цены обновлены {{ pricesLabel }}. Не оферта. · {% endif %}<a href="{{ 'docs'|page }}">Инструкция по установке</a></small></p>
         </div>
     </section>
 
     <section class="section">
         <div class="container">
+            {% if plans %}
             <div class="grid grid--3">
                 {% for plan in plans %}
                     <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
@@ -56,6 +58,12 @@ meta_description = "Сколько стоит готовый сайт: тари�
                     </div>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="empty">
+                <h2>Прайс пока пуст</h2>
+                <p>Мы не показываем выдуманные числа: тарифы появятся здесь, когда их зададут в админке Elv Kit → Прайс. Если смета нужна раньше — <a href="{{ 'contacts'|page }}">напишите нам</a>.</p>
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -202,7 +210,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 
     <section class="section">
         <div class="container">
-            {% partial 'cta' title='Обсудим запуск за 30 минут' text='Покажем живой сайт, посчитаем запуск и ответим на вопросы. Без презентаций и навязывания.' cta_url=orderUrl cta_label='Перейти к заказу' %}
+            {% partial 'cta' title='Обсудим запуск за 30 минут' text='Покажем живой сайт, посчитаем запуск и ответим на вопросы. Без презентаций и навязывания.' cta_url=orderUrl cta_label=(plans ? 'Перейти к заказу' : 'Записаться на 30 минут') %}
         </div>
     </section>
 </main>

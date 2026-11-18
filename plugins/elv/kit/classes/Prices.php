@@ -113,10 +113,13 @@ class Prices
 
     /**
      * label — дата, которую видит посетитель: прайс, затем поле настроек.
+     *
+     * Пустая строка, если цен нет ни в прайсе, ни в настройках: подставлять
+     * дату «по умолчанию» нельзя — посетитель прочитал бы её как факт.
      */
     public static function label(): string
     {
-        return static::updatedAt() ?: (string) (Settings::get('prices_updated_at') ?: '17.11.2026');
+        return (string) (static::updatedAt() ?: Settings::get('prices_updated_at'));
     }
 
     protected static function kitSlug(): string

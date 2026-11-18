@@ -4,20 +4,21 @@ layout = "default"
 meta_title = "Заказать готовый сайт Elv Kit"
 meta_description = "Заказ готового сайта и разделов: выбор тарифа, оплата картой через ЮKassa или Stripe, файлы сайта и ключ на e-mail. Поможем с установкой на ваш домен."
 ==
-{% set product = elv_product(elv_query('product')) %}
-{% set product = product ?: elv_kit() %}
-{% if not product %}
+{% set requestedProduct = elv_query('product') %}
+{% set product = elv_product(requestedProduct) %}
+{% if not product and requestedProduct %}
     {{ elv_not_found() }}
 {% endif %}
-{% set plans = elv_plans(product) %}
+{% set product = product ?: elv_kit() %}
+{% set plans = product ? elv_plans(product) : [] %}
 {% set selectedPlan = elv_query('plan', 'single') %}
 {% if selectedPlan not in ['single', 'multi', 'extended'] %}
     {% set selectedPlan = 'single' %}
 {% endif %}
-{% if product.kind != 'kit' %}
+{% if not product or product.kind != 'kit' %}
     {% set selectedPlan = 'single' %}
 {% endif %}
-{% set planLabel = product.kind == 'kit' ? (selectedPlan == 'multi' ? 'До 5 сайтов' : (selectedPlan == 'extended' ? 'Без ограничений' : 'Один сайт')) : 'Один сайт' %}
+{% set planLabel = product and product.kind == 'kit' ? (selectedPlan == 'multi' ? 'До 5 сайтов' : (selectedPlan == 'extended' ? 'Без ограничений' : 'Один сайт')) : 'Один сайт' %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -30,6 +31,7 @@ meta_description = "Заказ готового сайта и разделов: 
         </div>
     </section>
 
+    {% if product %}
     <section class="section">
         <div class="container">
             <div class="chips mb-24">
@@ -201,4 +203,14 @@ meta_description = "Заказ готового сайта и разделов: 
             </div>
         </div>
     </section>
+    {% else %}
+        <section class="section">
+            <div class="container">
+                <div class="empty">
+                    <h2>Оформление пока закрыто</h2>
+                    <p>В каталоге нет ни одного товара с ценой, поэтому заказ оформить нельзя. Добавьте товар в админке Elv Kit → Каталог или <a href="{{ 'contacts'|page }}">напишите нам</a> — выставим счёт вручную.</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 </main>
