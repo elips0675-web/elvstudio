@@ -1,4 +1,4 @@
-# Карта сайта и SEO-разметка страниц
+# Карта сайта и SEO-разметка
 
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====

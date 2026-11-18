@@ -6,6 +6,25 @@
 
 ---
 
+(Stage 58 — 18.11.2026) — **`test/ai-chat` сокращён до 10 файлов.**
+
+- Разрозненные срезы свёрнуты в тематические блоки: `03-config.txt`,
+  `05-chat.txt` (Chat + TextFilter + ChatController + widget),
+  `06-search.txt` (Search + страница `/search/`), `07-sitemap-seo.txt`,
+  `08-checks-docs.txt` (chat-check + docs). `04-plugin.php.txt` оставлен
+  отдельным, `01-context.txt` и `02-structure.txt` — без изменений.
+- `README.md` — новый манифест на 10 файлов и правила загрузки;
+  `ALL-IN-ONE.txt` пересобран из восьми срезов (~192 КБ).
+- Старые 10 файлов с пословной разбивкой удалены; код внутри блоков
+  не переписан.
+
+Чем проверено: сверка всех секций с исходниками — 22/22 OK;
+`php tools/chat-check.php` — OK; `node tools/gate.mjs` — all gates passed.
+
+Не проверено: загрузка снимка в чужой чат; это статический срез, не живой код.
+
+---
+
 (Stage 57 — 18.11.2026) — **Снимок `test/ai-chat` обновлён под Stage 56.**
 
 - `test/ai-chat/` — пересобраны 13 файлов и `ALL-IN-ONE.txt` из текущего кода

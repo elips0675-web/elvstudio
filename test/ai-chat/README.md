@@ -9,35 +9,34 @@
 структуру папок. Здесь эти файлы и код Консультанта/поиска лежат в виде
 обычных `.txt`, которые можно загрузить в чат.
 
+В папке **10 файлов**: 8 тематических срезов, `ALL-IN-ONE.txt` и этот
+`README.md`. Разрозненные файлы по 13 темам свёрнуты в шесть блоков, чтобы
+не путаться при загрузке.
+
 ## Что внутри
 
 | Файл | Что внутри |
 |---|---|
 | `01-context.txt` | что за проект, что анализировать, текущее поведение, проверки, ограничения, вопросы аудитору |
 | `02-structure.txt` | отслеживаемая структура репозитория (без `demo-static` целиком) |
-| `03-composer-package-theme.txt` | `composer.json`, `package.json`, `theme.yaml`, `version.yaml`, `README.md` |
+| `03-config.txt` | `composer.json`, `package.json`, `theme.yaml`, `version.yaml`, `README.md` |
 | `04-plugin.php.txt` | полный `plugins/elv/kit/Plugin.php` |
-| `05-chat.php.txt` | полный `plugins/elv/kit/classes/Chat.php` |
-| `06-search.php.txt` | полный `plugins/elv/kit/classes/Search.php` |
-| `07-textfilter.php.txt` | полный `plugins/elv/kit/classes/TextFilter.php` |
-| `08-chat-controller.txt` | полный `ChatController.php` |
-| `09-widget.js.txt` | полный `widget.js` |
-| `10-chat-check.php.txt` | полный `tools/chat-check.php` |
-| `11-sitemap-seo.txt` | `sitemap.htm`, `Seo.php`, `Sitemap.php`, `routes.php` |
-| `12-search-page.txt` | `search.htm`, `search.js`, `search.css` |
-| `13-docs.txt` | `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md` |
-| `ALL-IN-ONE.txt` | всё перечисленное одним файлом (~193 КБ) |
+| `05-chat.txt` | `Chat.php`, `TextFilter.php`, `ChatController.php`, `widget.js` — ответы, фильтр, HTTP-обработчик и виджет |
+| `06-search.txt` | `Search.php`, `search.htm`, `search.js`, `search.css` — индекс и страница `/search/` |
+| `07-sitemap-seo.txt` | `sitemap.htm`, `Seo.php`, `Sitemap.php`, `routes.php` |
+| `08-checks-docs.txt` | `tools/chat-check.php`, `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md` |
+| `ALL-IN-ONE.txt` | всё перечисленное одним файлом (~192 КБ) |
+| `README.md` | этот манифест |
 
 ## Как загружать
 
 1. Если чат принимает один файл — загрузить `ALL-IN-ONE.txt`.
 2. Если чат принимает несколько файлов — загрузить `01-context.txt`,
-   `02-structure.txt`, `03-composer-package-theme.txt` и код:
-   `05`–`10`. Карту сайта (`11`), поиск (`12`) и документацию (`13`)
-   добавить, если вопрос про sitemap/SEO.
+   `02-structure.txt`, `03-config.txt`, `04-plugin.php.txt`, `05-chat.txt`
+   и `06-search.txt`. Для вопроса про карту сайта/SEO добавить
+   `07-sitemap-seo.txt`, для проверок и политики — `08-checks-docs.txt`.
 3. Если у модели маленький контекст — начать с `01-context.txt`,
-   `05-chat.php.txt`, `06-search.php.txt`, `07-textfilter.php.txt`,
-   `09-widget.js.txt`, `10-chat-check.php.txt`.
+   `05-chat.txt`, `06-search.txt` и `08-checks-docs.txt`.
 
 Пример запроса:
 
