@@ -77,3 +77,9 @@
    Выключенный тариф не показывается и не принимается в заказе; значения
    сравнения привязаны к ключу, а не к порядку колонок. Проверка:
    `node tools/check-plans.mjs` (входит в `node tools/gate.mjs`).
+8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-studio`),
+   нет нашего домена и контактов: `elv-studio.by`, `sales@elv-studio`,
+   `t.me/elvstudio`. Контакты — только из Settings (`email`, `telegram`), валюта —
+   `Money::currency()`, дефолт почты — `sales@example.com`. Проверка:
+   `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`); `demo-static`
+   не сканируется — это наш собственный сайт.

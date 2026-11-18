@@ -401,14 +401,23 @@
       Elv Kit и студию. Покупатель получает чужой блог и чат, который отвечает
       про наши услуги. Нужно: контент — отдельным датасетом, чат и FAQ — из
       настроек покупателя.
-- [ ] **P1. Бренд в поставляемых файлах.** `Plugin.php:37` (`homepage`
-      `https://elv-studio.by`), `Demo.php:95-96` (`sales@elv-studio.by`,
-      `t.me/elvstudio`), `BlogContent.php:1824` и `Demo.php:373`
-      (`"priceCurrency": "BYN"`), `themes/elv-studio/pages/index.htm:48`
-      (декоративный `elv-studio.by/admin`). Поля бренда уже есть в
-      `models/settings/fields.yaml` (`brand_name`, `brand_tagline`,
-      `brand_description`, `email`, `phone`, `telegram`), дефолт e-mail —
-      `sales@example.com`. Нужны нейтральные дефолты и пустой `homepage`.
+- [x] **P1. Бренд в поставляемых файлах — закрыто 18.11.2026 (Stage 67).**
+      Убрано: `homepage` из `plugins/elv/kit/Plugin.php` (было
+      `https://elv-studio.by`), `homepage` из `themes/elv-studio/theme.yaml`,
+      демо-контакты в `Demo::contacts()` (`classes/Demo.php:92-103` — теперь
+      только `sales@example.com`, Telegram студии не подставляется),
+      домен в футере PDF-сметы (`views/quote-pdf.htm:82-85` — остались только
+      контакты из настроек), декоративный `elv-studio.by/admin` на главной
+      (`pages/index.htm:48` → `example.com/admin`). `"priceCurrency"` в примере
+      JSON-LD берётся из настроек (`Money::currency()`), а не строкой `BYN`
+      (`classes/Demo.php:372`, `classes/BlogContent.php:1824`); пример в тексте
+      статьи переписан без названия валюты, чтобы не расходиться с настройками,
+      и домены примеров заменены на `example.com`.
+      Проверка: `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`) —
+      202 файла плагина и темы, падает на `elv-studio.by`, `sales@elv-studio`,
+      `t.me/elvstudio` в любом `.php/.htm/.yaml/.js/.css/.json/.md`.
+      Дефолты бренда (`brand_name`, `email`, `telegram`) остаются в Settings —
+      владелец меняет их без правки кода.
 - [x] **P1. Демо не отделяется от продукта — закрыто 18.11.2026 (Stage 64).**
       `DownloadService::ensureArchive(bool $demo = false, bool $force = false)`:
       товарный архив по умолчанию не содержит `updates/seed_kit_*.php`, а его

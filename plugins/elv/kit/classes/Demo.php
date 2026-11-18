@@ -92,8 +92,7 @@ class Demo
     public static function contacts(): void
     {
         $defaults = [
-            'email' => 'sales@elv-studio.by',
-            'telegram' => 'https://t.me/elvstudio',
+            'email' => 'sales@example.com',
         ];
 
         foreach ($defaults as $key => $value) {
@@ -366,17 +365,17 @@ class Demo
   "@context": "https://schema.org",
   "@type": "Product",
   "name": "Elv Booking",
-  "image": "https://example.ru/og/booking.png",
+  "image": "https://example.com/og/booking.png",
   "offers": {
     "@type": "Offer",
     "price": "4900",
-    "priceCurrency": "BYN",
+    "priceCurrency": "' . Money::currency() . '",
     "availability": "https://schema.org/InStock",
-    "url": "https://example.ru/modules/booking/"
+    "url": "https://example.com/modules/booking/"
   }
 }</code></pre>
 <h2>Три частые ошибки</h2>
-<ol><li>Цена в копейках, а валюта в рублях: 490000 и BYN не совпадают с витриной.</li><li>Один Product на страницу каталога: размечайте карточку, а не список.</li><li>Относительный URL в поле image — валидатор его не разрешит.</li></ol>
+<ol><li>Цена в копейках вместо валюты: 490000 в разметке не совпадает с витриной, где 4900.</li><li>Один Product на страницу каталога: размечайте карточку, а не список.</li><li>Относительный URL в поле image — валидатор его не разрешит.</li></ol>
 <h2>Как проверить</h2>
 <p>Синтаксис проверяется локально: гейт парсит JSON-LD на каждой странице. Семантику — через Rich Results Test и отчёт «Ошибки структурированных данных» в Search Console. Первое ловит сломанный JSON, второе — неверный смысл.</p>
 <p>Разметка должна совпадать с тем, что видит человек. Если на странице «по запросу», а в разметке «в наличии», поисковик заметит это раньше вас.</p>',

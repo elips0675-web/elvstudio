@@ -34,7 +34,6 @@ class Plugin extends PluginBase
             'description' => 'Готовый сайт для бизнеса: онлайн-запись, заказы и оплата, блог и обратная связь.',
             'author' => 'Elv Studio',
             'icon' => 'icon-cubes',
-            'homepage' => 'https://elv-studio.by',
         ];
     }
 
