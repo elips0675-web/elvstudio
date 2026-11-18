@@ -13,10 +13,7 @@
             <a href="{{ 'modules'|page }}" {% if this.page.id in ['modules', 'module'] %}aria-current="page"{% endif %}>Разделы</a>
             <a href="{{ 'services'|page }}" {% if this.page.id in ['services', 'services-hosting', 'services-support', 'services-plugins', 'services-booking', 'services-audit', 'services-seo'] %}aria-current="page"{% endif %}>Услуги</a>
             <a href="{{ 'pricing'|page }}" {% if this.page.id == 'pricing' %}aria-current="page"{% endif %}>Цены</a>
-            <a href="{{ 'demo'|page }}" {% if this.page.id == 'demo' %}aria-current="page"{% endif %}>Демо</a>
             <a href="{{ 'blog'|page }}" {% if this.page.id in ['blog', 'blog-tech', 'blog-post'] %}aria-current="page"{% endif %}>Блог</a>
-            <a href="{{ 'docs'|page }}" {% if this.page.id == 'docs' %}aria-current="page"{% endif %}>Инструкция</a>
-            <a href="{{ 'contacts'|page }}" {% if this.page.id == 'contacts' %}aria-current="page"{% endif %}>Контакты</a>
         </nav>
 
         <button class="header__search" type="button" data-search-open aria-label="Поиск по сайту" aria-haspopup="dialog" aria-controls="site-search">
