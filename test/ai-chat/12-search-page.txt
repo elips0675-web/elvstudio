@@ -86,7 +86,6 @@ meta_robots = "noindex, follow"
     </section>
 </main>
 
-
 ===== FILE: themes/elv-studio/assets/js/search.js =====
 
 /* Страница поиска: клиентский индекс, чтобы поиск работал и в статической копии. */
@@ -400,7 +399,6 @@ meta_robots = "noindex, follow"
             statusNode.textContent = 'Поиск временно недоступен. Откройте карту сайта.';
         });
 })();
-
 
 ===== FILE: themes/elv-studio/assets/css/search.css =====
 

@@ -1,4 +1,4 @@
-# Фильтр грубых слов
+# Фильтр слов: мат и бессмыслица
 
 
 ===== FILE: plugins/elv/kit/classes/TextFilter.php =====

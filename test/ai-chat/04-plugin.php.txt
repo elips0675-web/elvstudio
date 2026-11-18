@@ -1,4 +1,4 @@
-# Точка входа плагина Elv.Kit
+# Плагин: точка входа Elv.Kit
 
 
 ===== FILE: plugins/elv/kit/Plugin.php =====

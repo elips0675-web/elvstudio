@@ -6,6 +6,27 @@
 
 ---
 
+(Stage 57 — 18.11.2026) — **Снимок `test/ai-chat` обновлён под Stage 56.**
+
+- `test/ai-chat/` — пересобраны 13 файлов и `ALL-IN-ONE.txt` из текущего кода
+  (`70eb5b6`): `Chat.php`, `Search.php` (в индексе «Модули», «Модуль Elv Kit»),
+  `TextFilter.php`, `ChatController`, `widget.js`, `chat-check`, `sitemap.htm`,
+  `Seo.php`, `Sitemap.php`, `routes.php`, `search.htm/js/css`, документация.
+- `test/ai-chat/README.md`, `01-context.txt`, `02-structure.txt` — Stage 56,
+  коммит `70eb5b6`, актуальные счётчики: 67 статей, 12 с FAQ, 107 страниц,
+  бюджет 137,9 / 36,0 / 20,0 КБ.
+- `docs/00-audit-documents.md`, `test/Для анализа.txt` — ссылка на снимок
+  теперь Stage 56, а не Stage 52.
+- `test/ai-chat/ALL-IN-ONE.txt` — ~193 КБ.
+
+Чем проверено: `git diff --check` без ошибок; `php tools/chat-check.php` — OK;
+`node tools/gate.mjs` — all gates passed (100 URL, 94 sitemap, 107 страниц,
+бюджет 137,9 КБ).
+
+Не проверено: загрузка снимка в чужой чат; это статический срез, не живой код.
+
+---
+
 (Stage 56 — 18.11.2026) — **«Услуги» возвращены в шапку.**
 
 - `themes/elv-studio/partials/header.htm` — по уточнению владельца в главном

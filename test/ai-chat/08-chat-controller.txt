@@ -1,4 +1,4 @@
-# HTTP-контракт Консультанта
+# HTTP-обработчик Консультанта
 
 
 ===== FILE: plugins/elv/kit/classes/Http/ChatController.php =====
