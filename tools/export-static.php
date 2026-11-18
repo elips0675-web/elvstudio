@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * export-static — статическая демо-копия лендинга для Vercel.
@@ -10,7 +10,9 @@
  * Запуск: php tools/export-static.php --origin=https://elvstudio.vercel.app
  */
 
-$options = getopt('', ['base::', 'origin::', 'out::']);
+$options = getopt('', ['base::', 'origin::', 'out::', 'stable', 'unstable', 'manifest::']);
+
+$stable = !isset($options['unstable']);
 
 $base = rtrim($options['base'] ?? 'http://127.0.0.1:8090', '/');
 $origin = rtrim($options['origin'] ?? 'https://elvstudio.vercel.app', '/');
@@ -121,7 +123,16 @@ function staticFinalize(string $html, string $base, string $origin, string $inje
     return str_replace('</body>', $inject . '</body>', $html);
 }
 
-function staticWrite(string $out, string $path, string $html): void
+function staticStable(string $html): string
+{
+    $html = (string) preg_replace('~\bnonce="[^"]*"~i', 'nonce="static-demo"', $html);
+    $html = (string) preg_replace('~(<meta name="csrf-token" content=")[^"]*(")~i', '$1static-demo$2', $html);
+    $html = (string) preg_replace('~(<input type="hidden" name="_token" value=")[^"]*(")~i', '$1static-demo$2', $html);
+
+    return $html;
+}
+
+function staticWrite(string $out, string $path, string $html, bool $stable = true): void
 {
     $file = staticPagePath($out, $path);
 
@@ -129,7 +140,7 @@ function staticWrite(string $out, string $path, string $html): void
         mkdir(dirname($file), 0775, true);
     }
 
-    file_put_contents($file, $html);
+    file_put_contents($file, $stable ? staticStable($html) : $html);
 }
 
 $style = '<style>'
@@ -252,7 +263,7 @@ foreach (array_keys($paths) as $path) {
     $html = staticFinalize($html, $base, $origin, $inject);
 
     $relative = $path === '/' ? 'index.html' : ($path === '/404' ? '404.html' : ltrim($path, '/') . '/index.html');
-    staticWrite($out, $path, $html);
+    staticWrite($out, $path, $html, $stable);
     $pages++;
     echo 'page: ' . $relative . PHP_EOL;
 }
@@ -277,7 +288,7 @@ if ($blogStatus === 200 && $blogHtml !== '') {
         }
 
         $path = '/blog/page/' . $page;
-        staticWrite($out, $path, staticFinalize($html, $base, $origin, $inject));
+        staticWrite($out, $path, staticFinalize($html, $base, $origin, $inject), $stable);
         $extra++;
         echo 'page: blog/page/' . $page . '/index.html' . PHP_EOL;
     }
@@ -312,7 +323,7 @@ if ($blogStatus === 200 && $blogHtml !== '') {
             }
 
             $path = '/blog/category/' . $slug . ($page > 1 ? '/page/' . $page : '');
-            staticWrite($out, $path, staticFinalize($html, $base, $origin, $inject));
+            staticWrite($out, $path, staticFinalize($html, $base, $origin, $inject), $stable);
             $extra++;
             echo 'page: blog/category/' . $slug . ($page > 1 ? '/page/' . $page : '') . '/index.html' . PHP_EOL;
         }
@@ -333,7 +344,7 @@ if ($techStatus === 200 && $techHtml !== '') {
             continue;
         }
 
-        staticWrite($out, '/blog/tech/category/' . $slug, staticFinalize($html, $base, $origin, $inject));
+        staticWrite($out, '/blog/tech/category/' . $slug, staticFinalize($html, $base, $origin, $inject), $stable);
         $extra++;
         echo 'page: blog/tech/category/' . $slug . '/index.html' . PHP_EOL;
     }
@@ -354,6 +365,34 @@ foreach (['sitemap.xml', 'robots.txt', 'llms.txt', 'rss.xml', 'search-index.json
 }
 
 staticCopy(dirname(__DIR__) . '/themes/elv-studio/assets', $out . '/themes/elv-studio/assets');
+
+if (!empty($options['manifest'])) {
+    $manifest = [];
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($out, FilesystemIterator::SKIP_DOTS)
+    );
+
+    foreach ($iterator as $file) {
+        if (!$file->isFile()) {
+            continue;
+        }
+
+        $relative = str_replace('\\', '/', substr($file->getPathname(), strlen($out) + 1));
+        $manifest[$relative] = hash_file('sha256', $file->getPathname());
+    }
+
+    ksort($manifest);
+
+    $lines = [];
+
+    foreach ($manifest as $relative => $hash) {
+        $lines[] = $hash . '  ' . $relative;
+    }
+
+    file_put_contents($options['manifest'], implode("\n", $lines) . "\n");
+    echo 'manifest: ' . $options['manifest'] . ' (' . count($manifest) . ' файлов)' . PHP_EOL;
+}
 
 echo 'pages: ' . $pages . PHP_EOL;
 echo 'origin: ' . $origin . PHP_EOL;
