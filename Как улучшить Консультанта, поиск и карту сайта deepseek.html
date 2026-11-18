@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elv Kit — План улучшений Консультанта, поиска и карты сайта</title>
+<style>
+:root{
+  --bg:#f7f8fb;
+  --surface:#ffffff;
+  --line:#e4e7ee;
+  --line-soft:#eef1f6;
+  --ink:#1c2333;
+  --ink-soft:#4a5368;
+  --muted:#7a8499;
+  --brand:#3b5bdb;
+  --brand-soft:#eef2ff;
+  --brand-ink:#2940b5;
+  --ok:#177245;
+  --ok-soft:#e7f6ec;
+  --warn:#9a6700;
+  --warn-soft:#fff6dd;
+  --danger:#b42318;
+  --danger-soft:#fdecea;
+  --shadow-sm:0 1px 2px rgba(20,30,60,.06);
+  --shadow:0 4px 14px rgba(20,30,60,.08);
+  --radius:12px;
+  --radius-sm:8px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  margin:0;
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.6;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:currentColor}
+
+/* Layout */
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:32px 0 80px}
+@media (max-width:900px){.layout{grid-template-columns:1fr;gap:20px}}
+
+/* Topbar */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(247,248,251,.85);
+  backdrop-filter:saturate(160%) blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.topbar__inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+.brand__mark{
+  width:26px;height:26px;border-radius:7px;
+  background:linear-gradient(135deg,var(--brand),#7c3aed);
+  box-shadow:var(--shadow-sm);
+  display:grid;place-items:center;color:#fff;font-size:14px;font-weight:800;
+}
+.topbar__meta{font-size:13px;color:var(--muted)}
+
+/* Hero */
+.hero{padding:40px 0 8px}
+.eyebrow{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--brand);
+  background:var(--brand-soft);padding:4px 10px;border-radius:999px;
+}
+.hero h1{font-size:34px;line-height:1.15;margin:14px 0 12px;letter-spacing:-.02em}
+.hero p{font-size:17px;color:var(--ink-soft);max-width:760px;margin:0}
+@media (max-width:600px){.hero h1{font-size:26px}}
+
+/* Nav */
+.toc{
+  position:sticky;top:76px;align-self:start;
+  padding:16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow-sm);
+}
+.toc h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:item}
+.toc li{counter-increment:item;margin:4px 0}
+.toc a{
+  display:flex;gap:10px;padding:6px 8px;border-radius:8px;
+  color:var(--ink-soft);font-size:14px;border:none;
+}
+.toc a::before{
+  content:counter(item);flex:none;width:20px;height:20px;border-radius:6px;
+  background:var(--line-soft);color:var(--muted);
+  display:grid;place-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.toc a:hover{background:var(--brand-soft);color:var(--brand-ink)}
+.toc a:hover::before{background:#fff;color:var(--brand)}
+@media (max-width:900px){.toc{position:static}}
+
+/* Sections */
+section{margin:48px 0}
+section > h2{
+  font-size:22px;letter-spacing:-.01em;margin:0 0 6px;
+  display:flex;align-items:center;gap:12px;
+}
+section > h2 .num{
+  font-size:14px;font-weight:800;color:var(--brand);
+  background:var(--brand-soft);border-radius:8px;padding:4px 9px;line-height:1;
+}
+section > .lead{color:var(--ink-soft);margin:0 0 20px}
+
+/* Cards */
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;box-shadow:var(--shadow-sm);margin:12px 0;
+}
+.card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}
+.card h3 .tag{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;
+}
+.card p{margin:6px 0;color:var(--ink-soft)}
+.card ul{margin:8px 0;padding-left:20px}
+.card li{margin:4px 0;color:var(--ink-soft)}
+.card strong{color:var(--ink)}
+
+/* Tags */
+.tag--hi{background:var(--danger-soft);color:var(--danger)}
+.tag--mid{background:var(--warn-soft);color:var(--warn)}
+.tag--low{background:var(--ok-soft);color:var(--ok)}
+
+/* Code */
+code{
+  font-family:var(--mono);font-size:13.5px;
+  background:var(--line-soft);color:#2b3550;
+  padding:1.5px 6px;border-radius:6px;
+}
+pre{
+  font-family:var(--mono);font-size:13px;line-height:1.55;
+  background:#f3f5fa;border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:14px 16px;overflow:auto;color:#28304a;
+}
+pre code{background:none;padding:0}
+
+/* Diff-style */
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+@media (max-width:700px){.diff{grid-template-columns:1fr}}
+.diff .box{border-radius:var(--radius-sm);padding:12px 14px;font-family:var(--mono);font-size:13px;line-height:1.5}
+.diff .box--bad{background:var(--danger-soft);border:1px solid #f3c5c0;color:#7a1f17}
+.diff .box--good{background:var(--ok-soft);border:1px solid #bfe3ca;color:#0f5132}
+.diff .box b{display:block;font-family:var(--font);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;opacity:.8}
+
+/* Priority table */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{background:#fafbfd;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+td.num{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700;width:44px}
+
+/* Callouts */
+.callout{
+  display:flex;gap:12px;padding:14px 16px;border-radius:var(--radius-sm);
+  background:var(--brand-soft);border:1px solid #dbe2ff;color:var(--brand-ink);
+  font-size:14.5px;margin:16px 0;
+}
+.callout__icon{flex:none;font-weight:800}
+.callout--warn{background:var(--warn-soft);border-color:#f0dfae;color:#7a5200}
+.callout--ok{background:var(--ok-soft);border-color:#cfe9d8;color:#0f5132}
+.callout--danger{background:var(--danger-soft);border-color:#f3c5c0;color:#7a1f17}
+.callout p{margin:0}
+
+/* Footer */
+footer{padding:32px 0 60px;border-top:1px solid var(--line);margin-top:60px;color:var(--muted);font-size:14px}
+
+/* Question */
+.qbox{
+  margin:32px 0 0;padding:18px 20px;border-radius:var(--radius);
+  background:linear-gradient(180deg,#fff,#f6f8ff);
+  border:1px solid #dbe2ff;
+}
+.qbox h3{margin:0 0 6px;font-size:15px;color:var(--brand-ink)}
+.qbox p{margin:0;color:var(--ink-soft)}
+
+/* Small */
+.small{font-size:13.5px;color:var(--muted)}
+.divider{height:1px;background:var(--line);margin:40px 0}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar__inner">
+    <div class="brand">
+      <span class="brand__mark">E</span>
+      Elv Kit — План улучшений
+    </div>
+    <div class="topbar__meta">Срез 18.11.2026 · Stage 56 · коммит 70eb5b6</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="eyebrow">Аудит и рекомендации</span>
+    <h1>Как улучшить Консультанта, поиск и карту сайта</h1>
+    <p>Срез сильный: клиентский поиск с честным <code>sources</code>, JSON‑LD из живых данных, <code>chat-check.php</code> как исполняемая спецификация, документация фиксирует границы. Ниже — что я бы улучшил, с приоритетами и конкретными правками.</p>
+  </div>
+
+  <div class="layout">
+
+    <nav class="toc" aria-label="Содержание">
+      <h2>Содержание</h2>
+      <ol>
+        <li><a href="#chat">Консультант</a></li>
+        <li><a href="#search">Поиск</a></li>
+        <li><a href="#seo">Карта сайта и SEO</a></li>
+        <li><a href="#arch">Архитектура и тесты</a></li>
+        <li><a href="#ux">UX/UI</a></li>
+        <li><a href="#priority">Приоритеты</a></li>
+        <li><a href="#notnow">Что не делал бы</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- 1. ЧАТ -->
+      <section id="chat">
+        <h2><span class="num">1</span>Консультант — <code>Chat::answer</code>, <code>widget.js</code></h2>
+        <p class="lead">Самый большой запас улучшений. Ответы работают, но UX и логика отсева оставляют пользователя без объяснений.</p>
+
+        <div class="card">
+          <h3>1.1. Не удалять пузырь пользователя при <code>rejected</code> <span class="tag tag--hi">Высокий</span></h3>
+          <p>Сейчас виджет «убирает» пузырь. Пользователь не понимает, куда делось сообщение. Правильно — оставить пузырь и показать inline‑ошибку с кнопкой «Исправить». Это же снимает риск «визуального исчезновения» в Safari, который пока не проверен.</p>
+          <div class="diff">
+            <div class="box box--bad"><b>Сейчас</b>message → rejected → пузырь скрыт<br>пользователь думает: «куда делось?»</div>
+            <div class="box box--good"><b>Предлагаю</b>message → rejected → пузырь остаётся<br>рядом: «Сообщение скрыто: нецензурная лексика» [Исправить]</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>1.2. Эвристика бессмыслицы ненадёжна — дешёвый слой правил <span class="tag tag--hi">Высокий</span></h3>
+          <p>Сейчас: «нет ни одного слова из индекса» → <code>rejected</code>. Проблемы: редкое осмысленное слово (<code>краудфандинг</code>) → ложный отказ; бессмыслица с известным словом (<code>абырвалг оплата</code>) → проходит. Минимальная правка перед <code>rejected</code>:</p>
+          <pre><code>// до rejected:
+// 1) длина ≥ 2 и есть хотя бы одна гласная
+// 2) нет трёх одинаковых символов подряд (аааа, фффф)
+// 3) слово длиной ≥ 3 в индексе
+//    ИЛИ в маленьком стоп-листе частых русских:
+//    цена, как, что, где, можно, нужно</code></pre>
+          <p>Плюс — логировать <code>rejected</code> в отдельную таблицу/файл. Это даст данные для калибровки без сбора персональных данных.</p>
+        </div>
+
+        <div class="card">
+          <h3>1.3. Интент‑классификация до поиска <span class="tag tag--hi">Высокий</span></h3>
+          <p>Запрос «сколько стоит CRM» уйдёт в fallback‑поиск, хотя готовый ответ про тарифы уже есть. Добавьте rule‑based интенты <em>до</em> вызова <code>Search</code>:</p>
+          <div class="table-wrap" style="margin-top:10px">
+            <table>
+              <thead><tr><th>Интент</th><th>Триггеры</th><th>Действие</th></tr></thead>
+              <tbody>
+                <tr><td><b>pricing</b></td><td><code>сколько</code>, <code>цена</code>, <code>стоит</code>, <code>тариф</code></td><td><code>Chat::pricing()</code></td></tr>
+                <tr><td><b>docs</b></td><td><code>как</code>, <code>настроить</code>, <code>установить</code>, <code>запустить</code></td><td>ссылка на <code>/docs/</code></td></tr>
+                <tr><td><b>booking</b></td><td><code>записаться</code>, <code>консультация</code>, <code>созвон</code></td><td><code>/booking/</code></td></tr>
+                <tr><td><b>demo</b></td><td><code>демо</code>, <code>посмотреть</code>, <code>попробовать</code></td><td><code>/demo/</code></td></tr>
+                <tr><td><b>contact</b></td><td><code>связаться</code>, <code>написать</code>, <code>поддержка</code></td><td><code>/feedback/</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small" style="margin-top:10px">~40 строк PHP, но убирает самый частый класс «глупых» fallback‑ответов.</p>
+        </div>
+
+        <div class="card">
+          <h3>1.4. Действия после ответа <span class="tag tag--mid">Средний</span></h3>
+          <ul>
+            <li><code>followups: [{label, query}]</code> — 2–3 подсказки («Сравнить тарифы», «Как запустить»);</li>
+            <li><code>feedback: true</code> — виджет рисует 👍/👎, отправляет на <code>/chat/feedback</code> (анонимно, без текста сообщения). Без этого вы не узнаете, какие ответы бесполезны.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>1.5. <code>ChatController</code> + антиспам <span class="tag tag--mid">Средний</span></h3>
+          <ul>
+            <li>Возвращать <code>rejected: false</code> спам‑боту — рабочая тактика, но зафиксируйте комментарием в коде, иначе следующий разработчик «починит»;</li>
+            <li><code>throttle:40,1</code> по IP обходится. Добавьте per‑session лимит (например, 15 сообщений / 5 минут) — счётчик в кэше по <code>session()->getId()</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>1.6. <code>TextFilter</code> — false positives <span class="tag tag--mid">Средний</span></h3>
+          <p><code>shitake → true</code> задокументировано, но это баг. Минимум: проверять границы слова для латиницы (не матчить <code>shit</code> внутри <code>shitake</code>), для кириллицы — оставить подстрочный поиск. Или заведите <code>TextFilter::$whitelist</code> с 5–10 словами.</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 2. ПОИСК -->
+      <section id="search">
+        <h2><span class="num">2</span>Поиск — <code>Search.php</code>, <code>search.js</code></h2>
+        <p class="lead">Работает, но без морфологии пользователи будут уходить с пустым результатом на «оплату».</p>
+
+        <div class="card">
+          <h3>2.1. Главный пробел — морфология <span class="tag tag--hi">Высокий</span></h3>
+          <p><code>phrase()</code> нормализует, но <code>indexOf</code> ищет точное вхождение: «оплата» не найдёт «оплаты/оплате/оплату». Варианты по возрастанию сложности:</p>
+          <ul>
+            <li><b>Стеммер Портера</b> для русского (~150 строк JS/PHP) — режет до основы <code>оплат</code>. ~80% эффекта за вечер;</li>
+            <li><b>Синонимы‑словарь</b> (10–20 групп): <code>оплата/платёж/платить/оплатить</code>, <code>запись/бронирование/бронь</code>, <code>цена/стоимость/тариф/сколько стоит</code>;</li>
+            <li><b>Опечатки</b>: для слов ≥ 5 — расстояние Левенштейна ≤ 1, только если 0 точных совпадений.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>2.2. Подсветка совпадений и сниппеты <span class="tag tag--mid">Средний</span></h3>
+          <p>Добавьте <code>&lt;mark&gt;</code> вокруг найденных слов в <code>title</code> и <code>description</code> карточки — бесплатно повышает конверсию поиска.</p>
+        </div>
+
+        <div class="card">
+          <h3>2.3. Пагинация вместо жёстких 30 <span class="tag tag--low">Низкий</span></h3>
+          <p><code>found.slice(0, 30)</code> — если результатов 100, пользователь видит 30 и не знает, что есть ещё. Добавьте «Показать ещё» или <code>?page=</code>.</p>
+        </div>
+
+        <div class="card">
+          <h3>2.4. Аналитика запросов <span class="tag tag--hi">Высокий (долгосрочно)</span></h3>
+          <p>Клиентский поиск не отправляет запрос на сервер — правильно для приватности. Но добавьте <b>анонимный</b> POST на <code>/search/stats</code> с <code>{query_hash, results_count}</code> (без IP, без сессии). Через месяц увидите, какие запросы дают 0 — это прямой список тем для блога. Иначе улучшаете поиск вслепую.</p>
+        </div>
+
+        <div class="card">
+          <h3>2.5. Индекс: тело статьи обрезано до 320 символов <span class="tag tag--mid">Средний</span></h3>
+          <p>Для статей про SEO/оплату ключевые слова часто во второй половине. Поднимите лимит до 800–1000 для статей (не для страниц) — при 67 статьях это +30–40 КБ gzip, приемлемо. Либо индексируйте отдельно <code>h2/h3</code> и первый абзац каждого раздела.</p>
+        </div>
+
+        <div class="card">
+          <h3>2.6. Кэш <code>Search::index()</code> <span class="tag tag--low">Низкий</span></h3>
+          <p><code>SeoController</code> кэширует <code>/search-index.json</code> на 30 минут — хорошо. Но если <code>Search::index()</code> вызывается где‑то ещё (например, в <code>elv_search_index()</code> для шаблона), кэшируйте внутри класса по ключу <code>theme + updated_at постов</code>.</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 3. SEO -->
+      <section id="seo">
+        <h2><span class="num">3</span>Карта сайта и SEO — <code>Sitemap.php</code>, <code>Seo.php</code></h2>
+        <p class="lead">Большинство правок — мелкие, но заметные для Search Console и Яндекса.</p>
+
+        <div class="card">
+          <h3>3.1. Пустой <code>FAQPage</code> в JSON‑LD <span class="tag tag--hi">Высокий</span></h3>
+          <p><code>faqNodeFromItems()</code> возвращает узел даже при <code>$items === []</code>. Пустой <code>FAQPage</code> — это либо игнор, либо предупреждение в Search Console.</p>
+          <pre><code>if ($items === []) {
+    return [];  // и не добавлять в $graph
+}</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>3.2. <code>Organization</code> без <code>logo</code> <span class="tag tag--mid">Средний</span></h3>
+          <p>Google любит <code>logo</code> для организаций. Добавьте:</p>
+          <pre><code>'logo' =&gt; static::base() . '/themes/elv-studio/assets/img/og-default.png'</code></pre>
+          <p>Плюс <code>sameAs</code> расширить: VK, YouTube, Habr — если есть.</p>
+        </div>
+
+        <div class="card">
+          <h3>3.3. XML‑sitemap: <code>changefreq</code> / <code>priority</code> <span class="tag tag--low">Низкий</span></h3>
+          <p>Google игнорирует, Яндекс частично учитывает. Не критично, но для блога можно поставить <code>monthly</code>, для главной <code>weekly</code>, для услуг <code>monthly</code>. Дешёвая правка, улучшает читаемость для SEO‑аудита.</p>
+        </div>
+
+        <div class="card">
+          <h3>3.4. <code>robots.txt</code>: расширить <code>Clean-param</code> <span class="tag tag--low">Низкий</span></h3>
+          <p>Сейчас <code>Clean-param: q&amp;category&amp;tag /blog/</code>. Но <code>?q=</code> может появиться и на других страницах. Правильнее:</p>
+          <pre><code>Clean-param: q&amp;category&amp;tag&amp;page</code></pre>
+          <p>без привязки к <code>/blog/</code> — Яндекс применит ко всем URL.</p>
+        </div>
+
+        <div class="card">
+          <h3>3.5. Человеческая карта сайта — добавить поиск <span class="tag tag--mid">Средний</span></h3>
+          <p><code>/sitemap/</code> — это 50+ ссылок. Добавьте поле «Фильтр по разделам» (тот же <code>search.js</code> с другим индексом) или хотя бы якорные ссылки на секции. Сейчас найти «Оферту» можно только скроллом.</p>
+        </div>
+
+        <div class="card">
+          <h3>3.6. <code>Sitemap::pages()</code> — проверить hidden <span class="tag tag--mid">Средний</span></h3>
+          <p><code>Page::listInTheme($theme, true)</code> — второй аргумент <code>$includeHidden = true</code>. Убедитесь, что страницы с <code>hidden: true</code> действительно должны попадать в sitemap. Если это служебные — фильтруйте по <code>$page->hidden</code>.</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 4. АРХИТЕКТУРА -->
+      <section id="arch">
+        <h2><span class="num">4</span>Архитектура и тесты</h2>
+        <p class="lead">Не срочно, но с текущим размером любая правка <code>Seo</code> требует держать в голове весь файл.</p>
+
+        <div class="card">
+          <h3>4.1. Разделить крупные классы <span class="tag tag--mid">Средний</span></h3>
+          <ul>
+            <li><code>Seo.php</code> (400+ строк) → <code>Meta</code>, <code>JsonLd</code>, <code>Robots</code>;</li>
+            <li><code>Chat.php</code> → <code>Intent</code>, <code>Responder</code>, <code>Guard</code>;</li>
+            <li><code>Search.php</code> → <code>Indexer</code>, <code>Ranker</code>, <code>Snippets</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>4.2. <code>tools/chat-check.php</code> — расширить <span class="tag tag--mid">Средний</span></h3>
+          <p>Добавьте кейсы:</p>
+          <ul>
+            <li>пустой ввод: <code>Chat::answer('')</code> → <code>rejected: true</code>, без исключения;</li>
+            <li>очень длинный ввод (10 000 символов) → не падает;</li>
+            <li>Unicode: <code>й</code> vs <code>и</code> + combining, <code>ё</code> vs <code>е</code>;</li>
+            <li><code>TextFilter::has('shitake')</code> — зафиксировать текущее поведение (<code>true</code>) как известное ограничение, или whitelist + тест <code>false</code>;</li>
+            <li><code>Chat::answer('абырвалг оплата')</code> и <code>Chat::answer('оплата абырвалг')</code> → проходят;</li>
+            <li>rate limiting: 16 запросов подряд → 16‑й получает <code>429</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>4.3. Golden‑тест для <code>Seo::jsonld()</code> <span class="tag tag--mid">Средний</span></h3>
+          <p>Зафиксируйте эталонный JSON для <code>/</code>, <code>/pricing/</code>, <code>/blog/tech/some-post</code> в <code>tools/fixtures/</code>. При правке <code>Seo</code> сравнение покажет, что изменилось. Ловит регрессии, которые <code>check-seo</code> не видит (он проверяет наличие, а не форму).</p>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 5. UX -->
+      <section id="ux">
+        <h2><span class="num">5</span>UX/UI — быстрые победы</h2>
+
+        <div class="card">
+          <h3>Чат</h3>
+          <ul>
+            <li>автофокус на поле ввода при открытии <code>&lt;dialog&gt;</code>;</li>
+            <li>индикатор «печатает…» перед ответом (пригодится, когда появятся интенты с задержкой);</li>
+            <li>кнопка «Связаться с человеком» в конце ответа.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Поиск</h3>
+          <ul>
+            <li>сохранение последних 5 запросов в <code>localStorage</code> и показ их при пустом поле;</li>
+            <li><code>aria-busy="true"</code> на контейнере результатов во время загрузки индекса (<code>aria-live</code> на статусе уже есть — хорошо).</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Карта сайта</h3>
+          <ul>
+            <li><code>lastmod</code> для статей — показывать «обновлено 12.11.2026» рядом с заголовком.</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 6. ПРИОРИТЕТЫ -->
+      <section id="priority">
+        <h2><span class="num">6</span>Приоритеты</h2>
+        <p class="lead">Что бы я делал в этом порядке.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Улучшение</th><th>Эффект</th><th>Трудозатраты</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">1</td><td>Стемминг + синонимы в поиске <span class="small">(2.1)</span></td><td><span class="tag tag--hi">Высокий</span></td><td>Средние</td></tr>
+              <tr><td class="num">2</td><td>Не удалять пузырь при <code>rejected</code> <span class="small">(1.1)</span></td><td><span class="tag tag--hi">Высокий</span></td><td>Низкие</td></tr>
+              <tr><td class="num">3</td><td>Интент‑классификация в чате <span class="small">(1.3)</span></td><td><span class="tag tag--hi">Высокий</span></td><td>Низкие</td></tr>
+              <tr><td class="num">4</td><td>Не добавлять пустой <code>FAQPage</code> <span class="small">(3.1)</span></td><td><span class="tag tag--mid">Средний</span></td><td>5 минут</td></tr>
+              <tr><td class="num">5</td><td>Анонимная аналитика поисковых запросов <span class="small">(2.4)</span></td><td><span class="tag tag--hi">Высокий (долгосрочно)</span></td><td>Низкие</td></tr>
+              <tr><td class="num">6</td><td><code>followups</code> + «полезно/нет» <span class="small">(1.4)</span></td><td><span class="tag tag--mid">Средний</span></td><td>Средние</td></tr>
+              <tr><td class="num">7</td><td>Подсветка совпадений в поиске <span class="small">(2.2)</span></td><td><span class="tag tag--mid">Средний</span></td><td>Низкие</td></tr>
+              <tr><td class="num">8</td><td>Расширить <code>chat-check.php</code> <span class="small">(4.2)</span></td><td><span class="tag tag--mid">Средний (качество)</span></td><td>Низкие</td></tr>
+              <tr><td class="num">9</td><td>Разделить <code>Seo</code>/<code>Chat</code>/<code>Search</code> <span class="small">(4.1)</span></td><td><span class="tag tag--mid">Средний (поддержка)</span></td><td>Высокие</td></tr>
+              <tr><td class="num">10</td><td><code>Clean-param</code> без привязки к <code>/blog/</code> <span class="small">(3.4)</span></td><td><span class="tag tag--low">Низкий</span></td><td>2 минуты</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- 7. ЧТО НЕ ДЕЛАЛ БЫ -->
+      <section id="notnow">
+        <h2><span class="num">7</span>Что бы я не делал сейчас</h2>
+
+        <div class="callout callout--danger">
+          <span class="callout__icon">✕</span>
+          <p><b>Серверный поиск / Elasticsearch.</b> При 67 статьях клиентский индекс ~20–40 КБ — быстрее и приватнее. Порог для пересмотра — 300+ статей или индекс > 500 КБ.</p>
+        </div>
+
+        <div class="callout callout--danger">
+          <span class="callout__icon">✕</span>
+          <p><b>ML‑модель для интентов.</b> Rule‑based покрывает 90% запросов при 1% сложности.</p>
+        </div>
+
+        <div class="callout callout--danger">
+          <span class="callout__icon">✕</span>
+          <p><b>Модерация форм через <code>TextFilter</code>.</b> Решение «не блокировать» задокументировано и верно: потеря заявки дороже мата в комментарии.</p>
+        </div>
+
+        <div class="qbox">
+          <h3>Один вопрос к вам</h3>
+          <p>Есть ли данные о том, какие запросы в чат/поиск сейчас дают <code>rejected</code> или пустой результат? Если да — приоритеты 1 и 3 можно уточнить под реальные формулировки пользователей, а не под гипотезы.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    Подготовлено по срезу Stage 56 (коммит <code>70eb5b6</code>) · 18.11.2026 · Все правки — рекомендации, требующие решения владельца.
+  </footer>
+</div>
+
+</body>
+</html>

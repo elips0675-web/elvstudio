@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Счетчик установок плагинов и шаблонов в October CMS</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 860px; margin: 40px auto; padding: 0 20px; color: #24292e; }
+        h1 { font-size: 1.8rem; border-bottom: 1px solid #e1e4e8; padding-bottom: 8px; }
+        h2 { font-size: 1.3rem; margin-top: 32px; color: #0366d6; }
+        h3 { font-size: 1.1rem; margin-top: 24px; }
+        code { background: #f6f8fa; padding: 2px 6px; border-radius: 4px; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; }
+        pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: none; padding: 0; }
+        .note { background: #fff8e1; border-left: 4px solid #f9a825; padding: 12px 16px; margin: 16px 0; border-radius: 0 4px 4px 0; }
+        .method { border: 1px solid #e1e4e8; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .method h2 { margin-top: 0; }
+        ul, ol { padding-left: 24px; }
+        li { margin: 6px 0; }
+        .tag { display: inline-block; background: #e1f5fe; color: #0277bd; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-left: 8px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<h1>Как сделать стучалку (счетчик) установок плагинов и шаблонов в October CMS</h1>
+
+<p>В October CMS нет единой «кнопки», которая считает установки всех сторонних расширений, потому что установка может происходить разными путями: через Marketplace, через Composer, копированием файлов вручную и т. д. [reference:0]. Однако задачу можно решить несколькими способами — выбор зависит от того, <strong>чьи</strong> установки вы хотите считать (своего продукта или всех подряд) и <strong>где</strong> нужно показывать цифру.</p>
+
+<div class="note">
+    <strong>Коротко:</strong> для собственного плагина проще всего использовать <strong>миграции</strong> (однократный инкремент при установке). Для гибкого подсчёта любых событий — плагин <strong>SunLab.Measures</strong>. Для продуктов, опубликованных в Marketplace, статистика уже ведётся автоматически.
+</div>
+
+<!-- СПОСОБ 1 -->
+<div class="method">
+    <h2>Способ 1: Встроенная статистика October CMS Marketplace <span class="tag">самый простой</span></h2>
+    <p>Если ваш плагин или шаблон опубликован в <a href="https://octobercms.com/plugins" target="_blank" rel="noopener">официальном Marketplace</a>, October CMS уже считает уникальные установки для бесплатных продуктов и показывает их на странице продукта и в панели автора. [reference:1]</p>
+    <p>Ограничение: этот счётчик работает только для продуктов, распространяемых через Marketplace. Если вы ставите плагины вручную или через приватный Composer-репозиторий, цифра не появится.</p>
+    <p><strong>Что использовать:</strong> личный кабинет автора в October CMS → раздел вашего продукта → статистика установок.</p>
+</div>
+
+<!-- СПОСОБ 2 -->
+<div class="method">
+    <h2>Способ 2: Собственный счётчик на миграциях <span class="tag">для своего плагина</span></h2>
+    <p>Самый надёжный способ посчитать <strong>уникальные установки вашего плагина</strong> — сделать это в миграции. Миграции плагина выполняются ровно один раз при установке (и при обновлении, если версия миграции новая), поэтому инкремент в миграции не будет срабатывать повторно при обычной загрузке сайта.</p>
+
+    <h3>Шаг 1. Создайте таблицу для счётчика</h3>
+    <p>В плагине создайте миграцию, которая создаст таблицу и сразу добавит в неё одну запись (это и будет «+1 установка»).</p>
+    <pre><code>&lt;?php
+// В файле миграции вашего плагина, например:
+// plugins/vendor/plugin/updates/create_installations_table.php
+
+use October\Rain\Database\Updates\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+class CreateInstallationsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('vendor_plugin_installations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
+        });
+
+        // Однократный инкремент при установке
+        DB::table('vendor_plugin_installations')->insert([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('vendor_plugin_installations');
+    }
+}</code></pre>
+
+    <h3>Шаг 2. Получите количество установок</h3>
+    <p>В любом месте плагина (компонент, модель, бэкенд-контроллер) можно получить цифру простым запросом:</p>
+    <pre><code>use Illuminate\Support\Facades\DB;
+
+$installCount = DB::table('vendor_plugin_installations')->count();</code></pre>
+
+    <p>Для <strong>шаблонов</strong> подход аналогичен, но у темы нет миграций. Можно включить в комплект темы небольшой плагин-компаньон, который будет считать активации темы через событие <code>cms.theme.activated</code> (если вы отслеживаете именно активации), либо использовать отдельный плагин-счётчик, который устанавливается вместе с темой.</p>
+</div>
+
+<!-- СПОСОБ 3 -->
+<div class="method">
+    <h2>Способ 3: Плагин SunLab.Measures <span class="tag">гибкий</span></h2>
+    <p><a href="https://octobercms.com/plugin/sunlab-measures" target="_blank" rel="noopener">SunLab.Measures</a> позволяет создавать произвольные счётчики и статистику поверх любой модели October CMS. [reference:2] Он не «считает установки» из коробки, но даёт удобный механизм инкремента и хранения чисел, который можно привязать к событию установки.</p>
+
+    <h3>Когда это удобно</h3>
+    <ul>
+        <li>Нужно считать не только установки, но и другие события (активации, просмотры, скачивания).</li>
+        <li>Нужна единая система счётчиков для нескольких моделей.</li>
+        <li>Вы хотите использовать готовое поведение <code>Measurable</code> вместо ручных SQL-запросов.</li>
+    </ul>
+
+    <h3>Как использовать</h3>
+    <ol>
+        <li>Установите плагин: <code>php artisan plugin:install SunLab.Measures</code>.</li>
+        <li>Добавьте поведение <code>Measurable</code> к модели, которую хотите считать. Например, если у вас есть модель <code>Installation</code>:</li>
+    </ol>
+    <pre><code>class Installation extends Model
+{
+    public $implement = ['SunLab.Measures.Behaviors.Measurable'];
+}</code></pre>
+    <p>Затем в миграции или в обработчике события установки вызовите:</p>
+    <pre><code>$installation = new Installation();
+$installation->incrementMeasure('installs');</code></pre>
+    <p>Или через статический помощник:</p>
+    <pre><code>use SunLab\Measures\Classes\MeasureManager;
+MeasureManager::incrementMeasure($installation, 'installs');</code></pre>
+    <p>Получить значение можно так:</p>
+    <pre><code>{{ installation.getMeasure('installs').amount }}</code></pre>
+</div>
+
+<!-- СПОСОБ 4 -->
+<div class="method">
+    <h2>Способ 4: Визуализация через DashMetrics <span class="tag">для дашборда</span></h2>
+    <p>Если счётчик уже собирается (любым из способов выше), но вы хотите видеть динамику в бэкенде October CMS в виде графиков и KPI, обратите внимание на <a href="https://amjad.com.pk/october-cms/plugins/dashmetrics" target="_blank" rel="noopener">DashMetrics</a>. Плагин позволяет без кода строить графики по любой модели, включая количество установок, с группировкой по дням, неделям и месяцам. [reference:3]</p>
+    <p><strong>Что использовать:</strong> после установки DashMetrics создайте датасет на основе таблицы установок и добавьте виджет на дашборд.</p>
+</div>
+
+<!-- ОТОБРАЖЕНИЕ -->
+<h2>Как показать счётчик на сайте (фронтенд)</h2>
+<p>Если вы используете собственный счётчик на миграциях, проще всего вывести цифру через компонент или прямо в Twig-шаблоне страницы. Например, создайте компонент <code>InstallCounter</code>, который в методе <code>onRun()</code> возвращает количество записей из таблицы установок, и выведите его в шаблоне:</p>
+<pre><code>{{ __SELF__.installCount }} установок</code></pre>
+<p>Для анимированного отображения цифры можно использовать готовые решения вроде <strong>Animated Number Counter</strong> от Common Ninja — они встраиваются одной строкой кода и не требуют изменения логики подсчёта. [reference:4]</p>
+
+<!-- РЕКОМЕНДАЦИЯ -->
+<h2>Что выбрать</h2>
+<ul>
+    <li><strong>Плагин уже в Marketplace</strong> → ничего не делайте, счётчик уже есть в панели автора. [reference:5]</li>
+    <li><strong>Свой плагин, нужна одна цифра «установок»</strong> → способ 2 (миграция с инкрементом). Это минимальный код и максимальная надёжность.</li>
+    <li><strong>Нужно считать разные события и удобно управлять счётчиками</strong> → способ 3 (SunLab.Measures).</li>
+    <li><strong>Нужны графики и отчёты в бэкенде</strong> → добавьте DashMetrics поверх любого из способов сбора данных. [reference:6]</li>
+</ul>
+
+<div class="note">
+    <strong>Важно:</strong> при подсчёте установок через миграции учитывайте, что миграция выполнится и при <strong>обновлении</strong> плагина, если вы добавите новую миграцию. Чтобы считать именно <em>уникальные установки</em>, не создавайте новых миграций, которые повторно инкрементируют тот же счётчик. Если нужна статистика по версиям, используйте отдельные таблицы или поля с версией.
+
+🛠️ Сценарий 2: Прямая продажа через ваш сайт (кастомная схема)
+Если вы хотите продавать плагин напрямую, минуя Marketplace, то да, вам придётся реализовать свою собственную систему лицензирования. Именно в этом случае покупатель сообщает вам домен, а вы генерируете для него уникальный ключ.
+
+Однако важно понимать: этот ключ не будет иметь никакой силы в официальной экосистеме October CMS (он не даст покупателю доступ к обновлениям через Gateway). Это будет ваша внутренняя защита.
+
+Как это может работать технически:
+
+Вы создаёте на своём сайте простую форму или личный кабинет.
+
+Покупатель вводит домен, на котором хочет использовать плагин, и оплачивает покупку.
+
+Ваш скрипт генерирует уникальный ключ (например, хэш от домен + соль + секрет) и сохраняет в вашей базе связку ключ → домен.
+
+Вы передаёте этот ключ покупателю. Покупатель вводит его в настройках плагина на своём сайте.
+
+В коде вашего плагина вы добавляете проверку: плагин отправляет запрос на ваш сервер с указанием своего домена и введённого ключа. Ваш сервер проверяет, совпадает ли домен с тем, что был указан при покупке, иactive ли ключ. Если нет — плагин блокируется (как в примере из предыдущего ответа).
+
+💎 Итог
+Штатный путь (Marketplace): Вы не управляете ключами. Покупатель использует свой Project Key, привязанный к его домену. Вы получаете деньги и поддержку от платформы.
+
+Прямой путь (свой сайт): Вы создаёте свою систему «домен → ключ». Это даёт вам полный контроль, но требует разработки и поддержки собственного сервера лицензий, и такой ключ не будет «пониматься» официальным Marketplace.
+
+Таким образом, фраза «покупатель говорит домен, я ему ключ» описывает именно кастомную схему, которую нужно реализовывать отдельно, если вы не хотите использовать механизмы Marketplace.
+
+
+
+</div>
+
+</body>
+</html>

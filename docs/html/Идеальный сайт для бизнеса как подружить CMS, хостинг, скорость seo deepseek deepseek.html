@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Идеальный сайт для бизнеса: CMS, хостинг, SEO, аналитика, бронирование, обратная связь и соцсети — полный гайд 2025–2026</title>
+<meta name="description" content="Полный гайд: выбор CMS, хостинг, скорость, SEO, UX, безопасность, интеграции, аналитика, контент, AI, право, доступность, поддержка, бронирование, виджеты обратной связи, продвижение в соцсетях и воронка продаж.">
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --ink:#16202c;
+    --ink-soft:#4a5b6d;
+    --line:#e2e8f0;
+    --accent:#2563eb;
+    --accent-soft:#e8f0fe;
+    --green:#0f9d58;
+    --amber:#b45309;
+    --red:#dc2626;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,32,56,.06), 0 8px 24px rgba(16,32,56,.06);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font);
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#2563eb 100%);
+    color:#fff;
+    padding:64px 24px 72px;
+  }
+  .hero-inner{max-width:1100px;margin:0 auto}
+  .hero .eyebrow{
+    display:inline-block;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);
+    padding:6px 12px;
+    border-radius:999px;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(28px,4.4vw,48px);
+    line-height:1.15;
+    margin:0 0 18px;
+    letter-spacing:-.02em;
+  }
+  .hero p{
+    font-size:clamp(16px,1.6vw,19px);
+    color:#dbe6ff;
+    max-width:820px;
+    margin:0 0 26px;
+  }
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .hero-tags span{
+    font-size:14px;
+    padding:7px 13px;
+    border-radius:999px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.20);
+    color:#eaf0ff;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  .layout{
+    display:grid;
+    grid-template-columns:270px 1fr;
+    gap:40px;
+    align-items:start;
+    padding:48px 0 72px;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc{
+    position:sticky;
+    top:24px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 18px;
+    box-shadow:var(--shadow);
+    max-height:calc(100vh - 48px);
+    overflow-y:auto;
+  }
+  .toc h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:0 0 14px;
+  }
+  .toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
+  .toc li{counter-increment:toc;margin-bottom:2px}
+  .toc a{
+    display:block;
+    padding:7px 10px 7px 34px;
+    border-radius:8px;
+    color:var(--ink);
+    font-size:14px;
+    position:relative;
+    line-height:1.35;
+  }
+  .toc a::before{
+    content:counter(toc,decimal-leading-zero);
+    position:absolute;
+    left:8px;top:9px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-soft);
+    width:20px;height:19px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .toc a:hover{background:var(--accent-soft);text-decoration:none}
+  .toc .part-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    padding:14px 8px 6px;
+    counter-increment:none;
+  }
+  .toc .part-label::before{content:none}
+  .toc .part-label:first-of-type{padding-top:0}
+
+  /* ---------- Article ---------- */
+  article{min-width:0}
+  section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 34px;
+    box-shadow:var(--shadow);
+    margin-bottom:28px;
+    scroll-margin-top:24px;
+  }
+  section > h2{
+    font-size:clamp(22px,2.4vw,29px);
+    line-height:1.25;
+    letter-spacing:-.015em;
+    margin:0 0 6px;
+  }
+  .section-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:34px;height:34px;
+    padding:0 9px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:15px;
+    font-weight:700;
+    margin-right:10px;
+    vertical-align:2px;
+  }
+  .new-marker{
+    display:inline-block;
+    padding:2px 8px;
+    background:var(--accent);
+    color:#fff;
+    border-radius:4px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.05em;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  section > h2 + .lead{
+    color:var(--ink-soft);
+    font-size:16.5px;
+    margin:14px 0 24px;
+  }
+  h3{
+    font-size:19px;
+    margin:30px 0 12px;
+    letter-spacing:-.01em;
+  }
+  h3:first-of-type{margin-top:8px}
+  h4{font-size:16.5px;margin:20px 0 8px}
+  p{margin:0 0 14px}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{margin-bottom:8px}
+  li > ul, li > ol{margin-top:8px}
+  strong{color:var(--ink)}
+  .muted{color:var(--ink-soft)}
+  code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.9em}
+
+  /* ---------- Table ---------- */
+  .table-scroll{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin:22px 0 12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    min-width:860px;
+  }
+  thead th{
+    background:#f1f5fb;
+    text-align:left;
+    padding:13px 14px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:13px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody th{
+    text-align:left;
+    padding:13px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    background:#f8fafc;
+    white-space:nowrap;
+  }
+  tbody tr:last-child th{border-bottom:none}
+  .cap{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px}
+
+  /* ---------- Cards ---------- */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+    margin:22px 0 8px;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 18px 12px;
+    background:#fbfcfe;
+  }
+  .card h4{margin:0 0 8px;font-size:16px}
+  .card p{font-size:14.5px;color:var(--ink-soft)}
+  .card ul{padding-left:18px;font-size:14.5px;color:var(--ink-soft)}
+  .tag{
+    display:inline-block;
+    padding:3px 10px;
+    background:#eef2f7;
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-right:5px;
+    margin-top:6px;
+  }
+  .tag.pro{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+  .tag.con{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+  .tag.new{background:var(--accent-soft);color:var(--accent);border-color:#c7d2fe}
+
+  /* ---------- Stats ---------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+    margin:22px 0 8px;
+  }
+  .stat{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 16px;
+    text-align:center;
+    background:#fbfcfe;
+  }
+  .stat .num{
+    font-size:30px;
+    font-weight:800;
+    color:var(--accent);
+    line-height:1;
+    letter-spacing:-.02em;
+  }
+  .stat .label{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:8px;
+    line-height:1.4;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note{
+    border-left:4px solid var(--accent);
+    background:var(--accent-soft);
+    border-radius:0 10px 10px 0;
+    padding:16px 18px;
+    margin:22px 0;
+    font-size:15.5px;
+  }
+  .note strong{color:#1e40af}
+  .note.warn{
+    border-left-color:#d97706;
+    background:#fffbeb;
+  }
+  .note.warn strong{color:var(--amber)}
+  .note.danger{
+    border-left-color:var(--red);
+    background:#fef2f2;
+  }
+  .note.danger strong{color:var(--red)}
+  .note.success{
+    border-left-color:var(--green);
+    background:#ecfdf5;
+  }
+  .note.success strong{color:#047857}
+
+  /* ---------- Checklist ---------- */
+  .checklist{
+    list-style:none;
+    padding:0;
+    margin:18px 0 10px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .checklist li{
+    position:relative;
+    padding:13px 18px 13px 48px;
+    margin:0;
+    border-bottom:1px solid var(--line);
+    font-size:15.5px;
+    background:#fff;
+  }
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{
+    content:"✓";
+    position:absolute;
+    left:16px;top:12px;
+    width:21px;height:21px;
+    border-radius:50%;
+    background:var(--green);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1;
+  }
+  .checklist li b{display:block;margin-bottom:2px}
+  .checklist li span{color:var(--ink-soft);font-size:14.5px}
+
+  /* ---------- Steps ---------- */
+  .steps{list-style:none;padding:0;margin:18px 0;counter-reset:step}
+  .steps li{
+    counter-increment:step;
+    position:relative;
+    padding:0 0 20px 52px;
+    margin:0;
+    border-left:2px solid var(--line);
+    margin-left:16px;
+  }
+  .steps li:last-child{border-left-color:transparent;padding-bottom:0}
+  .steps li::before{
+    content:counter(step);
+    position:absolute;
+    left:-17px;top:-2px;
+    width:32px;height:32px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .steps h4{margin:0 0 6px;font-size:16.5px}
+  .steps p{margin:0;font-size:15px;color:var(--ink-soft)}
+
+  /* ---------- Part divider ---------- */
+  .part-divider{
+    margin:56px 0 28px;
+    text-align:center;
+    position:relative;
+  }
+  .part-divider::before{
+    content:"";
+    position:absolute;
+    top:50%;left:0;right:0;
+    height:1px;
+    background:var(--line);
+  }
+  .part-divider span{
+    position:relative;
+    display:inline-block;
+    padding:9px 22px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:#0f172a;
+    color:#c8d5e8;
+    padding:44px 24px;
+    font-size:15px;
+  }
+  footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+  footer strong{color:#fff}
+  footer a{color:#93b4ff}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:24px;padding:32px 0 56px}
+    .toc{position:static;max-height:none}
+    section{padding:26px 20px}
+    .hero{padding:48px 20px 56px}
+  }
+  @media (max-width:520px){
+    body{font-size:16px}
+    section{padding:22px 16px}
+    .toc a{font-size:13.5px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Полный гайд · Части I–II · 2025–2026</span>
+    <h1>Идеальный сайт для бизнеса: от выбора CMS до продвижения в соцсетях</h1>
+    <p>Полный разбор: как выбрать движок и хостинг, ускорить загрузку, заложить SEO-фундамент, настроить UX, безопасность, интеграции и аналитику. Плюс вторая часть — бронирование и приём заказов, виджеты обратной связи, продвижение в соцсетях и воронка «соцсети → сайт → продажа». С практическими чек-листами, которые можно применить сразу.</p>
+    <div class="hero-tags">
+      <span>CMS</span>
+      <span>Хостинг</span>
+      <span>Скорость</span>
+      <span>SEO</span>
+      <span>UX/UI</span>
+      <span>Безопасность</span>
+      <span>Интеграции</span>
+      <span>Аналитика</span>
+      <span>Контент</span>
+      <span>AI</span>
+      <span>Право</span>
+      <span>Доступность</span>
+      <span>Поддержка</span>
+      <span>Бронирование</span>
+      <span>Виджеты связи</span>
+      <span>Соцсети</span>
+      <span>Воронка продаж</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+
+    <nav class="toc" aria-label="Содержание">
+      <h2>Содержание</h2>
+      <ol>
+        <li class="part-label">Часть I · Технический фундамент</li>
+        <li><a href="#cms">Выбор CMS и платформы</a></li>
+        <li><a href="#hosting">Хостинг и серверы</a></li>
+        <li><a href="#speed">Скорость загрузки</a></li>
+        <li><a href="#seo">SEO-фундамент на старте</a></li>
+        <li><a href="#ux">UX/UI и адаптивность</a></li>
+        <li><a href="#security">Безопасность сайта</a></li>
+        <li><a href="#integrations">Интеграции и автоматизация</a></li>
+        <li><a href="#analytics">Веб-аналитика</a></li>
+        <li><a href="#content">Контент-маркетинг</a></li>
+        <li><a href="#ai">AI-инструменты</a></li>
+        <li><a href="#legal">Юридические аспекты</a></li>
+        <li><a href="#a11y">Доступность (a11y)</a></li>
+        <li><a href="#support">Поддержка после запуска</a></li>
+
+        <li class="part-label">Часть II · Маркетинг и продажи</li>
+        <li><a href="#why">Зачем нужен свой сайт</a></li>
+        <li><a href="#booking">Бронирование и заказы</a></li>
+        <li><a href="#feedback">Виджеты обратной связи</a></li>
+        <li><a href="#social">Продвижение в соцсетях</a></li>
+        <li><a href="#funnel">Воронка: соцсети → сайт → продажа</a></li>
+
+        <li class="part-label">Финал</li>
+        <li><a href="#checklist">Сводный чек-лист</a></li>
+      </ol>
+    </nav>
+
+    <article>
+
+      <!-- ================= 1. CMS ================= -->
+      <section id="cms">
+        <h2><span class="section-num">01</span>Какую CMS выбрать: честный обзор движков и конструкторов</h2>
+        <p class="lead">Выбор платформы на старте определяет бюджет разработки, скорость работы и стоимость продвижения. Универсального «лучшего движка» нет — есть подходящий под задачу.</p>
+
+        <h3>Пять подходов, которые стоит сравнить</h3>
+
+        <div class="cards">
+          <div class="card">
+            <h4>WordPress</h4>
+            <p>Универсальный лидер: блоги, сайты услуг, корпоративные сайты, малые и средние магазины на WooCommerce.</p>
+            <ul>
+              <li>Плюсы: бесплатная основа, огромная экосистема, SEO-плагины (Yoast, Rank Math)</li>
+              <li>Минусы: скорость падает от избытка плагинов и тяжёлых тем</li>
+            </ul>
+            <div><span class="tag pro">Бесплатно</span><span class="tag pro">Экосистема</span><span class="tag con">Зависит от плагинов</span></div>
+          </div>
+          <div class="card">
+            <h4>October CMS</h4>
+            <p>Современная CMS на фреймворке Laravel — выбор разработчиков под нестандартные задачи.</p>
+            <ul>
+              <li>Плюсы: чистый код, высокая скорость, полный контроль над URL и разметкой</li>
+              <li>Минусы: платная лицензия, нужны навыки программирования</li>
+            </ul>
+            <div><span class="tag pro">Чистый код</span><span class="tag pro">Скорость</span><span class="tag con">Платная</span></div>
+          </div>
+          <div class="card">
+            <h4>1С-Битрикс</h4>
+            <p>Коммерческая CMS для крупного e-commerce, интеграций с 1С/ERP и корпоративных порталов.</p>
+            <ul>
+              <li>Плюсы: мощный SEO-функционал из коробки, готовые бизнес-инструменты</li>
+              <li>Минусы: платная лицензия, требователен к серверу</li>
+            </ul>
+            <div><span class="tag pro">SEO из коробки</span><span class="tag pro">1С/ERP</span><span class="tag con">Тяжёлый</span></div>
+          </div>
+          <div class="card">
+            <h4>OpenCart</h4>
+            <p>Классический движок для интернет-магазинов среднего размера (до 10–30 тыс. товаров).</p>
+            <ul>
+              <li>Плюсы: бесплатная база, шустрый из коробки</li>
+              <li>Минусы: SEO и ЧПУ требуют установки дополнительных модулей</li>
+            </ul>
+            <div><span class="tag pro">Бесплатно</span><span class="tag pro">Шустрый</span><span class="tag con">SEO — модули</span></div>
+          </div>
+          <div class="card">
+            <h4>Tilda</h4>
+            <p>Облачный конструктор для лендингов, промо-страниц и портфолио.</p>
+            <ul>
+              <li>Плюсы: быстрый старт без программиста, оптимизация на стороне платформы</li>
+              <li>Минусы: базовые SEO-настройки, ограниченная гибкость</li>
+            </ul>
+            <div><span class="tag pro">Быстрый старт</span><span class="tag con">Ограничена</span></div>
+          </div>
+          <div class="card">
+            <h4>Headless CMS + Next.js <span class="new-marker">NEW</span></h4>
+            <p>Современный подход для проектов с высокими требованиями к скорости и SEO: Strapi, Sanity, Directus в связке с Next.js или Nuxt. Плюс <strong>Webflow</strong> как альтернатива Tilda для сложных дизайнов без кода.</p>
+            <div><span class="tag new">Headless</span><span class="tag new">Next.js</span><span class="tag new">Webflow</span></div>
+          </div>
+        </div>
+
+        <h3>Сравнительная таблица</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Критерий</th>
+                <th>WordPress</th>
+                <th>October CMS</th>
+                <th>1С-Битрикс</th>
+                <th>OpenCart</th>
+                <th>Tilda</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>База / подход</th>
+                <td>Классическая CMS</td>
+                <td>CMS на фреймворке Laravel</td>
+                <td>Коммерческая CMS</td>
+                <td>E-commerce CMS</td>
+                <td>Облачный конструктор</td>
+              </tr>
+              <tr>
+                <th>Для кого создана</th>
+                <td>Пользователи и бизнес</td>
+                <td>Разработчики (чистый код)</td>
+                <td>Крупный бизнес</td>
+                <td>Владельцы магазинов</td>
+                <td>Маркетологи и новички</td>
+              </tr>
+              <tr>
+                <th>Скорость работы</th>
+                <td>Высокая при лёгкой теме</td>
+                <td>Очень высокая</td>
+                <td>Средняя, нужен мощный сервер</td>
+                <td>Высокая из коробки</td>
+                <td>Высокая на серверах платформы</td>
+              </tr>
+              <tr>
+                <th>SEO-возможности</th>
+                <td>Отличные через плагины</td>
+                <td>Отличные, полный контроль кода и ЧПУ</td>
+                <td>Мощные, встроены в ядро</td>
+                <td>Хорошие, нужны модули</td>
+                <td>Базовые, ограничены платформой</td>
+              </tr>
+              <tr>
+                <th>Стоимость лицензии</th>
+                <td>Бесплатно</td>
+                <td>Платная (есть форк Winter CMS)</td>
+                <td>Платная: от базовой до энтерпрайз</td>
+                <td>Бесплатно</td>
+                <td>Подписка ежемесячно / ежегодно</td>
+              </tr>
+              <tr>
+                <th>Требования к хостингу</th>
+                <td>Обычный виртуальный</td>
+                <td>Виртуальный или VPS, PHP 8+, Composer, SSH</td>
+                <td>Мощный VPS или выделенный сервер</td>
+                <td>Обычный виртуальный</td>
+                <td>Не требуется — всё внутри</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="cap">Таблица ориентировочная: реальные показатели зависят от конкретной реализации, темы и инфраструктуры.</p>
+
+        <h3>Чек-лист выбора под задачу</h3>
+        <ul class="checklist">
+          <li><b>Лендинг или быстрая проверка гипотезы</b><span>Tilda — запуск за дни без программиста.</span></li>
+          <li><b>Блог, контентный проект, сайт услуг</b><span>WordPress — оптимальный баланс цены, гибкости и SEO.</span></li>
+          <li><b>Нестандартный функционал и высокие требования к коду</b><span>October CMS — когда важнее качество разработки, чем «из коробки».</span></li>
+          <li><b>Интернет-магазин до 10–30 тыс. товаров</b><span>WordPress + WooCommerce или OpenCart.</span></li>
+          <li><b>Крупный магазин с интеграцией учёта</b><span>1С-Битрикс с обменом с 1С и ERP.</span></li>
+          <li><b>Максимальная скорость и SEO-контроль</b><span>Headless CMS (Strapi, Sanity) + Next.js — для зрелых проектов с бюджетом на разработку.</span></li>
+        </ul>
+
+        <div class="note">
+          <strong>Важно:</strong> ни одна CMS сама по себе не выводит сайт в топ и не гарантирует скорость. Результат даёт связка «движок + хостинг + качество реализации + контент».
+        </div>
+      </section>
+
+      <!-- ================= 2. HOSTING ================= -->
+      <section id="hosting">
+        <h2><span class="section-num">02</span>Как выбрать надёжный хостинг: виды, критерии и частые ошибки</h2>
+        <p class="lead">Экономия пары долларов в месяц на сервере оборачивается медленным откликом, просадкой позиций в поиске и потерянными заявками. Хостинг — это фундамент, а не статья расходов «на потом».</p>
+
+        <h3>Виды хостинга простыми словами</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Тип</th><th>Кому подходит</th><th>Особенности</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Виртуальный (Shared)</th>
+                <td>Визитки, небольшие блоги, сайты услуг</td>
+                <td>Низкая цена, ресурсы делятся с соседями, настройки ограничены</td>
+              </tr>
+              <tr>
+                <th>VPS / VDS</th>
+                <td>Растущие проекты, интернет-магазины, October CMS</td>
+                <td>Выделенные ресурсы, полный root-доступ, требуется администрирование</td>
+              </tr>
+              <tr>
+                <th>Облачный (Cloud)</th>
+                <td>Проекты с резкими скачками трафика</td>
+                <td>Гибкое масштабирование, оплата по факту потребления</td>
+              </tr>
+              <tr>
+                <th>Выделенный (Dedicated)</th>
+                <td>Крупные порталы, высоконагруженные системы</td>
+                <td>Максимальная производительность и контроль, высокая стоимость</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Главные критерии выбора</h3>
+        <ul>
+          <li><strong>Uptime не ниже 99,9%</strong> — простой сервера означает потерянный трафик и падение позиций.</li>
+          <li><strong>Только быстрые NVMe SSD</strong> — прямо влияет на время ответа сервера (TTFB) и скорость работы базы данных.</li>
+          <li><strong>Геолокация серверов</strong> — чем ближе к целевой аудитории, тем ниже пинг и быстрее отклик.</li>
+          <li><strong>Резервное копирование</strong> — автоматические бэкапы с возможностью отката должны быть по умолчанию.</li>
+          <li><strong>Техподдержка 24/7</strong> — с реальными сроками реакции, а не только с тикет-системой.</li>
+          <li><strong>Масштабирование</strong> — возможность перейти на тариф выше без переезда и простоя.</li>
+        </ul>
+
+        <h3>Специфика под CMS</h3>
+        <ul>
+          <li><strong>WordPress</strong> — достаточно недорогого виртуального тарифа с PHP 8+, MySQL и запасом по памяти.</li>
+          <li><strong>October CMS</strong> — желательны SSH-доступ и поддержка Composer для обновления ядра и плагинов.</li>
+          <li><strong>1С-Битрикс</strong> — сразу VPS или выделенный сервер: движок требователен к ресурсам.</li>
+          <li><strong>OpenCart</strong> — обычный виртуальный хостинг справляется до определённого объёма каталога.</li>
+          <li><strong>Tilda</strong> — хостинг не нужен, всё работает на инфраструктуре платформы.</li>
+        </ul>
+
+        <div class="note warn">
+          <strong>Частая ошибка:</strong> выбирать хостинг «по самой низкой цене» и без тестового периода. Берите провайдера с trial-периодом и проверяйте TTFB, стабильность и скорость поддержки до оплаты годового тарифа.
+        </div>
+      </section>
+
+      <!-- ================= 3. SPEED ================= -->
+      <section id="speed">
+        <h2><span class="section-num">03</span>Почему сайт медленно грузится и как это исправить</h2>
+        <p class="lead">Скорость влияет на отказы, конверсию и позиции в поиске: Core Web Vitals — официальный фактор ранжирования Google. При этом «виновата» обычно не CMS, а инфраструктура и настройка.</p>
+
+        <h3>Главные причины тормозов</h3>
+        <ul>
+          <li>Тяжёлые неоптимизированные изображения (PNG и JPEG по несколько мегабайт).</li>
+          <li>Слабый или перегруженный хостинг — высокий TTFB.</li>
+          <li>Избыток плагинов и модулей, особенно в WordPress и OpenCart.</li>
+          <li>Неоптимизированный код темы и отсутствие кеширования.</li>
+          <li>Скрипты аналитики, чатов и виджетов, подключённые без отложенной загрузки.</li>
+        </ul>
+
+        <h3>Инструменты проверки</h3>
+        <ul>
+          <li><strong>Google PageSpeed Insights</strong> — лабораторные и полевые данные Core Web Vitals.</li>
+          <li><strong>GTmetrix</strong> — детальный водопад загрузки, история замеров.</li>
+          <li><strong>Яндекс Вебмастер</strong> — скорость ответа сервера и время загрузки страниц.</li>
+        </ul>
+
+        <h3>5 шагов к ускорению</h3>
+        <ol class="steps">
+          <li>
+            <h4>Сжать изображения и перевести в WebP</h4>
+            <p>Уменьшите разрешение до реально отображаемого и включите ленивую загрузку (lazy load).</p>
+          </li>
+          <li>
+            <h4>Настроить кеширование</h4>
+            <p>Серверное и браузерное кеширование, а для WordPress — страничный кеш через плагин или CDN.</p>
+          </li>
+          <li>
+            <h4>Подключить CDN</h4>
+            <p>Статика раздаётся с ближайшей к пользователю точки присутствия, снижая нагрузку на сервер.</p>
+          </li>
+          <li>
+            <h4>Минифицировать CSS и JS</h4>
+            <p>Объединение и сжатие файлов, отложенная загрузка некритичных скриптов.</p>
+          </li>
+          <li>
+            <h4>Сменить хостинг на NVMe</h4>
+            <p>Переезд на быстрые диски часто ускоряет сайт без единой правки кода — за счёт снижения TTFB.</p>
+          </li>
+        </ol>
+
+        <div class="note">
+          <strong>Про October CMS:</strong> это пример системы без «лишнего багажа». В отличие от WordPress, который часто тормозит из-за десятков плагинов, сайты на October строятся на чистом коде Laravel и грузятся заметно легче.
+        </div>
+      </section>
+
+      <!-- ================= 4. SEO ================= -->
+      <section id="seo">
+        <h2><span class="section-num">04</span>SEO-фундамент: что заложить ещё до запуска</h2>
+        <p class="lead">Продвигать готовый сайт без базовой технической оптимизации в два раза дороже: часть работ придётся делать заново, ломая уже сформированную структуру.</p>
+
+        <h3>Технический минимум</h3>
+        <ul>
+          <li><strong>HTTPS</strong> — SSL-сертификат и корректный редирект с http на https.</li>
+          <li><strong>ЧПУ</strong> — человекопонятные URL без параметров вида <code>?id=123</code>.</li>
+          <li><strong>robots.txt</strong> — правильные директивы для служебных разделов и дублей.</li>
+          <li><strong>sitemap.xml</strong> — карта сайта с автоматическим обновлением.</li>
+          <li><strong>Скорость</strong> — см. раздел 03, это часть технического SEO.</li>
+        </ul>
+
+        <h3>Структура и семантика</h3>
+        <ul>
+          <li>Проектируйте меню и категории под логику спроса, а не под удобство дизайнера.</li>
+          <li>Одна посадочная страница — один кластер запросов.</li>
+          <li>Избегайте дублей: пагинация, фильтры и параметры сортировки должны быть закрыты корректно.</li>
+        </ul>
+
+        <h3>Контент и мета-теги</h3>
+        <ul>
+          <li>Один H1 на страницу, далее иерархия H2–H3 без пропусков уровней.</li>
+          <li>Title и Description — уникальные, с ключевым запросом и понятным призывом.</li>
+          <li>Микроразметка Schema.org: Organization, BreadcrumbList, Product, Article, FAQ.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Про October CMS:</strong> здесь нет навязанных шаблонами тегов и дублей — разработчик с нуля настраивает структуру URL, мета-теги и микроразметку без «костылей». Но и ответственности больше: базовые вещи не приходят «из коробки».
+        </div>
+      </section>
+
+      <!-- ================= 5. UX ================= -->
+      <section id="ux">
+        <h2><span class="section-num">05</span>UX/UI и адаптивность: почему уходят без заявки</h2>
+        <p class="lead">Самый быстрый сайт с идеальным SEO не продаст, если посетитель не понимает, куда нажать. Конверсия — это про удобство, а не про красоту.</p>
+
+        <h3>Mobile-first</h3>
+        <ul>
+          <li>60–70% трафика приходит со смартфонов, а Google индексирует преимущественно мобильную версию.</li>
+          <li>Проверяйте кликабельность кнопок, читаемость текста и отсутствие горизонтальной прокрутки.</li>
+        </ul>
+
+        <h3>Путь пользователя (CJM)</h3>
+        <ul>
+          <li>Понятная навигация: до нужного раздела — максимум 2–3 клика.</li>
+          <li>Заметные кнопки целевого действия (CTA) на каждом экране.</li>
+          <li>Короткие формы заявок: каждое лишнее поле снижает конверсию.</li>
+        </ul>
+
+        <h3>Доверие</h3>
+        <ul>
+          <li>Отзывы, кейсы, живые фото команды.</li>
+          <li>Прозрачные цены и понятные условия работы.</li>
+          <li>Контакты и юридическая информация на видном месте.</li>
+        </ul>
+      </section>
+
+      <!-- ================= 6. SECURITY ================= -->
+      <section id="security">
+        <h2><span class="section-num">06</span>Безопасность: как защитить сайт от взлома и атак</h2>
+        <p class="lead">Взломанный сайт мгновенно вылетает из поиска — поисковики помечают его как угрожающий. Утечка данных клиентов грозит штрафами и потерей репутации.</p>
+
+        <h3>Базовый чек-лист владельца</h3>
+        <ul class="checklist">
+          <li><b>SSL-сертификат (HTTPS)</b><span>Шифрование данных и доверие браузеров — обязательный стандарт.</span></li>
+          <li><b>Регулярные обновления</b><span>Ядро, темы и плагины нельзя оставлять без обновлений годами — особенно в WordPress.</span></li>
+          <li><b>Защита от ботов и спама</b><span>Капча, WAF, защита форм от парсинга и брутфорса.</span></li>
+          <li><b>Резервные копии</b><span>Автоматические бэкапы с проверкой возможности восстановления.</span></li>
+          <li><b>Юридический минимум</b><span>Политика конфиденциальности, согласие на обработку персональных данных, уведомление про cookies.</span></li>
+          <li><b>Доступы</b><span>Двухфакторная аутентификация для админки, сложные пароли, ограничение попыток входа.</span></li>
+        </ul>
+      </section>
+
+      <!-- ================= 7. INTEGRATIONS ================= -->
+      <section id="integrations">
+        <h2><span class="section-num">07</span>Интеграции: как превратить сайт в машину продаж</h2>
+        <p class="lead">Современный сайт — не витрина, а часть экосистемы бизнеса. Ручная обработка заявок убивает продажи: клиент успевает уйти к конкуренту, пока менеджер ищет письмо.</p>
+
+        <h3>Что подключать в первую очередь</h3>
+        <ul>
+          <li><strong>CRM</strong> (Bitrix24, amoCRM) — чтобы ни одна заявка или обратный звонок не потерялись.</li>
+          <li><strong>Платёжные шлюзы</strong> — онлайн-эквайринг, рассрочка, оплата по счёту.</li>
+          <li><strong>Доставка</strong> — автоматический расчёт стоимости и интеграция со службами доставки.</li>
+          <li><strong>Коммуникации</strong> — онлайн-чаты, виджеты мессенджеров (Telegram, WhatsApp), уведомления о заказах в Telegram-бот владельцу.</li>
+          <li><strong>Учёт товаров</strong> — синхронизация остатков и цен с 1С или МойСклад для интернет-магазинов.</li>
+          <li><strong>Сквозная аналитика</strong> — связка «реклама → заявка → сделка → деньги» в одной системе.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Правило:</strong> любая интеграция должна иметь владельца и мониторинг. «Настроили и забыли» — главная причина, по которой заявки перестают доходить.
+        </div>
+      </section>
+
+      <!-- ================= 8. ANALYTICS ================= -->
+      <section id="analytics">
+        <h2><span class="section-num">08</span>Аналитика: как понять, что сайт работает эффективно</h2>
+        <p class="lead">Без аналитики развитие сайта — гадание на кофейной гуще. Владелец должен видеть, какая реклама окупается, а какая сливает бюджет.</p>
+
+        <h3>Базовые счётчики</h3>
+        <ul>
+          <li><strong>Яндекс Метрика</strong> — включая Вебвизор и карты кликов.</li>
+          <li><strong>Google Analytics 4</strong> — события и сквозная воронка.</li>
+        </ul>
+
+        <h3>Цели и e-commerce</h3>
+        <ul>
+          <li>Отслеживание нажатий на кнопки и отправок форм.</li>
+          <li>Звонки и клики по телефону и мессенджерам.</li>
+          <li>Полная электронная торговля: показы, корзина, покупка.</li>
+        </ul>
+
+        <h3>Панели вебмастеров</h3>
+        <ul>
+          <li><strong>Яндекс Вебмастер</strong> — ошибки индексации, позиции, скорость.</li>
+          <li><strong>Google Search Console</strong> — покрытие, Core Web Vitals, запросы.</li>
+        </ul>
+
+        <h3>Что добавить в 2026 <span class="new-marker">NEW</span></h3>
+        <ul>
+          <li><strong>Сквозная аналитика</strong> (Roistat, Calltouch) — чтобы видеть полный путь клиента от объявления до сделки.</li>
+          <li><strong>UTM-метки</strong> для каждого канала — без них невозможно сравнить эффективность рекламы.</li>
+          <li><strong>Коллтрекинг</strong> — если продажи идут по телефону, иначе звонки «теряются» и не привязываются к источнику.</li>
+          <li><strong>Серверные события</strong> — обход блокировщиков рекламы и ограничений браузеров на куки.</li>
+        </ul>
+      </section>
+
+      <!-- ================= 9. CONTENT ================= -->
+      <section id="content">
+        <h2><span class="section-num">09</span>Контент-маркетинг: главный актив сайта <span class="new-marker">NEW</span></h2>
+        <p class="lead">Сайт без контента — как магазин без товара. Контент работает на SEO, доверие и конверсию годами. Это не «тексты ради текстов», а система, встроенная в воронку продаж.</p>
+
+        <h3>Что должно быть на сайте</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>Блог и статьи</h4>
+            <p>Регулярные публикации под запросы ЦА. Формат «проблема → решение» работает лучше всего. Минимум для роста — 2–4 статьи в месяц.</p>
+          </div>
+          <div class="card">
+            <h4>Кейсы и отзывы</h4>
+            <p>Конкретика: кто клиент, какая задача, какое решение, какой результат в цифрах. Живые отзывы с фото эффективнее анонимных в 3 раза.</p>
+          </div>
+          <div class="card">
+            <h4>Гайды и инструкции</h4>
+            <p>Длинный экспертный контент под высокочастотные запросы. Такие страницы собирают ссылки и становятся «магнитом» для SEO.</p>
+          </div>
+          <div class="card">
+            <h4>Видео и визуал</h4>
+            <p>Обзоры продуктов, инструкции, отзывы клиентов. Видео увеличивает время на странице и улучшает поведенческие факторы.</p>
+          </div>
+        </div>
+
+        <h3>Принципы работы с контентом</h3>
+        <ul class="checklist">
+          <li><b>Контент-план на квартал</b><span>Темы привязаны к семантическому ядру и воронке продаж.</span></li>
+          <li><b>Редактура и фактчекинг</b><span>Тексты вычитывает редактор, цифры и цитаты проверяются.</span></li>
+          <li><b>E-E-A-T для YMYL-тематик</b><span>Для медицины, финансов, юриспруденции — авторы с подтверждённым экспертным бэкграундом.</span></li>
+          <li><b>Обновление старого контента</b><span>Раз в 6 месяцев пересматривайте старые статьи — это даёт быстрый SEO-рост.</span></li>
+          <li><b>Распространение</b><span>Контент нужно продвигать: рассылки, соцсети, гостевые публикации, партнёрства.</span></li>
+        </ul>
+
+        <div class="note">
+          <strong>Правило:</strong> контент без дистрибуции — это контент, который никто не увидит. Планируйте не только написание, но и каналы распространения.
+        </div>
+      </section>
+
+      <!-- ================= 10. AI ================= -->
+      <section id="ai">
+        <h2><span class="section-num">10</span>AI-инструменты для сайта и бизнеса <span class="new-marker">NEW</span></h2>
+        <p class="lead">В 2025–2026 AI перестал быть «вау-фичей» и стал стандартом. Сайты без AI-элементов начинают проигрывать конкурентам по скорости обслуживания и конверсии.</p>
+
+        <h3>Где AI реально полезен</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>AI-чат-бот на сайте</h4>
+            <p>Отвечает на типовые вопросы 24/7, собирает контакты, квалифицирует лиды. Снижает нагрузку на менеджеров на 40–60%.</p>
+          </div>
+          <div class="card">
+            <h4>AI-поиск по сайту</h4>
+            <p>Понимает смысл запроса, а не только ключевые слова. Критично для магазинов с большим каталогом.</p>
+          </div>
+          <div class="card">
+            <h4>Генерация контента</h4>
+            <p>Первые черновики статей, описания товаров, мета-теги. Но финальная редактура — всегда за человеком.</p>
+          </div>
+          <div class="card">
+            <h4>AI-аналитика</h4>
+            <p>Автоматические инсайты из Метрики/GA4: «вот тут падают конверсии», «вот этот сегмент уходит».</p>
+          </div>
+          <div class="card">
+            <h4>Генерация изображений</h4>
+            <p>Уникальные иллюстрации, баннеры, превью статей без дизайнера. Важно — проверять лицензионную чистоту.</p>
+          </div>
+          <div class="card">
+            <h4>AI для A/B-тестов</h4>
+            <p>Генерация гипотез и вариантов заголовков, CTA, описаний. Ускорение итераций в 5–10 раз.</p>
+          </div>
+        </div>
+
+        <div class="note warn">
+          <strong>Осторожно:</strong> AI-контент без редактуры — это риск. Поисковики (особенно Google) научились отличать «машинный» текст. Главное — ценность для пользователя, а не объём.
+        </div>
+      </section>
+
+      <!-- ================= 11. LEGAL ================= -->
+      <section id="legal">
+        <h2><span class="section-num">11</span>Юридические аспекты <span class="new-marker">NEW</span></h2>
+        <p class="lead">Юридические ошибки обходятся дороже, чем хостинг за год. Штрафы по 152-ФЗ для юрлиц — до 500 тыс. ₽ за инцидент, а блокировка сайта Роскомнадзором — это остановка продаж.</p>
+
+        <h3>Обязательный минимум</h3>
+        <ul class="checklist">
+          <li><b>Политика конфиденциальности</b><span>Доступна по прямой ссылке, описывает цели сбора, сроки хранения, права субъекта.</span></li>
+          <li><b>Согласие на обработку ПДн</b><span>Галочка в формах, раздельное согласие на рекламу и аналитику.</span></li>
+          <li><b>Уведомление о cookies</b><span>Баннер с возможностью принять/отклонить. Для РФ — с ссылкой на политику.</span></li>
+          <li><b>Реквизиты юрлица</b><span>ИНН, ОГРН, юр. адрес — на видном месте (закон о защите прав потребителей).</span></li>
+          <li><b>Оферта для интернет-магазина</b><span>Условия продажи, доставки, возврата, гарантии.</span></li>
+        </ul>
+
+        <h3>Маркировка рекламы (с 2022 г.)</h3>
+        <div class="note danger">
+          <strong>Важно:</strong> любой рекламный контент в интернете — включая посты в блоге, если они оплачены — подлежит маркировке через ОРД (оператора рекламных данных). Штрафы: для юрлиц — до 500 тыс. ₽ за каждый немаркированный материал.
+        </div>
+
+        <h3>Что добавить в 2026</h3>
+        <ul>
+          <li>Регулярный аудит согласий — раз в год пересматривайте документы.</li>
+          <li>Хранение логов согласий — вы должны доказать, что согласие получено.</li>
+          <li>Уведомление Роскомнадзора об обработке ПДн — до начала работы.</li>
+          <li>Для работы с ЕС — GDPR-совместимость, даже если вы из РФ.</li>
+        </ul>
+      </section>
+
+      <!-- ================= 12. A11Y ================= -->
+      <section id="a11y">
+        <h2><span class="section-num">12</span>Доступность (Accessibility) <span class="new-marker">NEW</span></h2>
+        <p class="lead">Доступный сайт — это не только про людей с ограниченными возможностями. Это про 15% трафика, которые вы теряете, и про SEO: поисковики «читают» сайт так же, как скринридеры.</p>
+
+        <h3>Базовые требования WCAG 2.2</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>Клавиатурная навигация</h4>
+            <p>Все интерактивные элементы доступны с клавиатуры. Видимый фокус на активном элементе.</p>
+          </div>
+          <div class="card">
+            <h4>Альтернативные тексты</h4>
+            <p>Каждое содержательное изображение — с осмысленным alt. Декоративные — с <code>alt=""</code>.</p>
+          </div>
+          <div class="card">
+            <h4>Контрастность</h4>
+            <p>Соотношение контраста текста и фона — минимум 4.5:1 для обычного текста.</p>
+          </div>
+          <div class="card">
+            <h4>Семантическая вёрстка</h4>
+            <p>Заголовки по иерархии, списки — через ul/ol, формы — с label. Это и SEO, и доступность.</p>
+          </div>
+          <div class="card">
+            <h4>Субтитры для видео</h4>
+            <p>Обязательны для любого видеоконтента. Плюс транскрипция для аудио.</p>
+          </div>
+          <div class="card">
+            <h4>Без ловушек фокуса</h4>
+            <p>Пользователь всегда может уйти с любого элемента клавишей Tab/Shift+Tab.</p>
+          </div>
+        </div>
+
+        <h3>Инструменты проверки</h3>
+        <ul>
+          <li><strong>Lighthouse</strong> — встроен в Chrome DevTools, раздел Accessibility.</li>
+          <li><strong>axe DevTools</strong> — расширение для браузера, глубокий аудит.</li>
+          <li><strong>WAVE</strong> — онлайн-сервис для быстрой проверки.</li>
+          <li><strong>Ручная проверка</strong> — навигация только с клавиатуры + скринридер (NVDA, VoiceOver).</li>
+        </ul>
+      </section>
+
+      <!-- ================= 13. SUPPORT ================= -->
+      <section id="support">
+        <h2><span class="section-num">13</span>Поддержка и развитие после запуска <span class="new-marker">NEW</span></h2>
+        <p class="lead">Запуск — это 20% работы. 80% — это то, что происходит после. Сайт без поддержки устаревает за 6–12 месяцев: ломается, теряет позиции, перестаёт конвертировать.</p>
+
+        <h3>Регулярные задачи</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Частота</th><th>Что делать</th><th>Зачем</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Еженедельно</strong></td><td>Проверка бэкапов, мониторинг аптайма, разбор заявок</td><td>Не терять данные и лиды</td></tr>
+              <tr><td><strong>Ежемесячно</strong></td><td>Обновления ядра, тем, плагинов. Анализ конверсий</td><td>Безопасность и рост</td></tr>
+              <tr><td><strong>Ежеквартально</strong></td><td>Аудит скорости, SEO, UX. A/B-тесты ключевых страниц</td><td>Не отставать от конкурентов</td></tr>
+              <tr><td><strong>Раз в полгода</strong></td><td>Обновление контента, пересмотр структуры, юридический аудит</td><td>Актуальность и соответствие закону</td></tr>
+              <tr><td><strong>Раз в год</strong></td><td>Стратегический пересмотр: цели, позиционирование, редизайн</td><td>Сайт растёт вместе с бизнесом</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Формат поддержки</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>In-house</h4>
+            <p>Свой разработчик в штате. Подходит при частых доработках и высоких требованиях к скорости реакции.</p>
+          </div>
+          <div class="card">
+            <h4>Подрядчик на ретейнере</h4>
+            <p>Фиксированная сумма в месяц на N часов. Оптимально для большинства бизнесов.</p>
+          </div>
+          <div class="card">
+            <h4>Разовые задачи</h4>
+            <p>Оплата по факту. Подходит для редких доработок, но дороже в пересчёте на час.</p>
+          </div>
+        </div>
+
+        <div class="note success">
+          <strong>Правило:</strong> заложите в бюджет запуска минимум 15–20% от стоимости разработки на первый год поддержки. Иначе сайт быстро превратится в «витрину, которую стыдно показывать».
+        </div>
+      </section>
+
+      <!-- ================= PART DIVIDER ================= -->
+      <div class="part-divider"><span>Часть II · Маркетинг и продажи</span></div>
+
+      <!-- ================= 14. WHY OWN SITE ================= -->
+      <section id="why">
+        <h2><span class="section-num">14</span>Зачем нужен свой сайт, если есть соцсети</h2>
+        <p class="lead">Частый вопрос от малого бизнеса: «Зачем тратить деньги на сайт, если клиенты сидят в Instagram, Telegram и ВКонтакте?» Короткий ответ: соцсети — это канал, а сайт — это ваша территория.</p>
+
+        <h3>Цифры, которые стоит учитывать</h3>
+        <div class="stats">
+          <div class="stat">
+            <div class="num">72%</div>
+            <div class="label">покупателей проверяют сайт перед покупкой, даже если узнали о вас из соцсетей</div>
+          </div>
+          <div class="stat">
+            <div class="num">3–5×</div>
+            <div class="label">выше доверие к компании с сайтом vs. странице в соцсети</div>
+          </div>
+          <div class="stat">
+            <div class="num">+40%</div>
+            <div class="label">к конверсии, когда у клиента есть возможность оформить заказ онлайн</div>
+          </div>
+          <div class="stat">
+            <div class="num">0 ₽</div>
+            <div class="label">стоимость «аренды» своего сайта — в отличие от подписки на площадку</div>
+          </div>
+        </div>
+
+        <h3>Сайт vs. Соцсети: честное сравнение</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Критерий</th><th>Свой сайт</th><th>Соцсети / маркетплейсы</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Кому принадлежит</strong></td>
+                <td>Вам на 100%</td>
+                <td>Площадке (могут заблокировать аккаунт)</td>
+              </tr>
+              <tr>
+                <td><strong>SEO и органический трафик</strong></td>
+                <td>Работает годами, бесплатный трафик из поиска</td>
+                <td>Почти отсутствует, всё внутри платформы</td>
+              </tr>
+              <tr>
+                <td><strong>Функциональность</strong></td>
+                <td>Любая: бронирование, оплата, интеграции</td>
+                <td>Ограничена возможностями платформы</td>
+              </tr>
+              <tr>
+                <td><strong>Аналитика</strong></td>
+                <td>Полная: Метрика, GA4, сквозная</td>
+                <td>Обрезанная, данные принадлежат площадке</td>
+              </tr>
+              <tr>
+                <td><strong>Доверие клиентов</strong></td>
+                <td>Высокое: выглядит как серьёзный бизнес</td>
+                <td>Среднее: часто ассоциируется с «самозанятостью»</td>
+              </tr>
+              <tr>
+                <td><strong>Стоимость владения</strong></td>
+                <td>От 300 ₽/мес (хостинг) + разработка</td>
+                <td>Подписка + реклама + комиссии площадки</td>
+              </tr>
+              <tr>
+                <td><strong>Риски</strong></td>
+                <td>Минимальные: ваш домен, ваши правила</td>
+                <td>Блокировки, смена алгоритмов, закрытие платформы</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Когда сайт критически необходим</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>🏢 Услуги и сервисы</h4>
+            <p>Стоматологии, салоны, автосервисы, юристы. Клиенту нужно увидеть прайс, записаться онлайн, прочитать отзывы.</p>
+          </div>
+          <div class="card">
+            <h4>🛍️ E-commerce</h4>
+            <p>Интернет-магазины. Без сайта — это просто группа с каталогом, где каждая продажа требует ручного согласования.</p>
+          </div>
+          <div class="card">
+            <h4>🏨 Бронирование</h4>
+            <p>Отели, аренда, туры, рестораны. Бронирование через мессенджер — это потеря 30–50% заявок вне рабочего времени.</p>
+          </div>
+          <div class="card">
+            <h4>🎓 Образование</h4>
+            <p>Курсы, школы, репетиторы. Лендинг с программой, отзывами и онлайн-оплатой конвертит в 2–3 раза лучше поста.</p>
+          </div>
+          <div class="card">
+            <h4>🏗️ B2B и опт</h4>
+            <p>Корпоративные клиенты гуглят поставщиков. Без сайта вы для них не существуете.</p>
+          </div>
+          <div class="card">
+            <h4>👨‍💼 Личный бренд</h4>
+            <p>Эксперты, спикеры, консультанты. Сайт-портфолио — это ваша визитка, которая работает 24/7.</p>
+          </div>
+        </div>
+
+        <div class="note success">
+          <strong>Главная мысль:</strong> соцсети и сайт — не конкуренты, а части одной системы. Соцсети — это «удочка», сайт — это «кухня», где клиент принимает решение и делает заказ. Без сайта вы теряете до 60% потенциальных клиентов, которые хотят «посмотреть, что это за компания».
+        </div>
+      </section>
+
+      <!-- ================= 15. BOOKING ================= -->
+      <section id="booking">
+        <h2><span class="section-num">15</span>Бронирование и приём заказов на сайте</h2>
+        <p class="lead">Возможность оформить заказ или записаться онлайн в 3 часа ночи — это не «удобная фича», а базовое требование 2026 года. Клиент не будет ждать утра, он уйдёт к конкуренту, у которого есть кнопка «Записаться».</p>
+
+        <h3>Какие типы бронирования бывают</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>📅 По времени (услуги)</h4>
+            <p>Салоны, клиники, консультации, репетиторы. Клиент выбирает дату, время и специалиста.</p>
+            <ul>
+              <li>Учёт рабочего графика сотрудников</li>
+              <li>Автоматические напоминания</li>
+              <li>Онлайн-оплата или оплата на месте</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>🏨 По датам (аренда)</h4>
+            <p>Отели, апартаменты, аренда оборудования, авто, переговорные.</p>
+            <ul>
+              <li>Календарь доступности</li>
+              <li>Расчёт стоимости по датам</li>
+              <li>Депозит и предоплата</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>🛒 Корзина (товары)</h4>
+            <p>Интернет-магазины, доставка еды, цветочные.</p>
+            <ul>
+              <li>Каталог с фильтрами</li>
+              <li>Корзина и оформление заказа</li>
+              <li>Онлайн-оплата и доставка</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>📝 Форма заявки (услуги)</h4>
+            <p>Стройка, ремонт, юридические услуги — где цена индивидуальна.</p>
+            <ul>
+              <li>Короткая форма с расчётом</li>
+              <li>Загрузка файлов (ТЗ, фото)</li>
+              <li>Автоматический расчёт сметы</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Готовые решения для бронирования</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Сервис</th><th>Для кого</th><th>Плюсы</th><th>Минусы</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>YCLIENTS</strong></td>
+                <td>Салоны, клиники, студии</td>
+                <td>Популярный, много интеграций, мобильное приложение</td>
+                <td>Платная подписка, комиссии</td>
+              </tr>
+              <tr>
+                <td><strong>Dikidi</strong></td>
+                <td>Бьюти-сфера, мастера</td>
+                <td>Есть бесплатный тариф, простая настройка</td>
+                <td>Ограниченный функционал в free-версии</td>
+              </tr>
+              <tr>
+                <td><strong>BookTime</strong></td>
+                <td>Автосервисы, сервисные центры</td>
+                <td>Заточен под авто-услуги, учёт постов и мастеров</td>
+                <td>Узкая специализация</td>
+              </tr>
+              <tr>
+                <td><strong>Booking / Ostrovok API</strong></td>
+                <td>Отели, апартаменты</td>
+                <td>Выход на международный рынок</td>
+                <td>Высокие комиссии 15–20%</td>
+              </tr>
+              <tr>
+                <td><strong>Calendly</strong></td>
+                <td>Консультанты, эксперты</td>
+                <td>Простой, интеграция с Zoom/Google Meet</td>
+                <td>Англоязычный, оплата в валюте</td>
+              </tr>
+              <tr>
+                <td><strong>Своя разработка</strong></td>
+                <td>Уникальные задачи</td>
+                <td>Полный контроль, нет абонентской платы</td>
+                <td>Дорого на старте, нужна поддержка</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>5 шагов настройки приёма заказов</h3>
+        <ol class="steps">
+          <li>
+            <h4>Выбрать тип бронирования</h4>
+            <p>Определите, что продаёте: время, товар, услугу с расчётом. От этого зависит решение.</p>
+          </li>
+          <li>
+            <h4>Подключить сервис или разработать модуль</h4>
+            <p>Для типовых задач — готовый виджет. Для уникальных — своя разработка на CMS.</p>
+          </li>
+          <li>
+            <h4>Настроить уведомления</h4>
+            <p>Клиент получает подтверждение на email/SMS. Владелец — в Telegram или CRM.</p>
+          </li>
+          <li>
+            <h4>Интегрировать с CRM</h4>
+            <p>Все заявки автоматически падают в Bitrix24/amoCRM с метками и источником.</p>
+          </li>
+          <li>
+            <h4>Подключить онлайн-оплату</h4>
+            <p>ЮKassa, Тинькофф, CloudPayments — клиент платит сразу, вы получаете деньги быстрее.</p>
+          </li>
+        </ol>
+
+        <h3>Что должно быть в форме заказа</h3>
+        <ul class="checklist">
+          <li><b>Минимум полей</b><span>Имя + телефон/email. Каждое лишнее поле снижает конверсию на 10–15%.</span></li>
+          <li><b>Прозрачная цена</b><span>Клиент должен видеть итог до отправки формы. Скрытые доплаты = отказ.</span></li>
+          <li><b>Согласие на обработку ПДн</b><span>Галочка обязательна по 152-ФЗ. Раздельное согласие на рекламу.</span></li>
+          <li><b>Защита от спама</b><span>Невидимая капча (hCaptcha, Turnstile) — не раздражает клиентов, но блокирует ботов.</span></li>
+          <li><b>Страница благодарности</b><span>После отправки — отдельная страница /thanks. На неё ставится цель в Метрике/GA4.</span></li>
+          <li><b>Мобильная адаптация</b><span>Форма должна удобно заполняться со смартфона: крупные поля, правильные клавиатуры.</span></li>
+        </ul>
+
+        <div class="note warn">
+          <strong>Частая ошибка:</strong> поставить форму бронирования и забыть про неё. Проверяйте раз в неделю: заявки доходят? Уведомления приходят? Календарь актуален? «Мёртвое» бронирование хуже его отсутствия — оно убивает доверие.
+        </div>
+      </section>
+
+      <!-- ================= 16. FEEDBACK WIDGETS ================= -->
+      <section id="feedback">
+        <h2><span class="section-num">16</span>Виджеты обратной связи: типы и выбор</h2>
+        <p class="lead">Виджет обратной связи — это мост между сайтом и клиентом. Правильно подобранный виджет увеличивает конверсию на 15–30%, неправильно выбранный — раздражает и закрывается.</p>
+
+        <h3>Семь типов виджетов</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>💬 Онлайн-чат</h4>
+            <p>Классика. Живой оператор или бот. Подходит для сложных услуг, где нужна консультация.</p>
+            <div><span class="tag pro">Высокая конверсия</span><span class="tag con">Требует оператора</span></div>
+          </div>
+          <div class="card">
+            <h4>📞 Обратный звонок</h4>
+            <p>Клиент оставляет номер — система перезванивает за 28 секунд. Идеально для B2B и дорогих услуг.</p>
+            <div><span class="tag pro">Быстрый отклик</span><span class="tag con">Платный сервис</span></div>
+          </div>
+          <div class="card">
+            <h4>📱 Мессенджеры</h4>
+            <p>Кнопки WhatsApp, Telegram, Viber. Клиент пишет туда, где ему удобно.</p>
+            <div><span class="tag pro">Привычно для клиентов</span><span class="tag con">Нет истории на сайте</span></div>
+          </div>
+          <div class="card">
+            <h4>📧 Форма заявки</h4>
+            <p>Статичная форма на странице. Самый надёжный канал — всё остаётся в CRM.</p>
+            <div><span class="tag pro">Полный контроль</span><span class="tag con">Низкая скорость ответа</span></div>
+          </div>
+          <div class="card">
+            <h4>🤖 AI-чатбот</h4>
+            <p>Отвечает на типовые вопросы 24/7, квалифицирует лиды, передаёт сложные оператору.</p>
+            <div><span class="tag pro">Работает 24/7</span><span class="tag con">Требует настройки</span></div>
+          </div>
+          <div class="card">
+            <h4>⭐ Сбор отзывов</h4>
+            <p>Виджет с просьбой оценить услугу. Повышает доверие и даёт материал для SEO.</p>
+            <div><span class="tag pro">Работает на репутацию</span><span class="tag con">Низкая активность</span></div>
+          </div>
+          <div class="card">
+            <h4>🎯 Callback-триггер</h4>
+            <p>Всплывает, когда клиент хочет уйти с сайта. «Подождите! Оставьте телефон...»</p>
+            <div><span class="tag pro">Возвращает уходящих</span><span class="tag con">Раздражает, если не к месту</span></div>
+          </div>
+        </div>
+
+        <h3>Какой виджет выбрать под задачу</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Тип бизнеса</th><th>Рекомендуемый виджет</th><th>Почему</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Интернет-магазин</strong></td>
+                <td>Мессенджеры + форма заявки</td>
+                <td>Клиенту нужно быстро уточнить наличие/доставку</td>
+              </tr>
+              <tr>
+                <td><strong>Услуги (B2C)</strong></td>
+                <td>Онлайн-чат + обратный звонок</td>
+                <td>Высокий чек, нужна консультация перед покупкой</td>
+              </tr>
+              <tr>
+                <td><strong>B2B / опт</strong></td>
+                <td>Обратный звонок + форма с расчётом</td>
+                <td>Решения принимаются долго, нужен быстрый контакт</td>
+              </tr>
+              <tr>
+                <td><strong>Салоны, клиники</strong></td>
+                <td>Виджет бронирования + мессенджеры</td>
+                <td>Главная цель — запись, а не разговор</td>
+              </tr>
+              <tr>
+                <td><strong>Инфобизнес, курсы</strong></td>
+                <td>AI-бот + форма заявки</td>
+                <td>Много типовых вопросов, бот их закроет</td>
+              </tr>
+              <tr>
+                <td><strong>Лендинг</strong></td>
+                <td>Форма + callback-триггер</td>
+                <td>Одна страница — одна цель, нужен максимум заявок</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Популярные сервисы виджетов</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>💬 Jivo (бывш. JivoSite)</h4>
+            <p>Самый популярный в РФ. Чат + мессенджеры + обратный звонок в одном окне. Интеграция с CRM, Метрикой.</p>
+            <div><span class="tag pro">Всё в одном</span><span class="tag con">Платный от 1200 ₽/мес</span></div>
+          </div>
+          <div class="card">
+            <h4>💬 Carrot quest</h4>
+            <p>Чат + рассылки + AI-бот. Заточен под увеличение конверсии и работу с базой клиентов.</p>
+            <div><span class="tag pro">Мощная автоматизация</span><span class="tag con">Сложнее в настройке</span></div>
+          </div>
+          <div class="card">
+            <h4>📞 Calltouch / CoMagic</h4>
+            <p>Обратный звонок + коллтрекинг. Показывает, с какой рекламы пришёл клиент.</p>
+            <div><span class="tag pro">Сквозная аналитика</span><span class="tag con">Для среднего бизнеса</span></div>
+          </div>
+          <div class="card">
+            <h4>🤖 Chatfuel / SaleBot</h4>
+            <p>AI-боты для Telegram и WhatsApp. Автоматизируют ответы, продают, квалифицируют.</p>
+            <div><span class="tag pro">Работает 24/7</span><span class="tag con">Нужно проектировать сценарии</span></div>
+          </div>
+        </div>
+
+        <h3>Правила настройки, чтобы виджет работал</h3>
+        <ul class="checklist">
+          <li><b>Не показывать сразу</b><span>Задержка 10–15 секунд или после скролла 30%. Мгновенное всплытие = закрытие.</span></li>
+          <li><b>Приветствие от человека</b><span>«Здравствуйте, я Анна, помогу с выбором» работает лучше, чем «Чем могу помочь?»</span></li>
+          <li><b>Быстрый ответ</b><span>В чате — до 30 секунд. Если дольше — клиент уйдёт. Настройте автоответ с временем ожидания.</span></li>
+          <li><b>Мобильная версия</b><span>Виджет не должен перекрывать CTA-кнопки и мешать прокрутке.</span></li>
+          <li><b>Отслеживание в аналитике</b><span>Цели в Метрике: открытие чата, начало диалога, отправка контакта.</span></li>
+          <li><b>A/B-тесты</b><span>Пробуйте разные тексты приветствия, позиции на экране, цвета кнопок.</span></li>
+        </ul>
+
+        <div class="note danger">
+          <strong>Красный флаг:</strong> если виджет подключён, но оператор отвечает через 10+ минут — лучше отключите его совсем. Долгий ответ в чате раздражает сильнее, чем отсутствие чата.
+        </div>
+      </section>
+
+      <!-- ================= 17. SOCIAL ================= -->
+      <section id="social">
+        <h2><span class="section-num">17</span>Продвижение в соцсетях и связь с сайтом</h2>
+        <p class="lead">Соцсети в 2026 году — это не «постить картинки», а полноценный канал продаж. Но без связки с сайтом они работают вполсилы: вы теряете SEO-эффект, аналитику и контроль над аудиторией.</p>
+
+        <h3>Какие соцсети работают в РФ в 2026</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>📱 ВКонтакте</h4>
+            <p>Универсальная площадка. B2C, e-commerce, услуги. Таргетированная реклама.</p>
+          </div>
+          <div class="card">
+            <h4>✈️ Telegram</h4>
+            <p>Каналы, чаты, боты. Экспертный контент, B2B, инфобизнес, сообщества.</p>
+          </div>
+          <div class="card">
+            <h4>🎵 YouTube</h4>
+            <p>Видеоконтент, обучение, обзоры. Работает как поисковик — видео живут годами.</p>
+          </div>
+          <div class="card">
+            <h4>🎬 Dzen</h4>
+            <p>Статьи и ролики. Органический охват, хорошо для контент-маркетинга.</p>
+          </div>
+          <div class="card">
+            <h4>📸 Instagram*</h4>
+            <p>Визуальный контент, бьюти, fashion, HoReCa. Аудитория — через VPN.</p>
+          </div>
+          <div class="card">
+            <h4>🎭 OK (Одноклассники)</h4>
+            <p>Аудитория 35+, регионы. Хорошо для товаров, услуг для дома, семьи.</p>
+          </div>
+          <div class="card">
+            <h4>🎶 VK Клипы / YouTube Shorts</h4>
+            <p>Короткие видео. Быстрый органический охват, привлечение молодой аудитории.</p>
+          </div>
+          <div class="card">
+            <h4>📺 RuTube</h4>
+            <p>Альтернатива YouTube. Растущая площадка, меньше конкуренции.</p>
+          </div>
+        </div>
+
+        <h3>Стратегия продвижения: 6 шагов</h3>
+        <ol class="steps">
+          <li>
+            <h4>Определить ЦА и площадки</h4>
+            <p>Где сидят ваши клиенты? Не надо быть везде — лучше отлично в 2–3 местах.</p>
+          </li>
+          <li>
+            <h4>Упаковать профили</h4>
+            <p>Название, описание, аватар, ссылка на сайт. Единый tone of voice.</p>
+          </li>
+          <li>
+            <h4>Составить контент-план</h4>
+            <p>Полезный : продающий : развлекательный = 60 : 20 : 20. Минимум 3–5 постов в неделю.</p>
+          </li>
+          <li>
+            <h4>Запустить таргет / посевы</h4>
+            <p>ВК — таргет. Telegram — посевы в каналах через биржи (Telega.in). YouTube — pre-roll.</p>
+          </li>
+          <li>
+            <h4>Переливать аудиторию на сайт</h4>
+            <p>Каждый пост — со ссылкой на статью, лендинг, форму. Соцсети → сайт → продажа.</p>
+          </li>
+          <li>
+            <h4>Анализировать и корректировать</h4>
+            <p>UTM-метки на все ссылки. Смотреть, какой контент даёт переходы, а не только лайки.</p>
+          </li>
+        </ol>
+
+        <h3>Как связать соцсети с сайтом</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>🔗 Ссылки в профилях</h4>
+            <p>В шапке каждого профиля — ссылка на сайт. Используйте UTM-метки, чтобы видеть, откуда пришёл клиент.</p>
+          </div>
+          <div class="card">
+            <h4>📲 Виджеты соцсетей на сайте</h4>
+            <p>Иконки в шапке/подвале. Но не перегружайте — только те, где вы активны и где есть клиенты.</p>
+          </div>
+          <div class="card">
+            <h4>📰 Автопостинг статей</h4>
+            <p>Новая статья на сайте → автоматически анонс в Telegram, ВК, Dzen. Экономит часы.</p>
+          </div>
+          <div class="card">
+            <h4>🎯 Ретаргетинг</h4>
+            <p>Пиксель ВК на сайте → показываем рекламу тем, кто был на сайте, но не купил. Конверсия выше в 3–5 раз.</p>
+          </div>
+          <div class="card">
+            <h4>🤖 Telegram-бот на сайте</h4>
+            <p>Клиент авторизуется через Telegram — получает персональные предложения, историю заказов.</p>
+          </div>
+          <div class="card">
+            <h4>📊 Сквозная аналитика</h4>
+            <p>Roistat, Calltouch — видят путь клиента: пост в Telegram → сайт → заявка → продажа.</p>
+          </div>
+        </div>
+
+        <h3>Типичные ошибки в SMM</h3>
+        <ul>
+          <li><strong>Постить «ради галочки».</strong> 3 поста в месяц без стратегии = слив бюджета и времени.</li>
+          <li><strong>Не ставить UTM-метки.</strong> Невозможно понять, какой пост/канал принёс клиента.</li>
+          <li><strong>Игнорировать комментарии.</strong> Неотвеченный комментарий = потерянный клиент и минус к репутации.</li>
+          <li><strong>Копировать контент между площадками.</strong> В Telegram, ВК и Dzen — разные форматы и аудитория.</li>
+          <li><strong>Не работать с возражениями.</strong> Негативный комментарий — возможность показать сервис, а не повод удалять.</li>
+          <li><strong>Забыть про сайт.</strong> Соцсети без перелива на сайт — это «арендованная» аудитория, которую можно потерять.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Правило 80/20 в SMM:</strong> 80% контента — польза, экспертиза, кейсы, ответы на вопросы. 20% — прямые продажи. Если перевернуть — аудитория отписывается.
+        </div>
+
+        <p class="cap">* Instagram принадлежит компании Meta, признанной экстремистской организацией в РФ; её деятельность запрещена на территории России.</p>
+      </section>
+
+      <!-- ================= 18. FUNNEL ================= -->
+      <section id="funnel">
+        <h2><span class="section-num">18</span>Воронка: соцсети → сайт → продажа</h2>
+        <p class="lead">Все три блока — сайт, виджеты, соцсети — работают вместе. Вот как выглядит правильная воронка для бизнеса в 2026 году.</p>
+
+        <ol class="steps">
+          <li>
+            <h4>Охват в соцсетях</h4>
+            <p>Посты, ролики, реклама. Цель — зацепить внимание и вызвать интерес.</p>
+          </li>
+          <li>
+            <h4>Переход на сайт</h4>
+            <p>Ссылка с UTM-меткой в посте, шапке профиля, сторис. Клиент попадает на лендинг или статью.</p>
+          </li>
+          <li>
+            <h4>Прогрев на сайте</h4>
+            <p>Кейсы, отзывы, калькулятор, видео. Клиент убеждается, что вы — то, что нужно.</p>
+          </li>
+          <li>
+            <h4>Контакт через виджет</h4>
+            <p>Чат, форма, обратный звонок, бронирование. Клиент выбирает удобный канал.</p>
+          </li>
+          <li>
+            <h4>Заявка в CRM</h4>
+            <p>Автоматически падает в Bitrix24/amoCRM с пометкой источника и UTM.</p>
+          </li>
+          <li>
+            <h4>Продажа и оплата</h4>
+            <p>Менеджер закрывает сделку или клиент оплачивает онлайн. Деньги приходят быстрее.</p>
+          </li>
+          <li>
+            <h4>Возврат и рекомендации</h4>
+            <p>Рассылка, бонусы, запрос отзыва. Клиент возвращается и приводит друзей.</p>
+          </li>
+        </ol>
+
+        <h3>Что измеряем на каждом этапе</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Этап</th><th>Метрика</th><th>Инструмент</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Охват</strong></td><td>Показы, охват, ER (вовлечённость)</td><td>Внутренняя статистика соцсетей</td></tr>
+              <tr><td><strong>Переход</strong></td><td>CTR, количество переходов</td><td>Яндекс Метрика, GA4</td></tr>
+              <tr><td><strong>Прогрев</strong></td><td>Время на сайте, глубина просмотра</td><td>Метрика, Вебвизор</td></tr>
+              <tr><td><strong>Контакт</strong></td><td>Конверсия в заявку (CR)</td><td>Цели в Метрике/GA4</td></tr>
+              <tr><td><strong>Продажа</strong></td><td>Конверсия заявки в сделку</td><td>CRM (Bitrix24, amoCRM)</td></tr>
+              <tr><td><strong>Деньги</strong></td><td>ROMI, CPA, LTV</td><td>Сквозная аналитика (Roistat)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note success">
+          <strong>Итоговая формула успеха:</strong> свой сайт (фундамент) + удобные виджеты связи (конверсия) + активные соцсети (трафик) + CRM и аналитика (контроль). Уберите любой элемент — и воронка разваливается.
+        </div>
+      </section>
+
+      <!-- ================= PART DIVIDER ================= -->
+      <div class="part-divider"><span>Финал · Сводный чек-лист</span></div>
+
+      <!-- ================= 19. CHECKLIST ================= -->
+      <section id="checklist">
+        <h2><span class="section-num">19</span>Сводный чек-лист: всё ли у вас настроено</h2>
+        <p class="lead">Пройдитесь по пунктам. Если хотя бы половина не отмечена — у вас есть точка роста, которая может дать +30–50% к заявкам без увеличения рекламного бюджета. Список разбит на две части: техническую и маркетинговую.</p>
+
+        <h3>Часть I · Технический фундамент</h3>
+        <ul class="checklist">
+          <li><b>Платформа выбрана под задачу</b><span>Tilda / WordPress / October CMS / OpenCart / 1С-Битрикс / Headless — по типу проекта и бюджету.</span></li>
+          <li><b>Хостинг с NVMe, uptime 99,9% и бэкапами</b><span>Проверен на тестовом периоде, поддержка 24/7 на связи.</span></li>
+          <li><b>Скорость проверена</b><span>PageSpeed Insights и GTmetrix — приемлемые Core Web Vitals.</span></li>
+          <li><b>Техническое SEO на месте</b><span>HTTPS, ЧПУ, robots.txt, sitemap.xml, микроразметка.</span></li>
+          <li><b>Мобильная версия удобна</b><span>Кликабельные CTA, нет горизонтальной прокрутки, читаемый текст.</span></li>
+          <li><b>Безопасность настроена</b><span>Обновления, WAF, 2FA, бэкапы, юридические документы.</span></li>
+          <li><b>Интеграции работают</b><span>Заявки доходят в CRM, оплата и доставка считаются корректно.</span></li>
+          <li><b>Аналитика настроена</b><span>Метрика и GA4, цели, электронная торговля, UTM, коллтрекинг, панели вебмастеров.</span></li>
+          <li><b>Контент готов</b><span>Основные страницы, блог, кейсы, описания — вычитаны редактором.</span></li>
+          <li><b>AI-инструменты подключены</b><span>Чат-бот, AI-поиск по сайту, автоматические инсайты по аналитике — по необходимости.</span></li>
+          <li><b>Юридический минимум на месте</b><span>Политика, согласие на ПДн, cookies, оферта, маркировка рекламы.</span></li>
+          <li><b>Доступность проверена</b><span>Lighthouse Accessibility 90+, клавиатурная навигация, alt-тексты, контраст.</span></li>
+          <li><b>Поддержка запланирована</b><span>Есть ответственный, регламент задач и бюджет на первый год.</span></li>
+        </ul>
+
+        <h3>Часть II · Маркетинг и продажи</h3>
+        <ul class="checklist">
+          <li><b>Свой сайт запущен и работает</b><span>Быстрый, адаптивный, с HTTPS. Не только страница в соцсети.</span></li>
+          <li><b>Настроено онлайн-бронирование или приём заказов</b><span>Клиент может оставить заявку 24/7 без звонка менеджеру.</span></li>
+          <li><b>Подключён хотя бы один виджет связи</b><span>Чат, мессенджеры или форма заявки — в зависимости от ниши.</span></li>
+          <li><b>Виджет настроен правильно</b><span>Не всплывает сразу, с понятным приветствием, с быстрым ответом.</span></li>
+          <li><b>Все заявки падают в CRM</b><span>Ни одна заявка не теряется в почте или мессенджерах.</span></li>
+          <li><b>Есть активные соцсети</b><span>Минимум 2 площадки, где сидит ваша ЦА. Регулярный контент.</span></li>
+          <li><b>Соцсети связаны с сайтом</b><span>Ссылки с UTM, виджеты на сайте, автопостинг статей.</span></li>
+          <li><b>Настроен ретаргетинг</b><span>Пиксель ВК / VK Ads на сайте, возврат «тёплой» аудитории.</span></li>
+          <li><b>Вся аналитика на месте</b><span>Метрика + GA4 + цели + UTM + CRM. Видно ROMI по каждому каналу.</span></li>
+          <li><b>Есть контент-план</b><span>Понятно, что, где и когда публикуем. Не «постим, когда есть время».</span></li>
+          <li><b>Собираем и публикуем отзывы</b><span>На сайте, в картах, в соцсетях. Отзывы = бесплатный маркетинг.</span></li>
+          <li><b>Раз в месяц — анализ</b><span>Что сработало, что нет. Корректируем стратегию, а не действуем наугад.</span></li>
+        </ul>
+
+        <div class="note success">
+          <strong>Финальная мысль:</strong> сайт — это ваш дом. Соцсети — это улицы, по которым ходят люди. Виджеты связи — это открытая дверь. CRM и аналитика — это счётчик посетителей и касса. Без дома улицы бесполезны, без двери — дом бесполезен, без кассы — вы работаете впустую. Соберите всё вместе — и получите работающую систему продаж.
+        </div>
+      </section>
+
+    </article>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div><strong>Идеальный сайт для бизнеса</strong> · CMS, хостинг, скорость, SEO, UX, безопасность, интеграции, аналитика, контент, AI, право, доступность, поддержка, бронирование, виджеты связи, соцсети и воронка продаж</div>
+    <div>Части I–II · Ноябрь 2026 · Материал носит рекомендательный характер. Проверяйте актуальные тарифы и требования платформ.</div>
+  </div>
+</footer>
+
+</body>
+</html>

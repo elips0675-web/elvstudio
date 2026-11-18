@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аудит и точки роста блога ELV Studio — 50 статей</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-alt: #f0f3f7;
+    --text: #1a1f2e;
+    --text-muted: #5b6472;
+    --text-light: #8a94a6;
+    --border: #e3e8ef;
+    --accent: #3b6ef5;
+    --accent-soft: #eef3ff;
+    --accent-2: #00b894;
+    --accent-2-soft: #e6f9f4;
+    --accent-3: #f5a623;
+    --accent-3-soft: #fff6e5;
+    --accent-4: #a855f7;
+    --accent-4-soft: #f6edff;
+    --accent-5: #ec4899;
+    --accent-5-soft: #fdf2f8;
+    --danger: #e5484d;
+    --danger-soft: #fef1f2;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+    --shadow-hover: 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 40px rgba(16, 24, 40, 0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+  }
+  .container { max-width: 1120px; margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 44px 40px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-4), var(--accent-2), var(--accent-3));
+  }
+  .hero-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+  .hero p { font-size: 16px; color: var(--text-muted); max-width: 780px; }
+
+  /* Metrics */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .metric { background: var(--surface); padding: 22px 22px 20px; }
+  .metric .val { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+  .metric .val small { font-size: 13px; color: var(--text-light); font-weight: 500; }
+  .metric .lbl { font-size: 12.5px; color: var(--text-light); margin-top: 4px; }
+
+  /* Section */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 44px 0 8px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 22px; max-width: 800px; }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+  /* Problem */
+  .problem {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .problem-num {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--danger-soft);
+    color: var(--danger);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .problem-body { flex: 1; }
+  .problem-body h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; line-height: 1.35; }
+  .problem-body p { font-size: 14.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .problem-body p:last-child { margin-bottom: 0; }
+  .problem-body strong { color: var(--text); font-weight: 600; }
+  .problem-body code, .hero code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--surface-alt);
+    padding: 1px 6px;
+    border-radius: 5px;
+    color: #c2410c;
+  }
+
+  /* Gap cards */
+  .gap-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border-top: 3px solid var(--danger);
+  }
+  .gap-card .gap-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .gap-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: var(--danger-soft);
+    color: var(--danger);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .gap-card h4 { font-size: 16px; font-weight: 700; line-height: 1.35; }
+  .gap-card p { font-size: 14.5px; color: var(--text-muted); margin-bottom: 10px; }
+  .gap-card p:last-child { margin-bottom: 0; }
+  .gap-card strong { color: var(--text); font-weight: 600; }
+  .gap-card .solution {
+    background: var(--accent-2-soft);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #00876b;
+  }
+  .gap-card .solution strong { color: #006655; }
+
+  /* Table */
+  .table-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+  th, td { padding: 12px 18px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th {
+    background: var(--surface-alt);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfd; }
+  td strong { color: var(--text); font-weight: 600; }
+  td code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; background: var(--surface-alt); padding: 1px 5px; border-radius: 5px; }
+
+  /* Tags */
+  .tag-inline {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 100px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+  }
+  .t-red { background: var(--danger-soft); color: var(--danger); }
+  .t-blue { background: var(--accent-soft); color: var(--accent); }
+  .t-green { background: var(--accent-2-soft); color: #00876b; }
+
+  /* Plan card */
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .plan-card .ph { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .ph-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .plan-card h3 { font-size: 16px; font-weight: 700; line-height: 1.3; }
+  .plan-card .ph-meta { font-size: 12.5px; color: var(--text-light); font-weight: 500; margin-top: 2px; }
+  .plan-card ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .plan-card li { position: relative; padding-left: 18px; font-size: 14.5px; color: var(--text-muted); }
+  .plan-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+  .plan-card li strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+
+  /* Numbered list block */
+  .num-list { list-style: none; counter-reset: num; display: flex; flex-direction: column; gap: 14px; }
+  .num-list > li {
+    counter-increment: num;
+    position: relative;
+    padding-left: 46px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+  }
+  .num-list > li::before {
+    content: counter(num);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .num-list > li strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 3px; font-size: 15px; }
+
+  /* Priority */
+  .p-line {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .p-badge {
+    flex-shrink: 0;
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .p0 { background: var(--danger-soft); color: var(--danger); }
+  .p1 { background: var(--accent-3-soft); color: #b47700; }
+  .p2 { background: var(--accent-2-soft); color: #00876b; }
+  .p-line .pb h4 { font-size: 15.5px; font-weight: 700; margin-bottom: 8px; }
+  .p-line .pb ol { padding-left: 20px; margin: 0; }
+  .p-line .pb li { font-size: 14.5px; color: var(--text-muted); margin-bottom: 5px; }
+  .p-line .pb li:last-child { margin-bottom: 0; }
+  .p-line .pb strong { color: var(--text); font-weight: 600; }
+
+  /* Alert */
+  .alert {
+    background: var(--danger-soft);
+    border: 1px solid #fbc9cb;
+    border-left: 4px solid var(--danger);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 24px 28px;
+    margin-top: 22px;
+  }
+  .alert h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; color: var(--danger); display: flex; align-items: center; gap: 8px; }
+  .alert p { font-size: 14.5px; color: #7a1e21; }
+  .alert p:last-child { margin-bottom: 0; }
+  .alert strong { color: #4d0e11; font-weight: 600; }
+
+  /* Example */
+  .example {
+    background: linear-gradient(135deg, var(--accent-soft), var(--surface));
+    border: 1px solid #dce6ff;
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-top: 22px;
+  }
+  .example h3 { font-size: 17px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+  .cmp { background: var(--surface); border-radius: var(--radius-sm); padding: 18px 20px; border: 1px solid var(--border); }
+  .cmp h5 { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+  .cmp.bad h5 { color: var(--danger); }
+  .cmp.good h5 { color: #00876b; }
+  .cmp p { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+  .cmp p:last-child { margin-bottom: 0; }
+  .cmp strong { color: var(--text); }
+
+  /* Footnote */
+  .footnote { text-align: center; font-size: 13px; color: var(--text-light); margin-top: 32px; padding: 16px; }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    body { padding: 24px 14px; }
+    .hero { padding: 28px 22px; }
+    .hero h1 { font-size: 25px; }
+    .problem, .p-line { padding: 18px; flex-direction: column; gap: 10px; }
+    .section-title { font-size: 19px; }
+    .compare { grid-template-columns: 1fr; }
+    .card, .gap-card, .plan-card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <span class="hero-label">Аудит блога · 16.11.2026</span>
+    <h1>50 статей ELV Studio: что есть, где пробелы и о чём писать дальше</h1>
+    <p>Полный разбор выгрузки <code>elv_kit_posts</code> — данные, проблемы, gap-анализ, кластеры перелинковки, конверсия в Elv Kit и конкретные темы, которых в блоге не хватает.</p>
+  </header>
+
+  <!-- ============ METRICS ============ -->
+  <div class="metrics">
+    <div class="metric"><div class="val">50</div><div class="lbl">всего статей</div></div>
+    <div class="metric"><div class="val">35 / 15</div><div class="lbl">business / tech</div></div>
+    <div class="metric"><div class="val">2 043<small> симв.</small></div><div class="lbl">средняя business</div></div>
+    <div class="metric"><div class="val">1 159<small> симв.</small></div><div class="lbl">средняя tech</div></div>
+    <div class="metric"><div class="val">828</div><div class="lbl">самая короткая (ID 16)</div></div>
+    <div class="metric"><div class="val">20</div><div class="lbl">статей от 14.11.2026</div></div>
+  </div>
+
+  <!-- ============ SECTION 1: ЧТО ЕСТЬ ============ -->
+  <h2 class="section-title"><span class="num">1</span>Что есть сейчас</h2>
+  <p class="section-subtitle">
+    50 статей делятся на два раздела. Business (70%) — для владельцев бизнеса: выбор, запуск, оплата, запись, SEO, контент. Tech (30%) — для разработчиков: производительность, безопасность, инфраструктура, инженерные практики на October CMS / Laravel.
+  </p>
+
+  <div class="grid">
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-soft);color:var(--accent);">💼</span>
+        <div>
+          <h3>Business · 35 статей</h3>
+          <div class="ph-meta">Для владельцев малого бизнеса</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>Запуск и выбор</strong>21, 39, 40, 41, 45 — конструктор vs разработка, цена, оплата, чек-лист</li>
+        <li><strong>Запись и неявки</strong>35, 43, 44, 46 — бронирование, неявки, напоминания, мессенджер</li>
+        <li><strong>Отрасли</strong>47, 48, 49 — салон, мастер, магазин</li>
+        <li><strong>SEO и трафик</strong>3, 14, 24, 28 — Google, meta, фундамент, аналитика</li>
+        <li><strong>Контент и продажи</strong>4, 20, 29, 34, 37, 38, 50 — блог, план, воронка, отзывы</li>
+        <li><strong>Инфраструктура</strong>22, 26, 27, 32 — хостинг, безопасность, интеграции, доступность</li>
+        <li><strong>Прочее</strong>12, 23, 25, 30, 31, 33, 36, 42 — админка, скорость, UX, AI, право, поддержка, виджеты, конверсия</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-4-soft);color:var(--accent-4);">⚙️</span>
+        <div>
+          <h3>Tech · 15 статей</h3>
+          <div class="ph-meta">Для разработчиков и технических владельцев</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>Производительность</strong>5, 8, 11, 13 — Core Web Vitals, внешние запросы, CSS-бюджет, кэш</li>
+        <li><strong>Безопасность и надёжность</strong>7, 9, 10, 15 — вебхуки, токены, бэкапы, антиспам</li>
+        <li><strong>SEO-техника</strong>6, 19 — JSON-LD, sitemap/robots/llms</li>
+        <li><strong>Инженерные практики</strong>17, 18 — миграции, очередь на database</li>
+        <li><strong>Бронирование</strong>2 — защита от овербукинга</li>
+        <li><strong>Архитектура и контент</strong>1, 16 — October CMS, чек-лист статьи</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 2: GAP-АНАЛИЗ ============ -->
+  <h2 class="section-title"><span class="num">2</span>Критические пробелы в контенте</h2>
+  <p class="section-subtitle">
+    База знаний отличная, но отсутствуют форматы, которые напрямую закрывают сделки. Три главных пробела.
+  </p>
+
+  <div class="grid">
+
+    <div class="gap-card">
+      <div class="gap-head">
+        <span class="gap-tag">Пробел</span>
+      </div>
+      <h4>Нет реальных кейсов с цифрами</h4>
+      <p>Есть теория («Как настроить онлайн-бронирование»), но нет доказательств эффективности. В описаниях упоминаются «примеры с числом», но отдельных разборов нет.</p>
+      <div class="solution">
+        <strong>Решение:</strong> 3 статьи формата «Как мы внедрили онлайн-запись в салоне X и снизили неявки на 30% за месяц». Структура: Точка А → Внедрение Elv Kit → Точка Б (метрики).
+      </div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-head">
+        <span class="gap-tag">Пробел</span>
+      </div>
+      <h4>Нет готовых шаблонов (лид-магнитов)</h4>
+      <p>Статьи предлагают чек-листы текстом, но их нельзя «забрать с собой». Это упущенная возможность сбора email.</p>
+      <div class="solution">
+        <strong>Решение:</strong> Превратить статьи <strong>41</strong> («15 пунктов»), <strong>45</strong> («Что подготовить к запуску») и <strong>31</strong> («Юридические аспекты») в PDF-файлы. Добавить форму: «Скачать чек-лист в PDF за e-mail».
+      </div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-head">
+        <span class="gap-tag">Пробел</span>
+      </div>
+      <h4>Нет сравнений «до/после» для визуалов</h4>
+      <p>Статьи про UX/UI (<strong>25</strong>) и доступность (<strong>32</strong>) читаются, но не показываются.</p>
+      <div class="solution">
+        <strong>Решение:</strong> Добавить реальные скриншоты плохих форм и их исправленных версий с пояснением, почему второй вариант конвертит лучше.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 3: 8 ПРОБЛЕМ ============ -->
+  <h2 class="section-title"><span class="num">3</span>Восемь проблем, подтверждённых данными</h2>
+  <p class="section-subtitle">
+    Каждая проблема подкреплена конкретными ID статей и цифрами из выгрузки.
+  </p>
+
+  <div class="problem">
+    <span class="problem-num">1</span>
+    <div class="problem-body">
+      <h4>245 слов — это не статья, а tech-раздел ещё короче</h4>
+      <p>Средняя business-статья — <strong>2 043 символа</strong> (~290 слов), tech — <strong>1 159 символов</strong> (~165 слов). Самая короткая (ID 16, «Чек-лист статьи: 12 пунктов») — <strong>828 символов</strong>. Сам чек-лист из 12 пунктов с пояснениями физически не влезает. Обещание в SEO-описании («один H1, лид, canonical, JSON-LD…») в тексте не выполняется.</p>
+      <p>Весь блог на 50 статей — это ~<strong>89 000 символов ≈ 12 700 слов</strong>. Столько должен весить один хороший pillar-лонгрид. Для конкурентных запросов в 2026 Google Helpful Content такие тексты не ранжирует.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">2</span>
+    <div class="problem-body">
+      <h4>8 статей с дублирующимся meta description</h4>
+      <p>У статей <span class="tag-inline t-red">3</span><span class="tag-inline t-red">14</span><span class="tag-inline t-red">42</span><span class="tag-inline t-red">46</span><span class="tag-inline t-red">47</span><span class="tag-inline t-red">48</span><span class="tag-inline t-red">49</span><span class="tag-inline t-red">50</span> SEO-описание дословно совпадает с кратким. Google подставляет свой сниппет — CTR падает. Правка за час: формула «ключ + выгода + цифра + глагол» на каждую страницу.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">3</span>
+    <div class="problem-body">
+      <h4>5 пар дублирующихся тем</h4>
+      <div class="table-wrapper" style="margin-top:12px;">
+        <table>
+          <thead><tr><th>Пары</th><th>Проблема</th></tr></thead>
+          <tbody>
+            <tr><td><strong>43 + 44</strong></td><td>неявки + напоминания — одна тема, разбитая на две слабые</td></tr>
+            <tr><td><strong>35 + 46</strong></td><td>бронирование + онлайн-запись vs мессенджер — пересекаются в 60%</td></tr>
+            <tr><td><strong>24 + 3 + 19</strong></td><td>SEO-фундамент + Google-чек-лист + sitemap/robots — три куска одного pillar</td></tr>
+            <tr><td><strong>4 + 29 + 20</strong></td><td>блог-продаёт + контент-маркетинг + контент-план</td></tr>
+            <tr><td><strong>41 + 45</strong></td><td>проверка перед запуском + что подготовить к запуску</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px;">5 пар можно слить в 5 pillar-статей по 2 500–3 500 слов — трафик вырастет сильнее, чем от 10 тонких.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">4</span>
+    <div class="problem-body">
+      <h4>Ноль кейсов на 50 статей</h4>
+      <p>В описаниях обещано «реальный лендинг», «пример из Elv Booking», «на цифрах» — но <strong>ни одна статья не построена как кейс</strong>: клиент → проблема → что сделали → цифры до/после → сроки. Для студии это главный пропущенный формат: он продаёт без прямых продаж.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">5</span>
+    <div class="problem-body">
+      <h4>20 статей с одной датой</h4>
+      <p><strong>20 из 50</strong> датированы 14.11.2026. Для Google это content dump, а не живой блог. Нужно распределить на 10–14 недель.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">6</span>
+    <div class="problem-body">
+      <h4>Обещание на главной противоречит данным</h4>
+      <p>На главной: «понятным языком, 1 статья в две недели». По факту — 50 статей за 11 недель (≈4,5 в неделю). Клиент, который посмотрит даты, увидит несоответствие.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">7</span>
+    <div class="problem-body">
+      <h4>Нет статей под коммерческие запросы</h4>
+      <p>Из 50 только одна про цену (39). <strong>Ноль</strong> про «как выбрать студию», «договор», «сколько стоит поддержка», «аудит сайта», «миграция с конструктора». Нет текстов под горячий intent — тех, где человек готов платить.</p>
+    </div>
+  </div>
+
+  <div class="problem">
+    <span class="problem-num">8</span>
+    <div class="problem-body">
+      <h4>Tech и Business не связаны перелинковкой</h4>
+      <p>Владелец, читающий «Хостинг» (22), не увидит «Кэш и заголовки» (13). Разработчик, читающий «Core Web Vitals» (5), не увидит «Почему сайт медленно грузится» (23). Нужны перекрёстные ссылки: каждая business → 1 tech, каждая tech → 1 business, каждая → коммерческая страница.</p>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 4: ЧТО ДЕЛАТЬ С 50 ============ -->
+  <h2 class="section-title"><span class="num">4</span>Что делать с существующими 50</h2>
+  <p class="section-subtitle">
+    Не переписывать всё, а точечно усилить: слить дубли, расширить короткие, починить meta, разнести даты, связать перекрёстными ссылками.
+  </p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Действие</th><th>Статьи</th><th>Результат</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Слить в 5 pillar-статей</strong></td><td><code>43+44</code>, <code>35+46</code>, <code>24+3+19</code>, <code>4+29+20</code>, <code>41+45</code></td><td>5 текстов по 2 500–3 500 слов вместо 12 по 250</td></tr>
+        <tr><td><strong>Расширить до 1 500–2 500 слов</strong></td><td>15 tech-статей (все 828–1 484 симв.)</td><td>реальные примеры кода, схемы, скриншоты — сейчас их нет</td></tr>
+        <tr><td><strong>Переписать meta</strong></td><td><code>3</code>, <code>14</code>, <code>42</code>, <code>46</code>, <code>47</code>, <code>48</code>, <code>49</code>, <code>50</code></td><td>уникальные сниппеты вместо дублей</td></tr>
+        <tr><td><strong>Разнести даты</strong></td><td>20 от 14.11.2026</td><td>1–2 публикации в неделю — живой блог</td></tr>
+        <tr><td><strong>Добавить cross-links</strong></td><td>все 50</td><td>связать tech ↔ business ↔ коммерческие</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ SECTION 5: КЛАСТЕРЫ ПЕРЕЛИНКОВКИ ============ -->
+  <h2 class="section-title"><span class="num">5</span>Кластеры перелинковки (SEO-структура)</h2>
+  <p class="section-subtitle">
+    При 50 статьях высок риск «сиротских» страниц. Нужно жёстко связать материалы в тематические кластеры: одна pillar-статья собирает трафик, поддерживающие ведут на неё.
+  </p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Кластер (тема)</th><th>Якорная статья (Pillar)</th><th>Поддерживающие статьи (ссылки ведут сюда)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Запуск сайта</strong></td>
+          <td>ID 45: Что подготовить к запуску сайта</td>
+          <td>ID 41 (15 пунктов), ID 24 (SEO-фундамент), ID 31 (Юр. аспекты), ID 22 (Хостинг)</td>
+        </tr>
+        <tr>
+          <td><strong>Онлайн-запись</strong></td>
+          <td>ID 35: Онлайн-бронирование на сайте</td>
+          <td>ID 43 (Неявки), ID 44 (Напоминания), ID 2 (Овербукинг), ID 46 (Мессенджер vs запись)</td>
+        </tr>
+        <tr>
+          <td><strong>Скорость и SEO</strong></td>
+          <td>ID 23: Почему сайт медленно грузится</td>
+          <td>ID 5 (Core Web Vitals), ID 8 (Внешние запросы), ID 11 (Инлайн CSS), ID 13 (Кэш)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ SECTION 6: КОНВЕРСИЯ В ELV KIT ============ -->
+  <h2 class="section-title"><span class="num">6</span>Конверсия из блога в продукт (Elv Kit)</h2>
+  <p class="section-subtitle">
+    Читатель должен понимать, как применить теорию на практике с помощью вашего продукта. Три конкретных тактики.
+  </p>
+
+  <ol class="num-list">
+    <li>
+      <strong>Контекстные CTA вместо общих</strong>
+      В конце статьи ID 40 («Как принимать оплату») — не «Подпишитесь на блог», а: «Посмотрите, как это работает в демо-версии Elv Kit» со ссылкой на песочницу.
+    </li>
+    <li>
+      <strong>Виджеты внутри текста</strong>
+      В статью ID 36 («Виджеты обратной связи») встроить живой пример вашего ИИ-консультанта или формы с комментарием: «Именно такой виджет уже встроен в Elv Kit».
+    </li>
+    <li>
+      <strong>Блок «Сложно внедрять самому?»</strong>
+      В технических статьях (ID 7, 9, 17) добавить сноску: «В Elv Kit эти процессы (идемпотентность, токены, миграции) уже настроены по умолчанию».
+    </li>
+  </ol>
+
+  <!-- ============ SECTION 7: ФОРМАТ И АКТУАЛИЗАЦИЯ ============ -->
+  <h2 class="section-title"><span class="num">7</span>Формат и актуализация контента</h2>
+  <p class="section-subtitle">
+    Два механизма, которые повышают время на странице и защищают от устаревания.
+  </p>
+
+  <div class="grid">
+
+    <div class="card" style="border-top:3px solid var(--accent-2);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="tag-inline t-green" style="font-size:11px;text-transform:uppercase;letter-spacing:0.04em;">SEO</span>
+      </div>
+      <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;">Механизм актуализации (Evergreen)</h4>
+      <p style="font-size:14.5px;color:var(--text-muted);">Статьи от августа–сентября 2026 (например, ID 37 про соцсети) могут устареть. <strong style="color:var(--text);">Действие:</strong> добавить в шаблон статьи поле «Дата последнего обновления». Раз в квартал пробегать по топ-10 статьям и обновлять скриншоты, цифры и упоминания законов (например, 152-ФЗ).</p>
+    </div>
+
+    <div class="card" style="border-top:3px solid var(--accent-3);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="tag-inline" style="background:var(--accent-3-soft);color:#b47700;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;">Конверсия</span>
+      </div>
+      <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;">Видео-саммари для технических статей</h4>
+      <p style="font-size:14.5px;color:var(--text-muted);">Статьи типа ID 7 («Вебхук оплаты») или ID 17 («Миграции») сложны для восприятия. <strong style="color:var(--text);">Действие:</strong> записать 60-секундный скринкаст (Loom) для каждой сложной технической статьи и вставить в начало. Это увеличит время на странице (поведенческий фактор для SEO) и снизит процент отказов.</p>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 8: О ЧЁМ ПИСАТЬ ДАЛЬШЕ ============ -->
+  <h2 class="section-title"><span class="num">8</span>О чём писать дальше</h2>
+  <p class="section-subtitle">
+    Конкретные темы, которых в блоге нет. С обоснованием, почему именно они и какой запрос закрывают.
+  </p>
+
+  <div class="grid">
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-soft);color:var(--accent);">💰</span>
+        <div>
+          <h3>Коммерческие (высокий intent)</h3>
+          <div class="ph-meta">5 статей · горячие запросы</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«Сколько стоит поддержка сайта в месяц»</strong>Сейчас есть только стоимость создания (39). Поддержка — регулярный платёж, её ищут владельцы уже с сайтом.</li>
+        <li><strong>«Как выбрать веб-студию: 7 вопросов»</strong>Ноль статей про выбор подрядчика — это первый этап воронки.</li>
+        <li><strong>«Договор на разработку сайта: что в ТЗ»</strong>Юридические аспекты (31) есть, про договор с подрядчиком — нет.</li>
+        <li><strong>«Миграция с Tilda / WordPress на October CMS»</strong>Статья 1 сравнивает October с конструктором абстрактно, без Tilda и WP. Запрос «перейти с Tilda» — горячий.</li>
+        <li><strong>«Аудит сайта: как понять, что пора переделывать»</strong>Сейчас только «как проверить перед запуском» (41). А те, у кого сайт уже есть и не работает — самая платёжеспособная аудитория.</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-5-soft);color:var(--accent-5);">📊</span>
+        <div>
+          <h3>Кейсы с цифрами</h3>
+          <div class="ph-meta">3–5 статей · главный формат</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«Кейс: переделали сайт салона — записи выросли на X%»</strong>Формат: клиент → проблема → что сделали → цифры до/после → сроки → цена.</li>
+        <li><strong>«Кейс: магазин на October CMS обрабатывает 500 заказов/мес»</strong>Показывает админку и результат в реальной эксплуатации.</li>
+        <li><strong>«Кейс: убрали 12 внешних скриптов — LCP упал с 4,2 с до 1,3 с»</strong>Tech-кейс с замером Lighthouse до/после.</li>
+        <li><strong>«Кейс: напоминания и предоплата снизили неявки на N%»</strong>Связка business-механики с деньгами.</li>
+        <li><strong>«Кейс: перенос сайта с конструктора — что потеряли и приобрели»</strong>Прямой ответ на запрос миграции.</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-2-soft);color:var(--accent-2);">🏪</span>
+        <div>
+          <h3>Отраслевые посадочные</h3>
+          <div class="ph-meta">3 статьи · новые ниши</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«Сайт для кафе или ресторана»</strong>Меню, бронь столов, доставка, интеграция с iiko / R-Keeper. Ниша не покрыта.</li>
+        <li><strong>«Сайт для клиники или медцентра»</strong>Запись, 152-ФЗ, лицензии, доверие. Регуляторка — фильтр от конкурентов.</li>
+        <li><strong>«Сайт для автосервиса»</strong>Запись, калькулятор стоимости, отзывы, фото до/после. Высокий LTV клиента.</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-4-soft);color:var(--accent-4);">🤖</span>
+        <div>
+          <h3>GEO / AI-поиск</h3>
+          <div class="ph-meta">1 pillar + 2 сателлита</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«Как попасть в ответы ChatGPT, Perplexity и Яндекс Нейро»</strong>Статья 3 касается ИИ-поиска в одном абзаце, 19 — llms.txt. Отдельного разбора нет. Направление в 2026 растёт быстрее обычного SEO.</li>
+        <li><strong>«llms.txt: карта сайта для ИИ-моделей»</strong>Сателлит с примерами файла.</li>
+        <li><strong>«Что AI-поиск берёт в ответы, а что игнорирует»</strong>Разбор структуры контента под цитирование.</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-3-soft);color:#b47700;">📈</span>
+        <div>
+          <h3>Конверсия и удержание</h3>
+          <div class="ph-meta">3 статьи · шаг после «заявки есть»</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«A/B-тесты на малом трафике»</strong>Ноль статей. Следующий шаг после «заявки есть, продаж нет» (42).</li>
+        <li><strong>«Email-маркетинг для малого бизнеса»</strong>Подписная база упоминается на главной, но что с ней делать — не написано.</li>
+        <li><strong>«Тепловые карты и записи сессий»</strong>Яндекс.Метрика и Hotjar не упомянуты ни в одной статье, кроме общей «Веб-аналитика» (28).</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="ph">
+        <span class="ph-icon" style="background:var(--accent-soft);color:var(--accent);">🔧</span>
+        <div>
+          <h3>Tech-углубление</h3>
+          <div class="ph-meta">3 статьи · чего нет в текущих 15</div>
+        </div>
+      </div>
+      <ul>
+        <li><strong>«Плагин October CMS: как устроен и когда писать свой»</strong>Сейчас только «Почему October» (1) на архитектурном уровне — без практики.</li>
+        <li><strong>«Тестирование форм и оплаты: что автоматизировать»</strong>Тема тестирования отсутствует полностью.</li>
+        <li><strong>«Логи и мониторинг October CMS»</strong>Бэкапы (10) есть, мониторинга — нет. Без него бэкап обнаруживается, когда уже поздно.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 9: ПРИОРИТЕТ ============ -->
+  <h2 class="section-title"><span class="num">9</span>Приоритет внедрения</h2>
+  <p class="section-subtitle">
+    Что делать в первую очередь, что через месяц, что через квартал. Порядок — по соотношению «усилие / результат».
+  </p>
+
+  <div class="p-line">
+    <span class="p-badge p0">P0</span>
+    <div class="pb">
+      <h4>Эта неделя — быстрые правки с максимальным эффектом</h4>
+      <ol>
+        <li>Написать <strong>1 кейс с цифрами</strong> — без него блог не продаёт.</li>
+        <li>Переписать <strong>8 дублирующихся meta</strong> (3, 14, 42, 46, 47, 48, 49, 50).</li>
+        <li>Разнести <strong>20 дат</strong> от 14.11.2026 на 10–14 недель.</li>
+        <li>Сделать <strong>PDF-лид-магниты</strong> из статей 41, 45, 31 и добавить форму сбора email.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="p-line">
+    <span class="p-badge p1">P1</span>
+    <div class="pb">
+      <h4>1–2 месяца — структура и коммерция</h4>
+      <ol>
+        <li>Слить 5 пар в <strong>pillar-статьи</strong> (43+44, 35+46, 24+3+19, 4+29+20, 41+45).</li>
+        <li>Настроить <strong>3 кластера перелинковки</strong> (запуск, онлайн-запись, скорость+SEO).</li>
+        <li>Написать <strong>5 коммерческих статей</strong>: поддержка, выбор студии, договор, миграция, аудит.</li>
+        <li>Добавить <strong>3 отраслевых</strong>: кафе, клиника, автосервис.</li>
+        <li>Внедрить <strong>контекстные CTA в Elv Kit</strong> в статьи 40, 36 и тех-раздел (7, 9, 17).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="p-line">
+    <span class="p-badge p2">P2</span>
+    <div class="pb">
+      <h4>3 месяца — серии и углубление</h4>
+      <ol>
+        <li>Серия из <strong>3–5 кейсов</strong> с цифрами и сроками.</li>
+        <li><strong>Pillar по GEO / AI-поиску</strong> + 2 сателлита (llms.txt, что AI берёт в ответы).</li>
+        <li>Блок по конверсии: <strong>A/B, email, тепловые карты</strong>.</li>
+        <li>Tech-углубление: <strong>плагин October CMS, тестирование, мониторинг</strong>.</li>
+        <li>Добавить <strong>видео-саммари</strong> к тех-статьям 7, 9, 17.</li>
+        <li>Внедрить <strong>дату последнего обновления</strong> и квартальный ревью топ-10 статей.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============ ALERT ============ -->
+  <div class="alert">
+    <h3>⚠️ Главный приоритет на ближайший месяц</h3>
+    <p>Перестать писать новые теоретические статьи. Взять 3 существующие темы (<strong>онлайн-запись, приём оплаты, скорость сайта</strong>) и переписать их в формат <strong>«Пошаговый разбор реального внедрения в Elv Kit с цифрами»</strong>. Это превратит блог из справочника в инструмент продаж.</p>
+  </div>
+
+  <!-- ============ EXAMPLE ============ -->
+  <div class="example">
+    <h3>💎 Пример — как переделать статью 16</h3>
+    <p style="color:var(--text-muted);font-size:14.5px;">Самая короткая в блоге — 828 символов. Заголовок обещает 12 пунктов, а физически их не влезает. Вот как должно быть:</p>
+    <div class="compare">
+      <div class="cmp bad">
+        <h5>Сейчас</h5>
+        <p><strong>828 символов · 130 слов</strong></p>
+        <p>«Двенадцать проверок перед публикацией: один H1, лид с ответом, title и description, canonical, JSON-LD, консоль и мобильная вёрстка» — всё в одном SEO-описании, а в тексте ничего из этого не раскрыто.</p>
+      </div>
+      <div class="cmp good">
+        <h5>Как должно быть</h5>
+        <p><strong>1 500–2 000 слов</strong></p>
+        <p>H1: «Чек-лист статьи перед публикацией: 12 проверок, которые ловят ошибки до выхода». Каждый пункт: <strong>что проверить → почему важно → пример ошибки → как исправить</strong>. В конце — скачиваемый PDF (лид-магнит). Внутренние ссылки на 5 (Core Web Vitals), 6 (JSON-LD), 19 (sitemap/robots).</p>
+      </div>
+    </div>
+    <p style="color:var(--text-muted);font-size:14px;margin-top:14px;">Одна переделанная статья такого формата даст больше трафика и подписок, чем 10 текущих по 250 слов.</p>
+  </div>
+
+  <p class="footnote">ELV Studio · Аудит и точки роста блога · 16.11.2026</p>
+
+</div>
+</body>
+</html>

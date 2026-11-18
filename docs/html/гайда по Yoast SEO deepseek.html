@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Как писать статьи для веб-студии по стандарту Yoast SEO — гайд 2026</title>
+<meta name="description" content="Готовый стандарт написания статей для веб-студии под Yoast SEO: фокусная фраза, структура H1–H3, читаемость, мета-теги, ссылки, alt-тексты. Шаблон, чек-лист и примеры мета-данных.">
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --ink:#16202c;
+    --ink-soft:#4a5b6d;
+    --line:#e2e8f0;
+    --accent:#2563eb;
+    --accent-soft:#e8f0fe;
+    --green:#0f9d58;
+    --amber:#b45309;
+    --red:#dc2626;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,32,56,.06), 0 8px 24px rgba(16,32,56,.06);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- Hero ---------- */
+  .hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#2563eb 100%);color:#fff;padding:60px 24px 70px}
+  .hero-inner{max-width:1120px;margin:0 auto}
+  .hero .eyebrow{display:inline-block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:999px;margin-bottom:20px}
+  .hero h1{font-size:clamp(27px,4vw,44px);line-height:1.15;margin:0 0 16px;letter-spacing:-.02em}
+  .hero p{font-size:clamp(15px,1.5vw,19px);color:#dbe6ff;max-width:860px;margin:0}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .hero-tags span{font-size:13.5px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);color:#eaf0ff}
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .layout{display:grid;grid-template-columns:270px 1fr;gap:40px;align-items:start;padding:48px 0 72px}
+
+  /* ---------- TOC ---------- */
+  .toc{position:sticky;top:24px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 18px;box-shadow:var(--shadow);max-height:calc(100vh - 48px);overflow-y:auto}
+  .toc h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 14px}
+  .toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
+  .toc li{counter-increment:toc;margin-bottom:2px}
+  .toc a{display:block;padding:7px 10px 7px 34px;border-radius:8px;color:var(--ink);font-size:13.5px;position:relative;line-height:1.35}
+  .toc a::before{content:counter(toc,decimal-leading-zero);position:absolute;left:8px;top:9px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);width:20px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .toc a:hover{background:var(--accent-soft);text-decoration:none}
+
+  /* ---------- Article ---------- */
+  article{min-width:0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:32px 34px;box-shadow:var(--shadow);margin-bottom:28px;scroll-margin-top:24px}
+  section > h2{font-size:clamp(22px,2.4vw,28px);line-height:1.25;letter-spacing:-.015em;margin:0 0 6px}
+  .section-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 9px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;margin-right:10px;vertical-align:2px}
+  section > h2 + .lead{color:var(--ink-soft);font-size:16.5px;margin:14px 0 24px}
+  h3{font-size:19px;margin:28px 0 12px;letter-spacing:-.01em}
+  h3:first-of-type{margin-top:8px}
+  h4{font-size:16.5px;margin:20px 0 8px}
+  p{margin:0 0 14px}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{margin-bottom:8px}
+  strong{color:var(--ink)}
+  .muted{color:var(--ink-soft)}
+  code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.9em}
+
+  /* ---------- Table ---------- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:22px 0 12px;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+  thead th{background:#f1f5fb;text-align:left;padding:12px 14px;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  .cap{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px}
+
+  /* ---------- Cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:22px 0 8px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:18px 18px 14px;background:#fbfcfe}
+  .card h4{margin:0 0 8px;font-size:16px}
+  .card p{font-size:14.5px;color:var(--ink-soft);margin:0}
+  .card ul{padding-left:18px;font-size:14.5px;color:var(--ink-soft);margin:8px 0 0}
+  .tag{display:inline-block;padding:3px 10px;background:#eef2f7;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:600;color:var(--ink-soft);margin-right:5px;margin-top:6px}
+  .tag.pro{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+  .tag.con{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+  .tag.new{background:var(--accent-soft);color:var(--accent);border-color:#c7d2fe}
+
+  /* ---------- Note ---------- */
+  .note{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 10px 10px 0;padding:16px 18px;margin:22px 0;font-size:15.5px}
+  .note strong{color:#1e40af}
+  .note.warn{border-left-color:#d97706;background:#fffbeb}
+  .note.warn strong{color:var(--amber)}
+  .note.danger{border-left-color:var(--red);background:#fef2f2}
+  .note.danger strong{color:var(--red)}
+  .note.success{border-left-color:var(--green);background:#ecfdf5}
+  .note.success strong{color:#047857}
+
+  /* ---------- Checklist ---------- */
+  .checklist{list-style:none;padding:0;margin:18px 0 10px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .checklist li{position:relative;padding:13px 18px 13px 48px;margin:0;border-bottom:1px solid var(--line);font-size:15.5px;background:#fff}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:"✓";position:absolute;left:16px;top:12px;width:21px;height:21px;border-radius:50%;background:var(--green);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+  .checklist li b{display:block;margin-bottom:2px}
+  .checklist li span{color:var(--ink-soft);font-size:14.5px}
+
+  /* ---------- Template block ---------- */
+  .template{background:#0f172a;color:#dbe6ff;border-radius:12px;padding:22px 24px;margin:22px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.7;overflow-x:auto;white-space:pre}
+  .template .h{color:#93b4ff;font-weight:700}
+  .template .muted{color:#7d8ba4}
+
+  /* ---------- Steps ---------- */
+  .steps{list-style:none;padding:0;margin:18px 0;counter-reset:step}
+  .steps li{counter-increment:step;position:relative;padding:0 0 20px 52px;margin:0 0 0 16px;border-left:2px solid var(--line)}
+  .steps li:last-child{border-left-color:transparent;padding-bottom:0}
+  .steps li::before{content:counter(step);position:absolute;left:-17px;top:-2px;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .steps h4{margin:0 0 6px;font-size:16.5px}
+  .steps p{margin:0;font-size:15px;color:var(--ink-soft)}
+
+  /* ---------- Meta example ---------- */
+  .meta-example{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+  .meta-example dt{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:700;margin-top:12px}
+  .meta-example dt:first-child{margin-top:0}
+  .meta-example dd{margin:4px 0 0;font-size:15px}
+  .meta-example .num{color:var(--ink-soft);font-size:12px;margin-left:4px}
+  .meta-example code{font-size:13.5px}
+
+  /* ---------- Footer ---------- */
+  footer{background:#0f172a;color:#c8d5e8;padding:40px 24px;font-size:15px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+  footer strong{color:#fff}
+  footer a{color:#93b4ff}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;gap:24px;padding:32px 0 56px}
+    .toc{position:static;max-height:none}
+    section{padding:26px 20px}
+    .hero{padding:48px 20px 56px}
+  }
+  @media (max-width:520px){
+    body{font-size:16px}
+    section{padding:22px 16px}
+    .toc a{font-size:13px}
+    .template{font-size:12.5px;padding:16px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Гайд для веб-студии · 2026</span>
+    <h1>Как писать статьи, которые нравятся и читателям, и Yoast SEO</h1>
+    <p>Готовый стандарт: что именно проверяет Yoast, как строить структуру H1–H3, какие мета-теги заполнять, какой шаблон использовать и по какому чек-листу проходить перед публикацией. С примерами мета-данных и идеями тем для блога студии.</p>
+    <div class="hero-tags">
+      <span>Focus keyphrase</span>
+      <span>Структура H1–H3</span>
+      <span>Читаемость</span>
+      <span>Мета-теги</span>
+      <span>Внутренние ссылки</span>
+      <span>Alt-тексты</span>
+      <span>Шаблон статьи</span>
+      <span>Чек-лист</span>
+      <span>Кластеры тем</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+
+    <nav class="toc" aria-label="Содержание">
+      <h2>Содержание</h2>
+      <ol>
+        <li><a href="#intro">Введение</a></li>
+        <li><a href="#likes">Что «любит» Yoast</a></li>
+        <li><a href="#template">Шаблон статьи</a></li>
+        <li><a href="#example">Пример структуры</a></li>
+        <li><a href="#checklist">Чек-лист перед публикацией</a></li>
+        <li><a href="#topics">О чём писать студии</a></li>
+        <li><a href="#meta">Пример мета-тегов</a></li>
+        <li><a href="#summary">Итог</a></li>
+      </ol>
+    </nav>
+
+    <article>
+
+      <!-- ============ INTRO ============ -->
+      <section id="intro">
+        <h2><span class="section-num">01</span>Введение</h2>
+        <p class="lead">Чтобы статьи для веб-студии нравились и читателям, и Yoast SEO, важно понимать: плагин не требует «набивать ключи» и гнаться за зелёными индикаторами любой ценой. Yoast оценивает то, что важно и для поисковых систем: чёткую структуру, логичную иерархию заголовков, естественное вхождение ключевой фразы, короткие предложения, абзацы по одной мысли и наличие мета-данных.</p>
+        <p>Ниже — готовый стандарт, по которому можно писать статьи для студии, чтобы они проходили проверки Yoast и при этом оставались полезными.</p>
+      </section>
+
+      <!-- ============ LIKES ============ -->
+      <section id="likes">
+        <h2><span class="section-num">02</span>Что именно «любит» Yoast в статье</h2>
+        <p class="lead">Yoast проверяет два больших блока: SEO-анализ и анализ читаемости. Чтобы получить максимум пользы, а не просто «зелёный свет», стоит ориентироваться на следующие параметры.</p>
+
+        <h3>Фокусная ключевая фраза (Focus keyphrase)</h3>
+        <p>Одна главная фраза на статью. Она должна отражать реальный поисковый спрос, а не внутренний жаргон студии. Yoast проверяет её наличие в Title, URL (slug), мета-описании, первом абзаце и подзаголовках. Плотность не должна быть искусственной: рекомендация — примерно <strong>0,75–1%</strong> от объёма текста.</p>
+
+        <h3>Структура заголовков (H1 → H2 → H3)</h3>
+        <p>На странице должен быть <strong>один H1</strong>, который отражает главную тему. H2 делят статью на крупные смысловые блоки, H3 — на подтемы внутри них. Пропускать уровни (например, H2 → H4) нельзя. Подзаголовки должны быть через каждые <strong>~300 слов</strong>, чтобы текст легко сканировался и людьми, и алгоритмами.</p>
+
+        <h3>Читаемость (Readability)</h3>
+        <p>Yoast штрафует за длинные предложения, длинные абзацы и обилие пассивного залога. Ориентиры:</p>
+        <ul>
+          <li><strong>Предложения</strong> — до 20 слов.</li>
+          <li><strong>Абзацы</strong> — одна идея.</li>
+          <li><strong>Пассивный залог</strong> — менее 10%.</li>
+          <li><strong>Переходные слова</strong> (однако, следовательно, кроме того) — не менее 30%.</li>
+        </ul>
+        <p>Это напрямую влияет на то, как контент воспринимается и людьми, и AI-поиском.</p>
+
+        <h3>Мета-теги</h3>
+        <p>Yoast требует заполнить три поля:</p>
+        <ul>
+          <li><strong>SEO title</strong> — примерно 55–60 символов, с ключевой фразой и названием студии.</li>
+          <li><strong>Meta description</strong> — 120–155 символов, с ключом и понятным обещанием пользы.</li>
+          <li><strong>Slug</strong> — короткий URL с ключевой фразой (латиницей или транслитом).</li>
+        </ul>
+
+        <h3>Внутренние и внешние ссылки</h3>
+        <p>Плагин проверяет наличие исходящих ссылок и рекомендует внутренние ссылки. Для студии это особенно важно: каждая статья должна вести на страницы услуг, кейсы или другие статьи блога. Это усиливает структуру сайта и помогает Yoast корректно оценивать контент.</p>
+
+        <h3>Alt-тексты изображений</h3>
+        <p>Каждое содержательное изображение должно иметь <code>alt</code> с описанием, а не набор ключей. Yoast проверяет наличие alt у картинок в статье.</p>
+      </section>
+
+      <!-- ============ TEMPLATE ============ -->
+      <section id="template">
+        <h2><span class="section-num">03</span>Универсальный шаблон статьи для веб-студии (по стандарту Yoast)</h2>
+        <p class="lead">Такую структуру можно брать за основу для любой статьи в блог студии — от «сколько стоит сайт» до «как выбрать CMS».</p>
+
+        <div class="template"><span class="h">H1:</span> [Ключевая фраза] — [обещание пользы / конкретика]
+<span class="muted">Первый абзац (1–3 предложения): ключевая фраза + ответ на главный вопрос статьи.</span>
+
+<span class="h">H2:</span> [Проблема / контекст, с которым пришёл читатель]
+<span class="muted">Короткий абзац + список болей или типичных ошибок.</span>
+
+<span class="h">H2:</span> [Основной блок 1 — например, «Из чего складывается стоимость»]
+<span class="h">H3:</span> [Подпункт 1]
+<span class="h">H3:</span> [Подпункт 2]
+<span class="muted">(Таблица или маркированный список для наглядности)</span>
+
+<span class="h">H2:</span> [Основной блок 2 — например, «Как выбрать студию: чек-лист»]
+<span class="muted">Нумерованный список шагов или критериев.</span>
+
+<span class="h">H2:</span> [Сравнение / альтернативы / частые вопросы]
+<span class="h">H3:</span> [Вопрос 1]
+<span class="h">H3:</span> [Вопрос 2]
+
+<span class="h">H2:</span> [Итог / что делать дальше]
+<span class="muted">Короткое резюме + внутренняя ссылка на услугу или контактную страницу.</span></div>
+
+        <div class="note success">
+          <strong>Главное:</strong> такая структура закрывает и информационный, и коммерческий интент. А главный ключ естественно распределяется по H1, первому абзацу, URL и подзаголовкам.
+        </div>
+      </section>
+
+      <!-- ============ EXAMPLE ============ -->
+      <section id="example">
+        <h2><span class="section-num">04</span>Пример структуры для статьи о стоимости сайта</h2>
+        <p class="lead">Разберём на конкретном примере, как выглядит шаблон в действии.</p>
+
+        <h3>Заголовок и фокусная фраза</h3>
+        <ul>
+          <li><strong>H1:</strong> Сколько стоит разработка сайта в 2026: разбор цен и смет.</li>
+          <li><strong>Фокусная фраза:</strong> <code>сколько стоит разработка сайта</code>.</li>
+        </ul>
+
+        <h3>Структура заголовков</h3>
+        <ul>
+          <li><strong>H2:</strong> Почему цена на сайт может отличаться в 10 раз.</li>
+          <li><strong>H2:</strong> Из чего складывается стоимость: дизайн, вёрстка, CMS, интеграции.</li>
+          <li><strong>H2:</strong> Сколько стоит лендинг, корпоративный сайт и интернет-магазин.</li>
+          <li><strong>H2:</strong> Как сэкономить без потери качества: чек-лист.</li>
+          <li><strong>H2:</strong> Частые вопросы о стоимости сайтов.</li>
+          <li><strong>H2:</strong> Итог: как получить точную смету.</li>
+        </ul>
+
+        <h3>Что это даёт</h3>
+        <ul>
+          <li>Закрывает информационный и коммерческий интент.</li>
+          <li>Главный ключ распределяется по H1, первому абзацу, URL и подзаголовкам.</li>
+          <li>Каждый H2 — это отдельный смысловой блок, который легко сканируется.</li>
+        </ul>
+      </section>
+
+      <!-- ============ CHECKLIST ============ -->
+      <section id="checklist">
+        <h2><span class="section-num">05</span>Чек-лист перед публикацией</h2>
+        <p class="lead">Проверьте каждую статью по этим пунктам — они соответствуют основным проверкам Yoast.</p>
+
+        <ul class="checklist">
+          <li><b>Фокусная фраза выбрана и введена в поле Focus keyphrase</b><span>Одна главная фраза на статью, отражающая реальный спрос.</span></li>
+          <li><b>Ключ есть в SEO title, slug, meta description и первом абзаце</b><span>Без переспама, но заметно для плагина и поисковика.</span></li>
+          <li><b>Один H1, остальные заголовки — строго H2/H3 без пропусков</b><span>Никаких H2 → H4. Иерархия — строгая.</span></li>
+          <li><b>Подзаголовки идут не реже чем раз в 300 слов</b><span>Текст легко сканируется и читателем, и алгоритмом.</span></li>
+          <li><b>Предложения короткие, пассивный залог сведён к минимуму</b><span>До 20 слов в предложении, пассив — менее 10%.</span></li>
+          <li><b>Абзацы короткие, каждый — одна мысль</b><span>Читатель не теряет нить.</span></li>
+          <li><b>Есть хотя бы одна внутренняя ссылка</b><span>На другую страницу сайта студии: услугу, кейс, статью.</span></li>
+          <li><b>Есть хотя бы одна внешняя ссылка</b><span>На авторитетный источник — если тема требует подтверждений.</span></li>
+          <li><b>У изображений заполнен alt</b><span>Осмысленный, а не набор ключей.</span></li>
+          <li><b>Meta description укладывается в ~155 символов и содержит ключ</b><span>С понятным обещанием пользы.</span></li>
+          <li><b>Текст не переоптимизирован</b><span>Ключ не повторяется в каждом предложении, используются синонимы и LSI-слова.</span></li>
+        </ul>
+      </section>
+
+      <!-- ============ TOPICS ============ -->
+      <section id="topics">
+        <h2><span class="section-num">06</span>О чём писать веб-студии, чтобы статьи работали на SEO и лиды</h2>
+        <p class="lead">Темы стоит делить на два кластера: информационные (привлекают трафик на раннем этапе) и коммерческие (приводят горячих клиентов). Вот несколько идей, которые хорошо ложатся на структуру Yoast и закрывают реальные запросы.</p>
+
+        <h3>Информационные (верх воронки)</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>Как выбрать веб-студию</h4>
+            <p>7 критериев, которые сэкономят бюджет. Помогает клиенту на этапе выбора подрядчика.</p>
+            <div><span class="tag new">Инфо</span><span class="tag">Верх воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>ТЗ на разработку сайта</h4>
+            <p>Пример и частые ошибки. Закрывает запросы тех, кто готовится к проекту.</p>
+            <div><span class="tag new">Инфо</span><span class="tag">Верх воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Почему сайт медленно грузится</h4>
+            <p>И как это исправить. Один из самых частых технических запросов.</p>
+            <div><span class="tag new">Инфо</span><span class="tag">Верх воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Что такое Core Web Vitals</h4>
+            <p>И как они влияют на SEO. Полезно для тех, кто занимается продвижением.</p>
+            <div><span class="tag new">Инфо</span><span class="tag">Верх воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Сколько стоит поддержка сайта</h4>
+            <p>В месяц и что в неё входит. Частый вопрос перед покупкой.</p>
+            <div><span class="tag new">Инфо</span><span class="tag">Верх воронки</span></div>
+          </div>
+        </div>
+
+        <h3>Коммерческие (низ воронки)</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>Разработка сайта под ключ</h4>
+            <p>Этапы, сроки и что входит в стоимость. Прямой коммерческий запрос.</p>
+            <div><span class="tag pro">Коммерция</span><span class="tag">Низ воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Заказать лендинг</h4>
+            <p>На что смотреть при выборе подрядчика. Горячий запрос с явным интентом.</p>
+            <div><span class="tag pro">Коммерция</span><span class="tag">Низ воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Разработка интернет-магазина</h4>
+            <p>На конкретной CMS: плюсы и минусы. Подходит для запросов с уточнением.</p>
+            <div><span class="tag pro">Коммерция</span><span class="tag">Низ воронки</span></div>
+          </div>
+          <div class="card">
+            <h4>Создание корпоративного сайта</h4>
+            <p>Цена и сроки в 2026 году. Запрос с явным намерением заказать.</p>
+            <div><span class="tag pro">Коммерция</span><span class="tag">Низ воронки</span></div>
+          </div>
+        </div>
+
+        <div class="note">
+          <strong>Совет:</strong> для каждой такой статьи сразу прописывайте фокусную фразу — например, <code>заказать лендинг</code>, <code>разработка сайта под ключ</code>, <code>поддержка сайта стоимость</code> — и используйте её в мета-тегах и структуре заголовков.
+        </div>
+      </section>
+
+      <!-- ============ META ============ -->
+      <section id="meta">
+        <h2><span class="section-num">07</span>Пример оптимизированных мета-тегов</h2>
+        <p class="lead">Возьмём статью «Заказать лендинг: на что смотреть при выборе подрядчика» и подготовим для неё мета-данные по стандарту Yoast.</p>
+
+        <div class="meta-example">
+          <dl>
+            <dt>SEO title <span class="num">≈58 символов</span></dt>
+            <dd>Заказать лендинг — как выбрать подрядчика | [Название студии]</dd>
+
+            <dt>Meta description <span class="num">≈150 символов</span></dt>
+            <dd>Как заказать лендинг и не переплатить: критерии выбора студии, сроки, цены и чек-лист приёмки. Практические советы от веб-студии [Название].</dd>
+
+            <dt>Slug</dt>
+            <dd><code>/blog/zakazat-landing-kak-vybrat-podryadchika</code></dd>
+
+            <dt>Focus keyphrase</dt>
+            <dd><code>заказать лендинг</code></dd>
+          </dl>
+        </div>
+
+        <p>Такие мета-теги проходят проверку Yoast на длину, наличие ключа и читаемость. А заодно дают понятный сниппет в поиске.</p>
+
+        <h3>Что проверить в мета-тегах</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Поле</th><th>Длина</th><th>Что внутри</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>SEO title</td><td>55–60 симв.</td><td>Ключ + обещание пользы + бренд</td></tr>
+              <tr><td>Meta description</td><td>120–155 симв.</td><td>Ключ + понятная выгода + призыв</td></tr>
+              <tr><td>Slug</td><td>Короткий</td><td>Транслит ключа, без стоп-слов и дат</td></tr>
+              <tr><td>Focus keyphrase</td><td>1 фраза</td><td>Реальный поисковый спрос, не жаргон</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ SUMMARY ============ -->
+      <section id="summary">
+        <h2><span class="section-num">08</span>Итог</h2>
+        <p>Yoast SEO не требует сложных манипуляций. Ему «нравится» то же, что и людям: ясная мысль, короткие предложения, логичные заголовки, ключевая фраза без переспама и заполненные мета-теги.</p>
+        <p>Если писать статьи для студии по предложенному шаблону и проходить чек-лист перед публикацией, текст будет стабильно получать хорошие оценки в Yoast и при этом реально помогать читателю — а значит, и приносить заявки.</p>
+
+        <div class="note success">
+          <strong>Финальная мысль:</strong> Yoast — это инструмент, а не цель. Он помогает держать качество на уровне, но не заменяет смысл. Пишите так, чтобы было полезно человеку, — и плагин это оценит.
+        </div>
+      </section>
+
+    </article>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div><strong>Как писать статьи по стандарту Yoast SEO</strong> · гайд для веб-студии</div>
+    <div>Структура · Читаемость · Мета-теги · Шаблон · Чек-лист · Примеры</div>
+  </div>
+</footer>
+
+</body>
+</html>

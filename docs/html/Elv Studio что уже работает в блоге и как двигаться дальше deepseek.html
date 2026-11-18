@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аудит контент-плана Elv Studio — 2026</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #5b6472;
+    --accent: #2563eb;
+    --accent-soft: #eaf0fe;
+    --border: #e3e7ee;
+    --good: #137a4b;
+    --good-soft: #e6f5ec;
+    --warn: #a15c00;
+    --warn-soft: #fff3e0;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  header.hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+  }
+  header.hero .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  header.hero h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  header.hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+  }
+  h2 {
+    margin: 0 0 16px;
+    font-size: 21px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    margin: 22px 0 8px;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  p { margin: 0 0 12px; }
+  p:last-child { margin-bottom: 0; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+  .muted { color: var(--muted); }
+  .pill {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-right: 6px;
+  }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    header.hero h1 { font-size: 23px; }
+    section { padding: 22px; }
+  }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: #fbfcfe;
+  }
+  .card h4 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 4px;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: #f2f5fa;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  tr:last-child td { border-bottom: none; }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    background: #eef2f8;
+    padding: 1px 6px;
+    border-radius: 5px;
+    color: #243447;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .option {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    background: #fbfcfe;
+    position: relative;
+  }
+  .option .num {
+    display: inline-block;
+    width: 26px; height: 26px;
+    line-height: 26px;
+    text-align: center;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  .option h3 {
+    display: inline;
+    margin: 0;
+    font-size: 17px;
+    vertical-align: middle;
+  }
+  .option p { margin: 10px 0 8px; }
+  .option ul { margin: 6px 0 0; }
+  .prompt {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-top: 14px;
+  }
+  .prompt strong { color: var(--accent); }
+  .final {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f7fd 100%);
+    border: 1px solid var(--border);
+  }
+  .kbd {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  .footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Аудит контент-плана · 2026</span>
+    <h1>Elv Studio: что уже работает в блоге и как двигаться дальше</h1>
+    <p>Разбор таблицы из 47 статей на фоне конкурентной выдачи по «веб студия сео» — плюс три варианта следующего шага: редактура, черновик с нуля или доработка стратегии.</p>
+  </header>
+
+  <section>
+    <h2>📋 Что уже хорошо</h2>
+    <p><span class="pill good">сильная сторона</span></p>
+
+    <h3>Две аудитории — редкая честность</h3>
+    <p>Разделение «Для бизнеса» и «Технический раздел» — это то, чего не хватает многим студиям. Конкуренты часто смешивают владельца и программиста в одной ленте. У вас это можно превратить в позиционирование: <strong>«объясняем владельцу, а не разработчику»</strong>.</p>
+
+    <h3>Практическая направленность заголовков</h3>
+    <p>«Заявки есть, а продаж нет: 7 причин», «Сколько стоит сайт с онлайн-записью», «Почему клиенты не приходят на запись» — это реальные запросы малого бизнеса. Та же логика у ВебШтриха: блог строится вокруг услуг и возражений клиентов, а не вокруг «10 трендов».</p>
+
+    <h3>Техническая глубина</h3>
+    <p>Core Web Vitals, JSON-LD, вебхуки оплаты, защита от овербукинга через <code>UNIQUE</code> и <code>lockForUpdate</code> — контент, который приводит «прогретых» заказчиков и работает на доверие. Не у каждой студии хватает смелости писать про транзакции и идемпотентность.</p>
+  </section>
+
+  <section>
+    <h2>⚠️ Системные пробелы</h2>
+    <p><span class="pill warn">на что смотреть</span></p>
+
+    <h3>1. Нет контент-хаба — статьи живут отдельными постами</h3>
+    <p>47 статей — это много, но без связки <strong>pillar + cluster</strong> они не дают topical authority. Конкуренты уже перешли на эту модель: одна обзорная страница на услугу и 4–8 кластерных постов вокруг неё. У вас пока нет ни одной очевидной pillar-страницы — «SEO-фундамент сайта», «Готовый сайт, конструктор или разработка», «Веб-аналитика» — это кандидаты, но они не собраны в хаб.</p>
+
+    <h3>2. GEO / AI-поиск — только одна статья на 47</h3>
+    <p><code>seo-for-google-ai</code> — хорошая основа, но одна статья не закрывает кластер. На рынке уже фиксируют, что доля ИИ-ответов в Яндексе доходит до 42%, а по информационным запросам — до 68%. ВебШтрих и SEO-Академия уже сделали GEO отдельным направлением, включая «как попасть в AI-обзоры для услужного бизнеса».</p>
+
+    <h3>3. Мало кейсов с цифрами «до/после»</h3>
+    <p>Много инструкций — мало материалов, которые показывают <strong>результат</strong>. Для владельца малого бизнеса «ускорили сайт с 4,2 с до 1,3 с и получили +30% заявок» убедительнее, чем ещё один чек-лист. Конкурентная выдача по «веб студия сео» полна страниц с портфолио и примерами — этот разрыв стоит закрыть.</p>
+
+    <h3>4. Коммерческие и информационные интенты не разделены</h3>
+    <p>Статьи «Сколько стоит сайт…», «Сайт для салона…», «Сайт для магазина…» — ближе к коммерческим запросам, но лежат в блоге. Логичнее развести: <strong>блог — под информационные запросы, страницы услуг — под коммерческие</strong>, а не смешивать всё в одной ленте.</p>
+
+    <h3>5. Даты и «время чтения» создают риск устаревания</h3>
+    <p>У 20+ статей дата 14.11.2026, у остальных — разброс с августа по ноябрь. Если контент не обновляется, через полгода он проигрывает конкурентам с пометкой «обновлено». AI-поиск особенно чувствителен к свежести и приросту информации (Information Gain), а не к пересказу.</p>
+  </section>
+
+  <section>
+    <h2>🛠️ Приоритетные правки</h2>
+
+    <h3>Шаг 1. Собрать 3 контент-хаба из существующих статей</h3>
+    <p>Новое писать не нужно — сгруппируйте то, что уже есть, и добавьте обзорную страницу на 1500–2000 символов с перелинковкой.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Хаб (pillar)</th>
+          <th>Кластерные статьи из CSV</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>«Сайт под SEO с первого дня»</strong></td>
+          <td><code>seo-fundament-sajta</code>, <code>sitemap-robots-llms</code>, <code>meta-title-length</code>, <code>jsonld-ecommerce</code>, <code>core-web-vitals-lcp</code>, <code>pochemu-sajt-medlenno-gruzitsya</code></td>
+        </tr>
+        <tr>
+          <td><strong>«Онлайн-запись и оплата без потерь»</strong></td>
+          <td><code>onlajn-zapis-ili-messendzher</code>, <code>onlajn-bronirovanie-na-sajte</code>, <code>kak-prinimat-oplatu-na-sajte</code>, <code>payment-webhook-idempotency</code>, <code>booking-without-race</code>, <code>pochemu-klienty-ne-prihodyat-na-zapis</code>, <code>napominaniya-klientam</code></td>
+        </tr>
+        <tr>
+          <td><strong>«Сайт для малого бизнеса: с чего начать»</strong></td>
+          <td><code>kak-vybrat-cms</code>, <code>chto-podgotovit-k-zapusku-sajta</code>, <code>proverka-sajta-pered-zapuskom</code>, <code>sajt-dlya-salona-krasoty</code>, <code>sajt-dlya-mastera</code>, <code>sajt-dlya-magazina</code>, <code>skolko-stoit-sajt-s-onlajn-zapisyu</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Шаг 2. Закрыть GEO-кластер (2–3 статьи)</h3>
+    <ul>
+      <li>«GEO для услужного бизнеса: как попасть в ответы Алисы и ChatGPT» — про малый бизнес, без enterprise-терминов.</li>
+      <li>«llms.txt: зачем он нужен и как проверить, что сайт читают нейросети» — отдельная «владельческая» статья, не дублирующая техническую.</li>
+      <li>«Почему AI-обзоры снижают клики и что с этим делать» — честный разбор: клики падают, упоминания растут.</li>
+    </ul>
+
+    <h3>Шаг 3. Добавить 3–4 кейса с цифрами</h3>
+    <p>Формат: <strong>«Было → Что сделали → Стало (в цифрах) → Чему научились»</strong>. Например, «Салон: как онлайн-запись сократила неявки на 40%» — естественно связывается с <code>pochemu-klienty-ne-prihodyat-na-zapis</code>.</p>
+
+    <h3>Шаг 4. Развести блог и услуги по интентам</h3>
+    <p>Статьи «Сколько стоит…», «Сайт для салона…», «Сайт для магазина…» перенести или продублировать на страницы услуг, в блоге оставить информационные материалы.</p>
+
+    <h3>Шаг 5. Обновить даты и добавить «обновлено»</h3>
+    <p>Пройдитесь по 10–15 статьям с наибольшим трафиком, добавьте актуальные данные за 2026 год и поставьте пометку «Обновлено [дата]» — сигнал свежести и для поиска, и для читателя.</p>
+  </section>
+
+  <section>
+    <h2>💎 Итог аудита</h2>
+    <p>У Elv Studio уже есть контент, которого нет у многих конкурентов — техническая глубина плюс ориентация на владельца малого бизнеса. Не хватает не статей, а <strong>архитектуры</strong>: хаба, GEO-кластера и кейсов. Если собрать три хаба из существующего контента и добавить 2–3 GEO-статьи и 3 кейса, блог начнёт работать не как архив заметок, а как система, которую и Google, и AI-поиск смогут рекомендовать.</p>
+  </section>
+
+  <section>
+    <h2>🚀 Как двигаться дальше — три варианта</h2>
+    <p class="muted">В CSV только метаданные (заголовки, описания, ключевые слова), поэтому для редактуры нужен текст. Выберите удобный сценарий.</p>
+
+    <div class="options">
+
+      <div class="option">
+        <span class="num">1</span><h3>Редактура готового текста</h3>
+        <p>Пришлите полный текст или черновик статьи и укажите ID из таблицы.</p>
+        <ul>
+          <li>Улучшу структуру H1–H3 и лид-абзац.</li>
+          <li>Добавлю LSI-ключи из вашей таблицы.</li>
+          <li>Усилю практические примеры и CTA.</li>
+          <li>Сохраню тон «простым языком, без маркетингового шума».</li>
+        </ul>
+      </div>
+
+      <div class="option">
+        <span class="num">2</span><h3>Черновик с нуля по метаданным</h3>
+        <p>Назовите ID или заголовок — сгенерирую готовый к публикации текст на ~1500–2500 слов.</p>
+        <ul>
+          <li>На основе «Краткого описания» и «SEO-описания».</li>
+          <li>С подзаголовками, списками и чек-листами.</li>
+          <li>В формате, принятом в блоге Elv Studio.</li>
+        </ul>
+      </div>
+
+      <div class="option">
+        <span class="num">3</span><h3>Доработка контент-стратегии</h3>
+        <p>Добавить в план 3–4 темы, которые активно ищут в 2026 году и усилят экспертность студии:</p>
+        <ul>
+          <li><strong>Кейсы «Было / Стало»</strong> — например, «ускорили сайт салона на 2 секунды и увеличили запись на 15%: технический разбор». Закрывает потребность в социальных доказательствах.</li>
+          <li><strong>Локальное SEO</strong> — «Как попасть в топ Яндекс.Карт и 2ГИС в 2026: профиль, отзывы, связь с сайтом».</li>
+          <li><strong>TCO сайта</strong> — «Сколько реально стоит сайт через год: хостинг, домен, поддержка, доработки».</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="prompt">
+      Напишите <span class="kbd">Напиши полную статью для ID [номер]</span> — или вставьте черновик, который нужно отредактировать. Можно сразу приступать к работе.
+    </div>
+  </section>
+
+  <p class="footer-note">Elv Studio · аудит блога и контент-стратегии · ноябрь 2026</p>
+
+</div>
+</body>
+</html>

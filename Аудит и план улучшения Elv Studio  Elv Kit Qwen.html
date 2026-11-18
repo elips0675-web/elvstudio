@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аудит и план улучшения: Elv Studio / Elv Kit</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --accent-color: #0d6efd;
+            --accent-hover: #0b5ed7;
+            --border-color: #dee2e6;
+            
+            /* Priority Colors */
+            --p1-color: #dc3545; --p1-bg: #f8d7da;
+            --p2-color: #fd7e14; --p2-bg: #ffe5d0;
+            --p3-color: #ffc107; --p3-bg: #fff3cd;
+            --p4-color: #198754; --p4-bg: #d1e7dd;
+            --p5-color: #0dcaf0; --p5-bg: #cff4fc;
+            --p6-color: #6f42c1; --p6-bg: #e2d9f3;
+            --p7-color: #212529; --p7-bg: #e2e3e5;
+            
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 { font-size: 2.2rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .subtitle { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem; }
+        .sources { font-size: 0.9rem; color: var(--text-secondary); }
+        .sources a { color: var(--accent-color); text-decoration: none; }
+        .sources a:hover { text-decoration: underline; }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .toc h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-primary); }
+        .toc ul { list-style: none; margin: 0; columns: 2; column-gap: 2rem; }
+        .toc li { margin-bottom: 0.5rem; break-inside: avoid; }
+        .toc a { color: var(--accent-color); text-decoration: none; font-size: 0.95rem; }
+        .toc a:hover { text-decoration: underline; color: var(--accent-hover); }
+
+        section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+        }
+
+        h3 { font-size: 1.15rem; color: var(--text-primary); margin: 1.5rem 0 0.8rem; }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        ul { margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.6rem; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-p1 { background: var(--p1-bg); color: var(--p1-color); }
+        .badge-p2 { background: var(--p2-bg); color: var(--p2-color); }
+        .badge-p3 { background: var(--p3-bg); color: #856404; }
+        .badge-p4 { background: var(--p4-bg); color: var(--p4-color); }
+        .badge-p5 { background: var(--p5-bg); color: #055160; }
+        .badge-p6 { background: var(--p6-bg); color: var(--p6-color); }
+        .badge-p7 { background: var(--p7-bg); color: var(--p7-color); }
+
+        .highlight {
+            background-color: #e7f1ff;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        th { background-color: #f1f3f5; color: var(--text-primary); font-weight: 600; }
+        tr:hover { background-color: #f8f9fa; }
+
+        .start-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .start-card {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .start-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+        .start-card h4 { color: var(--accent-color); margin-bottom: 0.8rem; font-size: 1.1rem; }
+
+        footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .toc ul { columns: 1; }
+            section { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Аудит и план улучшения: Elv Studio / Elv Kit</h1>
+        <p class="subtitle">Комплексный разбор продукта, UX, архитектуры и инфраструктуры</p>
+        <p class="sources">
+            Источники: 
+            <a href="https://github.com/elips0675-web/elvstudio" target="_blank">github.com/elips0675-web/elvstudio</a> · 
+            <a href="https://elvstudio.vercel.app/" target="_blank">elvstudio.vercel.app</a>
+        </p>
+    </header>
+
+    <nav class="toc">
+        <h2>Содержание</h2>
+        <ul>
+            <li><a href="#strengths">✅ Сильные стороны</a></li>
+            <li><a href="#p1">🟥 P1 — Продукт, UX и доверие</a></li>
+            <li><a href="#p2">🟧 P2 — Навигация и дизайн</a></li>
+            <li><a href="#p3">🟨 P3 — Архитектура и код</a></li>
+            <li><a href="#p4">🟩 P4 — Производительность и кэширование</a></li>
+            <li><a href="#p5">🟦 P5 — Безопасность</a></li>
+            <li><a href="#p6">🟪 P6 — SEO и контент</a></li>
+            <li><a href="#p7">⬛ P7 — CI/CD и деплой в production</a></li>
+            <li><a href="#plan">📋 План действий на 2 недели</a></li>
+            <li><a href="#questions">❓ Уточняющие вопросы</a></li>
+            <li><a href="#start">🚀 С чего начать прямо сейчас</a></li>
+        </ul>
+    </nav>
+
+    <section id="strengths">
+        <h2>✅ Сильные стороны (уже реализовано хорошо)</h2>
+        <ul>
+            <li><strong>Выдающаяся производительность:</strong> Lighthouse 100/100, инлайн CSS/JS, SVG-иконки, отсутствие внешних CDN, оптимизация LCP (кейс 2.9 с → 1.6 с).</li>
+            <li><strong>Инженерная культура:</strong> автоматизированные гейты (<span class="highlight">npm run check</span>, E2E-тесты калькулятора, аудит блога), журнал «Что сделано.txt», <span class="highlight">tools/production-check.php</span>.</li>
+            <li><strong>SEO-подготовка:</strong> 67 структурированных статей, канонические теги, разметка FAQPage, <span class="highlight">sitemap.xml</span>, <span class="highlight">robots.txt</span>, <span class="highlight">llms.txt</span> для AI-краулеров, поддержка RSS.</li>
+            <li><strong>Безопасность:</strong> CSRF, throttle, honeypot в формах, изоляция секретов в <span class="highlight">.env</span> (в репозиторий попадает только <span class="highlight">.env.example</span>).</li>
+            <li><strong>Чёткая продуктовая логика:</strong> готовое решение «под ключ» (тема + плагин + демо-данные), функциональное покрытие ~90% потребностей микробизнеса (онлайн-запись, цифровые файлы, антиспам, блог, калькулятор).</li>
+        </ul>
+    </section>
+
+    <section id="p1">
+        <h2><span class="badge badge-p1">P1</span> Продукт, UX и доверие</h2>
+        
+        <h3>1. Устранить путаницу между «Модулями» и «Тарифами»</h3>
+        <p>В блоке «Разделы» функции продаются поштучно ($49 за запись, $39 за заказы, $29 за форму = <strong>$117</strong>), а ниже в «Ценах» сказано, что все разделы уже включены в базовый тариф от <strong>$79</strong>. Покупателю непонятно, зачем переплачивать.</p>
+        <p><strong>Решение:</strong> либо убрать цены у отдельных модулей, либо сделать базовый тариф дешевле (например, $39 за сайт-визитку), а модули продавать как дополнения к нему.</p>
+
+        <h3>2. Разрешить противоречия в описании услуг</h3>
+        <p>На первом экране: «Установим на ваш домен, настроим оплату и почту». В таблице цен установка и настройка включены только в тариф $499. В блоке «Чего не делаем» прямо написано: «Настройка почты и платёжных ключей».</p>
+        <p><strong>Решение:</strong> явно указать в hero-блоке, что установка и настройка зависят от выбранного тарифа, и синхронизировать формулировки во всех секциях.</p>
+
+        <h3>3. Ограничения статического демо на Vercel</h3>
+        <p>Сейчас формы, бронирование, чат и оплата отключены, что снижает доверие покупателя готовой CMS.</p>
+        <ul>
+            <li><strong>Быстрое решение:</strong> заметный баннер в шапке: «⚠️ Это статическая демо-версия для предпросмотра дизайна. Формы и оплата отключены».</li>
+            <li><strong>Качественное решение:</strong> сделать мок-обработчики на чистом JS — при отправке заявки показывать уведомление «Демо-режим: заявка успешно создана, в полной версии она появится в админке».</li>
+            <li><strong>Идеальное решение:</strong> развернуть полноценное PHP-окружение для демо (дешёвый VPS, Railway, Render).</li>
+        </ul>
+
+        <h3>4. Добавить интерактивное демо админки</h3>
+        <p><strong>Решение:</strong> открытая песочница <span class="highlight">/admin</span> с тестовым логином и автосбросом данных раз в час — либо хотя бы скриншоты/видео-обзор панели управления.</p>
+
+        <h3>5. Локализация и платёжные шлюзы</h3>
+        <p>Домен <span class="highlight">elv-studio.by</span> ориентирован на Беларусь, но цены в долларах, а из платёжек упомянуты только ЮKassa и Stripe.</p>
+        <p><strong>Решение:</strong> добавить поддержку WebPay, bePaid, ЕРИП и расчёты в BYN. Если ЦА — СНГ/мир, вынести это в отдельный блок.</p>
+
+        <h3>6. Контактные данные</h3>
+        <p><strong>Решение:</strong> добавить реальные контакты (телефон, Telegram) в шапку и подвал для студии, обещающей «запуск за 1–3 дня».</p>
+
+        <h3>7. Доработка калькулятора стоимости</h3>
+        <ul>
+            <li><strong>Версионность цен:</strong> добавить в таблицу настроек поля <span class="highlight">valid_from</span> и <span class="highlight">valid_to</span> — чтобы исторически корректно хранить старые PDF-сметы при изменении прайса.</li>
+            <li><strong>Прозрачность:</strong> явно выделить в UI, что строки «Хостинг» и «Сторонние плагины» оплачиваются напрямую провайдеру, а не студии.</li>
+        </ul>
+    </section>
+
+    <section id="p2">
+        <h2><span class="badge badge-p2">P2</span> Навигация и дизайн</h2>
+        <ul>
+            <li><strong>Разгрузить верхнее меню:</strong> Сейчас 11 пунктов подряд. Оставить 5–6 ключевых (Возможности, Цены, Демо, Блог, Контакты) + контрастную CTA-кнопку («Заказать»). «Инструкцию» и «Услуги» перенести в подвал.</li>
+            <li><strong>Снять эффект «пластмассовых» цифр:</strong> Показатели «128 заказов, 34 записи» рядом с «0 ₽/мес» выглядят смешанно. Оформить их как мини-виджет дашборда с подписью «Пример статистики в админке», отделив цифры продукта от УТП.</li>
+            <li><strong>Убрать дублирование форм:</strong> Внизу страницы одновременно: CTA-блок, блок «Обратная связь» и плавающий виджет «ИИ-консультант». Оставить одну универсальную форму заявки с выбором темы и аккуратную иконку чата в углу.</li>
+        </ul>
+    </section>
+
+    <section id="p3">
+        <h2><span class="badge badge-p3">P3</span> Архитектура и код</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Проблема</th>
+                    <th>В чём суть</th>
+                    <th>Как исправить</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Монолитный плагин <span class="highlight">Elv.Kit</span></td>
+                    <td>Содержит модели, миграции, маршруты, оплату, лицензии, SEO и админку одновременно. Сложно тестировать и поддерживать.</td>
+                    <td>Разбить на специализированные модули (<span class="highlight">Elv.Booking</span>, <span class="highlight">Elv.Shop</span>, <span class="highlight">Elv.Seo</span>). Упростит тестирование и позволит клиентам подключать только нужное.</td>
+                </tr>
+                <tr>
+                    <td>Стандартизация имён таблиц</td>
+                    <td>Риск конфликтов со сторонними плагинами October CMS.</td>
+                    <td>Использовать вендорный префикс: <span class="highlight">elv_kit_bookings</span> вместо простого <span class="highlight">bookings</span>.</td>
+                </tr>
+                <tr>
+                    <td>Двойное управление контентом</td>
+                    <td>Если статика на Vercel и PHP-шаблоны поддерживаются отдельно, правки текстов и цен приходится вносить дважды.</td>
+                    <td>Вынести тарифы, FAQ, пункты меню в единые JSON/YAML-конфиги или собирать демо-версию напрямую из PHP-шаблонов скриптом сборки в GitHub Actions.</td>
+                </tr>
+                <tr>
+                    <td>Управление фронтенд-ресурсами</td>
+                    <td>Встроенные CSS/JS хороши для лендинга, но неудобны для темы в целом.</td>
+                    <td>Использовать стандартные механизмы темы October CMS (комбинация и минификация ресурсов), чтобы браузер мог кэшировать их отдельно от HTML.</td>
+                </tr>
+                <tr>
+                    <td>Кроссплатформенность разработки</td>
+                    <td>Проект завязан на Windows-окружение (<span class="highlight">запуск.bat</span>, жёсткие пути к <span class="highlight">C:\laragon\…</span>).</td>
+                    <td>Заменить <span class="highlight">.bat</span> на команды в <span class="highlight">composer.json</span> или <span class="highlight">Makefile</span> (например, <span class="highlight">"dev": "php artisan serve --port=8090"</span>).</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="p4">
+        <h2><span class="badge badge-p4">P4</span> Производительность и кэширование</h2>
+        <ul>
+            <li><strong>Полностью включить кэш October CMS:</strong> для production на PHP-хостинге критически важно задействовать все слои кэша и отключить режим отладки.</li>
+            <li><strong>Асинхронная обработка изображений:</strong> использовать плагин resize-on-upload или очередь, чтобы не нагружать рендеринг страницы.</li>
+            <li><strong>Vercel — ISR и заголовки:</strong> включить инкрементальную статическую регенерацию для демо и отдавать статические ассеты с <span class="highlight">Cache-Control: max-age=31536000, immutable</span>.</li>
+        </ul>
+    </section>
+
+    <section id="p5">
+        <h2><span class="badge badge-p5">P5</span> Безопасность</h2>
+        <ul>
+            <li><strong>Капча на ключевых формах:</strong> базовые меры (CSRF, throttle, honeypot) уже есть — добавьте hCaptcha или Cloudflare Turnstile на формы обратной связи и бронирования.</li>
+            <li><strong>Аудит зависимостей:</strong> регулярно запускать <span class="highlight">composer audit</span> и обновлять пакеты.</li>
+            <li><strong>Заголовки безопасности в production:</strong> настроить <span class="highlight">Content-Security-Policy</span>, <span class="highlight">X-Content-Type-Options</span>, <span class="highlight">Referrer-Policy</span> для защиты от XSS.</li>
+            <li><strong>Техническая гигиена репозитория:</strong> убедиться, что в коммиты не попали <span class="highlight">config.php</span>, <span class="highlight">.env</span>, SQLite-базы с реальными почтами.</li>
+        </ul>
+    </section>
+
+    <section id="p6">
+        <h2><span class="badge badge-p6">P6</span> SEO и контент</h2>
+        <ul>
+            <li><strong>Валидация JSON-LD:</strong> прогнать страницы через Google Rich Results Test и валидатор Яндекса. Особое внимание — <span class="highlight">BlogPosting</span>: добавить реальные URL в поле <span class="highlight">image</span> (сейчас отсутствуют в теле статей).</li>
+            <li><strong>Product-Led Content:</strong> добавить CTA-виджеты в отраслевые статьи (например, «Сайт для клиники», «Сайт для автосервиса», «Тепловые карты и записи сессий»).</li>
+            <li><strong>Реальный инженерный кейс:</strong> подготовить 1 честный кейс (про оптимизацию LCP 2.9 → 1.6 с, 100/100 Lighthouse) и опубликовать в блоге, чтобы закрыть пробел в разделе «Кейсы» без выдуманных цифр.</li>
+            <li><strong>Исправление дат:</strong> убрать даты из будущего (17.11.2026) в карточках блога, чтобы не вводить пользователей и поисковики в заблуждение.</li>
+            <li><strong>Структурированные данные:</strong> добавить Schema.org JSON-LD для товаров, услуг и организации.</li>
+            <li><strong>Канонические URL:</strong> убедиться, что для всех страниц настроен <span class="highlight">&lt;link rel="canonical"&gt;</span>.</li>
+            <li><strong>Визуальный контент в блоге:</strong> добавить хотя бы по одному лёгкому WebP-изображению или тематическому SVG-блоку в ключевые статьи.</li>
+        </ul>
+    </section>
+
+    <section id="p7">
+        <h2><span class="badge badge-p7">P7</span> CI/CD и деплой в production</h2>
+        <ul>
+            <li><strong>GitHub Actions:</strong> создать <span class="highlight">.github/workflows/ci.yml</span>, который при каждом пуше устанавливает зависимости, проверяет синтаксис PHP (<span class="highlight">php -l</span>), запускает <span class="highlight">npm run check</span>, <span class="highlight">php tools/calculator-check.php</span> и <span class="highlight">php tools/production-check.php</span>.</li>
+            <li><strong>Очереди и планировщик:</strong> переключить <span class="highlight">QUEUE_CONNECTION=database</span> и настроить supervisor для <span class="highlight">queue:work</span> (режим <span class="highlight">sync</span> недопустим для отправки писем на проде). Настроить cron для <span class="highlight">php artisan schedule:run</span>.</li>
+            <li><strong>Почта и платёжные ключи:</strong> настроить реальный <span class="highlight">MAIL_MAILER</span> (SMTP) и боевые платёжные ключи. Убедиться, что <span class="highlight">php tools/production-check.php --strict</span> проходит на целевом сервере без предупреждений.</li>
+        </ul>
+    </section>
+
+    <section id="plan">
+        <h2>📋 План действий на 2 недели</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Задача</th>
+                    <th>Приоритет</th>
+                    <th>Ожидаемый результат</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Баннер «Статическое демо» на Vercel + мок-обработчики форм + реальные контакты (Telegram/почта) в шапке.</td>
+                    <td><span class="badge badge-p1">P1</span></td>
+                    <td>Снижение недопонимания у пользователей, рост доверия и конверсии.</td>
+                </tr>
+                <tr>
+                    <td>Согласовать блоки «Модули» и «Тарифы»: убрать противоречие $49+$39+$29 = $117 vs $79.</td>
+                    <td><span class="badge badge-p1">P1</span></td>
+                    <td>Прозрачное ценообразование, рост конверсии.</td>
+                </tr>
+                <tr>
+                    <td>Синхронизировать описание услуг («настроим почту и оплату») с реальными тарифами и блоком «Чего не делаем».</td>
+                    <td><span class="badge badge-p1">P1</span></td>
+                    <td>Устранение противоречий, повышение доверия.</td>
+                </tr>
+                <tr>
+                    <td>Добавить поддержку локальных платёжных систем (WebPay/bePaid/ЕРИП) и расчётов в BYN, если ЦА — Беларусь.</td>
+                    <td><span class="badge badge-p1">P1</span></td>
+                    <td>Готовность принимать платежи от юрлиц/ИП РБ.</td>
+                </tr>
+                <tr>
+                    <td>Версионность цен (<span class="highlight">valid_from</span> / <span class="highlight">valid_to</span>) в калькуляторе + выделение «прямых» статей расходов.</td>
+                    <td><span class="badge badge-p1">P1</span></td>
+                    <td>Корректное хранение истории смет, прозрачность калькулятора.</td>
+                </tr>
+                <tr>
+                    <td>Настроить GitHub Actions: <span class="highlight">php -l</span>, <span class="highlight">npm run check</span>, <span class="highlight">php tools/calculator-check.php</span>, <span class="highlight">php tools/production-check.php</span>.</td>
+                    <td><span class="badge badge-p2">P2</span></td>
+                    <td>Гарантия отсутствия регрессий в коде и вёрстке.</td>
+                </tr>
+                <tr>
+                    <td>Кроссплатформенность: заменить <span class="highlight">.bat</span> на <span class="highlight">composer</span>-скрипты и/или <span class="highlight">Makefile</span>.</td>
+                    <td><span class="badge badge-p2">P2</span></td>
+                    <td>Возможность разработки на macOS/Linux, простой онбординг.</td>
+                </tr>
+                <tr>
+                    <td>Чек-лист деплоя в production: очередь, cron, реальный SMTP, боевые платёжные ключи.</td>
+                    <td><span class="badge badge-p2">P2</span></td>
+                    <td>Бесшовный и безопасный деплой на elv-studio.by.</td>
+                </tr>
+                <tr>
+                    <td>Разгрузить верхнее меню до 5–6 пунктов + CTA; объединить формы заявки и виджет чата.</td>
+                    <td><span class="badge badge-p2">P2</span></td>
+                    <td>Чистая навигация, меньше визуального шума.</td>
+                </tr>
+                <tr>
+                    <td>WebP/SVG в статьи + <span class="highlight">image</span> в JSON-LD + валидация через Google/Yandex.</td>
+                    <td><span class="badge badge-p3">P3</span></td>
+                    <td>Корректные расширенные сниппеты в поиске, улучшение поведенческих факторов.</td>
+                </tr>
+                <tr>
+                    <td>Добавить CTA-виджеты в отраслевые статьи («Клиника», «Автосервис»).</td>
+                    <td><span class="badge badge-p3">P3</span></td>
+                    <td>Рост конверсии из информационного трафика.</td>
+                </tr>
+                <tr>
+                    <td>Опубликовать 1 честный технический кейс (про оптимизацию LCP) + удалить даты из будущего (17.11.2026).</td>
+                    <td><span class="badge badge-p3">P3</span></td>
+                    <td>Закрытие пробела в разделе «Кейсы» без выдуманных цифр, восстановление доверия.</td>
+                </tr>
+                <tr>
+                    <td>Оформить hero-цифры как мини-виджет дашборда с подписью «Пример статистики в админке».</td>
+                    <td><span class="badge badge-p3">P3</span></td>
+                    <td>Разделение продукта и УТП, ясность для покупателя.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="questions">
+        <h2>❓ Уточняющие вопросы</h2>
+        <p>Для точечных рекомендаций по архитектуре и коду важно понять:</p>
+        <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
+            <li><strong>Стек внутри репозитория:</strong> чистый HTML/CSS/JS, сборщик (Vite/Webpack) или полноценные исходники October CMS с PHP-плагином?</li>
+            <li><strong>Целевой регион:</strong> Беларусь, РФ, СНГ или международный рынок? От этого зависит выбор платёжных шлюзов, валюты и юридического оформления.</li>
+            <li><strong>Разделение кода:</strong> как сейчас организовано взаимодействие между статической демо-версией на Vercel и PHP-бэкендом на production-хостинге? Есть ли автоматическая сборка демо из PHP-шаблонов?</li>
+        </ol>
+        <p style="margin-top: 1rem;"><em>Если пришлёте структуру папок или ключевые файлы (<span class="highlight">composer.json</span>, <span class="highlight">plugins/elv/kit/Plugin.php</span>, конфигурацию темы), можно подготовить детальный рефакторинг-план с примерами кода и конфигов.</em></p>
+    </section>
+
+    <section id="start">
+        <h2>🚀 С чего начать прямо сейчас</h2>
+        <p>Чтобы получить быстрый видимый результат без глобального рефакторинга, выберите один из трёх вариантов:</p>
+        <div class="start-cards">
+            <div class="start-card">
+                <h4>1. JS-мок для Vercel</h4>
+                <p>Добавить лёгкий скрипт <span class="highlight">mock-demo.js</span>, который перехватывает отправку форм, бронирование и расчёт калькулятора, показывая красивое уведомление: «Демо-режим: данные успешно обработаны». Это мгновенно повысит доверие к демо-стенду.</p>
+            </div>
+            <div class="start-card">
+                <h4>2. Генератор SVG/WebP + JSON-LD</h4>
+                <p>Написать простой скрипт, который пройдётся по 67 статьям, добавит тематический SVG-блок или лёгкое WebP-изображение, а также корректно заполнит поле <span class="highlight">"image"</span> в разметке <span class="highlight">BlogPosting</span>. Исправит даты из будущего.</p>
+            </div>
+            <div class="start-card">
+                <h4>3. План декомпозиции плагина</h4>
+                <p>Подготовить пошаговый план разделения монолитного <span class="highlight">plugins/elv/kit</span> на <span class="highlight">Elv.Booking</span>, <span class="highlight">Elv.Shop</span>, <span class="highlight">Elv.Seo</span> с готовыми миграциями для переименования таблиц в формат <span class="highlight">elv_kit_*</span>.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Документ объединяет архитектурный разбор репозитория и UX-аудит демо-версии.<br>
+        По любому из пунктов можно подготовить конкретный код, конфигурационные файлы или Pull Request.</p>
+    </footer>
+</div>
+
+</body>
+</html>

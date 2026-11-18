@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аудит и план улучшения блога Elv Studio (50 статей)</title>
+    <style>
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --muted: #475569;
+            --accent: #2563eb; --accent-light: #eff6ff; --border: #e2e8f0;
+            --danger: #dc2626; --danger-light: #fef2f2; --success: #16a34a; --success-light: #f0fdf4;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
+        h1 { font-size: 1.8rem; margin: 0 0 10px 0; border-bottom: 3px solid var(--accent); padding-bottom: 12px; display: inline-block; }
+        .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 30px; }
+        h2 { font-size: 1.3rem; margin-top: 35px; margin-bottom: 15px; display: flex; align-items: center; color: var(--text); }
+        h2::before { content: ""; display: inline-block; width: 8px; height: 20px; background: var(--accent); margin-right: 12px; border-radius: 4px; }
+        h3 { font-size: 1.1rem; margin: 20px 0 8px 0; color: var(--text); }
+        p, li { color: var(--muted); margin-bottom: 10px; font-size: 0.95rem; }
+        strong { color: var(--text); }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--accent-light); padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); }
+        .stat-card h4 { margin: 0 0 5px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; }
+        .stat-card .val { font-size: 1.5rem; font-weight: 700; color: var(--text); margin: 0; }
+
+        .action-block { background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+        .action-block h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; }
+        .tag { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+        .tag-gap { background: var(--danger-light); color: var(--danger); }
+        .tag-seo { background: var(--success-light); color: var(--success); }
+        .tag-conv { background: #fff7ed; color: #c2410c; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f1f5f9; color: #1e293b; font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+
+        .alert { background: var(--danger-light); border-left: 4px solid var(--danger); padding: 15px; border-radius: 0 8px 8px 0; margin-top: 30px; }
+        .alert h3 { color: var(--danger); margin-top: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Аудит и точки роста блога Elv Studio</h1>
+    <p class="subtitle">Анализ 50 опубликованных статей (август–ноябрь 2026). Выявлены структурные пробелы и даны конкретные инструкции по улучшению конверсии и SEO без «воды».</p>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <h4>Всего статей</h4>
+            <p class="val">50</p>
+        </div>
+        <div class="stat-card">
+            <h4>Для бизнеса</h4>
+            <p class="val">35 (70%)</p>
+        </div>
+        <div class="stat-card">
+            <h4>Технический раздел</h4>
+            <p class="val">15 (30%)</p>
+        </div>
+        <div class="stat-card">
+            <h4>Средний объем</h4>
+            <p class="val">~1 800 зн.</p>
+        </div>
+    </div>
+
+    <h2>1. Критические пробелы в контенте (Gap-анализ)</h2>
+    <p>База знаний отличная, но отсутствуют форматы, которые напрямую закрывают сделки.</p>
+
+    <div class="action-block">
+        <h3><span class="tag tag-gap">Пробел</span> Отсутствие реальных кейсов с цифрами</h3>
+        <p><strong>Проблема:</strong> Есть теория («Как настроить онлайн-бронирование»), но нет доказательств эффективности. В описаниях упоминаются «примеры с числом», но отдельных разборов нет.</p>
+        <p><strong>Решение:</strong> Написать 3 статьи формата: «Как мы внедрили онлайн-запись в салоне X и снизили неявки на 30% за месяц». Структура: Точка А → Внедрение Elv Kit → Точка Б (метрики).</p>
+    </div>
+
+    <div class="action-block">
+        <h3><span class="tag tag-gap">Пробел</span> Нет готовых шаблонов (Lead Magnets)</h3>
+        <p><strong>Проблема:</strong> Статьи предлагают чек-листы текстом, но их нельзя «забрать с собой». Это упущенная возможность сбора email.</p>
+        <p><strong>Решение:</strong> Превратить статьи ID 41 («15 пунктов»), ID 45 («Что подготовить к запуску») и ID 31 («Юридические аспекты») в PDF-файлы. Добавить форму: «Скачать чек-лист в PDF за e-mail».</p>
+    </div>
+
+    <div class="action-block">
+        <h3><span class="tag tag-gap">Пробел</span> Отсутствие сравнений «До/После» для визуалов</h3>
+        <p><strong>Проблема:</strong> Статьи про UX/UI (ID 25) и доступность (ID 32) читаются, но не показываются.</p>
+        <p><strong>Решение:</strong> Добавить в эти статьи реальные скриншоты плохих форм и их исправленных версий с пояснением, почему второй вариант конвертит лучше.</p>
+    </div>
+
+    <h2>2. Улучшение внутренней перелинковки (SEO-кластеры)</h2>
+    <p>При 50 статьях высок риск «сиротских» страниц. Необходимо жестко связать материалы в тематические кластеры.</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Кластер (Тема)</th>
+                <th>Якорная статья (Pillar)</th>
+                <th>Поддерживающие статьи (ссылки должны вести сюда)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Запуск сайта</strong></td>
+                <td>ID 45: Что подготовить к запуску сайта</td>
+                <td>ID 41 (15 пунктов), ID 24 (SEO-фундамент), ID 31 (Юр. аспекты), ID 22 (Хостинг)</td>
+            </tr>
+            <tr>
+                <td><strong>Онлайн-запись</strong></td>
+                <td>ID 35: Онлайн-бронирование на сайте</td>
+                <td>ID 43 (Неявки), ID 44 (Напоминания), ID 2 (Защита от овербукинга), ID 46 (Мессенджер vs запись)</td>
+            </tr>
+            <tr>
+                <td><strong>Скорость и SEO</strong></td>
+                <td>ID 23: Почему сайт медленно грузится</td>
+                <td>ID 5 (Core Web Vitals), ID 8 (Ноль внешних запросов), ID 11 (Инлайн CSS), ID 13 (Кэш)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Повышение конверсии из блога в продукт (Elv Kit)</h2>
+    <p>Читатель должен понимать, как применить теорию на практике с помощью вашего продукта.</p>
+    <ul>
+        <li><strong>Контекстные CTA вместо общих:</strong> В конце статьи ID 40 («Как принимать оплату») добавить не «Подпишитесь на блог», а: «<strong>Посмотрите, как это работает в демо-версии Elv Kit</strong>» со ссылкой на песочницу.</li>
+        <li><strong>Виджеты внутри текста:</strong> В статью ID 36 («Виджеты обратной связи») встроить живой пример вашего ИИ-консультанта или формы с комментарием: «Именно такой виджет уже встроен в Elv Kit».</li>
+        <li><strong>Блок «Сложно внедрять самому?»:</strong> В технических статьях (ID 7, ID 9, ID 17) добавлять сноску: «В Elv Kit эти процессы (идемпотентность, токены, миграции) уже настроены по умолчанию».</li>
+    </ul>
+
+    <h2>4. Формат и актуализация контента</h2>
+    <div class="action-block">
+        <h3><span class="tag tag-seo">SEO</span> Механизм актуализации (Evergreen)</h3>
+        <p>Статьи от августа-сентября 2026 (например, ID 37 про соцсети) могут устареть. <strong>Действие:</strong> Добавить в шаблон статьи поле «Дата последнего обновления». Раз в квартал пробегать по топ-10 статьям и обновлять скриншоты, цифры и упоминания законов (например, 152-ФЗ).</p>
+    </div>
+    <div class="action-block">
+        <h3><span class="tag tag-conv">Конверсия</span> Видео-саммари для технических статей</h3>
+        <p>Статьи типа ID 7 («Вебхук оплаты») или ID 17 («Миграции») сложны для восприятия. <strong>Действие:</strong> Записать 60-секундный скринкаст (Loom) для каждой сложной технической статьи и вставить его в самое начало. Это увеличит время на странице (поведенческий фактор для SEO) и снизит процент отказов.</p>
+    </div>
+
+    <div class="alert">
+        <h3>⚠️ Главный приоритет на ближайший месяц</h3>
+        <p style="margin-bottom: 0;">Перестать писать новые теоретические статьи. Взять 3 существующие темы (Онлайн-запись, Прием оплаты, Скорость сайта) и переписать их в формат <strong>«Пошаговый разбор реального внедрения в Elv Kit с цифрами»</strong>. Это превратит блог из справочника в инструмент продаж.</p>
+    </div>
+</div>
+
+</body>
+</html>

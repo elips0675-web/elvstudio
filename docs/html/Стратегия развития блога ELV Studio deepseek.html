@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стратегия развития блога ELV Studio — Полный план</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-alt: #f0f3f7;
+    --text: #1a1f2e;
+    --text-muted: #5b6472;
+    --text-light: #8a94a6;
+    --border: #e3e8ef;
+    --accent: #3b6ef5;
+    --accent-soft: #eef3ff;
+    --accent-2: #00b894;
+    --accent-2-soft: #e6f9f4;
+    --accent-3: #f5a623;
+    --accent-3-soft: #fff6e5;
+    --accent-4: #a855f7;
+    --accent-4-soft: #f6edff;
+    --accent-5: #ec4899;
+    --accent-5-soft: #fdf2f8;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+    --shadow-hover: 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 40px rgba(16, 24, 40, 0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 1120px; margin: 0 auto; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 44px 40px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-4), var(--accent-2), var(--accent-3));
+  }
+  .hero-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 760px;
+    margin-bottom: 10px;
+  }
+  .hero .meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-light);
+  }
+  .hero .meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .hero .meta strong { color: var(--text); font-weight: 600; }
+
+  /* ---------- Section title ---------- */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 48px 0 8px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-bottom: 24px;
+    max-width: 780px;
+  }
+
+  /* ---------- Cards grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .icon-badge {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    flex-shrink: 0;
+  }
+  .badge-blue   { background: var(--accent-soft);   color: var(--accent); }
+  .badge-green  { background: var(--accent-2-soft); color: var(--accent-2); }
+  .badge-orange { background: var(--accent-3-soft); color: var(--accent-3); }
+  .badge-purple { background: var(--accent-4-soft); color: var(--accent-4); }
+  .badge-pink   { background: var(--accent-5-soft); color: var(--accent-5); }
+
+  .card h3 {
+    font-size: 16.5px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+  .card .stage {
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .article-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .article-list li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+  }
+  .article-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .article-list li strong {
+    display: block;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  /* ---------- Table ---------- */
+  .table-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 900px;
+  }
+  th, td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--surface-alt);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfd; }
+  td strong { color: var(--text); font-weight: 600; }
+  .funnel-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .funnel-awareness { background: var(--accent-soft);   color: var(--accent); }
+  .funnel-interest  { background: var(--accent-3-soft); color: #b47700; }
+  .funnel-trust     { background: var(--accent-2-soft); color: #00876b; }
+  .funnel-decision  { background: var(--accent-4-soft); color: #8b3fd9; }
+
+  /* ---------- Steps / Timeline ---------- */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    transition: box-shadow 0.2s ease;
+  }
+  .step:hover { box-shadow: var(--shadow-hover); }
+  .step-num {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--surface-alt);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 17px;
+    flex-direction: column;
+    line-height: 1;
+    gap: 2px;
+  }
+  .step-num small {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-light);
+  }
+  .step-body h4 {
+    font-size: 16.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .step-body .step-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 100px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .step-body ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .step-body li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+  }
+  .step-body li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px; height: 6px;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+  .step-body li strong { color: var(--text); font-weight: 600; }
+
+  /* ---------- Summary / Note ---------- */
+  .summary {
+    margin-top: 36px;
+    background: linear-gradient(135deg, var(--accent-soft), var(--surface));
+    border: 1px solid #dce6ff;
+    border-radius: var(--radius);
+    padding: 32px 34px;
+    box-shadow: var(--shadow);
+  }
+  .summary h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .summary p {
+    font-size: 15px;
+    color: var(--text-muted);
+  }
+  .summary p strong { color: var(--text); }
+
+  .note {
+    background: var(--accent-3-soft);
+    border: 1px solid #f5dfb0;
+    border-left: 4px solid var(--accent-3);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 24px 28px;
+    margin-top: 28px;
+  }
+  .note h3 {
+    font-size: 16.5px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8a5a00;
+  }
+  .note p {
+    font-size: 14.5px;
+    color: #6b4a00;
+    margin-bottom: 8px;
+  }
+  .note ol {
+    padding-left: 22px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .note li {
+    font-size: 14.5px;
+    color: #6b4a00;
+    margin-bottom: 6px;
+  }
+  .note li strong { color: #4d3500; }
+
+  /* ---------- Footer ---------- */
+  .footnote {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 32px;
+    padding: 16px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 600px) {
+    body { padding: 24px 14px; }
+    .hero { padding: 28px 22px; }
+    .hero h1 { font-size: 25px; }
+    .card, .step { padding: 20px; }
+    .step { flex-direction: column; gap: 12px; }
+    .section-title { font-size: 19px; }
+    .summary { padding: 24px 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <span class="hero-label">Контент-стратегия · 2026</span>
+    <h1>Стратегия развития блога ELV Studio</h1>
+    <p>Полный план контента, продвижения и редакционная карта — для привлечения целевой аудитории и укрепления экспертности студии.</p>
+    <div class="meta">
+      <span>📚 <strong>4</strong> смысловых кластера</span>
+      <span>🎯 <strong>5</strong> контент-столпов</span>
+      <span>📋 <strong>5</strong> тем в редакционной карте</span>
+      <span>🚀 <strong>3</strong> месяца продвижения</span>
+    </div>
+  </header>
+
+  <!-- ============ SECTION 1: КАРТА СТАТЕЙ ============ -->
+  <h2 class="section-title"><span class="num">1</span>Карта статей по этапам воронки</h2>
+  <p class="section-subtitle">
+    Эффективнее всего строить контент-план не вокруг «интересных идей», а вокруг реальных этапов, через которые проходит клиент при выборе подрядчика и работе над проектом.
+  </p>
+
+  <div class="grid">
+
+    <!-- Cluster 1 -->
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-blue">🤝</span>
+        <div>
+          <h3>Выбор подрядчика</h3>
+          <span class="stage">Прогрев и доверие</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Как читать коммерческое предложение на разработку сайта</strong>Учит клиента разбираться в чужих КП и косвенно показывает вашу экспертизу.</li>
+        <li><strong>5 признаков, что веб-студия понимает ваш бизнес</strong>Помогает клиенту сформировать критерии выбора.</li>
+        <li><strong>Студия vs. фрилансер</strong>Честное сравнение, которое помогает принять решение.</li>
+        <li><strong>Почему мы просим доступ к аналитике перед стартом</strong>Демонстрирует профессиональный подход и глубину погружения.</li>
+      </ul>
+    </div>
+
+    <!-- Cluster 2 -->
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-green">🚀</span>
+        <div>
+          <h3>Подготовка и запуск</h3>
+          <span class="stage">Снятие страхов</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Что подготовить клиенту, чтобы сайт запустился в срок</strong>Чек-лист, который снимает страх «я не знаю, что делать».</li>
+        <li><strong>Как не утонуть в правках: регламент обратной связи</strong>Показывает управляемый процесс, а не хаос.</li>
+        <li><strong>Почему сайт «под ключ» — это не только дизайн и код</strong>Объясняет ценность комплексной работы (аналитика, структура, тексты).</li>
+        <li><strong>Реальный кейс: как мы запустили проект за N недель</strong>Честный разбор (включая то, что пошло не по плану) укрепляет доверие сильнее идеальных историй.</li>
+      </ul>
+    </div>
+
+    <!-- Cluster 3 -->
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-orange">⚙️</span>
+        <div>
+          <h3>Технологии и тренды</h3>
+          <span class="stage">Экспертность и SEO</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Стоит ли внедрять Glassmorphism в 2026 году</strong>Разбор тренда с точки зрения влияния на конверсию и производительность.</li>
+        <li><strong>Bento Grid vs. классическая сетка</strong>Сравнение паттернов для посадочной страницы.</li>
+        <li><strong>Next.js или WordPress: выбор стека под задачи бизнеса</strong>Техническая статья для аудитории, готовой к обсуждению бюджета.</li>
+        <li><strong>Почему мы не используем «тяжёлые» анимации на ключевых страницах</strong>Связь дизайна и скорости загрузки (Core Web Vitals).</li>
+      </ul>
+    </div>
+
+    <!-- Cluster 4 -->
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-purple">👥</span>
+        <div>
+          <h3>Процессы и команда</h3>
+          <span class="stage">Ликбез и человечность</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Один день из жизни project-менеджера</strong>Показывает, как вы коммуницируете и контролируете задачи.</li>
+        <li><strong>Как мы тестируем сайты перед сдачей</strong>Чек-лист из 50 пунктов демонстрирует серьёзный подход к качеству.</li>
+        <li><strong>Почему мы не берём проекты «сделайте нам красиво»</strong>Отсеивает нецелевых клиентов и привлекает осознанных.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 2: 5 КОНТЕНТ-СТОЛПОВ ============ -->
+  <h2 class="section-title"><span class="num">2</span>Пять контент-столпов для баланса блога</h2>
+  <p class="section-subtitle">
+    Чтобы блог привлекал разную аудиторию и не скатывался в один формат, чередуйте пять основных типов контента.
+  </p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-blue">🏆</span>
+        <div>
+          <h3>Кейсы и портфолио</h3>
+          <span class="stage">Proof of Work</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Пример:</strong> «Как мы решили [проблему клиента] и увеличили [метрику] на X%».</li>
+        <li><strong>Зачем:</strong> формирует доверие и продаёт услуги без прямых призывов.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-green">📖</span>
+        <div>
+          <h3>Экспертные гайды</h3>
+          <span class="stage">How-To / Туториалы</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Пример:</strong> «Пошаговая настройка [инструмента] для начинающих» или «Чек-лист проверки перед запуском».</li>
+        <li><strong>Зачем:</strong> привлекает органический трафик из поиска (SEO) и позиционирует вас как эксперта.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-orange">🎬</span>
+        <div>
+          <h3>Закулисье и процессы</h3>
+          <span class="stage">Behind the Scenes</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Пример:</strong> «Инструменты, которые мы используем в ELV Studio в 2026 году» или «Как мы проводим брейнштормы».</li>
+        <li><strong>Зачем:</strong> очеловечивает бренд и сближает с аудиторией.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-purple">📊</span>
+        <div>
+          <h3>Аналитика и тренды</h3>
+          <span class="stage">Thought Leadership</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Пример:</strong> «5 трендов в [вашей индустрии], которые изменят рынок к 2027 году».</li>
+        <li><strong>Зачем:</strong> показывает, что вы держите руку на пульсе; такой контент часто репостят.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="icon-badge badge-pink">💬</span>
+        <div>
+          <h3>Личный бренд и ошибки</h3>
+          <span class="stage">Storytelling</span>
+        </div>
+      </div>
+      <ul class="article-list">
+        <li><strong>Пример:</strong> «Главный урок, который я извлёк из провального проекта» или «Путь от идеи до запуска ELV Studio».</li>
+        <li><strong>Зачем:</strong> вызывает эмпатию и лояльность — люди покупают у людей.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============ SECTION 3: РЕДАКЦИОННАЯ КАРТА ============ -->
+  <h2 class="section-title"><span class="num">3</span>Редакционная карта (Content Map)</h2>
+  <p class="section-subtitle">
+    Рекомендуется вести эту таблицу в Notion, Google Sheets или Trello для отслеживания статусов. Колонки показывают связку: тема → этап воронки → аудитория → формат → SEO → каналы.
+  </p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Тема статьи (гипотеза)</th>
+          <th>Этап воронки</th>
+          <th>Целевая аудитория</th>
+          <th>Формат</th>
+          <th>Ключевые слова (SEO)</th>
+          <th>Каналы дистрибуции</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Разбор кейса:</strong> Как мы создали [продукт] за 2 недели</td>
+          <td><span class="funnel-tag funnel-decision">Решение</span></td>
+          <td>Потенциальные заказчики, B2B</td>
+          <td>Текст + скриншоты / видео</td>
+          <td>«разработка [услуги] под ключ», «кейс [ниша]»</td>
+          <td>Блог, LinkedIn, Email, Behance</td>
+        </tr>
+        <tr>
+          <td><strong>Тренды:</strong> Что будет с [индустрией] в 2027 году</td>
+          <td><span class="funnel-tag funnel-awareness">Осведомлённость</span></td>
+          <td>Широкая аудитория, коллеги</td>
+          <td>Подборка, аналитика</td>
+          <td>«тренды [ниша] 2027», «прогноз [индустрия]»</td>
+          <td>VC.ru / Habr, Telegram, Twitter</td>
+        </tr>
+        <tr>
+          <td><strong>Гайд:</strong> 5 ошибок при [процессе] и как их избежать</td>
+          <td><span class="funnel-tag funnel-interest">Интерес</span></td>
+          <td>Начинающие, DIY-клиенты</td>
+          <td>Пошаговый список, чек-лист</td>
+          <td>«как избежать ошибок в [ниша]», «гайд»</td>
+          <td>Instagram (карусель), Pinterest, Блог</td>
+        </tr>
+        <tr>
+          <td><strong>Закулисье:</strong> Наш стек технологий в ELV Studio</td>
+          <td><span class="funnel-tag funnel-trust">Доверие</span></td>
+          <td>Другие разработчики / дизайнеры, HR</td>
+          <td>Обзор инструментов</td>
+          <td>«инструменты для [профессия]», «стек технологий»</td>
+          <td>Блог, профильные чаты, YouTube Shorts</td>
+        </tr>
+        <tr>
+          <td><strong>Личное:</strong> Почему я отказался от [популярной практики]</td>
+          <td><span class="funnel-tag funnel-awareness">Осведомлённость</span></td>
+          <td>Широкая аудитория</td>
+          <td>Эссе, мнение</td>
+          <td>«мнение о [тренд]», «опыт работы в [ниша]»</td>
+          <td>LinkedIn, Twitter, Telegram-канал</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ SECTION 4: ПЛАН ПРОДВИЖЕНИЯ ============ -->
+  <h2 class="section-title"><span class="num">4</span>План продвижения блога</h2>
+  <p class="section-subtitle">
+    Публикации — это только половина дела. Чтобы статьи работали, их нужно доставлять до аудитории. Ниже — четыре шага (они же — три месяца внедрения), от фундамента до анализа.
+  </p>
+
+  <div class="steps">
+
+    <div class="step">
+      <span class="step-num">01<small>Месяц 1</small></span>
+      <div class="step-body">
+        <span class="step-tag">Фундамент и SEO</span>
+        <h4>Техническая оптимизация и база</h4>
+        <ul>
+          <li><strong>Аудит существующих статей:</strong> добавить ключевые слова, заголовки H2/H3, мета-описания и внутренние перелинковки.</li>
+          <li><strong>Кластеризация:</strong> объединить статьи в смысловые кластеры с одной главной (pillar) страницей в центре каждого.</li>
+          <li><strong>Перелинковка:</strong> каждая статья ведёт на коммерческую страницу услуг и на смежные статьи в кластере.</li>
+          <li><strong>Лид-магнит:</strong> настроить сбор email-адресов (PDF-чеклист или шаблон в обмен на подписку).</li>
+          <li><strong>Профили на площадках:</strong> Behance, Habr, VC.ru, LinkedIn, GitHub — с обратными ссылками на блог.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">02<small>Месяц 2</small></span>
+      <div class="step-body">
+        <span class="step-tag">Дистрибуция и соцсети</span>
+        <h4>Доставка контента до аудитории</h4>
+        <ul>
+          <li><strong>Правило «1 статья = 5 микро-контентов»:</strong> тред в Twitter/X, пост в Telegram, карусель в Instagram/LinkedIn, короткий сценарий для Reels/Shorts.</li>
+          <li><strong>Гостевой постинг:</strong> 1–2 статьи для крупных профильных изданий с канонической ссылкой на блог.</li>
+          <li><strong>Email-дайджест:</strong> регулярная (раз в 1–2 недели) рассылка лучших материалов подписчикам.</li>
+          <li><strong>Профильные площадки (Habr, VC.ru, DTF):</strong> адаптированные технические статьи с бэклинками.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">03<small>Месяц 3</small></span>
+      <div class="step-body">
+        <span class="step-tag">Комьюнити и партнёрства</span>
+        <h4>Вовлечение и социальные доказательства</h4>
+        <ul>
+          <li><strong>Участие в обсуждениях:</strong> Reddit, профильные форумы, Telegram-чаты — нативно рекомендуйте статьи как решение проблем.</li>
+          <li><strong>Партнёрства:</strong> 2–3 неконкурирующих специалиста/студии со схожей ЦА для взаимного пиара (кросс-постинг или совместный эфир).</li>
+          <li><strong>Кейсы в соцсетях:</strong> визуальные кейсы (до/после, процесс) с отсылкой к разбору в блоге.</li>
+          <li><strong>Опросы и вопросы:</strong> спрашивайте аудиторию о темах — это идеи для контента и рост вовлечённости.</li>
+          <li><strong>Комментарии:</strong> отвечайте под статьями на внешних площадках, поддерживая дискуссию и экспертизу.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">04<small>Постоянно</small></span>
+      <div class="step-body">
+        <span class="step-tag">Анализ и корректировка</span>
+        <h4>Что измерять и как улучшать</h4>
+        <ul>
+          <li><strong>Раз в месяц:</strong> анализируйте, какие статьи дали больше переходов на услуги и заявок — отталкивайтесь от этих данных.</li>
+          <li><strong>Глубина просмотра и время на странице:</strong> если статья читается плохо — меняйте структуру или формат (визуал, подзаголовки).</li>
+          <li><strong>Вопросы из чатов с клиентами:</strong> самые частые — готовые темы для новых статей, гарантированно полезных аудитории.</li>
+          <li><strong>Удвоение усилий:</strong> те форматы и каналы, что сработали лучше всего — масштабируйте.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div class="summary">
+    <h3>💎 Резюме</h3>
+    <p>Блог должен стать <strong>«помощником по выбору»</strong> для клиента, а не «рекламной витриной». Каждая статья должна отвечать на конкретный вопрос или снимать конкретное сомнение, возникающее у человека на пути к заявке. Балансируйте пять контент-столпов, ведите редакционную карту, следуйте трёхмесячному плану продвижения — и блог станет стабильным источником доверия и лидов для студии.</p>
+  </div>
+
+  <!-- ============ NOTE ============ -->
+  <div class="note">
+    <h3>💡 Следующие шаги для максимальной точности</h3>
+    <p>Чтобы адаптировать план идеально под ваши задачи, уточните:</p>
+    <ol>
+      <li><strong>Какова основная тема блога</strong> и какие услуги/продукты предлагает ELV Studio?</li>
+      <li><strong>Какие 2–3 статьи уже опубликованы</strong> или запланированы?</li>
+    </ol>
+    <p style="margin-top: 10px; margin-bottom: 0;">Как только вы предоставите эти детали — контент-карта и план продвижения будут обновлены под вашу конкретную нишу.</p>
+  </div>
+
+  <p class="footnote">ELV Studio · Стратегия развития блога · 2026</p>
+
+</div>
+</body>
+</html>
