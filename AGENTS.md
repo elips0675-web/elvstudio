@@ -29,7 +29,7 @@
 | `plugins/elv/kit/models/` | `Product`, `Post`, `Order`, `Booking`, `Slot`, `Message`, `Subscriber`, `License`, `Install`, `Category`, `Settings` |
 | `plugins/elv/kit/controllers/` | админка: `posts`, `products`, `categories`, `orders`, `bookings`, `messages`, `subscribers`, `licenses`, `install` |
 | `plugins/elv/kit/console/` | `elv:kit:demo`, `elv:kit:reset`, `elv:kit:package` |
-| `plugins/elv/kit/updates/` | `version.yaml` (1.0.5) + миграции и сиды |
+| `plugins/elv/kit/updates/` | `version.yaml` (единственный источник версии плагина) + миграции и сиды |
 | `plugins/elv/kit/routes.php` | формы, оплата, `/download/{token}`, `/api/v1/license/*`, sitemap/robots/llms/rss |
 | `tools/` | гейты `check-*.mjs`, `production-check.php`, `export-static.php`, `blog-content-audit.php` |
 | `demo-static/` | статический экспорт демо для Vercel |
@@ -38,10 +38,10 @@
 ## Как устроена продажа
 
 1. `php artisan elv:kit:package` собирает ZIP в `storage/app/kit/elv-kit-<версия>.zip`
-   (`classes/DownloadService.php:19`): `elv-kit/theme`, `elv-kit/plugin`, README, LICENSE.
+   (`classes/DownloadService.php:38-41`): `elv-kit/theme`, `elv-kit/plugin`, README, LICENSE.
 2. Заказ и оплата (ЮKassa/Stripe) → выдача по токену `/download/{token}`
    (`routes.php:34`); архив отдаётся только оплаченному заказу
-   (`classes/DownloadService.php:58-65`).
+   (`classes/DownloadService.php:79-86`).
 3. Активация лицензии — `POST /api/v1/license/activate` (`routes.php:51`),
    домены хранятся хэшем, лимит по тарифу.
 4. Установка у покупателя без терминала — страница админки
@@ -55,6 +55,10 @@
 2. SEO-наработки идут в одну сторону: отсюда → `Elv\Library`. Обратно не тащить.
 3. October не ставит плагин из ZIP через админку: ZIP распаковывается в файловом
    менеджере, дальше — страница «Установка».
-4. Версия в `classes/DownloadService.php:15` (`1.0.0`) обязана совпадать с
-   `updates/version.yaml` (сейчас `1.0.5`) — расхождение, читать версию из файла.
+4. Версия продукта живёт в одном месте — `plugins/elv/kit/updates/version.yaml`;
+   `DownloadService::version()` (`classes/DownloadService.php:15-38`) читает
+   старшую версию из файла, имя ZIP и README собираются из неё. Захардкоженная
+   константа версии — дефект: проверка `node tools/check-package.mjs` (входит в
+   `node tools/gate.mjs`) падает на расхождении и на возврате константы.
+   Тема версионируется отдельно — `themes/elv-studio/version.yaml`.
 5. Секреты только в `.env`; в репозитории — `.env.example`.

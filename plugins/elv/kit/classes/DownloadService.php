@@ -12,11 +12,32 @@ use Illuminate\Support\Facades\Log;
  */
 class DownloadService
 {
-    public const VERSION = '1.0.0';
+    public static function version(): string
+    {
+        static $version;
+
+        if ($version !== null) {
+            return $version;
+        }
+
+        $version = '0.0.0';
+        $file = dirname(__DIR__) . '/updates/version.yaml';
+
+        if (is_file($file)
+            && preg_match_all('~^([0-9]+(?:\.[0-9]+)*)\s*:~m', (string) file_get_contents($file), $matches)) {
+            foreach ($matches[1] as $candidate) {
+                if (version_compare($candidate, $version, '>')) {
+                    $version = $candidate;
+                }
+            }
+        }
+
+        return $version;
+    }
 
     public function path(): string
     {
-        return storage_path('app/kit/elv-kit-' . self::VERSION . '.zip');
+        return storage_path('app/kit/elv-kit-' . self::version() . '.zip');
     }
 
     public function ensureArchive(): string
@@ -96,7 +117,7 @@ class DownloadService
 
     protected function readme(): string
     {
-        return "# Elv Kit " . self::VERSION . "\n\n"
+        return "# Elv Kit " . self::version() . "\n\n"
             . "Тема `elv-studio` и плагин `Elv.Kit` для October CMS 4.4+.\n\n"
             . "## Установка\n"
             . "1. Скопируйте `theme/` в `themes/elv-studio/`, `plugin/` в `plugins/elv/kit/`.\n"

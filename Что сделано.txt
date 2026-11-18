@@ -6,6 +6,54 @@
 
 ---
 
+(Stage 63 - 18.11.2026) - **Упаковка: `composer.json`, `version.yaml` темы и версия из одного места.**
+
+- `plugins/elv/kit/composer.json` — `elv/kit`, `type: october-plugin`,
+  `license: proprietary`, `require.php: ^8.2`.
+  `themes/elv-studio/composer.json` — `elv/elv-studio`, `type: october-theme`,
+  тот же набор полей (форма повторяет `themes/elv/composer.json` из
+  `D:\October CMS`).
+- `themes/elv-studio/version.yaml` — `1.0.0` с описанием выпуска;
+  `themes/elv-studio/screenshot.png` — 1200×630, карточка `og-default.png`
+  (реального скриншота админки нет; помечено в очереди как «заменить»).
+- `plugins/elv/kit/classes/DownloadService.php` — константа `VERSION = '1.0.0'`
+  удалена, добавлен `version()`: читает `updates/version.yaml`, берёт старшую
+  версию через `version_compare`, кэширует в `static`. `path()` и `readme()`
+  собираются из неё, поэтому ZIP называется `elv-kit-1.0.6.zip` и README
+  печатает `# Elv Kit 1.0.6` — расхождение из `AGENTS.md` (правило 4) закрыто
+  не сверкой двух чисел, а единственным источником.
+- `tools/check-package.mjs` (+ строка в `tools/gate.mjs`) — проверяет
+  `composer.json` обеих поставок (тип, имя, описание, лицензия, PHP), наличие и
+  размер `screenshot.png`, непустые `version.yaml` и **равенство**
+  `DownloadService::version()` старшей версии файла (PHP вызывается через
+  `-r`, путь ищется как в `check-console.mjs`: `PHP_BIN` → `php` в PATH →
+  Laragon). Отдельно падает, если в `DownloadService` снова появится
+  `const VERSION`.
+- `AGENTS.md` — правило 4 переписано под «версия из файла», убраны протухшие
+  номера версий (`1.0.5`) и сдвинувшиеся ссылки на строки
+  (`DownloadService.php:19/58-65` → `38-41/79-86`).
+- Мусор: старый `storage/app/kit/elv-kit-1.0.0.zip` (179 КБ, собран с
+  захардкоженной версией) удалён; актуальный архив — `elv-kit-1.0.6.zip`
+  (487,9 КБ).
+
+Проверено: `php artisan elv:kit:package` — «Архив готов:
+storage/app/kit/elv-kit-1.0.6.zip», разбор архива через `ZipArchive` — 247
+файлов, внутри `elv-kit/plugin/composer.json`, `elv-kit/theme/composer.json`,
+`elv-kit/theme/version.yaml`, `elv-kit/theme/screenshot.png`, README начинается
+с `# Elv Kit 1.0.6`. Обратная подстановка (каждая поломка → красный, возврат →
+зелёный): версия читается не из `version.yaml` → `version() = 0.0.0` против
+`1.0.6`; `type` плагина `october-widget`; `name` темы `vendor/theme`; удалён
+`screenshot.png`. `node tools/gate.mjs` — all gates passed (новый
+`check-package` в списке).
+
+Не проверено: установка ZIP на чистый October 4.4 и видимость пакета в
+Marketplace — для Marketplace нужен аккаунт и ревью, для чистой установки —
+отдельный этап «Проверка на чистом October» (P2 в очереди). Демо-сиды
+(`seed_kit_demo`, `seed_kit_blog`) по-прежнему в архиве — это следующий пункт
+очереди, в коммит не входит.
+
+---
+
 (Stage 62 - 18.11.2026) - **Ссылка на блок «С чего начать» из навигации блога.**
 
 - `themes/elv-studio/pages/blog.htm` — в строке над лентой (рядом с «Технический

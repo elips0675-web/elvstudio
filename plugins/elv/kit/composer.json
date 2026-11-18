@@ -1,0 +1,9 @@
+{
+    "name": "elv/kit",
+    "type": "october-plugin",
+    "description": "Elv Kit: онлайн-запись, заказы и оплата, обратная связь, блог, лицензии и выдача пакета после оплаты для October CMS 4.4+.",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2"
+    }
+}

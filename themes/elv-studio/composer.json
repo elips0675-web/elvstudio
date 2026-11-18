@@ -1,0 +1,9 @@
+{
+    "name": "elv/elv-studio",
+    "type": "october-theme",
+    "description": "Витрина Elv Kit: блог, услуги, калькулятор смет, страницы модулей и статическое демо для October CMS 4.4+.",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2"
+    }
+}
