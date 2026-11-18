@@ -5,30 +5,32 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const problems = [];
 
+const PHP_PROBE = 'echo (int) (extension_loaded("zip") && extension_loaded("mbstring"));';
+
+function phpSupports(requested) {
+  const probe = spawnSync(requested, ['-r', PHP_PROBE], { encoding: 'utf8', stdio: 'pipe' });
+
+  return probe.status === 0 && String(probe.stdout).trim() === '1';
+}
+
 function resolvePhp() {
   if (process.env.PHP_BIN) {
     return process.env.PHP_BIN;
   }
 
-  if (spawnSync('php', ['-v'], { stdio: 'ignore' }).status === 0) {
-    return 'php';
-  }
-
+  const candidates = ['php'];
   const laragon = 'C:\\laragon\\bin\\php';
 
   if (fs.existsSync(laragon)) {
-    const versions = fs.readdirSync(laragon)
+    fs.readdirSync(laragon)
       .map((name) => path.join(laragon, name, 'php.exe'))
       .filter((file) => fs.existsSync(file))
       .sort()
-      .reverse();
-
-    if (versions.length) {
-      return versions[0];
-    }
+      .reverse()
+      .forEach((file) => candidates.push(file));
   }
 
-  return '';
+  return candidates.find(phpSupports) || '';
 }
 
 const readJson = (relative) => {
@@ -123,6 +125,33 @@ if (!themeVersions) {
   problems.push('themes/elv-studio/version.yaml — нет ни одной версии');
 }
 
+function inspectArchives(php) {
+  if (!php) {
+    return null;
+  }
+
+  let output = '';
+
+  try {
+    output = execFileSync(php, ['tools/package-inspect.php'], {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 8 * 1024 * 1024,
+    });
+  } catch (error) {
+    problems.push('не удалось собрать архивы: ' + String(error.stderr || error.message).trim().split('\n')[0]);
+
+    return null;
+  }
+
+  try {
+    return JSON.parse(output);
+  } catch (error) {
+    problems.push('разбор архивов вернул не JSON: ' + error.message.slice(0, 120) + ' | начало вывода: ' + JSON.stringify(output.slice(0, 80)));
+
+    return null;
+  }}
+
 const newest = (list) => list.reduce((max, item) => (compareVersions(item, max) > 0 ? item : max), '0.0.0');
 
 function compareVersions(a, b) {
@@ -145,7 +174,7 @@ if (pluginVersions && themeVersions) {
   let codeVersion = '';
 
   if (!php) {
-    problems.push('PHP не найден (PHP_BIN или C:\\laragon\\bin\\php) — версию из DownloadService не проверить');
+    problems.push('PHP с расширениями zip и mbstring не найден (PHP_BIN или C:\\laragon\\bin\\php) — версию и архивы не проверить');
   } else {
     try {
       codeVersion = execFileSync(
@@ -168,6 +197,47 @@ if (pluginVersions && themeVersions) {
 
   if (/const\s+VERSION\s*=/.test(hardcoded)) {
     problems.push('plugins/elv/kit/classes/DownloadService.php — версия снова захардкожена константой');
+  }
+
+  const report = inspectArchives(php);
+
+  if (report) {
+    const product = report.product;
+    const demo = report.demo;
+
+    if (product.seeds.length) {
+      problems.push('товарный архив содержит демо-сиды: ' + product.seeds.join(', '));
+    }
+
+    if (product.versionFileSeeds) {
+      problems.push('товарный архив: в updates/version.yaml остались seed_kit_*.php');
+    }
+
+    if (!demo.seeds.length) {
+      problems.push('демо-архив без демо-сидов — вариант --demo ничего не добавляет');
+    }
+
+    if (!product.hasComposer || !demo.hasComposer) {
+      problems.push('в архиве нет composer.json плагина или темы');
+    }
+
+    if (!product.hasScreenshot) {
+      problems.push('в товарном архиве нет themes/elv-studio/screenshot.png');
+    }
+
+    if (product.path === demo.path) {
+      problems.push('товарный и демо-архив пишутся в один файл');
+    }
+
+    for (const [name, archive] of [['товарный', product], ['демо', demo]]) {
+      if (!archive.listed.length) {
+        problems.push(name + ' архив: в version.yaml не найдено ни одной миграции — сверка файлов ничего не проверила');
+      }
+
+      if (archive.missingListed.length) {
+        problems.push(name + ' архив: version.yaml ссылается на отсутствующие файлы — ' + archive.missingListed.join(', '));
+      }
+    }
   }
 }
 

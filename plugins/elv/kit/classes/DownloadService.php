@@ -35,16 +35,16 @@ class DownloadService
         return $version;
     }
 
-    public function path(): string
+    public function path(bool $demo = false): string
     {
-        return storage_path('app/kit/elv-kit-' . self::version() . '.zip');
+        return storage_path('app/kit/elv-kit-' . self::version() . ($demo ? '-demo' : '') . '.zip');
     }
 
-    public function ensureArchive(): string
+    public function ensureArchive(bool $demo = false, bool $force = false): string
     {
-        $path = $this->path();
+        $path = $this->path($demo);
 
-        if (is_file($path) && filesize($path) > 0) {
+        if (!$force && is_file($path) && filesize($path) > 0) {
             return $path;
         }
 
@@ -63,8 +63,8 @@ class DownloadService
             throw new \RuntimeException('Не удалось открыть ZIP для записи.');
         }
 
-        $this->addDirectory($zip, base_path('themes/elv-studio'), 'elv-kit/theme');
-        $this->addDirectory($zip, base_path('plugins/elv/kit'), 'elv-kit/plugin');
+        $this->addDirectory($zip, base_path('themes/elv-studio'), 'elv-kit/theme', $demo);
+        $this->addDirectory($zip, base_path('plugins/elv/kit'), 'elv-kit/plugin', $demo);
 
         $zip->addFromString('elv-kit/README.md', $this->readme());
         $zip->addFromString('elv-kit/LICENSE.txt', $this->licenseText());
@@ -85,7 +85,7 @@ class DownloadService
         return $this->ensureArchive();
     }
 
-    protected function addDirectory(\ZipArchive $zip, string $source, string $prefix): void
+    protected function addDirectory(\ZipArchive $zip, string $source, string $prefix, bool $demo = false): void
     {
         if (!is_dir($source)) {
             return;
@@ -106,13 +106,38 @@ class DownloadService
                 continue;
             }
 
+            if (!$demo && preg_match('~^updates/seed_kit_[a-z0-9_]+\.php$~', $relative)) {
+                continue;
+            }
+
             if ($file->isDir()) {
                 $zip->addEmptyDir($prefix . '/' . $relative);
                 continue;
             }
 
+            if (!$demo && $relative === 'updates/version.yaml') {
+                $zip->addFromString($prefix . '/' . $relative, $this->productVersionFile($file->getPathname()));
+                continue;
+            }
+
             $zip->addFile($file->getPathname(), $prefix . '/' . $relative);
         }
+    }
+
+    protected function productVersionFile(string $path): string
+    {
+        $lines = preg_split('~\R~u', (string) file_get_contents($path)) ?: [];
+        $result = [];
+
+        foreach ($lines as $line) {
+            if (preg_match('~^\s*-\s*seed_kit_[a-z0-9_]+\.php\s*$~u', $line)) {
+                continue;
+            }
+
+            $result[] = $line;
+        }
+
+        return implode("\n", $result) . "\n";
     }
 
     protected function readme(): string
@@ -124,7 +149,9 @@ class DownloadService
             . "2. Выполните `php artisan october:migrate`.\n"
             . "3. Включите тему: `ACTIVE_THEME=elv-studio` в `.env` или через Settings → CMS.\n"
             . "4. Настройте почту и платёжные ключи в Settings → Elv Kit.\n"
-            . "5. Демо-данные: `php artisan elv:kit:demo`.\n"
+            . "5. Демо-данные (не обязательны): `php artisan elv:kit:demo` — заливает\n"
+            . "   демонстрационные разделы, товары и статьи. В архиве без флага `--demo`\n"
+            . "   миграций с демо-данными нет: после `october:migrate` каталог и блог пустые.\n"
             . "6. Cron: `php artisan schedule:run` раз в минуту.\n\n"
             . "## Лицензия\nСм. LICENSE.txt. Ключ активации выдаётся после оплаты.\n";
     }

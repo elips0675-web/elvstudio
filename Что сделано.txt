@@ -6,6 +6,49 @@
 
 ---
 
+(Stage 64 - 18.11.2026) - **Товарный ZIP без демо-данных, демо — отдельным архивом.**
+
+- `plugins/elv/kit/classes/DownloadService.php` —
+  `ensureArchive(bool $demo = false, bool $force = false)`, `path($demo)`;
+  товарный архив `elv-kit-<версия>.zip`, демо — `elv-kit-<версия>-demo.zip`.
+  В товарном варианте `addDirectory()` пропускает
+  `updates/seed_kit_*.php`, а `updates/version.yaml` пишется через
+  `productVersionFile()` — без строк, ссылающихся на эти сиды (иначе
+  `october:migrate` у покупателя искал бы отсутствующие файлы). README объясняет,
+  что после миграций каталог и блог пустые, а демо включается
+  `php artisan elv:kit:demo`.
+- `plugins/elv/kit/console/PackageCommand.php` — флаги `--demo` и `--rebuild`
+  (`ensureArchive($demo, $rebuild)`), в выводе вариант сборки.
+- `tools/package-inspect.php` — собирает оба архива с `--force` и печатает JSON:
+  состав, размер, наличие сидов, миграции, на которые ссылается `version.yaml`,
+  и список тех, которых в архиве нет. `tools/check-package.mjs` читает этот JSON
+  и падает, если в товарном архиве есть сиды, если в демо их нет, если
+  `version.yaml` ссылается на отсутствующий файл или если миграций в нём не
+  найдено вообще (иначе сверка была бы зелёной по построению).
+- Дефекты, найденные при живой проверке: (1) `\R` без флага `u` в
+  `productVersionFile()` резал кириллическую «Е» (`D0 85`) как перевод строки —
+  версия в архиве становилась невалидным UTF-8, `json_encode` возвращал `false`,
+  и разбор молча печатал пустую строку; (2) `resolvePhp()` в
+  `check-package.mjs` брал самую новую сборку Laragon — здесь PHP 8.5 без
+  `ext-zip`, разбор падал с «Расширение ext-zip не установлено», а текст ошибки
+  October печатал в stdout. Теперь PHP выбирается проверкой
+  `extension_loaded('zip') && extension_loaded('mbstring')`, а
+  `package-inspect.php` уводит PHP-ошибки в stderr.
+
+Проверено: `node tools/check-package.mjs` — товарный архив 245 файлов, 0 сидов,
+3 миграции в `version.yaml`, все на месте; демо — 247 файлов, 2 сида, 5
+миграций. Обратная подстановка: `create_price_versions.php` заменён в
+`version.yaml` на `missing_migration.php` — красный с обеими строками
+(«ссылается на отсутствующие файлы — missing_migration.php»), возврат — зелёный.
+`php artisan elv:kit:package --demo --rebuild` — «Вариант: с демо-данными»,
+488,5 КБ. `node tools/gate.mjs` — all gates passed.
+
+Не проверено: установка товарного ZIP на чистый October 4.4 с пустой БД
+(пункт P0 «Установщик без демо-данных» остаётся открытым: нужен прогон
+install → `/`, `/kit/`, `/modules/`, `/blog/` на пустых данных).
+
+---
+
 (Stage 63 - 18.11.2026) - **Упаковка: `composer.json`, `version.yaml` темы и версия из одного места.**
 
 - `plugins/elv/kit/composer.json` — `elv/kit`, `type: october-plugin`,

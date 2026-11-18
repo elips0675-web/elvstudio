@@ -373,13 +373,19 @@
       `models/settings/fields.yaml` (`brand_name`, `brand_tagline`,
       `brand_description`, `email`, `phone`, `telegram`), дефолт e-mail —
       `sales@example.com`. Нужны нейтральные дефолты и пустой `homepage`.
-- [ ] **P1. Демо не отделяется от продукта.** `DownloadService::ensureArchive()`
-      пакует `themes/elv-studio` + `plugins/elv/kit` целиком, включая
-      `updates/seed_kit_demo.php` и `seed_kit_blog.php`: покупатель получает ZIP
-      с демо-данными Elv. Нужно: ZIP без демо по умолчанию, `--demo` — для
-      лендинга. Расхождения версии больше нет (Stage 63: версия читается из
-      `updates/version.yaml`, `node tools/check-package.mjs` падает на возврате
-      константы).
+- [x] **P1. Демо не отделяется от продукта — закрыто 18.11.2026 (Stage 64).**
+      `DownloadService::ensureArchive(bool $demo = false, bool $force = false)`:
+      товарный архив по умолчанию не содержит `updates/seed_kit_*.php`, а его
+      `updates/version.yaml` пересобирается без строк с этими файлами
+      (`productVersionFile()`), поэтому `october:migrate` у покупателя создаёт
+      схему без демо-каталога и статей. Демо-вариант — `php artisan elv:kit:package --demo`
+      → `storage/app/kit/elv-kit-1.0.6-demo.zip`. Заказ отдаёт только товарный
+      архив (`forOrder()`), версия — из `updates/version.yaml`.
+      Проверка: `tools/package-inspect.php` (JSON о составе обоих архивов) +
+      `node tools/check-package.mjs` — сидов в товарном 0, в демо 2; каждая
+      миграция из `version.yaml` обязана быть в архиве.
+      Осталось по контенту: `classes/Demo.php`, `BlogContent.php`, `Chat.php`
+      и `config/*.php` по-прежнему про Elv — это отдельные пункты ниже.
 - [ ] **P1. Тема — витрина Elv, а не шаблон.** `themes/elv-studio/pages/*.htm`
       (29 страниц) и `partials/*` (7) — маркетинговые тексты студии, каталог
       `content/` пуст, у темы нет `composer.json`, `version.yaml` и

@@ -37,8 +37,10 @@
 
 ## Как устроена продажа
 
-1. `php artisan elv:kit:package` собирает ZIP в `storage/app/kit/elv-kit-<версия>.zip`
-   (`classes/DownloadService.php:38-41`): `elv-kit/theme`, `elv-kit/plugin`, README, LICENSE.
+1. `php artisan elv:kit:package` собирает **товарный** ZIP без демо-данных в
+   `storage/app/kit/elv-kit-<версия>.zip`, `--demo` — вариант для лендинга
+   (`…-demo.zip`, с `updates/seed_kit_*.php`). Состав: `elv-kit/theme`,
+   `elv-kit/plugin`, README, LICENSE (`classes/DownloadService.php:38-41`).
 2. Заказ и оплата (ЮKassa/Stripe) → выдача по токену `/download/{token}`
    (`routes.php:34`); архив отдаётся только оплаченному заказу
    (`classes/DownloadService.php:79-86`).
