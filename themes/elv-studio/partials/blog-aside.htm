@@ -4,34 +4,37 @@
 {% set allLabel = allLabel ?? 'Все статьи' %}
 {% set moreHref = moreHref ?? null %}
 {% set moreLabel = moreLabel ?? '' %}
-<aside class="blog-aside" aria-label="Меню блога">
-    <div class="aside-card">
-        <h2 class="aside-title">Разделы</h2>
-        <ul class="aside-list">
-            <li>
-                <a class="{{ activeCategory ? '' : 'is-active' }}" href="{{ indexPage }}">
-                    {{ allLabel }}
-                    {% if total %}<span class="aside-count">{{ total }}</span>{% endif %}
-                </a>
-            </li>
-            {% for category in categories %}
+<details class="blog-aside">
+    <summary class="aside-toggle">Разделы и стоимость</summary>
+    <aside class="aside-body" aria-label="Меню блога">
+        <div class="aside-card">
+            <h2 class="aside-title">Разделы</h2>
+            <ul class="aside-list">
                 <li>
-                    <a class="{{ activeCategory == category.slug ? 'is-active' }}" href="{{ indexPage }}?category={{ category.slug }}">
-                        {{ category.name }}
-                        <span class="aside-count">{{ category.posts_count }}</span>
+                    <a class="{{ activeCategory ? '' : 'is-active' }}" href="{{ indexPage }}">
+                        {{ allLabel }}
+                        {% if total %}<span class="aside-count">{{ total }}</span>{% endif %}
                     </a>
                 </li>
-            {% endfor %}
-        </ul>
-        {% if moreHref %}
-            <p class="aside-more"><a href="{{ moreHref }}">{{ moreLabel }} →</a></p>
-        {% endif %}
-    </div>
+                {% for category in categories %}
+                    <li>
+                        <a class="{{ activeCategory == category.slug ? 'is-active' }}" href="{{ indexPage }}?category={{ category.slug }}">
+                            {{ category.name }}
+                            <span class="aside-count">{{ category.posts_count }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if moreHref %}
+                <p class="aside-more"><a href="{{ moreHref }}">{{ moreLabel }} →</a></p>
+            {% endif %}
+        </div>
 
-    <div class="aside-card">
-        <h2 class="aside-title">Стоимость и вопросы</h2>
-        <p class="muted">Калькулятор соберёт смету за минуту. Ответим по вашей задаче, без навязчивых звонков.</p>
-        <a class="btn btn--primary btn--sm" href="{{ 'calculator'|page }}">Калькулятор</a>
-        <a class="btn btn--ghost btn--sm" href="{{ 'feedback'|page }}">Задать вопрос</a>
-    </div>
-</aside>
+        <div class="aside-card">
+            <h2 class="aside-title">Стоимость и вопросы</h2>
+            <p class="muted">Калькулятор соберёт смету за минуту. Ответим по вашей задаче, без навязчивых звонков.</p>
+            <a class="btn btn--primary btn--sm" href="{{ 'calculator'|page }}">Калькулятор</a>
+            <a class="btn btn--ghost btn--sm" href="{{ 'feedback'|page }}">Задать вопрос</a>
+        </div>
+    </aside>
+</details>
