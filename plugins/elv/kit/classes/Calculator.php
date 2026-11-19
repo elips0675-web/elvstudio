@@ -76,18 +76,19 @@ class Calculator
     public static function recommendations(): array
     {
         $keys = Catalog::planKeys();
+        $labels = Catalog::planLabels();
         $fallback = (string) ($keys[0] ?? 'single');
 
         $items = [
             'landing' => [
                 'plan' => 'single',
                 'modules' => [],
-                'reason' => 'Один сайт, блог уже включён. Если сайтов несколько — выберите Multi.',
+                'reason' => 'Тариф «' . $labels['single'] . '»: блог уже включён. Если сайтов несколько — «' . $labels['multi'] . '».',
             ],
             'services' => [
                 'plan' => 'single',
                 'modules' => ['booking', 'feedback'],
-                'reason' => 'Запись и обратная связь для сайта услуг. Один сайт; для 2–5 сайтов есть Multi.',
+                'reason' => 'Запись и обратная связь для сайта услуг: «' . $labels['single'] . '». Для 2–5 сайтов — «' . $labels['multi'] . '».',
             ],
             'shop' => [
                 'plan' => 'single',
@@ -97,7 +98,7 @@ class Calculator
             'booking' => [
                 'plan' => 'single',
                 'modules' => ['booking', 'feedback'],
-                'reason' => 'Онлайн-запись и обратная связь. Один сайт; для сети — Multi.',
+                'reason' => 'Онлайн-запись и обратная связь: «' . $labels['single'] . '». Для сети сайтов — «' . $labels['multi'] . '».',
             ],
         ];
 

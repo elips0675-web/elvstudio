@@ -122,11 +122,7 @@ class OrderService
         $license->product_slug = $slug;
         $license->email = $order->email;
         $license->order_id = $order->id;
-        $license->domain_limit = match ($order->plan) {
-            'extended' => 1000,
-            'multi' => 5,
-            default => 1,
-        };
+        $license->domain_limit = Catalog::planDomainLimit((string) $order->plan);
         $license->status = License::STATUS_ACTIVE;
         $license->save();
 

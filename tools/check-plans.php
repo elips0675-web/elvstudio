@@ -24,6 +24,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\Chat;
 use Elv\Kit\Classes\Http\OrderController;
 use Elv\Kit\Models\Order;
 use Elv\Kit\Models\Price;
@@ -132,6 +133,32 @@ try {
         $order->plan_label
     );
 
+    $licenseAnswer = (string) (Chat::answer('на какой домен ставится ключ')['answer'] ?? '');
+
+    $expect(
+        'консультант называет домены подписями из настроек',
+        str_contains($licenseAnswer, '«Бизнес-5» — до 5 доменов'),
+        mb_substr($licenseAnswer, 0, 160)
+    );
+
+    $recommendation = (string) (Calculator::recommendations()['landing']['reason'] ?? '');
+
+    $expect(
+        'калькулятор называет тариф подписью, а не прежним именем',
+        str_contains($recommendation, '«Бизнес-5»') && !str_contains($recommendation, 'До 5 сайтов'),
+        $recommendation
+    );
+
+    $expect(
+        'домены лицензии считаются по ключу тарифа',
+        [Catalog::planDomainLimit('single'), Catalog::planDomainLimit('multi'), Catalog::planDomainLimit('extended')] === [1, 5, 1000],
+        implode(', ', [
+            Catalog::planDomainLimit('single'),
+            Catalog::planDomainLimit('multi'),
+            Catalog::planDomainLimit('extended'),
+        ])
+    );
+
     $settings->plan_extended_on = false;
 
     $expect(
@@ -144,6 +171,14 @@ try {
         'выключенный тариф не попадает в plans()',
         !in_array('extended', array_column(Catalog::plans(), 'key'), true),
         implode(', ', array_column(Catalog::plans(), 'key'))
+    );
+
+    $licenseAfter = (string) (Chat::answer('какой домен у ключа')['answer'] ?? '');
+
+    $expect(
+        'выключенный тариф не назван в ответе консультанта',
+        !str_contains($licenseAfter, 'Без ограничений'),
+        mb_substr($licenseAfter, 0, 160)
     );
 
     $misaligned = array_filter(

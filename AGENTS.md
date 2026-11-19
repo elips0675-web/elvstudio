@@ -75,8 +75,12 @@
    (`Catalog::planLabels()`, `Catalog::planKeys()`, вкладка «Продажи»). Подпись
    в шаблоне строкой — дефект: `elv_plan_label()`, `plans`, `elv_plan_keys()`.
    Выключенный тариф не показывается и не принимается в заказе; значения
-   сравнения привязаны к ключу, а не к порядку колонок. Проверка:
-   `node tools/check-plans.mjs` (входит в `node tools/gate.mjs`).
+   сравнения привязаны к ключу, а не к порядку колонок. Подпись в тексте
+   консультанта, калькулятора и рекомендаций — тот же дефект, что в шаблоне:
+   `Chat` и `Calculator` берут `Catalog::planLabels()`/`plans()`, лимит доменов
+   считается только в `Catalog::planDomainLimit()`. Проверка:
+   `node tools/check-plans.mjs` (входит в `node tools/gate.mjs`); поиск подписи
+   идёт подстрокой по теме и коду плагина.
 8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-studio`),
    нет нашего домена и контактов: `elv-studio.by`, `sales@elv-studio`,
    `t.me/elvstudio`. Контакты — только из Settings (`email`, `telegram`), валюта —

@@ -77,6 +77,18 @@ class Catalog
     }
 
     /**
+     * planDomainLimit — сколько доменов даёт лицензия тарифа.
+     */
+    public static function planDomainLimit(string $key): int
+    {
+        return match ($key) {
+            'extended' => 1000,
+            'multi' => 5,
+            default => 1,
+        };
+    }
+
+    /**
      * planDefinitions — что входит в тариф, кроме подписи из Settings.
      *
      * @return array<string, array<string, mixed>>

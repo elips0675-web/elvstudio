@@ -6,6 +6,11 @@
  * Данные проверяет `tools/check-plans.php` (меняет настройки только в памяти
  * процесса), разметку — этот файл: подписи и число карточек на /pricing/ и
  * /order/ должны совпадать с тем, что отдаёт Catalog. Входит в `gate.mjs`.
+ *
+ * Тексты подписей ищутся подстрокой во всей теме и в коде плагина: зашитая
+ * в длинную фразу подпись — та же поломка, что и отдельной строкой. Пропущены
+ * только источники: `Catalog.php` (дефолты), `BlogContent.php`/`Demo.php`
+ * (демо-контент) и `models/settings/fields.yaml` (дефолты полей).
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -85,36 +90,62 @@ if (plans.length !== (report.keys || []).length) {
   problems.push('витрина: plans() отдаёт ' + plans.length + ' тарифов, а включено ' + (report.keys || []).length);
 }
 
-const themeDir = path.join(root, 'themes/elv-studio');
-const themeFiles = [];
+const DEFAULT_LABELS = ['Один сайт', 'До 5 сайтов', 'Без ограничений'];
+const scannedLabels = [...new Set([...labels, ...DEFAULT_LABELS])];
 
-const walk = (dir) => {
+const scanRoots = [
+  { dir: path.join(root, 'themes/elv-studio'), extensions: ['.htm'], skipDirs: ['assets', 'content'] },
+  { dir: path.join(root, 'plugins/elv/kit'), extensions: ['.php', '.htm', '.yaml'], skipDirs: [] },
+];
+
+const skipFiles = new Set([
+  'plugins/elv/kit/classes/Catalog.php',
+  'plugins/elv/kit/classes/BlogContent.php',
+  'plugins/elv/kit/classes/Demo.php',
+  'plugins/elv/kit/models/settings/fields.yaml',
+]);
+
+const sourceFiles = [];
+
+const walk = (dir, extensions, skipDirs) => {
   fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
     const full = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      if (entry.name !== 'assets' && entry.name !== 'content') {
-        walk(full);
+      if (!skipDirs.includes(entry.name)) {
+        walk(full, extensions, skipDirs);
       }
 
       return;
     }
 
-    if (entry.name.endsWith('.htm')) {
-      themeFiles.push(full);
+    if (extensions.some((extension) => entry.name.endsWith(extension))) {
+      sourceFiles.push(full);
     }
   });
 };
 
-walk(themeDir);
+scanRoots.forEach(({ dir, extensions, skipDirs }) => walk(dir, extensions, skipDirs));
 
-themeFiles.forEach((file) => {
-  const source = fs.readFileSync(file, 'utf8');
+let scanned = 0;
+
+sourceFiles.forEach((file) => {
   const relative = path.relative(root, file).replace(/\\/g, '/');
 
-  labels.forEach((label) => {
-    if (source.includes("'" + label + "'") || source.includes('"' + label + '"')) {
-      problems.push(relative + ' — подпись тарифа «' + label + '» зашита строкой, нужен elv_plan_label/plans');
+  if (skipFiles.has(relative)) {
+    return;
+  }
+
+  scanned += 1;
+  const source = fs.readFileSync(file, 'utf8');
+
+  scannedLabels.forEach((label) => {
+    const index = source.indexOf(label);
+
+    if (index !== -1) {
+      const line = source.slice(0, index).split('\n').length;
+
+      problems.push(relative + ':' + line + ' — подпись тарифа «' + label + '» зашита в текст, нужен elv_plan_label/plans');
     }
   });
 });
@@ -173,4 +204,5 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log('тарифы из настроек: ' + plans.length + ' (' + labels.join(' / ') + '), проверок данных ' + report.checks);
+console.log('тарифы из настроек: ' + plans.length + ' (' + labels.join(' / ') + '), проверок данных ' + report.checks
+  + ', файлов без зашитых подписей ' + scanned);
