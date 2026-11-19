@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elv Landing или October CMS — что делать первым</title>
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --ink:#18212b;
+    --muted:#5b6675;
+    --line:#e3e7ee;
+    --accent:#2f6fed;
+    --accent-soft:#eaf1fe;
+    --ok:#0d8a5f;
+    --ok-soft:#e6f6ef;
+    --warn:#a8620a;
+    --warn-soft:#fdf3e3;
+    --danger:#b3261e;
+    --danger-soft:#fdecea;
+    --neutral-soft:#eef1f6;
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ---------- hero ---------- */
+
+  .hero{
+    background:
+      radial-gradient(1200px 380px at 50% -140px, #e8f0ff 0%, rgba(232,240,255,0) 70%),
+      var(--card);
+    border-bottom:1px solid var(--line);
+    padding:56px 0 40px;
+  }
+
+  .eyebrow{
+    margin:0 0 14px;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+
+  h1{
+    margin:0 0 16px;
+    font-size:clamp(28px,4.2vw,42px);
+    line-height:1.18;
+    letter-spacing:-.02em;
+    font-weight:750;
+  }
+
+  .lede{
+    margin:0;
+    max-width:74ch;
+    font-size:17px;
+    color:var(--muted);
+  }
+
+  .verdict{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    margin-top:28px;
+    padding:18px 20px;
+    background:var(--accent-soft);
+    border:1px solid #d3e2fd;
+    border-radius:var(--radius);
+  }
+
+  .verdict-label{
+    flex:0 0 auto;
+    margin-top:2px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:var(--accent);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+
+  .verdict p{margin:0;font-size:16.5px}
+  .verdict b{color:#123a86}
+
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(47,111,237,.28)}
+  a:hover{border-bottom-color:var(--accent)}
+
+  .hero-links{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    margin:20px 0 0;
+    font-size:14px;
+  }
+
+  .hero-links-label{
+    margin-right:2px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .hero-links a{
+    padding:5px 12px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--card);
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .hero-links a:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- metrics ---------- */
+
+  .metrics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px;
+    margin:28px 0 0;
+  }
+
+  .metric{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+
+  .metric dt{
+    margin:0 0 6px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .metric dd{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .metric .note{display:block;margin-top:4px;font-size:13px;font-weight:400;color:var(--muted)}
+
+  /* ---------- layout ---------- */
+
+  main{padding:36px 0 8px}
+
+  section{margin:0 0 40px;scroll-margin-top:24px}
+
+  h2{
+    margin:0 0 8px;
+    font-size:23px;
+    line-height:1.3;
+    letter-spacing:-.01em;
+  }
+
+  h2 .num{
+    display:inline-block;
+    min-width:30px;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+
+  h3{margin:22px 0 8px;font-size:17.5px;line-height:1.4}
+
+  p{margin:0 0 12px}
+  p:last-child{margin-bottom:0}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+
+  .muted{color:var(--muted)}
+
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:.9em;
+    background:var(--neutral-soft);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:1px 5px;
+    white-space:nowrap;
+  }
+
+  .ref{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  /* ---------- toc ---------- */
+
+  .toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:0 0 32px;
+    padding:0;
+    list-style:none;
+  }
+
+  .toc a{
+    display:inline-block;
+    padding:7px 13px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--card);
+    color:var(--ink);
+    font-size:14px;
+    text-decoration:none;
+  }
+
+  .toc a:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- table ---------- */
+
+  .table-scroll{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--line);background:var(--card)}
+
+  table{border-collapse:collapse;width:100%;min-width:680px;font-size:14.5px}
+
+  caption{
+    caption-side:top;
+    padding:16px 20px 12px;
+    text-align:left;
+    font-size:13px;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+  }
+
+  th,td{padding:13px 18px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+
+  thead th{
+    background:#f1f5fb;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:#334155;
+    white-space:nowrap;
+  }
+
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:last-child td{border-bottom:0}
+
+  td:first-child{font-weight:600;color:#26313f}
+
+  /* ---------- badges ---------- */
+
+  .badge{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.03em;
+    white-space:nowrap;
+    vertical-align:1px;
+  }
+
+  .b-p0{background:var(--danger-soft);color:var(--danger)}
+  .b-p1{background:var(--warn-soft);color:var(--warn)}
+  .b-p2{background:var(--neutral-soft);color:#475569}
+  .b-ok{background:var(--ok-soft);color:var(--ok)}
+  .b-no{background:var(--danger-soft);color:var(--danger)}
+  .b-yes{background:var(--ok-soft);color:var(--ok)}
+
+  /* ---------- reasons ---------- */
+
+  .reasons{
+    margin:0;
+    padding:0;
+    list-style:none;
+    counter-reset:reason;
+    display:grid;
+    gap:12px;
+  }
+
+  .reasons li{
+    counter-increment:reason;
+    position:relative;
+    padding:16px 20px 16px 58px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+
+  .reasons li::before{
+    content:counter(reason);
+    position:absolute;
+    left:18px;
+    top:16px;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:13px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .reasons b{color:#123a86}
+
+  /* ---------- steps ---------- */
+
+  .steps{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:14px;
+    counter-reset:step;
+  }
+
+  .step{
+    counter-increment:step;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--accent);
+    border-radius:var(--radius);
+    padding:18px 22px 18px 22px;
+  }
+
+  .step-head{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-bottom:8px;
+  }
+
+  .step-head .n{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+
+  .step-head .title{font-size:17px;font-weight:700;line-height:1.35}
+
+  .step p{margin:0 0 8px;font-size:15px}
+  .step p:last-child{margin-bottom:0}
+
+  .step .label{
+    display:inline-block;
+    min-width:74px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .step.is-owner{border-left-color:var(--warn)}
+
+  /* ---------- callouts ---------- */
+
+  .callout{
+    margin:14px 0 0;
+    padding:14px 18px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--card);
+    font-size:15px;
+  }
+
+  .callout.warn{background:var(--warn-soft);border-color:#f0dcb8}
+  .callout.ok{background:var(--ok-soft);border-color:#c6ebd9}
+  .callout.info{background:var(--accent-soft);border-color:#d3e2fd}
+
+  .callout strong{display:block;margin-bottom:4px;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+
+  /* ---------- two columns ---------- */
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+  }
+
+  .panel h3{margin-top:0}
+  .panel ul{margin:8px 0 0;padding-left:20px}
+  .panel li{margin-bottom:6px;font-size:15px}
+
+  /* ---------- checklist ---------- */
+
+  .checks{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+
+  .checks li{
+    position:relative;
+    padding-left:28px;
+    font-size:15px;
+  }
+
+  .checks li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:7px;
+    width:14px;
+    height:14px;
+    border-radius:4px;
+    border:1.5px solid #b9c3d1;
+    background:#fff;
+  }
+
+  /* ---------- footer ---------- */
+
+  footer{
+    border-top:1px solid var(--line);
+    background:var(--card);
+    padding:26px 0 34px;
+    margin-top:12px;
+    font-size:13.5px;
+    color:var(--muted);
+  }
+
+  footer p{margin:0 0 6px}
+
+  /* ---------- print ---------- */
+
+  @media print{
+    body{background:#fff}
+    .hero{background:#fff}
+    .card,.metric,.panel,.reasons li,.step{box-shadow:none}
+    .toc{display:none}
+    section{break-inside:avoid}
+  }
+
+  @media (max-width:760px){
+    .cols{grid-template-columns:1fr}
+    .verdict{flex-direction:column;gap:10px}
+    .verdict-label{align-self:flex-start}
+    .hero{padding:40px 0 30px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Анализ проектов · срез 19.11.2026</p>
+    <h1>Elv Landing или October CMS:<br>что делать первым</h1>
+    <p class="lede">
+      Сравнение двух каталогов по коду, бэклогам и живым адресам. Вывод не «какой проект важнее»,
+      а «какой блок разблокирует остальное».
+    </p>
+
+    <div class="verdict">
+      <span class="verdict-label">Вывод</span>
+      <p>
+        Сначала <b>D:\Elv Landing</b> — четыре пункта, которые мешают продавать Elv Kit.
+        Потом <b>D:\October CMS</b> одним крупным блоком: CI и бэкапы, поиск, REST API, чат.
+        Хостинг и домен — после обоих, они общие и решаются владельцем.
+      </p>
+    </div>
+
+    <p class="hero-links">
+      <span class="hero-links-label">Ссылки</span>
+      <a href="https://github.com/elips0675-web/OctoberCMS" target="_blank" rel="noopener">OctoberCMS — репозиторий</a>
+      <a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">OctoberCMS — демо</a>
+      <a href="https://github.com/elips0675-web/elvstudio" target="_blank" rel="noopener">elvstudio — репозиторий</a>
+      <a href="https://elvstudio.vercel.app/" target="_blank" rel="noopener">elvstudio.vercel.app — демо</a>
+    </p>
+
+    <dl class="metrics">
+      <div class="metric">
+        <dt>Этап</dt>
+        <dd>74 / 45.2<span class="note">витрина / шаблон</span></dd>
+      </div>
+      <div class="metric">
+        <dt>Открытых пунктов</dt>
+        <dd>41 / ~35<span class="note">у шаблона 6 из них — P0</span></dd>
+      </div>
+      <div class="metric">
+        <dt>Публичный адрес</dt>
+        <dd>200 / 200<span class="note">витрина / демо шаблона</span></dd>
+      </div>
+      <div class="metric">
+        <dt>Проверки</dt>
+        <dd>31 / 305<span class="note">гейтов / тестов плагина</span></dd>
+      </div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <nav aria-label="Содержание">
+    <ul class="toc">
+      <li><a href="#compare">Сравнение</a></li>
+      <li><a href="#why">Почему витрина первая</a></li>
+      <li><a href="#landing">План по Elv Landing</a></li>
+      <li><a href="#october">План по October CMS</a></li>
+      <li><a href="#reverse">Когда наоборот</a></li>
+      <li><a href="#notes">Замечания по бэклогам</a></li>
+      <li><a href="#method">Как проверял</a></li>
+    </ul>
+  </nav>
+
+  <section id="compare">
+    <h2><span class="num">01</span>Сравнение по факту</h2>
+    <p class="muted">Данные из <code>Что доделать.txt</code>, <code>AGENTS.md</code>, <code>README.md</code> и проверки файлов на диске.</p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Срез 19.11.2026. Цифры открытых пунктов — по чекбоксам и заголовкам бэклогов.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Критерий</th>
+            <th scope="col">D:\Elv Landing</th>
+            <th scope="col">D:\October CMS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Роль</td>
+            <td>Витрина продаж и сам продукт Elv Kit<br><span class="ref">AGENTS.md:3-15</span></td>
+            <td>Продукт-шаблон сайта, продаётся через витрину<br><span class="ref">AGENTS.md:14</span></td>
+          </tr>
+          <tr>
+            <td>Репозиторий</td>
+            <td><a href="https://github.com/elips0675-web/elvstudio" target="_blank" rel="noopener">github.com/elips0675-web/elvstudio</a></td>
+            <td><a href="https://github.com/elips0675-web/OctoberCMS" target="_blank" rel="noopener">github.com/elips0675-web/OctoberCMS</a></td>
+          </tr>
+          <tr>
+            <td>Этап</td>
+            <td>Stage 74</td>
+            <td>Stage 45.2</td>
+          </tr>
+          <tr>
+            <td>Открытые пункты</td>
+            <td>41 чекбокс, из них ~10 — данные владельца</td>
+            <td>~35 заголовков, 6 в разделе P0</td>
+          </tr>
+          <tr>
+            <td>Живой адрес</td>
+            <td><span class="badge b-yes">200</span> <a href="https://elvstudio.vercel.app/" target="_blank" rel="noopener">elvstudio.vercel.app</a></td>
+            <td><span class="badge b-yes">200</span> <a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">elips0675-web.github.io</a><br><span class="ref">octobercms.vercel.app — 404</span></td>
+          </tr>
+          <tr>
+            <td>Тесты</td>
+            <td>PHPUnit-тестов нет, 31 гейт в <code>tools/</code></td>
+            <td>305 тестов плагина зелёные, 18 гейтов</td>
+          </tr>
+          <tr>
+            <td>CI</td>
+            <td><span class="badge b-no">нет</span> каталога <code>.github</code> нет</td>
+            <td><span class="badge b-no">нет</span> и это P0-9<br><span class="ref">Что доделать.txt:141</span></td>
+          </tr>
+          <tr>
+            <td>Бэкапы</td>
+            <td><span class="badge b-no">нет</span> скрипта, P2</td>
+            <td><span class="badge b-no">нет</span> скрипта, P0-8<br><span class="ref">Что доделать.txt:124-137</span></td>
+          </tr>
+          <tr>
+            <td>Главный блокер</td>
+            <td>Тема продаётся как витрина студии, а не шаблон<br><span class="ref">Что доделать.txt:508-513</span></td>
+            <td>Хостинг, контакты, права на фото, поиск, API, чат</td>
+          </tr>
+          <tr>
+            <td>Объём кастома</td>
+            <td>84 PHP-файла / 7 343 строки, 28 страниц темы</td>
+            <td>89 PHP-файлов / 11 019 строк, 110 адресов</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="why">
+    <h2><span class="num">02</span>Почему витрина первая</h2>
+
+    <ol class="reasons">
+      <li>
+        <b>Она — единственный канал продаж обоих продуктов.</b>
+        Пока витрина не готова, продавать нечего: шаблон из <code>D:\October CMS</code> по правилам
+        продаётся именно через неё <span class="ref">(October CMS/AGENTS.md:14)</span>.
+      </li>
+      <li>
+        <b>Она ближе к «продаётся».</b>
+        18–19.11 закрыты упаковка ZIP, отделение демо от товара, нейтральный бренд, тарифы и FAQ
+        из настроек <span class="ref">(Что доделать.txt:349-538)</span>. В коде осталось четыре пункта, а не тридцать.
+      </li>
+      <li>
+        <b>У October CMS P0 — это инфраструктура и данные владельца, а не код.</b>
+        Хостинг и домен (M17), реальные контакты (P0-6), права на 20 демо-фото (P0-7),
+        бэкапы (P0-8), CI (P0-9). Плюс крупные фичи: поиск BM25 (M8), <code>POST /api/bookings</code> (P1-16),
+        бэкенд чата (P1-17).
+      </li>
+      <li>
+        <b>Демо шаблона — статический снимок, продавать он не может.</b>
+        Оно уже опубликовано и отдаёт 200
+        (<a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">elips0675-web.github.io</a>:
+        110 страниц, sitemap 107), но формы, брони, оплата и админка там отключены
+        <span class="ref">(October CMS/README.md:24-28)</span>. Витрина принимает заказы, лицензии и выдаёт ZIP —
+        то есть зарабатывает именно она.
+      </li>
+      <li>
+        <b>Общий ресурс — данные владельца.</b>
+        Цены, провайдеры хостинга, кейсы, валюта, SLA блокируют обе площадки. Пока их нет,
+        двигать код витрины выгоднее: там меньше зависимостей от чужих решений.
+      </li>
+    </ol>
+  </section>
+
+  <section id="landing">
+    <h2><span class="num">03</span>Порядок внутри D:\Elv Landing</h2>
+    <p class="muted">Пять шагов, затем — только внешние пункты. Номера строк — по <code>Что доделать.txt</code>.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Шаг 1</span>
+          <span class="badge b-p0">P0</span>
+          <span class="title">Модульные страницы на пустом каталоге дают 404</span>
+        </div>
+        <p><span class="label">Что</span>Решить: честный 404 или 200 со ссылкой на каталог <span class="ref">(:380-383)</span>.</p>
+        <p><span class="label">Почему</span>Это первое, что видит покупатель на чистой установке.</p>
+        <p><span class="label">Приёмка</span><code>node tools/check-empty-install.mjs --base=…</code> зелёный, поведение записано в README.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Шаг 2</span>
+          <span class="badge b-p1">P1</span>
+          <span class="title">Тема — витрина студии, а не шаблон</span>
+        </div>
+        <p><span class="label">Что</span>Нейтральный набор страниц или продажа «как есть» с честным описанием <span class="ref">(:508-513)</span>.</p>
+        <p><span class="label">Факт</span>28 из 28 страниц в <code>themes/elv-studio/pages</code> упоминают Elv.</p>
+        <p><span class="label">Важно</span>Пункт частично устарел: <code>composer.json</code>, <code>version.yaml</code> и
+          <code>screenshot.png</code> у темы уже есть — добавлены в Stage 63 <span class="ref">(:514-522)</span>. Переделывать не нужно.</p>
+        <p><span class="label">Приёмка</span>Карточка товара не обещает того, чего в архиве нет.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Шаг 3</span>
+          <span class="badge b-p2">P2</span>
+          <span class="title">i18n или пометка «только RU»</span>
+        </div>
+        <p><span class="label">Факт</span>Каталога <code>plugins/elv/kit/lang</code> нет, подписи русские в YAML и контроллерах <span class="ref">(:523-525)</span>.</p>
+        <p><span class="label">Почему</span>Без этого карточка товара врёт покупателю из другой локали.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Шаг 4</span>
+          <span class="badge b-p2">P2</span>
+          <span class="title">Прогон на чистом October 4.4 через D:\Elv test</span>
+        </div>
+        <p><span class="label">Что</span>Активация темы, установщик, пустые состояния, письма в лог, mock-оплата,
+          <code>production-check.php --strict</code> <span class="ref">(:526-529)</span>.</p>
+        <p><span class="label">Почему</span>Это и есть приёмка товара, а не «скрипт есть».</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Шаг 5</span>
+          <span class="badge b-p2">P2</span>
+          <span class="title">Слэш-ссылки</span>
+        </div>
+        <p><span class="label">Что</span>301 на первом переходе по каждой внутренней ссылке <span class="ref">(:530-538)</span>.</p>
+        <p><span class="label">Почему последним</span>Индексации не мешает, canonical один. Косметика.</p>
+      </li>
+
+      <li class="step is-owner">
+        <div class="step-head">
+          <span class="n">Дальше</span>
+          <span class="badge b-p2">владелец</span>
+          <span class="title">Только внешние пункты</span>
+        </div>
+        <p>Ключи ЮKassa/Stripe, SMTP, домен, SSL, cron, очередь, бэкап <span class="ref">(:540-550)</span>.
+          Кода здесь нет — без этих данных прод не запускается.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="october">
+    <h2><span class="num">04</span>Потом — D:\October CMS</h2>
+    <p class="muted">Четыре блока по возрастанию стоимости. Первые два не требуют данных владельца.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Блок A</span>
+          <span class="badge b-ok">готово</span>
+          <span class="title">Публичное демо шаблона — уже опубликовано</span>
+        </div>
+        <p>Демо живёт на GitHub Pages: <a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">elips0675-web.github.io</a>
+          — 110 страниц, sitemap 107 адресов, неизвестный путь отдаёт 404. Алиас
+          <code>octobercms.vercel.app</code> по-прежнему 404, и в README публичной ссылки нет
+          <span class="ref">(Что доделать.txt:67-73)</span> — документ отстал от факта.</p>
+        <p><span class="label">Осталось</span>Вписать адрес в README и GitHub About, а снимок
+          пересобирать после правок: <code>php tools/export-static.php --origin=https://elips0675-web.github.io</code>.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Блок B</span>
+          <span class="badge b-p0">P0</span>
+          <span class="title">Бэкапы и CI</span>
+        </div>
+        <p>P0-8: скрипт в <code>tools/</code>, восстановление прогнано один раз и сверено, RTO записан
+          <span class="ref">(:124-137)</span>. P0-9: workflow на push/PR — PHPUnit, <code>composer audit</code>,
+          гейты на поднятом <code>serve</code> <span class="ref">(:139-160)</span>.</p>
+        <p><span class="label">Почему</span>Сейчас «миграции forward-only» — лозунг: восстановление ни разу не проверялось.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Блок C</span>
+          <span class="badge b-p1">P1</span>
+          <span class="title">Крупные фичи</span>
+        </div>
+        <p>Поиск BM25 — M8 <span class="ref">(:298-307)</span>; <code>POST /api/bookings</code> с идемпотентностью
+          и <code>409</code> на занятый слот — P1-16 <span class="ref">(:218-234)</span>; бэкенд чата — P1-17
+          <span class="ref">(:236-251)</span>.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <span class="n">Блок D</span>
+          <span class="badge b-p1">P1</span>
+          <span class="title">Контент и хостинг</span>
+        </div>
+        <p>59 позиций из 91 без фото (P1-11), демо-подсказка «часть слотов занята» (P1-9),
+          затем M17: хостинг, домен, HTTPS, cron, внешняя проба <code>/health</code>.</p>
+      </li>
+    </ol>
+
+    <div class="callout info">
+      <strong>Почему не наоборот</strong>
+      Даже если начать с шаблона, первым шагом всё равно будет импорт демо и P0-8/P0-9:
+      поиск и API без бэкапов и сборки — это функция, которую нельзя выпускать.
+    </div>
+  </section>
+
+  <section id="reverse">
+    <h2><span class="num">05</span>Когда порядок обратный</h2>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Цель — сдать библиотечный шаблон</h3>
+        <p class="muted">Тогда первым идёт October CMS.</p>
+        <ul>
+          <li>Демо уже на GitHub Pages — проверить свежесть снимка и пересобрать после правок.</li>
+          <li>Затем P0-8 и P0-9 — это фундамент релиза.</li>
+          <li>Поиск и API — после, но до публикации на своём домене.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Цель — деньги от Elv Kit</h3>
+        <p class="muted">Тогда порядок однозначный.</p>
+        <ul>
+          <li>Только витрина: шаги 1–4 из раздела 03.</li>
+          <li>Октябрьский шаблон ждёт: он не влияет на продажу Elv Kit.</li>
+          <li>Хостинг и ключи — параллельно, силами владельца.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="notes">
+    <h2><span class="num">06</span>Замечания по бэклогам</h2>
+
+    <div class="card">
+      <h3>Устаревший пункт в витрине</h3>
+      <p>В <code>Что доделать.txt:508-513</code> написано, что у темы нет <code>composer.json</code>,
+        <code>version.yaml</code> и <code>screenshot.png</code>. Файлы есть — добавлены в Stage 63
+        <span class="ref">(:514-522)</span>. Устарел только текст пункта, работа не нужна.</p>
+
+      <h3>Расхождение текстов на 33 страницах</h3>
+      <p>В October CMS это P2-42 <span class="ref">(:31)</span> — следствие нейтрального бренда с Stage 36,
+        а не баг. Гейт <code>check-dom-parity --structure</code> по структуре зелёный.</p>
+
+      <h3>Один класс дефекта в обоих проектах</h3>
+      <p>«Контент про нас, а не универсальный». В витрине он закрыт для плагина — услуги, FAQ, блог
+        и бренд из настроек (Stage 67, 71–74), осталась тема. В шаблоне висит как P2-42.
+        Логично закрыть его в витрине первым и перенести рецепт в шаблон.</p>
+
+      <h3>README шаблона отстал от факта</h3>
+      <p>В <code>October CMS/README.md:30-33</code> написано, что публичной ссылки у шаблона нет:
+        «<code>octobercms.vercel.app</code> ещё не развёрнут». При этом демо на GitHub Pages отдаёт 200
+        и содержит 110 страниц. Не блокер, но при выборе порядка работ вводит в заблуждение.</p>
+
+      <h3>Деревья чистые</h3>
+      <p><code>git status</code> в обоих каталогах пуст, поэтому переключение между проектами
+        ничего не потеряет.</p>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2><span class="num">07</span>Как проверял</h2>
+
+    <div class="card">
+      <ul class="checks">
+        <li><code>git log --oneline</code> и <code>git status --porcelain</code> в обоих каталогах — деревья чистые, Stage 74 и Stage 45.2.</li>
+        <li><code>Что доделать.txt</code> обоих: 41 открытый чекбокс против ~35 заголовков, 6 в P0.</li>
+        <li><code>AGENTS.md</code> и <code>README.md</code> обоих — роли, границы, направление переноса SEO.</li>
+        <li>HTTP (19.11.2026): <code>elvstudio.vercel.app</code> → 200; <code>octobercms.vercel.app</code> → 404,
+          но демо шаблона живёт на <a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">elips0675-web.github.io</a>
+          → 200, 110 страниц, sitemap 107, неизвестный путь → 404.</li>
+        <li>Наличие файлов: <code>themes/elv-studio/{composer.json,version.yaml,screenshot.png}</code> — есть;
+          <code>plugins/elv/kit/lang</code> — нет; <code>plugins/elv/site/classes/{Search,Chat}.php</code> — нет;
+          <code>.github</code> — нет у обоих.</li>
+        <li>Объём: 84 PHP-файла / 7 343 строки (kit) против 89 / 11 019 (site);
+          тесты шаблона — 305 зелёных по бэклогу, 278 <code>function test</code> в 21 файле.</li>
+      </ul>
+
+      <div class="callout warn">
+        <strong>Ограничение</strong>
+        Тяжёлые прогоны (<code>npm run check</code>, PHPUnit) не перезапускались: цифры взяты
+        из журналов Stage 74 и Stage 45.2. Это анализ состояния по коду и документации, а не новый прогон гейтов.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Источники:</strong> <code>D:\Elv Landing\Что доделать.txt</code>, <code>D:\Elv Landing\AGENTS.md</code>,
+      <code>D:\October CMS\Что доделать.txt</code>, <code>D:\October CMS\AGENTS.md</code>,
+      <code>D:\October CMS\README.md</code>, <code>git log</code> обоих репозиториев.</p>
+    <p><strong>Ссылки:</strong>
+      <a href="https://github.com/elips0675-web/OctoberCMS" target="_blank" rel="noopener">OctoberCMS</a> ·
+      <a href="https://elips0675-web.github.io/" target="_blank" rel="noopener">демо OctoberCMS</a> ·
+      <a href="https://github.com/elips0675-web/elvstudio" target="_blank" rel="noopener">elvstudio</a> ·
+      <a href="https://elvstudio.vercel.app/" target="_blank" rel="noopener">демо elvstudio.vercel.app</a></p>
+    <p>Срез 19.11.2026. Файл самодостаточный: без внешних шрифтов, скриптов и запросов.</p>
+  </div>
+</footer>
+
+</body>
+</html>

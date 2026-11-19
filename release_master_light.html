@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Единый пакет релиза: Elv Kit + Универсальный шаблон October CMS</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --p0: #dc2626;
+      --p0-bg: #fef2f2;
+      --p1: #d97706;
+      --p1-bg: #fffbeb;
+      --p2: #059669;
+      --p2-bg: #ecfdf5;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 5rem;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+    }
+
+    .nav-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--surface-alt);
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 2rem 1rem 0;
+    }
+
+    header.hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .meta {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .lead {
+      color: var(--text-muted);
+      font-size: 1.02rem;
+      max-width: 820px;
+    }
+
+    .progress-bar-wrap {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      margin: 1.25rem 0 0.4rem;
+    }
+
+    .progress-bar {
+      background: var(--accent);
+      height: 100%;
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    /* Section Headings */
+    .section {
+      margin-top: 3rem;
+      scroll-margin-top: 4.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      margin-bottom: 1rem;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.84rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .stats strong { color: var(--text); }
+
+    /* Badges */
+    .badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .badge-p0 { background: var(--p0-bg); color: var(--p0); border: 1px solid rgba(220,38,38,0.25); }
+    .badge-p1 { background: var(--p1-bg); color: var(--p1); border: 1px solid rgba(217,119,6,0.25); }
+    .badge-p2 { background: var(--p2-bg); color: var(--p2); border: 1px solid rgba(5,150,105,0.25); }
+    .badge-info { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(37,99,235,0.25); }
+
+    /* Tasks */
+    .stage-label {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+
+    .task:hover {
+      border-color: var(--border-strong);
+      background: #fcfdff;
+    }
+
+    .task input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      margin-top: 3px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .task-content { flex: 1; }
+
+    .task-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .task.done .task-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    code {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.38rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85em;
+      color: #1e293b;
+    }
+
+    .callout {
+      background: var(--accent-soft);
+      border-left: 4px solid var(--accent);
+      padding: 1.1rem 1.25rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 1.25rem 0;
+      font-size: 0.94rem;
+      color: var(--text);
+    }
+
+    .callout strong { color: var(--accent); }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-alt);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    /* Copyable Blocks */
+    .copy-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .copy-card-header {
+      background: var(--surface-alt);
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .copy-card-title {
+      font-weight: 600;
+      font-size: 0.96rem;
+      color: var(--text);
+    }
+
+    .btn-copy {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-copy:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-copy.copied {
+      background: var(--p2);
+      border-color: var(--p2);
+      color: #ffffff;
+    }
+
+    .copy-body {
+      padding: 1.25rem;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    /* FAQ Accordion */
+    details.faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.65rem;
+      box-shadow: var(--shadow);
+    }
+
+    details.faq-item summary {
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.96rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    details.faq-item summary::-webkit-details-marker { display: none; }
+
+    details.faq-item summary::after {
+      content: "+";
+      font-size: 1.25rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    details.faq-item[open] summary::after {
+      content: "−";
+    }
+
+    details.faq-item .faq-answer {
+      padding: 0 1.25rem 1.15rem;
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">Пакет релиза · Elv Kit + October CMS</div>
+      <div class="nav-links">
+        <a href="#plan">План (12 задач)</a>
+        <a href="#debrand">Деобрендинг</a>
+        <a href="#cards">Карточки товаров</a>
+        <a href="#pricing">Тарифы и FAQ</a>
+        <a href="#legal">Оферта и Чекаут</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header class="hero">
+      <div class="meta">Единая рабочая панель · Срез 19.11.2026</div>
+      <h1>Запуск продаж: Elv Kit + Универсальный шаблон October CMS</h1>
+      <p class="lead">Полный набор материалов для вывода двух продуктов на рынок: интерактивный чек-лист разработки, шпаргалка по очистке темы <code>elv-studio</code>, тексты карточек товаров, тарифы, FAQ, публичная оферта, политика конфиденциальности и шаблоны для формы заказа.</p>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">Выполнено: 0 из 12 задач (0%)</div>
+    </header>
+
+    <!-- ОБЗОР ПРОДУКТОВ -->
+    <div class="grid-2">
+      <div class="card">
+        <h3>Товар №1: Elv Kit <span class="badge badge-p2">Почти готов</span></h3>
+        <p>Каталог <code>D:\Elv Landing</code>. Одновременно ваша собственная витрина продаж и готовый продукт (тема <code>elv-studio</code> + плагин <code>elv/kit</code>) для клиентов, которым нужен сайт для продажи цифровых товаров.</p>
+        <div class="stats">
+          <span>Этап: <strong>Stage 74</strong></span>
+          <span>В коде: <strong>4 задачи</strong></span>
+          <span>Демо: <strong>elvstudio.vercel.app</strong></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Товар №2: Шаблон сайта <span class="badge badge-p1">В разработке</span></h3>
+        <p>Каталог <code>D:\October CMS</code>. Большой многостраничный универсальный шаблон сайта на October CMS (110 страниц), который будет продаваться через витрину <code>Elv Kit</code>.</p>
+        <div class="stats">
+          <span>Этап: <strong>Stage 45.2</strong></span>
+          <span>В коде: <strong>CI, Бэкапы, API</strong></span>
+          <span>Демо: <strong>GitHub Pages (200)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Логика запуска:</strong> <code>D:\Elv Landing</code> — единственный канал приёма оплат, выдачи лицензий и ZIP-архивов. Доведя его за 4 шага, вы сразу открываете продажи <strong>Elv Kit</strong> и готовите площадку для релиза шаблона <strong>October CMS</strong>.
+    </div>
+
+    <!-- РАЗДЕЛ 1: ПЛАН -->
+    <section id="plan" class="section">
+      <div class="section-header">
+        <h2 class="section-title">1. План разработки и релиза (12 задач)</h2>
+      </div>
+
+      <div class="stage-label">Этап 1. Доводим D:\Elv Landing и запускаем продажи Elv Kit</div>
+      <div class="task-list">
+        <label class="task">
+          <input type="checkbox" data-id="elv-1">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p0">P0 · Блокер</span>
+              <span class="task-title">1. Поведение модульных страниц на пустом каталоге</span>
+            </div>
+            <div class="task-desc">Определить и записать в <code>README.md</code>, что отдают страницы при пустой базе (честный <code>404</code> или <code>200</code> со ссылкой на каталог). Проверить прохождение <code>node tools/check-empty-install.mjs</code>.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="elv-2">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p1">P1 · Продукт</span>
+              <span class="task-title">2. Очистка темы elv-studio от бренда Elv (Деобрендинг)</span>
+            </div>
+            <div class="task-desc">Заменить захардкоженные упоминания студии Elv на 28 страницах <code>themes/elv-studio/pages</code> на нейтральные шаблонные или вынести в настройки темы. <em>(<code>composer.json</code>, <code>version.yaml</code> и <code>screenshot.png</code> уже созданы).</em></div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="elv-3">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p2">P2 · Упаковка</span>
+              <span class="task-title">3. Локализация или пометка «Только RU»</span>
+            </div>
+            <div class="task-desc">В <code>plugins/elv/kit</code> нет папки <code>lang</code>, строки зашиты на русском. Либо вынести строки в i18n, либо явно указать в карточке товара, что продукт поставляется только на русском языке.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="elv-4">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p2">P2 · Приёмка</span>
+              <span class="task-title">4. Тестовый прогон на чистом October CMS 4.4</span>
+            </div>
+            <div class="task-desc">Развернуть архив товара в песочнице <code>D:\Elv test</code>: проверить активацию темы, установщик, пустые состояния, отправку писем в лог, mock-оплату и скрипт <code>production-check.php --strict</code>.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="elv-5">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p2">P2 · Косметика</span>
+              <span class="task-title">5. Убрать лишние 301-редиректы на слэш-ссылках</span>
+            </div>
+            <div class="task-desc">Поправить внутренние ссылки, чтобы при первом переходе не срабатывал редирект из-за закрывающего слэша.</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="stage-label">Этап 2. Доводим D:\October CMS и выкладываем второй товар</div>
+      <div class="task-list">
+        <label class="task">
+          <input type="checkbox" data-id="oct-1">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-info">Документация</span>
+              <span class="task-title">6. Обновить ссылку на демо в README.md</span>
+            </div>
+            <div class="task-desc">Вписать рабочий адрес демо <code>https://elips0675-web.github.io</code> (110 страниц, отдает 200) в <code>README.md</code> и описание репозитория.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="oct-2">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p0">P0 · Надёжность</span>
+              <span class="task-title">7. Скрипт бэкапов и тест восстановления (P0-8)</span>
+            </div>
+            <div class="task-desc">Написать скрипт резервного копирования в <code>tools/</code>, провести тестовое восстановление базы и файлов, замерить и записать RTO.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="oct-3">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p0">P0 · Автоматизация</span>
+              <span class="task-title">8. Настроить CI в .github (P0-9)</span>
+            </div>
+            <div class="task-desc">Добавить GitHub Actions workflow на <code>push</code> и <code>PR</code>: запуск 305 PHPUnit-тестов, <code>composer audit</code> и прогон гейтов на локальном сервере.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="oct-4">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p1">P1 · Фичи</span>
+              <span class="task-title">9. Реализовать поиск BM25, API бронирования и чат</span>
+            </div>
+            <div class="task-desc">Дописать модули: полнотекстовый поиск BM25 (<code>M8</code>), <code>POST /api/bookings</code> с идемпотентностью и <code>409</code> на занятый слот (<code>P1-16</code>), а также бэкенд чата (<code>P1-17</code>).</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="oct-5">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p1">P1 · Контент</span>
+              <span class="task-title">10. Закрыть вопросы с фото и демо-контентом</span>
+            </div>
+            <div class="task-desc">Решить права на 20 демо-фото (<code>P0-7</code>), заполнить оставшиеся 59 позиций из 91 без фотографий (<code>P1-11</code>) и добавить демо-подсказку про занятые слоты (<code>P1-9</code>).</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="stage-label">Этап 3. Инфраструктура владельца</div>
+      <div class="task-list">
+        <label class="task">
+          <input type="checkbox" data-id="infra-1">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p0">Прод · Витрина</span>
+              <span class="task-title">11. Подключить боевые ключи и домен для Elv Landing</span>
+            </div>
+            <div class="task-desc">Зарегистрировать домен, настроить SSL, SMTP для писем с лицензиями, боевые ключи ЮKassa / Stripe, очереди и cron.</div>
+          </div>
+        </label>
+
+        <label class="task">
+          <input type="checkbox" data-id="infra-2">
+          <div class="task-content">
+            <div class="task-header">
+              <span class="badge badge-p1">Прод · Демо</span>
+              <span class="task-title">12. Выкатить живое демо October CMS на хостинг (M17)</span>
+            </div>
+            <div class="task-desc">Поднять полноценную демо-версию шаблона на боевом сервере с HTTPS, cron и мониторингом <code>/health</code>, затем добавить товар в каталог витрины.</div>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- РАЗДЕЛ 2: ДЕОБРЕНДИНГ -->
+    <section id="debrand" class="section">
+      <div class="section-header">
+        <h2 class="section-title">2. Шпаргалка по очистке темы elv-studio (Шаг 2)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Что сейчас в <code>themes/elv-studio</code></th>
+              <th>На что заменить для покупателя</th>
+              <th>Где хранить данные</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Название «Elv Studio», логотип, копирайт в футере</td>
+              <td>«Digital Store» / «Product Kit» + заглушка логотипа</td>
+              <td>Настройки темы (<code>theme.yaml</code>)</td>
+            </tr>
+            <tr>
+              <td>Кейсы и описания услуг самой студии Elv (28 страниц)</td>
+              <td>Демо-контент (нейтральные описания цифровых товаров)</td>
+              <td>Страницы темы и сидер демо-данных</td>
+            </tr>
+            <tr>
+              <td>Реальные контакты, реквизиты и ссылки на соцсети</td>
+              <td>Плейсхолдеры (<code>hello@example.com</code>, пустые ссылки)</td>
+              <td>Настройки плагина <code>elv/kit</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- РАЗДЕЛ 3: КАРТОЧКИ ТОВАРОВ -->
+    <section id="cards" class="section">
+      <div class="section-header">
+        <h2 class="section-title">3. Готовые тексты карточек товаров</h2>
+      </div>
+
+      <div class="copy-card">
+        <div class="copy-card-header">
+          <span class="copy-card-title">Карточка №1: Elv Kit (Витрина цифровых товаров)</span>
+          <button class="btn-copy" onclick="copyText('card-elv', this)">Скопировать текст</button>
+        </div>
+        <div class="copy-body" id="card-elv">Название: Elv Kit — готовая витрина для продажи цифровых товаров на October CMS
+
+Короткий оффер:
+Запустите собственный магазин шаблонов, плагинов или цифровых продуктов за 1 вечер. Внутри — каталог, приём платежей, автоматическая выдача ZIP-архивов и управление лицензиями.
+
+Что входит в комплект:
+- Плагин elv/kit: заказы, генерация лицензионных ключей, привязка к доменам, выдача файлов после оплаты, управление тарифами и FAQ из админки.
+- Адаптивная тема оформления (28 готовых страниц): главная, каталог продуктов, карточки товаров, личный кабинет покупателя, документация и страницы правовой информации.
+- Интеграция с платёжными шлюзами (ЮKassa / Stripe) и отправка уведомлений на e-mail.
+- Инструменты проверки продакшн-окружения и скрипт развёртывания.
+
+Технические требования и особенности:
+- Платформа: October CMS 4.4+ (PHP 8.2+).
+- Язык интерфейса и документации: Русский (RU).
+- Поставляется в виде чистого ZIP-архива для установки на ваш сервер.</div>
+      </div>
+
+      <div class="copy-card">
+        <div class="copy-card-header">
+          <span class="copy-card-title">Карточка №2: Универсальный шаблон сайта на October CMS</span>
+          <button class="btn-copy" onclick="copyText('card-october', this)">Скопировать текст</button>
+        </div>
+        <div class="copy-body" id="card-october">Название: Универсальный многостраничный шаблон на October CMS (110 страниц)
+
+Короткий оффер:
+Готовая основа для корпоративного сайта, каталога услуг, портала или сервиса бронирования. Продуманная архитектура, высокая скорость работы и встроенные бизнес-модули.
+
+Что входит в комплект:
+- 110 готовых страниц и компонентов: главная, разделы услуг, подробный каталог позиций, карточки объектов, блог, контакты и служебные страницы.
+- Встроенный каталог с фильтрацией и полнотекстовым поиском (BM25).
+- Модуль онлайн-бронирования слотов (REST API с защитой от двойного бронирования).
+- Встроенный модуль чата и формы обратной связи с защитой от спама.
+- Набор автоматических тестов (305 PHPUnit-тестов) и скрипты резервного копирования.
+
+Технические требования и особенности:
+- Платформа: October CMS 4.4+ (PHP 8.2+).
+- Язык интерфейса: Русский (RU).
+- В комплекте: исходный код темы, плагины, сидер демо-данных и инструкция по запуску.</div>
+      </div>
+    </section>
+
+    <!-- РАЗДЕЛ 4: ТАРИФЫ И FAQ -->
+    <section id="pricing" class="section">
+      <div class="section-header">
+        <h2 class="section-title">4. Тарифная сетка и FAQ для покупателей</h2>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom: 1.5rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Параметр</th>
+              <th>Elv Kit (Витрина)</th>
+              <th>Универсальный шаблон</th>
+              <th>Комплект «Два в одном»</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Для каких задач</strong></td>
+              <td>Запуск витрины продаж, приём оплат и выдача ZIP/лицензий</td>
+              <td>Корпоративный сайт, каталог, портал услуг или система броней</td>
+              <td>Полный стек: своя площадка продаж + шаблон для проектов</td>
+            </tr>
+            <tr>
+              <td><strong>Что в комплекте</strong></td>
+              <td>Плагин <code>elv/kit</code> + тема (28 страниц, оплата, FAQ)</td>
+              <td>Тема и модули (110 страниц, каталог, поиск BM25, API броней)</td>
+              <td>Оба продукта в одном кабинете со скидкой ~20%</td>
+            </tr>
+            <tr>
+              <td><strong>Тариф «Старт» (1 домен)</strong></td>
+              <td><strong>X ₽</strong> · 1 проект, 1 год обновлений, базовый саппорт</td>
+              <td><strong>Y ₽</strong> · 1 проект, 1 год обновлений, базовый саппорт</td>
+              <td><strong>Z ₽</strong> · По 1 домену на каждый продукт, 1 год обновлений</td>
+            </tr>
+            <tr>
+              <td><strong>Тариф «Студия» (до 5 доменов)</strong></td>
+              <td><strong>2.5X ₽</strong> · До 5 клиентских проектов, приоритет</td>
+              <td><strong>2.5Y ₽</strong> · До 5 клиентских проектов, приоритет</td>
+              <td><strong>2.5Z ₽</strong> · До 5 проектов на каждый продукт + приоритет</td>
+            </tr>
+            <tr>
+              <td><strong>Язык интерфейса</strong></td>
+              <td>Только русский (RU)</td>
+              <td>Русский (RU)</td>
+              <td>Русский (RU)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="faq-item" open>
+        <summary>1. В чём главная разница между Elv Kit и Универсальным шаблоном October CMS?</summary>
+        <div class="faq-answer"><strong>Elv Kit</strong> — это движок витрины для продажи цифровых товаров (корзина, ЮKassa/Stripe, лицензии, выдача ZIP). <strong>Универсальный шаблон October CMS</strong> — это готовый многофункциональный сайт для бизнеса на 110 страниц с каталогом, поиском и онлайн-бронированием.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>2. Нужен ли мне Elv Kit, если я хочу купить только Универсальный шаблон?</summary>
+        <div class="faq-answer">Нет, продукты полностью независимы. Вы можете купить только Универсальный шаблон и развернуть его на своём хостинге. Elv Kit нужен только если вы сами планируете продавать цифровые товары.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>3. Какая версия October CMS требуется для работы?</summary>
+        <div class="faq-answer">Оба продукта рассчитаны на актуальную ветку <strong>October CMS 4.x</strong> (рекомендуется 4.4 и выше) и PHP 8.2+. Перед установкой убедитесь, что у вас есть лицензия на саму платформу October CMS.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>4. В чём разница между тарифами «Старт» и «Студия»?</summary>
+        <div class="faq-answer"><strong>Старт</strong> — лицензия на 1 боевой домен (плюс тестовые поддомены для разработки). <strong>Студия</strong> — позволяет использовать продукт на 5 независимых коммерческих доменах (для клиентских сайтов) и даёт приоритетную поддержку.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>5. На каком языке написаны админка и шаблоны?</summary>
+        <div class="faq-answer">Оба продукта поставляются <strong>только на русском языке</strong> (интерфейс, письма, настройки и документация). При необходимости тексты в шаблонах можно перевести самостоятельно.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>6. Как происходит получение файлов после оплаты?</summary>
+        <div class="faq-answer">Сразу после подтверждения платежа на e-mail приходит письмо с лицензионным ключом и ссылкой на скачивание ZIP-архива. Также все покупки сохраняются в личном кабинете.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>7. Что происходит через год, когда заканчивается период обновлений?</summary>
+        <div class="faq-answer">Ваш сайт продолжит работать без ограничений — лицензия на код бессрочная. Истекает только доступ к скачиванию новых версий и обращениям в техподдержку (продление со скидкой 50%).</div>
+      </details>
+    </section>
+
+    <!-- РАЗДЕЛ 5: ЮРИДИЧЕСКИЙ БЛОК И ЧЕКАУТ -->
+    <section id="legal" class="section">
+      <div class="section-header">
+        <h2 class="section-title">5. Оферта, Политика конфиденциальности и Чекаут</h2>
+      </div>
+
+      <div class="copy-card">
+        <div class="copy-card-header">
+          <span class="copy-card-title">Чекбоксы для формы заказа (Чекаут) и Шаблон письма после оплаты</span>
+          <button class="btn-copy" onclick="copyText('checkout-pack', this)">Скопировать текст</button>
+        </div>
+        <div class="copy-body" id="checkout-pack">[ЧЕКБОКС 1 — ОБЯЗАТЕЛЬНЫЙ]
+Я принимаю условия Лицензионного договора (Публичной оферты) и соглашаюсь с тем, что доступ к цифровому товару предоставляется сразу после оплаты, в связи с чем возврат средств после выдачи ключа не производится.
+
+[ЧЕКБОКС 2 — ОБЯЗАТЕЛЬНЫЙ]
+Я даю согласие на обработку персональных данных в соответствии с Политикой конфиденциальности.
+
+[ПОДСКАЗКА ПОД КНОПКОЙ ОПЛАТЫ]
+Продукт поставляется на русском языке (RU). Требуется October CMS 4.4+ и PHP 8.2+. Лицензионный ключ и ссылка на ZIP-архив придут на указанный e-mail сразу после оплаты.
+
+------------------------------------------------------------
+ТЕМА ПИСЬМА: Ваш заказ #{order_number}: лицензионный ключ и ссылка на скачивание
+
+Здравствуйте!
+
+Благодарим за покупку продукта «{product_name}» (Тариф: {tariff_name}).
+Ваш платёж успешно подтверждён.
+
+Данные вашей лицензии:
+- Лицензионный ключ: {license_key}
+- Лимит доменов: {domain_limit}
+- Срок бесплатных обновлений и поддержки: до {updates_until}
+
+Скачать актуальный ZIP-архив:
+{download_url}
+
+Все купленные файлы и управление привязкой доменов всегда доступны в вашем личном кабинете: {cabinet_url}
+
+Краткая инструкция по установке:
+1. Распакуйте архив в корневую директорию вашего проекта на October CMS 4.4+.
+2. Перейдите в панель управления и активируйте тему/плагин согласно файлу README.md внутри архива.
+3. Введите лицензионный ключ в настройках плагина.
+
+Если возникнут вопросы по установке, ответьте на это письмо или напишите нам в поддержку.</div>
+      </div>
+
+      <div class="copy-card">
+        <div class="copy-card-header">
+          <span class="copy-card-title">Публичная оферта (Лицензионный договор) — для страницы /offer</span>
+          <button class="btn-copy" onclick="copyText('legal-offer', this)">Скопировать текст</button>
+        </div>
+        <div class="copy-body" id="legal-offer">ПУБЛИЧНАЯ ОФЕРТА
+о заключении лицензионного договора на право использования программного обеспечения
+
+1. ОБЩИЕ ПОЛОЖЕНИЯ
+1.1. Настоящий документ является официальным предложением (публичной офертой) [Укажите статус: ИП / Самозанятый / ООО, ФИО/Наименование, ИНН] (далее — «Лицензиар») заключить лицензионный договор на предоставление права использования программного обеспечения (далее — «ПО» или «Продукт») с любым физическим или юридическим лицом (далее — «Лицензиат»).
+1.2. Акцептом оферты является оплата выбранного тарифа на сайте [Ваш домен].
+
+2. ПРЕДМЕТ ДОГОВОРА И ОБЪЁМ ПРАВ
+2.1. Лицензиар предоставляет Лицензиату неисключительную лицензию на использование выбранного Продукта («Elv Kit» и/или «Универсальный шаблон October CMS») в соответствии с оплаченным тарифом:
+- Тариф «Старт»: право установки и использования ПО на 1 (одном) боевом домене, а также на локальных/тестовых поддоменах для разработки.
+- Тариф «Студия»: право установки и использования ПО на 5 (пяти) независимых коммерческих доменах (включая создание сайтов для третьих лиц).
+2.2. Срок действия права на использование скачанной версии ПО не ограничен (бессрочная лицензия).
+2.3. Доступ к скачиванию новых версий (обновлений) и технической поддержке предоставляется в течение 12 (двенадцати) месяцев с момента оплаты. По истечении этого срока ПО продолжает работать без ограничений; продление обновлений осуществляется по желанию Лицензиата.
+
+3. ОГРАНИЧЕНИЯ ИСПОЛЬЗОВАНИЯ
+3.1. Лицензиат не вправе:
+- перепродавать, сдавать в аренду, сублицензировать или публиковать исходный код ПО в открытом доступе (включая публичные репозитории GitHub/GitLab);
+- распространять ПО как самостоятельный шаблон, плагин или конструктор сайтов;
+- передавать лицензионный ключ третьим лицам (за исключением передачи готового клиентского сайта в рамках лимита доменов тарифа «Студия»).
+
+4. ПОРЯДОК ПЕРЕДАЧИ ПО И ВОЗВРАТ СРЕДСТВ
+4.1. Передача ПО осуществляется автоматически после подтверждения оплаты путём отправки лицензионного ключа и ссылки на скачивание ZIP-архива на e-mail Лицензиата, а также через личный кабинет на сайте.
+4.2. Обязательства Лицензиара считаются исполненными в полном объёме в момент генерации лицензионного ключа и предоставления доступа к скачиванию архива.
+4.3. Поскольку Продукт является цифровым товаром (программным обеспечением) с индивидуально-определённым лицензионным ключом, после предоставления доступа к архиву и ключу возврат денежных средств не производится, за исключением случаев невозможности устранения критической неработоспособности ПО, заявленной в документации.
+
+5. ОТВЕТСТВЕННОСТЬ И ТЕХНИЧЕСКИЕ ТРЕБОВАНИЯ
+5.1. ПО предоставляется по принципу «как есть» (as is). Лицензиат самостоятельно обеспечивает соответствие своего хостинга техническим требованиям (October CMS 4.4+, PHP 8.2+) и наличие действующей лицензии на платформу October CMS.
+5.2. Продукт поставляется на русском языке (RU), если иное прямо не указано в карточке товара.
+
+6. РЕКВИЗИТЫ ЛИЦЕНЗИАРА
+[ФИО / Наименование организации]
+ИНН: [Ваш ИНН]
+E-mail для связи: [Ваш e-mail]</div>
+      </div>
+
+      <div class="copy-card">
+        <div class="copy-card-header">
+          <span class="copy-card-title">Политика конфиденциальности — для страницы /privacy</span>
+          <button class="btn-copy" onclick="copyText('legal-privacy', this)">Скопировать текст</button>
+        </div>
+        <div class="copy-body" id="legal-privacy">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ
+
+1. Общие положения
+Настоящая Политика определяет порядок обработки и защиты персональных данных пользователей сайта [Ваш домен] (далее — «Оператор»).
+
+2. Какие данные мы собираем
+- Адрес электронной почты (e-mail) и имя — для создания личного кабинета, отправки чеков, лицензионных ключей и ссылок на скачивание архивов.
+- Доменные имена сайтов — для технической проверки и привязки лицензионных ключей.
+- Технические данные (IP-адрес, cookies) — для защиты от спама, обеспечения безопасности и корректной работы корзины.
+* Данные банковских карт обрабатываются напрямую сертифицированными платёжными провайдерами (ЮKassa / Stripe) и не хранятся на сервере Оператора.
+
+3. Цели обработки
+Данные используются исключительно для исполнения лицензионного договора, предоставления обновлений, технической поддержки и направления сервисных уведомлений.
+
+4. Передача третьим лицам и защита
+Оператор не передаёт персональные данные третьим лицам, за исключением платёжных шлюзов и сервисов доставки e-mail в объёме, необходимом для выполнения заказа. Пользователь вправе запросить удаление своих данных, написав на [Ваш e-mail].</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const STORAGE_KEY = 'elv_october_unified_light_v1';
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        checkboxes.forEach(cb => {
+          if (saved[cb.dataset.id]) {
+            cb.checked = true;
+            cb.closest('.task').classList.add('done');
+          }
+        });
+      } catch (e) {}
+      updateProgress();
+    }
+
+    function saveState() {
+      const state = {};
+      checkboxes.forEach(cb => {
+        state[cb.dataset.id] = cb.checked;
+      });
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function updateProgress() {
+      const total = checkboxes.length;
+      const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+      const pct = Math.round((checked / total) * 100);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = `Выполнено: ${checked} из ${total} задач (${pct}%)`;
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        cb.closest('.task').classList.toggle('done', cb.checked);
+        saveState();
+        updateProgress();
+      });
+    });
+
+    function copyText(elementId, btn) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Скопировано!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.classList.remove('copied');
+        }, 1800);
+      });
+    }
+
+    loadState();
+  </script>
+</body>
+</html>
