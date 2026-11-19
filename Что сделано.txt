@@ -6,6 +6,70 @@
 
 ---
 
+(Stage 72 - 19.11.2026) - **FAQ читается из настроек; без настроек блоков FAQ нет.**
+
+Что было: `Faq::items()` читал `plugins/elv/kit/config/faq.php`,
+`calculator.php`, `services.php`, `seo.php`, а `Faq::post()` — `post-faq.php`.
+Это наши вопросы про Elv Kit и студию: покупатель получал чужой FAQ на
+главной, в тарифах, калькуляторе, услугах, SEO и в каждой демо-статье.
+
+Что сделано:
+- `classes/Faq.php:10-137` — единственный источник: настройки владельца.
+  `items('faq'|'calculator'|'services'|'seo')` читает `faq_items`,
+  `faq_calculator_items`, `faq_services_items`, `faq_seo_items`
+  (`settingKey()`, `:23-28`), формат — «Вопрос | Ответ» по строке;
+  `post()` читает `faq_post_items` («адрес статьи | вопрос | ответ»,
+  `:52-73`). Пустые строки и строки с `#` пропускаются, ответ режется по
+  первому `|`, строка без разделителя отбрасывается (`parse()`, `:30-50`).
+  Файлы `config/*.php` остались демо-датасетом и читаются только через
+  `configItems()`/`configPostItems()` (`:75-97`).
+- `models/settings/fields.yaml:201-230` — вкладка «FAQ»: пять textarea
+  (`faq_items`, `faq_calculator_items`, `faq_services_items`, `faq_seo_items`,
+  `faq_post_items`) с комментарием про формат и «пусто — блока нет».
+- `classes/Demo.php:105-136` — `Demo::faq()` переносит демо-вопросы из
+  `config/*.php` в настройки, только если поле пустое;
+  `console/DemoCommand.php:30` вызывает его рядом с `Demo::contacts()`.
+- Шаблоны: блок FAQ обёрнут в `{% if faqItems|length %}` и при пустом списке
+  не рендерится целиком (заголовок, `#pricing-faq`, `#calculator-faq`,
+  `#services-faq`, `#seo-faq`): `pages/index.htm:376`, `pages/pricing.htm:176`,
+  `pages/calculator.htm:400`, `pages/services.htm:134`,
+  `pages/services-seo.htm:178`. FAQ статьи уже был с гвардом
+  (`pages/blog-post.htm:60`).
+- `tools/seo-check.php:33-88` — проверки: пустые настройки → пустой FAQ
+  (общий, калькулятор, статья); пары из настроек парсятся построчно, ответ
+  сохраняет `|`; ключи не протекают между страницами (`calculator` не виден в
+  `services`); FAQ статьи читается по адресу и не отдаётся чужому slug; демо
+  датасет в `config/*.php` на месте и конвертируется в строки.
+- `tools/check-php.mjs` — общий PHP-гейт (`chat-check.php` + `seo-check.php`)
+  вместо `check-chat.mjs` (тот был добавлен часом раньше в Stage 71 и покрывал
+  только консультанта): `tools/gate.mjs:13`.
+
+Проверка: `node tools/check-php.mjs` → `php checks passed`;
+`node tools/gate.mjs` → `all gates passed` (check-seo по JSON-LD всех 94 URL,
+check-console — 111 страниц, perf p90 168 мс). Живой стенд 8090 после
+`php artisan elv:kit:demo --days=1`: `/` и `/pricing/` — 8 `<details>` и
+`FAQPage` в разметке, `/calculator/` — 5, `/services/` — 5, `/services/seo/` — 6,
+`/blog/seo-for-google-ai/` — 3 и `#post-faq`.
+
+Обратная подстановка (две ломки, обе красные, код возвращён):
+1. `Faq::items()` при пустых настройках падает обратно в `configItems()` →
+   `empty settings still return a FAQ block`, `…calculator FAQ`,
+   `calculator FAQ leaks into the services block`.
+2. `parse()` режет строку по всем `|` (`explode('|', $line)` без лимита) →
+   `FAQ pairs from settings are not parsed line by line`, `FAQ answer is cut
+   at the first pipe`.
+
+Живая обратная подстановка: очистка `faq_items` → на `/` и `/pricing/`
+`details=0` и `FAQPage=0` (секции нет), `/services/` остаётся `details=5`;
+возврат демо-настроек → снова 8 и `FAQPage=1`. Очистка `faq_post_items` →
+`/blog/seo-for-google-ai/` без `#post-faq`, после возврата — снова 3 вопроса.
+
+Не проверено: блог (`classes/BlogContent.php`, 48 статей) остаётся демо-датасетом
+и попадает на сайт только через `elv:kit:demo` — отдельного пункта в очереди
+это не закрывает.
+
+---
+
 (Stage 71 - 19.11.2026) - **Консультант перечисляет услуги из настроек, а не наши.**
 
 Что было: `Chat::studioServicesText()` (было `Chat.php:530-533`) возвращал

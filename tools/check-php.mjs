@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
+const SCRIPTS = ['tools/chat-check.php', 'tools/seo-check.php'];
 
 function commandWorks(command, args) {
   const result = spawnSync(command, args, { stdio: 'ignore' });
@@ -39,11 +40,21 @@ function resolvePhp() {
 }
 
 const php = resolvePhp();
-const result = spawnSync(php, ['tools/chat-check.php'], { cwd: ROOT, stdio: 'inherit' });
+const failed = [];
 
-if (result.status !== 0) {
-  console.error('chat-check failed');
+for (const script of SCRIPTS) {
+  console.log('\n== ' + script + ' ==');
+
+  const result = spawnSync(php, [script], { cwd: ROOT, stdio: 'inherit' });
+
+  if (result.status !== 0) {
+    failed.push(script);
+  }
+}
+
+if (failed.length) {
+  console.error('\nfailed: ' + failed.join(', '));
   process.exit(1);
 }
 
-console.log('chat-check ok');
+console.log('\nphp checks passed');

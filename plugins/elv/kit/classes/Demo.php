@@ -105,6 +105,27 @@ class Demo
     }
 
     /**
+     * faq — переносит демонстрационные вопросы из config/*.php в настройки,
+     * если владелец их ещё не задал. Консультант и блоки FAQ читают только настройки.
+     */
+    public static function faq(): void
+    {
+        $defaults = [
+            'faq_items' => Faq::toLines(Faq::configItems('faq')),
+            'faq_calculator_items' => Faq::toLines(Faq::configItems('calculator')),
+            'faq_services_items' => Faq::toLines(Faq::configItems('services')),
+            'faq_seo_items' => Faq::toLines(Faq::configItems('seo')),
+            'faq_post_items' => Faq::postToLines(Faq::configPostItems()),
+        ];
+
+        foreach ($defaults as $key => $value) {
+            if ($value !== '' && (string) \Elv\Kit\Models\Settings::get($key) === '') {
+                \Elv\Kit\Models\Settings::set($key, $value);
+            }
+        }
+    }
+
+    /**
      * slots — генерирует сетку для всех услуг демо-бронирования.
      */    public static function slots(int $days = 21): int
     {

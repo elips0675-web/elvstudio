@@ -396,6 +396,8 @@ meta_description = "Соберите смету за две минуты: тар
             </div>
         </section>
 
+        {% set faqItems = elv_calculator_faq() %}
+        {% if faqItems|length %}
         <section class="section" id="calculator-faq">
             <div class="container">
                 <div class="section-head">
@@ -403,7 +405,7 @@ meta_description = "Соберите смету за две минуты: тар
                     <h2>Что уточняют до оплаты</h2>
                 </div>
                 <div class="faq">
-                    {% for item in elv_calculator_faq() %}
+                    {% for item in faqItems %}
                         <details>
                             <summary>{{ item.q }}</summary>
                             <div><p>{{ item.a }}</p></div>
@@ -412,6 +414,7 @@ meta_description = "Соберите смету за две минуты: тар
                 </div>
             </div>
         </section>
+        {% endif %}
 
         <div class="calc-print" id="calculator-print" aria-hidden="true">
             <h2>Смета Elv Kit</h2>

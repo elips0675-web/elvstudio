@@ -117,4 +117,13 @@
     `elv:kit:demo` (`Demo.php`, `contacts()`), на чистой установке их нет.
     Зашитый список услуг в коде — дефект. Ссылки чата канонические, со слэшем:
     `Chat::link()` возвращает его после `url()`, иначе каждая ссылка даёт 301.
-    Проверка: `node tools/check-chat.mjs` (входит в `node tools/gate.mjs`).
+    Проверка: `node tools/check-php.mjs` (входит в `node tools/gate.mjs`).
+12. FAQ — только из настроек (вкладка «FAQ»): `faq_items` (общий блок),
+    `faq_calculator_items`, `faq_services_items`, `faq_seo_items` в формате
+    «Вопрос | Ответ» по строке и `faq_post_items` — «адрес статьи | вопрос |
+    ответ». `config/*.php` — демо-датасет для `elv:kit:demo`, в рантайме не
+    читается (`Faq::configItems()` только для сида). Пустые настройки — секции
+    FAQ не рендерятся (`{% if faqItems|length %}` в `index.htm`, `pricing.htm`,
+    `calculator.htm`, `services.htm`, `services-seo.htm`), `FAQPage` в JSON-LD
+    не добавляется. Наш текст в `Faq::items()` как фолбэк — дефект. Проверка:
+    `tools/seo-check.php` в `node tools/check-php.mjs`.

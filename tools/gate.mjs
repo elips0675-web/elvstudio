@@ -10,7 +10,7 @@ const gates = [
   { script: 'check-package.mjs' },
   { script: 'check-brand.mjs' },
   { script: 'check-plans.mjs' },
-  { script: 'check-chat.mjs' },
+  { script: 'check-php.mjs' },
   { script: 'check-console.mjs' },
   { script: 'check-perf.mjs', args: ['--ttfb-only'] },
 ];

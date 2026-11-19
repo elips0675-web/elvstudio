@@ -372,6 +372,8 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
+    {% set faqItems = elv_faq() %}
+    {% if faqItems|length %}
     <section class="section">
         <div class="container">
             <div class="section-head">
@@ -380,7 +382,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             </div>
 
             <div class="faq">
-                {% for item in elv_faq() %}
+                {% for item in faqItems %}
                     <details>
                         <summary>{{ item.q }}</summary>
                         <div><p>{{ item.a }}</p></div>
@@ -389,6 +391,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             </div>
         </div>
     </section>
+    {% endif %}
 
     <section class="section">
         <div class="container">

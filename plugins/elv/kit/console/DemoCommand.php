@@ -27,6 +27,7 @@ class DemoCommand extends Command
         if (!$this->option('refresh-slots')) {
             $created = Demo::seed((bool) $this->option('refresh-posts'), (bool) $this->option('refresh-catalog'));
             Demo::contacts();
+            Demo::faq();
 
             if ($this->option('refresh-posts')) {
                 $this->info('Тексты демо-статей обновлены из классов\Demo.');

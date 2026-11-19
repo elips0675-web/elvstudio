@@ -130,6 +130,8 @@ meta_description = "Помогаем с хостингом, поддержкой
         </div>
     </section>
 
+    {% set faqItems = elv_service_faq() %}
+    {% if faqItems|length %}
     <section class="section" id="services-faq">
         <div class="container">
             <div class="section-head">
@@ -137,7 +139,7 @@ meta_description = "Помогаем с хостингом, поддержкой
                 <h2>Коротко о деньгах и границах</h2>
             </div>
             <div class="faq">
-                {% for item in elv_service_faq() %}
+                {% for item in faqItems %}
                     <details>
                         <summary>{{ item.q }}</summary>
                         <div><p>{{ item.a }}</p></div>
@@ -146,6 +148,7 @@ meta_description = "Помогаем с хостингом, поддержкой
             </div>
         </div>
     </section>
+    {% endif %}
 
     <section class="section">
         <div class="container">

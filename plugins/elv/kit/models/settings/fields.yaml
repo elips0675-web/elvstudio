@@ -197,3 +197,34 @@ tabs:
             tab: 'SEO и аналитика'
             type: switch
             default: false
+
+        faq_items:
+            label: 'Общий блок FAQ'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блок FAQ на главной и в тарифах не показывается.'
+        faq_calculator_items:
+            label: 'FAQ калькулятора'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице калькулятора нет.'
+        faq_services_items:
+            label: 'FAQ страницы услуг'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице услуг нет.'
+        faq_seo_items:
+            label: 'FAQ страницы SEO'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице SEO нет.'
+        faq_post_items:
+            label: 'FAQ статей'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Адрес статьи | Вопрос | Ответ, по одной паре в строке. Пусто — у статей нет блока вопросов.'
