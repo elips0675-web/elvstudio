@@ -406,9 +406,9 @@
       `/order/` 2 варианта, `/` 2 колонки, `/terms/` новая подпись; при
       выключенном `single` калькулятор и форма выбирают `multi`. Настройки
       возвращены, стенд снова с тремя тарифами.
-- [ ] **P0. Контент знает только Elv.** `classes/BlogContent.php` — 48 статей
-      (строки 11–2147) про Elv Kit и студию. Покупатель получает чужой блог,
-      если сам запустит `elv:kit:demo`; на чистой установке статей нет.
+- [x] **P0. Контент знает только Elv — закрыто 19.11.2026 (Stage 74).** `classes/BlogContent.php` — 48 статей
+      (строки 11–2147) про Elv Kit и студию. Покупатель получал чужой блог,
+      если сам запускал `elv:kit:demo`; на чистой установке статей нет.
       **Часть 1 закрыта 19.11.2026 (Stage 71):** Консультант берёт услуги из
       настроек (`chat_services`/`chat_services_url`,
       `models/settings/fields.yaml:59-69`), при пустом списке отвечает
@@ -418,9 +418,16 @@
       услуги, SEO, статьи) читается только из настроек (`Faq.php:10-137`,
       вкладка «FAQ», `fields.yaml:201-230`); при пустых полях секции не
       рендерятся (`index.htm:376` и др.), FAQPage в разметку не попадает.
-      Осталось: вынести 48 статей из `BlogContent.php` в отдельный
-      демо-датасет/пакет, чтобы код плагина не нёс наш контент; проверить
-      сценарий «купил, не запускал демо» целиком.
+      **Часть 3 (Stage 74):** тексты вынесены в `plugins/elv/kit/demo/blog.json`
+      (`seed` 38, `overrides` 48, `extras` 25); `BlogContent.php` удалён,
+      `Demo::posts()` только собирает статьи по `slug` и подставляет
+      `{{currency}}` из `Money::currency()`. Товарный архив папку `demo/`
+      не содержит (`DownloadService::addDirectory()`), демо-архив содержит;
+      `Demo::posts()` без датасета отдаёт пустой список, а `elv:kit:demo`
+      предупреждает «Статьи блога не входят в этот архив»
+      (`Demo::hasPostsDataset()`). Проверка: `node tools/check-package.mjs`
+      (товарный без `demo/blog.json`, демо с ним, число статей совпадает),
+      тела 67 статей побайтово равны прежнему коду (md5 по `body`).
 - [x] **P0. Стенд стартовал без OPcache: TTFB 383–457 мс и Performance 99 — закрыто 19.11.2026 (Stage 70).**
       `запуск.bat` вызывал `php artisan serve` без OPcache (`zend_extension`
       в Laragon php.ini закомментирован), PHP компилировал фреймворк на каждом
@@ -475,7 +482,7 @@
       контакты из настроек), декоративный `elv-studio.by/admin` на главной
       (`pages/index.htm:48` → `example.com/admin`). `"priceCurrency"` в примере
       JSON-LD берётся из настроек (`Money::currency()`), а не строкой `BYN`
-      (`classes/Demo.php:372`, `classes/BlogContent.php:1824`); пример в тексте
+      (`classes/Demo.php:372`, `plugins/elv/kit/demo/blog.json` — с Stage 74); пример в тексте
       статьи переписан без названия валюты, чтобы не расходиться с настройками,
       и домены примеров заменены на `example.com`.
       Проверка: `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`) —
@@ -494,8 +501,10 @@
       Проверка: `tools/package-inspect.php` (JSON о составе обоих архивов) +
       `node tools/check-package.mjs` — сидов в товарном 0, в демо 2; каждая
       миграция из `version.yaml` обязана быть в архиве.
-      Осталось по контенту: `classes/Demo.php`, `BlogContent.php`, `Chat.php`
+      Осталось по контенту: `classes/Demo.php` (каталог), `Chat.php`
       и `config/*.php` по-прежнему про Elv — это отдельные пункты ниже.
+      Статьи блога вынесены из кода в `demo/blog.json` и исключены из
+      товарного архива (Stage 74, пункт P0 выше).
 - [ ] **P1. Тема — витрина Elv, а не шаблон.** `themes/elv-studio/pages/*.htm`
       (29 страниц) и `partials/*` (7) — маркетинговые тексты студии, каталог
       `content/` пуст, у темы нет `composer.json`, `version.yaml` и

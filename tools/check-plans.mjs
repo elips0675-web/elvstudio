@@ -9,7 +9,7 @@
  *
  * Тексты подписей ищутся подстрокой во всей теме и в коде плагина: зашитая
  * в длинную фразу подпись — та же поломка, что и отдельной строкой. Пропущены
- * только источники: `Catalog.php` (дефолты), `BlogContent.php`/`Demo.php`
+ * только источники: `Catalog.php` (дефолты), `Demo.php`
  * (демо-контент) и `models/settings/fields.yaml` (дефолты полей).
  */
 
@@ -100,7 +100,6 @@ const scanRoots = [
 
 const skipFiles = new Set([
   'plugins/elv/kit/classes/Catalog.php',
-  'plugins/elv/kit/classes/BlogContent.php',
   'plugins/elv/kit/classes/Demo.php',
   'plugins/elv/kit/models/settings/fields.yaml',
 ]);

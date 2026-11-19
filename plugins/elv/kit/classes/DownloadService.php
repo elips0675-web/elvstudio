@@ -110,6 +110,10 @@ class DownloadService
                 continue;
             }
 
+            if (!$demo && ($relative === 'demo' || str_starts_with($relative, 'demo/'))) {
+                continue;
+            }
+
             if ($file->isDir()) {
                 $zip->addEmptyDir($prefix . '/' . $relative);
                 continue;
@@ -150,8 +154,9 @@ class DownloadService
             . "3. Включите тему: `ACTIVE_THEME=elv-studio` в `.env` или через Settings → CMS.\n"
             . "4. Настройте почту и платёжные ключи в Settings → Elv Kit.\n"
             . "5. Демо-данные (не обязательны): `php artisan elv:kit:demo` — заливает\n"
-            . "   демонстрационные разделы, товары и статьи. В архиве без флага `--demo`\n"
-            . "   миграций с демо-данными нет: после `october:migrate` каталог и блог пустые.\n"
+            . "   демонстрационные разделы, товары, контакты и FAQ. Статьи блога лежат\n"
+            . "   в `plugin/demo/blog.json` и входят только в архив `--demo`: после\n"
+            . "   установки товарного архива блог пуст и наполняется вашими статьями.\n"
             . "6. Cron: `php artisan schedule:run` раз в минуту.\n\n"
             . "## Лицензия\nСм. LICENSE.txt. Ключ активации выдаётся после оплаты.\n";
     }

@@ -25,7 +25,8 @@
 | Путь | Что внутри |
 |---|---|
 | `themes/elv-studio/` | лендинг: `layouts/`, `pages/` (index, kit, modules, module, pricing, demo, blog, blog-tech, blog-post, docs, order, order-success, booking, feedback, contacts, terms, privacy, sitemap, 404), `partials/`, `assets/`, `content/` |
-| `plugins/elv/kit/classes/` | `Catalog`, `Demo`, `BlogContent`, `Seo`, `Sitemap`, `Rss`, `DownloadService`, `LicenseService`, `OrderService`, `BookingService`, `Slots`, `Chat`, `AntiSpam`, `Http/*` |
+| `plugins/elv/kit/classes/` | `Catalog`, `Demo`, `Seo`, `Sitemap`, `Rss`, `DownloadService`, `LicenseService`, `OrderService`, `BookingService`, `Slots`, `Chat`, `AntiSpam`, `Http/*` |
+| `plugins/elv/kit/demo/` | `blog.json` — демо-статьи блога (38 базовых + 48 переопределений + 25 блоков перелинковки); в товарный архив не входит |
 | `plugins/elv/kit/models/` | `Product`, `Post`, `Order`, `Booking`, `Slot`, `Message`, `Subscriber`, `License`, `Install`, `Category`, `Settings` |
 | `plugins/elv/kit/controllers/` | админка: `posts`, `products`, `categories`, `orders`, `bookings`, `messages`, `subscribers`, `licenses`, `install` |
 | `plugins/elv/kit/console/` | `elv:kit:demo`, `elv:kit:reset`, `elv:kit:package` |
@@ -134,3 +135,14 @@
     недоступна», чат не перечисляет услуги; чужие цены («120 BYN») в коде
     плагина — дефект. Проверка: `tools/booking-check.php` в
     `node tools/check-php.mjs`.
+14. Статьи блога — демо-датасет, а не код: тексты лежат в
+    `plugins/elv/kit/demo/blog.json` (`seed`, `overrides`, `extras`),
+    `Demo::posts()` только собирает их по `slug`. Файл входит в архив
+    `--demo` и исключается из товарного (`DownloadService::addDirectory()`),
+    поэтому у покупателя блог пуст до его собственных статей, а
+    `elv:kit:demo` в товарном архиве честно предупреждает об этом
+    (`Demo::hasPostsDataset()`). Динамика в текстах — только плейсхолдер
+    `{{currency}}`, который подставляется из `Money::currency()` при загрузке.
+    Зашитый текст статьи в PHP-классе — дефект. Проверка:
+    `node tools/check-package.mjs` (товарный архив без `demo/blog.json`,
+    демо-архив с ним, `Demo::posts()` совпадает с числом уникальных slug).

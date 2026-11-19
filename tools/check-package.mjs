@@ -217,6 +217,39 @@ if (pluginVersions && themeVersions) {
       problems.push('демо-архив без демо-сидов — вариант --demo ничего не добавляет');
     }
 
+    if (product.hasDemoDataset) {
+      problems.push('товарный архив содержит демо-датасет блога (elv-kit/plugin/demo/blog.json) — статьи уехали покупателю');
+    }
+
+    if (!demo.hasDemoDataset) {
+      problems.push('демо-архив без демо-датасета блога — вариант --demo не приносит статьи');
+    }
+
+    const datasetRelative = 'plugins/elv/kit/demo/blog.json';
+    const dataset = fs.existsSync(path.join(root, datasetRelative)) ? readJson(datasetRelative) : null;
+
+    if (!dataset) {
+      problems.push(datasetRelative + ' — датасета демо-блога нет, команда elv:kit:demo останется без статей');
+    } else {
+      const seed = Array.isArray(dataset.seed) ? dataset.seed : [];
+      const overrides = Array.isArray(dataset.overrides) ? dataset.overrides : [];
+      const slugs = new Set([...seed, ...overrides].map((post) => post && post.slug).filter(Boolean));
+
+      if (!seed.length || !overrides.length) {
+        problems.push(datasetRelative + ' — пустой seed (' + seed.length + ') или overrides (' + overrides.length + ')');
+      }
+
+      if (report.dataset && typeof report.dataset.loaded === 'number' && report.dataset.loaded !== slugs.size) {
+        problems.push('Demo::posts() отдаёт ' + report.dataset.loaded + ' статей, а в датасете ' + slugs.size + ' уникальных slug');
+      }
+    }
+
+    const demoClassBytes = fs.statSync(path.join(root, 'plugins/elv/kit/classes/Demo.php')).size;
+
+    if (demoClassBytes > 60 * 1024) {
+      problems.push('plugins/elv/kit/classes/Demo.php разросся до ' + Math.round(demoClassBytes / 1024) + ' КБ — текст статей снова в коде, а не в demo/blog.json');
+    }
+
     if (!product.hasComposer || !demo.hasComposer) {
       problems.push('в архиве нет composer.json плагина или темы');
     }

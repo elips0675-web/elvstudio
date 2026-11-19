@@ -29,8 +29,12 @@ class DemoCommand extends Command
             Demo::contacts();
             Demo::faq();
 
+            if (!Demo::hasPostsDataset()) {
+                $this->warn('Статьи блога не входят в этот архив (plugin/demo/blog.json): блог останется пустым.');
+            }
+
             if ($this->option('refresh-posts')) {
-                $this->info('Тексты демо-статей обновлены из классов\Demo.');
+                $this->info('Тексты демо-статей обновлены из demo/blog.json.');
             }
 
             if ($this->option('refresh-catalog')) {

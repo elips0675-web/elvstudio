@@ -65,7 +65,27 @@ foreach (['product' => false, 'demo' => true] as $key => $demo) {
         'hasComposer' => in_array('elv-kit/plugin/composer.json', $files, true)
             && in_array('elv-kit/theme/composer.json', $files, true),
         'hasScreenshot' => in_array('elv-kit/theme/screenshot.png', $files, true),
+        'hasDemoDataset' => in_array('elv-kit/plugin/demo/blog.json', $files, true),
     ];
 }
+
+$datasetFile = __DIR__ . '/../plugins/elv/kit/demo/blog.json';
+$dataset = is_file($datasetFile) ? json_decode((string) file_get_contents($datasetFile), true) : null;
+
+$loaded = null;
+
+try {
+    $loaded = count(Elv\Kit\Classes\Demo::posts());
+} catch (Throwable $e) {
+    $loaded = null;
+}
+
+$report['dataset'] = [
+    'file' => is_file($datasetFile),
+    'seed' => is_array($dataset['seed'] ?? null) ? count($dataset['seed']) : 0,
+    'overrides' => is_array($dataset['overrides'] ?? null) ? count($dataset['overrides']) : 0,
+    'extras' => is_array($dataset['extras'] ?? null) ? count($dataset['extras']) : 0,
+    'loaded' => $loaded,
+];
 
 echo json_encode($report, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
