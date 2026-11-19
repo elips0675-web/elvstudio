@@ -87,3 +87,14 @@
    `Money::currency()`, дефолт почты — `sales@example.com`. Проверка:
    `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`); `demo-static`
    не сканируется — это наш собственный сайт.
+9. Один адрес на страницу: каноническая форма — со слэшем. `/blog` уводится 301
+   на `/blog/` (`Plugin.php`, `cms.page.beforeDisplay`), у страниц пагинации свой
+   canonical `?page=N` и свой `<title>` «— страница N» (`Seo::canonical()`,
+   `Seo::title()`), страница за последней — 404 (`pages/blog.htm`), фильтры
+   `?category/?tag/?q` — `noindex` и canonical на общий список
+   (`layouts/default.htm`). Ссылки October генерирует без слэша, поэтому первый
+   переход по ним получает 301 (он кэшируется). Проверка:
+   `node tools/check-blog.mjs` (входит в `tools/gate.mjs`). Метрика:
+   `node tools/check-perf.mjs` — Lighthouse mobile, медиана Performance 100,
+   худший прогон не ниже 95; стенд перед замером прогрет (`tools/warmup.ps1`
+   вызывается из `запуск.bat`), иначе первый прогон платит за компиляцию Twig.

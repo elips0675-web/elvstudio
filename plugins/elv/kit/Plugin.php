@@ -197,6 +197,18 @@ class Plugin extends PluginBase
             ->make(\Illuminate\Contracts\Http\Kernel::class)
             ->pushMiddleware(SecurityHeaders::class)
             ->pushMiddleware(CompressResponse::class);
+
+        \Event::listen('cms.page.beforeDisplay', function ($controller, $url, $page) {
+            $raw = (string) (parse_url((string) request()->getRequestUri(), PHP_URL_PATH) ?: '');
+
+            if ($raw === '' || $raw === '/' || str_ends_with($raw, '/') || request()->ajax() || !request()->isMethod('get')) {
+                return null;
+            }
+
+            $query = (string) request()->getQueryString();
+
+            return redirect()->to(url(ltrim($raw, '/')) . '/' . ($query !== '' ? '?' . $query : ''), 301);
+        });
     }
 
     public function registerMarkupTags()
@@ -307,14 +319,24 @@ class Plugin extends PluginBase
                 'elv_icon' => function ($name, $class = '') {
                     return Icons::svg((string) $name, (string) $class);
                 },
-                'elv_canonical' => function () {
-                    return Seo::canonical();
+                'elv_canonical' => function ($pageNo = 1) {
+                    return Seo::canonical((int) $pageNo);
+                },
+                'elv_page_no' => function () {
+                    return max(1, (int) request()->query('page', 1));
+                },
+                'elv_404_if' => function ($condition) {
+                    if ($condition) {
+                        abort(404);
+                    }
+
+                    return '';
                 },
                 'elv_jsonld' => function ($page = null) {
                     return Seo::jsonld($page);
                 },
-                'elv_seo_title' => function ($page = null) {
-                    return Seo::title($page);
+                'elv_seo_title' => function ($page = null, $pageNo = 1) {
+                    return Seo::title($page, (int) $pageNo);
                 },
                 'elv_seo_description' => function ($page = null) {
                     return Seo::description($page);

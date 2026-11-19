@@ -103,7 +103,7 @@ echo  Это окно держит сервер: закроете его - сайт остановится.
 echo  Остановить: Ctrl+C.
 echo.
 
-powershell -NoProfile -Command "Start-Process -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-Command','Start-Sleep 5; Start-Process %SITE%'" >nul 2>&1
+powershell -NoProfile -Command "Start-Process -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','%~dp0tools\warmup.ps1','-Port','%PORT%','-Site','%SITE%'" >nul 2>&1
 
 "%PHP%" artisan serve --host=%HOST% --port=%PORT%
 

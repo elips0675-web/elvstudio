@@ -1,10 +1,12 @@
 title = "Блог"
 url = "/blog/"
 layout = "default"
-meta_title = "Блог о сайтах для бизнеса — Elv Kit"
+paginated = 1
+meta_title = "Блог о сайтах для бизнеса"
 meta_description = "Статьи о сайтах простым языком: как принимать записи и оплату, вести блог и продвигать бизнес в поиске. Практика без маркетингового шума."
 ==
 {% set posts = elv_blog(9, 'business') %}
+{% do elv_404_if(posts.currentPage() > posts.lastPage()) %}
 {% set categories = elv_categories('business') %}
 {% set activeCategory = elv_query('category') %}
 {% set activeTag = elv_query('tag') %}

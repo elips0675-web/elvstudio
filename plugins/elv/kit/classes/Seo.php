@@ -51,7 +51,7 @@ class Seo
         return rtrim(url('/'), '/');
     }
 
-    public static function canonical(): string
+    public static function canonical(?int $pageNo = null): string
     {
         $path = '/' . ltrim((string) request()->path(), '/');
 
@@ -59,7 +59,13 @@ class Seo
             $path = rtrim($path, '/') . '/';
         }
 
-        return static::base() . $path;
+        $url = static::base() . $path;
+
+        if ($pageNo !== null && $pageNo > 1) {
+            $url .= '?page=' . $pageNo;
+        }
+
+        return $url;
     }
 
     public static function setPost(?Post $post): void
@@ -85,16 +91,26 @@ class Seo
     /**
      * title — заголовок страницы с суффиксом бренда.
      */
-    public static function title($page): string
+    public static function title($page, ?int $pageNo = null): string
     {
+        $suffix = ($pageNo !== null && $pageNo > 1) ? ' — страница ' . $pageNo : '';
+
         if (static::$post) {
             return ($page->meta_title ?: static::$post->seo_title ?: static::$post->title) . ' — ' . static::siteName();
         }
 
+        $brand = static::siteName();
         $raw = trim((string) ($page->meta_title ?? $page->title ?? ''));
-        $raw = $raw !== '' ? $raw : static::siteName();
 
-        return str_contains($raw, static::siteName()) ? $raw : $raw . ' — ' . static::siteName();
+        if ($raw === '') {
+            return $brand . $suffix;
+        }
+
+        if (str_contains($raw, $brand)) {
+            return $raw . $suffix;
+        }
+
+        return $raw . $suffix . ' — ' . $brand;
     }
 
     public static function description($page): string
