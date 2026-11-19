@@ -521,7 +521,7 @@
       «студи» — 16 вхождений (`pages/calculator.htm:176,239,245,259,271,281,
       376,428,430,431`, `pages/services.htm:62`, `pages/services-booking.htm:66`,
       `pages/services-seo.htm:4,17,104`, `pages/blog.htm:70`). Бренд, слоган и
-      контакты уже в Settings (`models/settings/fields.yaml:3-32`), но
+      контакты уже в Settings (`models/settings/fields.yaml:3-34`), но
       `brand_tagline` в теме не используется ни разу (`brand_name` — 6
       вхождений, контакты — 30), а тексты студии зашиты;
       `themes/elv-studio/theme.yaml:1-4` —
@@ -576,14 +576,14 @@
       настройка `demo_sandbox` в Settings (по умолчанию выключено); сервис
       `classes/DemoSandbox.php`: `demo_session_id` в сессии, изменения — только
       `Session`/`Cache` с TTL 24 часа, сброс — отдельная кнопка. Эндпоинты — в
-      `routes.php:20-45` (там же `throttle`), ввод — через `AntiSpam::clean()`
+      `routes.php:19-45` (там же `throttle`), ввод — через `AntiSpam::clean()`
       (`classes/AntiSpam.php`). Приёмка: при выключенном флаге маршрутов нет
       (404) и панели нет; при включённом — ни одной записи в БД (сверка
       `COUNT(*)` до и после сессии).
 - [ ] **P1. Пресеты ниш, товары, тарифы и валюта.** Четыре пресета: шаблоны и
       плагины CMS (дефолт), курсы/гайды, дизайн-системы (Figma), SaaS-лицензии.
       Оверрайды должны кормить те же точки, что и настройки: `Catalog::plans()`
-      (`classes/Catalog.php`), `Prices` (`classes/Prices.php`),
+      (`classes/Catalog.php:146`), `Prices` (`classes/Prices.php`),
       `Money::currency()` (`classes/Money.php:10`), `Product::planPrice()`
       (`models/Product.php:66`); название товара и цены — в сессии, не в
       `elv_kit_products`. Приёмка: пресет меняет витрину и калькулятор, сброс
@@ -591,7 +591,7 @@
 - [ ] **P1. Конструктор полей чекаута.** Repeater `checkout_fields` в
       `models/settings/fields.yaml` (тип, подпись, обязательность, порядок);
       рендер — `themes/elv-studio/pages/order.htm:124-150`; валидация — в
-      `OrderController::rules()` (`classes/Http/OrderController.php:29-40`) и
+      `OrderController::rules()` (`classes/Http/OrderController.php:25-38`) и
       `OrderService::create()` (`classes/OrderService.php:22-65`), значения — в
       `Order.meta.checkout`; в sandbox тот же контракт, но без записи заказа.
       Типы: `text`, `email`, `tel`, `select`, `checkbox`; «Домен для привязки
