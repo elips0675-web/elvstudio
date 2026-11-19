@@ -512,16 +512,19 @@
       Статьи блога вынесены из кода в `demo/blog.json` и исключены из
       товарного архива (Stage 74, пункт P0 выше).
 - [ ] **P1. Тема — витрина Elv, а не шаблон.** В теме 28 страниц и 8 партиалов;
-      тексты студии остались: «Elv Studio» — 18 вхождений на 12 страницах
-      (`partials/header.htm:3,7`, `partials/footer.htm:9`, `pages/services.htm:4`,
+      тексты студии остались: «Elv Studio» — 18 вхождений в 10 файлах
+      (8 страниц и 2 партиала; `partials/header.htm:3,7`,
+      `partials/footer.htm:9`, `pages/services.htm:4`,
       `pages/services-seo.htm:4,17`, `pages/calculator.htm:4`,
       `pages/contacts.htm:89`, `pages/docs.htm:53,91,111,133,135,238`,
       `pages/privacy.htm:26`, `pages/terms.htm:26,30`, `pages/search.htm:5`),
       «студи» — 16 вхождений (`pages/calculator.htm:176,239,245,259,271,281,
       376,428,430,431`, `pages/services.htm:62`, `pages/services-booking.htm:66`,
       `pages/services-seo.htm:4,17,104`, `pages/blog.htm:70`). Бренд, слоган и
-      контакты уже в Settings (`models/settings/fields.yaml:3-32`), но тема
-      берёт их только в 6 местах; `themes/elv-studio/theme.yaml:1-4` —
+      контакты уже в Settings (`models/settings/fields.yaml:3-32`), но
+      `brand_tagline` в теме не используется ни разу (`brand_name` — 6
+      вхождений, контакты — 30), а тексты студии зашиты;
+      `themes/elv-studio/theme.yaml:1-4` —
       `name/description/author` = «Elv Studio». Вариант: (а) нейтральные тексты
       в 28 страницах + блоки бренда в `theme.yaml` → `form:` (как у
       `themes/elv`), (б) продажа «как есть» с честным описанием. Устарело в
