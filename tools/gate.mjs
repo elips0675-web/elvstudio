@@ -1,26 +1,30 @@
 import { spawnSync } from 'node:child_process';
 
-const scripts = [
-  'check-urls.mjs',
-  'check-blog.mjs',
-  'check-seo.mjs',
-  'check-headers.mjs',
-  'check-budget.mjs',
-  'check-orphans.mjs',
-  'check-package.mjs',
-  'check-brand.mjs',
-  'check-plans.mjs',
-  'check-console.mjs',
+const gates = [
+  { script: 'check-urls.mjs' },
+  { script: 'check-blog.mjs' },
+  { script: 'check-seo.mjs' },
+  { script: 'check-headers.mjs' },
+  { script: 'check-budget.mjs' },
+  { script: 'check-orphans.mjs' },
+  { script: 'check-package.mjs' },
+  { script: 'check-brand.mjs' },
+  { script: 'check-plans.mjs' },
+  { script: 'check-console.mjs' },
+  { script: 'check-perf.mjs', args: ['--ttfb-only'] },
 ];
 
 const failed = [];
 
-for (const script of scripts) {
-  console.log('\n== ' + script + ' ==');
-  const result = spawnSync(process.execPath, ['tools/' + script], { stdio: 'inherit' });
+for (const gate of gates) {
+  const args = gate.args || [];
+
+  console.log('\n== ' + gate.script + (args.length ? ' ' + args.join(' ') : '') + ' ==');
+
+  const result = spawnSync(process.execPath, ['tools/' + gate.script, ...args], { stdio: 'inherit' });
 
   if (result.status !== 0) {
-    failed.push(script);
+    failed.push(gate.script);
   }
 }
 

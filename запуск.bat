@@ -105,7 +105,15 @@ echo.
 
 powershell -NoProfile -Command "Start-Process -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','%~dp0tools\warmup.ps1','-Port','%PORT%','-Site','%SITE%'" >nul 2>&1
 
-"%PHP%" artisan serve --host=%HOST% --port=%PORT%
+for %%I in ("%PHP%") do set "PHP_DIR=%%~dpI"
+set "OPCACHE=%PHP_DIR%ext\php_opcache.dll"
+if exist "%OPCACHE%" (
+    echo  OPcache: включён
+    "%PHP%" -d zend_extension="%OPCACHE%" -d opcache.enable=1 -d opcache.enable_cli=1 -d opcache.memory_consumption=192 -d opcache.max_accelerated_files=20000 -d opcache.validate_timestamps=1 -d opcache.revalidate_freq=0 -S %HOST%:%PORT% server.php
+) else (
+    echo  OPcache: не найден, работаю без него
+    "%PHP%" -S %HOST%:%PORT% server.php
+)
 
 echo.
 echo Сервер остановлен.

@@ -98,3 +98,14 @@
    `node tools/check-perf.mjs` — Lighthouse mobile, медиана Performance 100,
    худший прогон не ниже 95; стенд перед замером прогрет (`tools/warmup.ps1`
    вызывается из `запуск.bat`), иначе первый прогон платит за компиляцию Twig.
+10. Встроенный сервер стартует с OPcache: `запуск.bat:108-116` вызывает
+    `php -d zend_extension=…\ext\php_opcache.dll -d opcache.enable=1
+    -d opcache.enable_cli=1 -d opcache.validate_timestamps=1
+    -d opcache.revalidate_freq=0 -S %HOST%:%PORT% server.php` — та же команда,
+    которой Laravel поднимает сервер (`ServeCommand.php:209-221`), плюс кэш
+    опкодов. Без него TTFB скачет 383–930 мс и Lighthouse даёт 99 при TBT 0;
+    с ним медиана 115 мс и Performance 100. `validate_timestamps=1` обязателен,
+    иначе правки шаблонов не видны. После правки `.env` стенд перезапускается
+    (раньше это делал `artisan serve`). Проверка:
+    `node tools/check-perf.mjs --runs=5`; быстрая часть (p90 ответа ≤ 300 мс)
+    входит в `node tools/gate.mjs` как `check-perf.mjs --ttfb-only`.
