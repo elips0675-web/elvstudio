@@ -1,5 +1,7 @@
 # Консультант: ответы, фильтр, контроллер и виджет
 
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
+
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
 <?php namespace Elv\Kit\Classes;
@@ -118,9 +120,20 @@ class Chat
         }
 
         if (static::has($text, ['лиценз', 'домен', 'активац', 'ключ'])) {
+            $limits = [];
+
+            foreach (Catalog::planKeys() as $key) {
+                $limit = Catalog::planDomainLimit($key);
+                $limits[] = '«' . Catalog::planLabel($key) . '» — ' . match (true) {
+                    $limit <= 1 => 'один домен',
+                    $limit >= 1000 => 'любое число доменов',
+                    default => 'до ' . $limit . ' доменов',
+                };
+            }
+
             return static::reply(
-                "Ключ привязан к домену: тариф «Один сайт» — 1 домен, «До 5 сайтов» — до 5, «Без ограничений» — любое число.\n"
-                . "Ключ приходит на e-mail после оплаты; в админке на своём домене есть поле для ключа.",
+                ($limits !== [] ? 'Ключ привязан к домену: ' . implode(', ', $limits) . ".\n" : '')
+                . 'Ключ приходит на e-mail после оплаты; в админке на своём домене есть поле для ключа.',
                 ['Сколько стоит?', 'Как оплатить?', 'Написать нам']
             );
         }
@@ -172,15 +185,21 @@ class Chat
         }
 
         if (static::has($text, ['аудит'])) {
-            return static::reply(
-                'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
-                ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
-                static::link('Бесплатный аудит', '/services/audit/')
-            );
+            $services = static::servicesText();
+
+            if ($services !== '' && mb_stripos($services, 'аудит') !== false) {
+                return static::reply(
+                    'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
+                    ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+                    static::servicesLink('Бесплатный аудит')
+                );
+            }
+
+            return static::servicesReply();
         }
 
         if (static::has($text, ['услуг'])) {
-            return static::reply(static::studioServicesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Услуги Elv Studio', '/services/'));
+            return static::servicesReply();
         }
 
         if (static::has($text, ['заказ', 'магазин', 'корзин', 'покупк', 'купить', 'shop'])) {
@@ -200,8 +219,16 @@ class Chat
         }
 
         if (static::has($text, ['обновлен', 'поддержк', 'гаранти', 'документац', 'док'])) {
+            $terms = [];
+
+            foreach (Catalog::plans() as $plan) {
+                $terms[] = '«' . $plan['label'] . '» — обновления ' . mb_strtolower((string) $plan['updates'])
+                    . ', поддержка ' . mb_strtolower((string) $plan['support']);
+            }
+
             return static::reply(
-                'Обновления: 12 месяцев на тарифах «Один сайт» и «До 5 сайтов», навсегда на «Без ограничений». Поддержка: 30, 90 и 365 дней. Обновление заменяет файлы сайта, база и заказы остаются.',
+                ($terms !== [] ? 'По тарифам: ' . implode('; ', $terms) . '. ' : '')
+                . 'Обновление заменяет файлы сайта, база и заказы остаются.',
                 ['Сколько стоит?', 'Как установить?', 'Написать нам']
             );
         }
@@ -419,7 +446,13 @@ class Chat
 
     protected static function link(string $label, string $path): array
     {
-        return ['label' => $label, 'url' => url($path)];
+        $url = url($path);
+
+        if (str_ends_with($path, '/')) {
+            $url = rtrim($url, '/') . '/';
+        }
+
+        return ['label' => $label, 'url' => $url];
     }
 
     protected static function normalize(string $text): string
@@ -512,9 +545,49 @@ class Chat
         return static::modulesText();
     }
 
-    protected static function studioServicesText(): string
+    protected static function servicesText(): string
     {
-        return 'Услуги Elv Studio: хостинг и запуск, поддержка сайта, модули и плагины October CMS, сайт с онлайн-записью, бесплатный аудит и SEO-продвижение.';
+        $raw = (string) Settings::get('chat_services');
+        $lines = [];
+
+        foreach (preg_split('/\R/u', $raw) ?: [] as $line) {
+            $line = trim((string) preg_replace('/^\s*[-•*]\s*/u', '', trim($line)));
+
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
+        return implode('; ', $lines);
+    }
+
+    protected static function servicesLink(string $label = 'Услуги сайта'): ?array
+    {
+        $url = trim((string) Settings::get('chat_services_url'));
+
+        if ($url === '' || $url[0] !== '/' || strlen($url) > 200) {
+            return null;
+        }
+
+        return static::link($label, $url);
+    }
+
+    protected static function servicesReply(): array
+    {
+        $services = static::servicesText();
+
+        if ($services === '') {
+            return static::reply(
+                'Список услуг на сайте не заполнен. Напишите в форме обратной связи — ответим и подскажем, что подойдёт.',
+                ['Сколько стоит?', 'Написать нам']
+            );
+        }
+
+        return static::reply(
+            'Услуги сайта: ' . $services . '.',
+            ['Сколько стоит?', 'Написать нам'],
+            static::servicesLink()
+        );
     }
 
     protected static function bookingServicesText(): string
@@ -525,7 +598,7 @@ class Chat
             return '';
         }
 
-        $lines = ["\nВ демо-записи:"];
+        $lines = ["\nУслуги для записи:"];
 
         foreach ($services as $service) {
             $lines[] = '• ' . $service['name'] . ' — ' . $service['duration'] . ' мин, ' . $service['price'] . '.';

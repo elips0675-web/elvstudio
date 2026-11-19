@@ -32,7 +32,7 @@
 | `plugins/elv/kit/console/` | `elv:kit:demo`, `elv:kit:reset`, `elv:kit:package` |
 | `plugins/elv/kit/updates/` | `version.yaml` (единственный источник версии плагина) + миграции и сиды |
 | `plugins/elv/kit/routes.php` | формы, оплата, `/download/{token}`, `/api/v1/license/*`, sitemap/robots/llms/rss |
-| `tools/` | гейты `check-*.mjs`, `production-check.php`, `export-static.php`, `blog-content-audit.php` |
+| `tools/` | гейты `check-*.mjs`, `production-check.php`, `export-static.php`, `blog-content-audit.php`, `build-test-snapshot.mjs` (снимок `test/ai-chat`) |
 | `demo-static/` | статический экспорт демо для Vercel |
 | `exports/` | выгрузки статей блога (данные, не для импорта в October CMS) |
 

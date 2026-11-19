@@ -1,4 +1,6 @@
-# Поиск: серверный индекс и страница /search/
+# Поиск: сервер, выдача и страница /search/
+
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -980,10 +982,12 @@ description = "Основной макет: шапка, подвал, инлай
 ==
 {% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
 {% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
-{% set seo_noindex = this.page.id in ['404', 'order-success'] %}
+{% set seo_filtered = this.page.id in ['blog', 'blog-tech'] and (elv_query('category') or elv_query('tag') or elv_query('q')) %}
+{% set seo_noindex = this.page.id in ['404', 'order-success'] or seo_filtered %}
+{% set seo_page_no = this.page.paginated and not seo_filtered ? elv_page_no() : 1 %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
-    : elv_seo_title(this.page) %}
+    : elv_seo_title(this.page, seo_page_no) %}
 {% set seo_description = seo_product
     ? (seo_product.description ?: seo_product.tagline)
     : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
@@ -1002,14 +1006,14 @@ description = "Основной макет: шапка, подвал, инлай
     {% else %}
         <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     {% endif %}
-    <link rel="canonical" href="{{ elv_canonical() }}">
+    <link rel="canonical" href="{{ elv_canonical(seo_page_no) }}">
     <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
 
     <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
     <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">
     <meta property="og:title" content="{{ seo_title }}">
     <meta property="og:description" content="{{ seo_description|striptags|slice(0, 300) }}">
-    <meta property="og:url" content="{{ elv_canonical() }}">
+    <meta property="og:url" content="{{ elv_canonical(seo_page_no) }}">
     <meta property="og:image" content="{{ elv_og_image() }}">
     <meta property="og:locale" content="ru_RU">
     <meta name="twitter:card" content="summary_large_image">
@@ -1029,6 +1033,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% endif %}
     {% if this.page.id == 'search' %}
         <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
+    {% endif %}
+    {% if this.page.id in ['blog', 'blog-tech', 'blog-post'] %}
+        <link rel="stylesheet" href="{{ 'assets/css/blog.css'|theme }}?v=20261118-11">
     {% endif %}
 </head>
 <body>

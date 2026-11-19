@@ -1,5 +1,6 @@
-# Конфигурация сборки, зависимостей и темы
+# Конфигурация: сборка, зависимости и тема
 
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: composer.json =====
 
@@ -95,7 +96,6 @@ name: 'Elv Studio'
 code: elv-studio
 description: 'Лендинг Elv Kit: тема и модули для October CMS. CSS и JS инлайн, системные шрифты, ноль внешних запросов.'
 author: 'Elv Studio'
-homepage: 'https://elv-studio.by'
 form:
     fields:
         meta_title:

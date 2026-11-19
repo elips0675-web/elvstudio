@@ -1,10 +1,11 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Дата: 18.11.2026. Stage 60. Коммит: `b43a437`.
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
-Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта, проверки, версии прайса и документация. Файлы разделены, чтобы можно было цитировать.
+Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
+проверки, доки и аудит приватности. Файлы разделены, чтобы каждый был понятен.
 
-Содержание:
+Состав:
 - 01-context.txt
 - 02-structure.txt
 - 03-config.txt
@@ -18,29 +19,33 @@
 01-context.txt
 ==============================================================================
 
-# Elv Landing — срез для AI-анализа Консультанта, поиска и карты сайта
+# Elv Landing — срез для AI-анализа: Консультант, поиск и карта сайта
 
-Дата среза: 18.11.2026. Стадия: 60. Коммит: `b43a437`.
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 ## Что это за проект
 
 `D:\Elv Landing` — витрина студии и продукта Elv Kit на October CMS 4.x:
 тема `elv-studio` и плагин `Elv.Kit` (Booking, Shop, Feedback, Blog).
-Это не тот же код, что продукт `D:\October CMS`: общих файлов нет, каждая
-инсталляция October своя. Витрина продаёт Elv Kit, модули, лицензии и услуги;
+Это не код продукта `D:\October CMS`: общих файлов нет, каждая инсталляция
+October своя. Витрина продаёт Elv Kit, модули, консультации и услуги;
 блог из 67 статей продаёт через контент. В шапке пять пунктов: Возможности,
 Услуги, Цены, Демо, Блог + CTA «Заказать сайт»; «Контакты» и «Модули» — в
-подвале, чтобы не перегружать первый уровень.
+подвале, чтобы не перегружать шапку.
+
+Данные покупателя витрина не подставляет: услуги Консультанта, FAQ и услуги
+записи читаются только из настроек (вкладка «Виджет», «FAQ», «Запись»).
+Пустая настройка — честное пустое состояние, а не наш текст.
 
 ## Что анализировать в этом срезе
 
 1. Консультант: `Chat::answer()`, `TextFilter`, `ChatController`, `widget.js`.
 2. Поиск: `Search.php`, страница `/search/`, `search.js`, `/search-index.json`.
 3. Карта сайта: `sitemap.htm`, `Seo.php`, `Sitemap.php`.
-4. Проверки: `tools/chat-check.php`, `tools/search-check.php`,
-   `tools/seo-check.php`, `tools/price-check.php`, `node tools/gate.mjs`.
-5. Периметр: `SecurityHeaders.php` — CSP и локальный HTTP.
+4. Проверки: `tools/check-php.mjs` (chat/seo/booking), `tools/search-check.php`,
+   `tools/price-check.php`, `node tools/gate.mjs`.
+5. Приватность: `SecurityHeaders.php` — CSP и заголовки HTTP.
 6. Прайс: `classes/Prices.php`, `models/Price.php`, админка
    `controllers/Prices.php` — версии цен и дата актуальности.
 
@@ -52,8 +57,8 @@
   Страница поиска закрыта `noindex, follow` и не попадает в XML-sitemap.
 - Индекс собирается из проверенного списка страниц и опубликованных статей;
   в записи статьи попадают заголовок, анонс, ключевые слова и первые
-  800 символов тела. На Stage 59 индекс — 94 записи, 143,5 КБ JSON,
-  35,6 КБ gzip.
+  800 символов тела. Сейчас индекс — 94 записи, 143 529 байт JSON,
+  35 814 байт gzip.
 - Поиск строит простые основы и синонимы (`оплата/оплаты/оплатить`,
   `тариф/тарифы/тарифами`, `статья/статьи`, `бронирование/бронирования`,
   `цена/цены/стоимость`), без Левенштейна и внешних сервисов. Первые
@@ -61,6 +66,26 @@
   Совпадения подсвечиваются `<mark>` через DOM, без вставки HTML.
 - Консультант не использует внешние сервисы и ключи. Тарифы, разделы, запуск
   и оплата берутся из каталога и настроек.
+- Услуги Консультанта — из настроек (`chat_services`, `chat_services_url`).
+  Пустой список → нейтральный ответ про форму обратной связи, без названия
+  студии и без ссылки (`Chat.php`, `servicesReply()`); про аудит бот говорит,
+  только если аудит есть в списке. Демо-значения ставит `elv:kit:demo`,
+  на чистой установке их нет. Ссылки в чате канонические, со слэшем
+  (`Chat::link()` восстанавливает `/` после `url()`).
+- FAQ (общий, калькулятор, услуги, SEO, статьи) — из настроек
+  (`faq_items`, `faq_calculator_items`, `faq_services_items`,
+  `faq_seo_items`, `faq_post_items`). Пустое поле → секция не рендерится,
+  `FAQPage` в JSON-LD не добавляется; фолбэка на `config/*.php` нет.
+- Услуги записи — из настроек `booking_services` (формат
+  `код | название | минут | цена | описание | иконка`, 5–480 минут).
+  Пустое поле → `/booking/` показывает «Запись временно недоступна»
+  и контакты, чат не перечисляет услуги.
+- Статьи блога — демо-датасет `plugins/elv/kit/demo/blog.json`
+  (`seed` 38, `overrides` 48, `extras` 25 блоков перелинковки);
+  `Demo::posts()` только собирает статьи по `slug` и подставляет
+  `{{currency}}` из `Money::currency()`. В товарный ZIP папка `demo/`
+  не входит (`DownloadService::addDirectory()`), поэтому у покупателя блог
+  пуст до его собственных статей, а `elv:kit:demo` предупреждает об этом.
 - Цены трёх тарифов Kit лежат версиями в `elv_kit_price_versions`
   (`valid_from`, `valid_to`, `is_active`, цена в центах, валюта, автор,
   заметка). Действует версия, у которой `valid_from <= сегодня`,
@@ -111,29 +136,44 @@
 - FAQ выводится у 12 статей; в подвале нет технической ссылки «Для ИИ-поиска»
   (`/llms.txt` остаётся доступен), а на `/kit/` инструкция по установке стоит
   в блоке «Запуск», не под кнопкой заказа.
+- Блог: 67 статей (47 business / 20 tech), 38 тегов; все статьи длиннее
+  1 500 знаков, у каждой внутренние ссылки и CTA.
 
 ## Чем проверено
 
+- `node tools/gate.mjs` — all gates passed: 100 внутренних URL, 94 URL
+  sitemap, 111 страниц без ошибок консоли, блог (301 на `/blog/`, 6 страниц
+  пагинации с canonical, 404 за последней), бюджет, состав ZIP, бренд,
+  тарифы, PHP-проверки (chat/seo/booking) и TTFB p90 110 мс.
+- `node tools/check-budget.mjs` — `/` HTML 139,2 КБ / CSS 36,0 КБ / JS 20,0 КБ,
+  gzip 25,3 КБ (лимиты 150/36/20/30).
 - `php tools/chat-check.php` — OK: тарифы, явный и запасной поиск, пустой
   результат, услуги/контакты/аудит, фильтр грубых слов, «абырвалг оплата»,
-  «краудфандинг», пустой ввод и 10 000 символов.
+  «краудфандинг», пустой ввод и 10 000 символов; услуги — из настроек,
+  пустой список даёт нейтральный ответ.
 - `php tools/search-check.php` — OK: кэш индекса, основы, лимит тела 800,
   выдача `/pricing/`.
 - `php tools/seo-check.php` — OK: пустой FAQ не создаёт `FAQPage`,
   `Clean-param` без привязки к `/blog/`.
+- `php tools/booking-check.php` — OK: 20 проверок услуг записи из настроек,
+  пустое поле закрывает запись честным сообщением.
 - `php tools/price-check.php` — OK: `versions=3 plans=3 base=7900
   fresh=8600 label=17.11.2026`; проверка в транзакции с откатом ловит
   будущую/истёкшую/выключенную версию, границу `valid_to = сегодня`, чужой
   товар, расхождение с `/pricing/`, калькулятором, сметой и Консультантом,
   а также битый конфиг колонок админки.
-- `node tools/gate.mjs` — all gates passed: 100 внутренних URL, 94 URL
-  sitemap, 107 статических страниц без ошибок консоли; бюджет главной
-  137,9 КБ HTML / 36,0 КБ CSS / 20,0 КБ JS.
+- `node tools/check-package.mjs` — товарный архив 244 файла / 376 КБ без
+  `demo/blog.json`, демо-архив 248 файлов / 547 КБ с ним; `Demo::posts()`
+  отдаёт 67 статей и совпадает с числом уникальных `slug` в датасете.
 - `node tools/check-headers.mjs` — CSP без `upgrade-insecure-requests` на
   локальном HTTP; `check-seo` требует `Organization.logo` и якоря карты.
 - Live-`/chat` с CSRF: 15 ответов `200`, 16-й — `429`. На LAN-IP
   `http://172.29.24.250:8090/` Консультант отвечает, поиск отдаёт 73
   результата; до фикса CSP `fetch('/chat')` уходил на `https://` и падал.
+- Обратные подстановки Stage 74: без пропуска `demo/` в `DownloadService`
+  гейт красный («товарный архив содержит демо-датасет блога»); сломанный
+  `Demo::dataset()` — красный («`Demo::posts()` отдаёт 0 статей, а в датасете
+  67 уникальных slug»).
 
 ## Ограничения и что не проверено
 
@@ -146,7 +186,12 @@
 - `demo-static` — снимок; при изменении PHP-кода его нужно пересобирать.
   Экспорт недетерминирован: CSP-nonce, CSRF-токены и `lastmod` в
   `sitemap.xml` меняются от прогона к прогону, поэтому пересборка без
-  видимых правок даёт 108 «изменённых» файлов.
+  видимых правок даёт десятки «изменённых» файлов. На Stage 74 статика
+  не перегенерирована по этой причине.
+- Товарный архив не содержит демо-статей блога: покупатель начинает с пустого
+  блога. Установка архива на чистый October 4.4 не проверена — чистого
+  скелета в рабочей папке нет.
+- PHPUnit-тестов для `Elv.Kit` нет; качество держат гейты `tools/*` и `php -l`.
 - В `test/ai-chat/` лежит снимок кода, а не весь репозиторий; `vendor/`,
   `modules/`, `.env`, дампы БД и `demo-static` целиком не включены.
 
@@ -162,7 +207,9 @@
    сниппеты), или разделение преждевременно?
 5. Корректна ли группировка карты сайта для SEO и для человека; не теряются
    ли важные страницы?
-6. Какие 3–5 правок дадут наибольший эффект без нового продуктового кода?
+6. Настройки как единственный источник контента: какие пустые состояния
+   выглядят для покупателя как дефект и где нужна подсказка в админке?
+7. Какие 3–5 правок дадут наибольший эффект без нового продуктового кода?
 
 ==============================================================================
 02-structure.txt
@@ -170,9 +217,11 @@
 
 # Структура репозитория Elv Landing
 
-Срез: 18.11.2026, Stage 60, коммит `b43a437`.
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
-Показаны только отслеживаемые файлы. `demo-static` — 107 HTML-страниц, здесь не развёрнут. `vendor/`, `modules/`, `.env` и дампы БД не включены.
+Отслеживаемые файлы (`git ls-files`), всего 465.
+`demo-static` — 111 HTML-страниц, показан не развёрнуто.
+`vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
 
@@ -181,20 +230,25 @@
 - `.gitignore`
 - `.htaccess`
 - `.vercelignore`
+- `AGENTS.md`
 - `LICENSE.md`
-- `October CMS Booking deepseek.html`
 - `README.md`
 - `artisan`
 - `composer.json`
 - `composer.lock`
+- `elv-kit-audit-report.html`
+- `elv-kit-audit-report.txt`
 - `index.php`
 - `package.json`
 - `phpunit.xml`
 - `server.php`
 - `vercel.json`
+- `Аудит и план улучшения Elv Studio  Elv Kit Qwen.html`
+- `Как улучшить Консультанта, поиск и карту сайта deepseek.html`
 - `Что доделать.txt`
 - `Что сделано.txt`
 - `админка.bat`
+- `весь план и техническая инструкция для разработчика.txt`
 - `запуск.bat`
 
 ## plugins/elv/kit
@@ -205,7 +259,6 @@
 - `plugins/elv/kit/classes/AntiSpam.php`
 - `plugins/elv/kit/classes/Assets.php`
 - `plugins/elv/kit/classes/Blog.php`
-- `plugins/elv/kit/classes/BlogContent.php`
 - `plugins/elv/kit/classes/BookingService.php`
 - `plugins/elv/kit/classes/Calculator.php`
 - `plugins/elv/kit/classes/Catalog.php`
@@ -248,6 +301,8 @@
 - `plugins/elv/kit/classes/SlotUnavailableException.php`
 - `plugins/elv/kit/classes/Slots.php`
 - `plugins/elv/kit/classes/TextFilter.php`
+- `plugins/elv/kit/composer.json`
+- `plugins/elv/kit/config/blog.php`
 - `plugins/elv/kit/config/booking.php`
 - `plugins/elv/kit/config/calculator.php`
 - `plugins/elv/kit/config/faq.php`
@@ -307,6 +362,7 @@
 - `plugins/elv/kit/controllers/products/update.htm`
 - `plugins/elv/kit/controllers/subscribers/config_list.yaml`
 - `plugins/elv/kit/controllers/subscribers/index.htm`
+- `plugins/elv/kit/demo/blog.json`
 - `plugins/elv/kit/models/Booking.php`
 - `plugins/elv/kit/models/Category.php`
 - `plugins/elv/kit/models/Install.php`
@@ -355,6 +411,7 @@
 
 ## themes/elv-studio
 
+- `themes/elv-studio/assets/css/blog.css`
 - `themes/elv-studio/assets/css/calculator.css`
 - `themes/elv-studio/assets/css/search.css`
 - `themes/elv-studio/assets/css/styles.css`
@@ -363,6 +420,7 @@
 - `themes/elv-studio/assets/js/app.js`
 - `themes/elv-studio/assets/js/calculator.js`
 - `themes/elv-studio/assets/js/search.js`
+- `themes/elv-studio/composer.json`
 - `themes/elv-studio/layouts/default.htm`
 - `themes/elv-studio/pages/404.htm`
 - `themes/elv-studio/pages/blog-post.htm`
@@ -393,35 +451,50 @@
 - `themes/elv-studio/pages/sitemap.htm`
 - `themes/elv-studio/pages/terms.htm`
 - `themes/elv-studio/partials/analytics.htm`
+- `themes/elv-studio/partials/blog-aside.htm`
 - `themes/elv-studio/partials/breadcrumbs.htm`
 - `themes/elv-studio/partials/cta.htm`
 - `themes/elv-studio/partials/feedback-form.htm`
 - `themes/elv-studio/partials/footer.htm`
 - `themes/elv-studio/partials/header.htm`
 - `themes/elv-studio/partials/subscribe.htm`
+- `themes/elv-studio/screenshot.png`
 - `themes/elv-studio/theme.yaml`
+- `themes/elv-studio/version.yaml`
 
 ## tools
 
 - `tools/blog-content-audit.php`
+- `tools/booking-check.php`
+- `tools/build-test-snapshot.mjs`
 - `tools/calculator-check.php`
 - `tools/calculator-e2e.mjs`
 - `tools/chat-check.php`
+- `tools/check-blog.mjs`
+- `tools/check-brand.mjs`
 - `tools/check-budget.mjs`
 - `tools/check-common.mjs`
 - `tools/check-console.mjs`
+- `tools/check-empty-install.mjs`
 - `tools/check-headers.mjs`
 - `tools/check-orphans.mjs`
+- `tools/check-package.mjs`
+- `tools/check-perf.mjs`
+- `tools/check-php.mjs`
+- `tools/check-plans.mjs`
+- `tools/check-plans.php`
 - `tools/check-seo.mjs`
 - `tools/check-urls.mjs`
 - `tools/export-blog-articles.php`
 - `tools/export-static.php`
 - `tools/gate.mjs`
+- `tools/package-inspect.php`
 - `tools/price-check.php`
 - `tools/production-check.php`
 - `tools/search-check.php`
-- `tools/serve-static.php`
 - `tools/seo-check.php`
+- `tools/serve-static.php`
+- `tools/warmup.ps1`
 
 ## docs
 
@@ -429,6 +502,28 @@
 - `docs/blog-audit.md`
 - `docs/blog-content-plan.md`
 - `docs/content-policy.md`
+- `docs/html/50 статей ELV Studio что есть, где пробелы и о чём писать дальше deepseek.html`
+- `docs/html/Elv Studio что уже работает в блоге и как двигаться дальше deepseek.html`
+- `docs/html/Laravel + Filament.txt`
+- `docs/html/October CMS Booking deepseek.html`
+- `docs/html/October CMS для лендинга с бронированием, заказами и чатом deepseek.html`
+- `docs/html/«Стучалка» установок с проверкой Ключа (License Key) Qwen.html`
+- `docs/html/Аудит и точки роста блога Elv Studio Qwen.html`
+- `docs/html/Бренд Elv шаблон функционал.txt`
+- `docs/html/Готовые статьи для блога от выбора CMS до воронки продаж deepseek.html`
+- `docs/html/Доработка студии.txt`
+- `docs/html/Доступ к товару после оплаты.txt`
+- `docs/html/Идеальный сайт для бизнеса как подружить CMS, хостинг, скорость seo deepseek deepseek.html`
+- `docs/html/Как монетизировать шаблон и функционал для October CMS deepseek.html`
+- `docs/html/Как сделать стучалку (счетчик) установок плагинов и шаблонов в October CMS deepseek.html`
+- `docs/html/Промт Промт для создания сайта на October CMS для продажи Elv Kit (универсальный конструктор).txt`
+- `docs/html/Промты Elv.txt`
+- `docs/html/Стратегия развития блога ELV Studio deepseek.html`
+- `docs/html/Улучшение шаблона .txt`
+- `docs/html/гайда по Yoast SEO deepseek.html`
+- `docs/html/код Qwen.html`
+- `docs/html/код гугл режим ИИ.txt`
+- `docs/html/на October CMS процесс оплаты заказа был таким же безопасным и удобным.txt`
 - `docs/prices.md`
 - `docs/qa/README.md`
 - `docs/qa/firefox-360-blog-article.png`
@@ -445,20 +540,21 @@
 
 ## database/migrations
 
-
+(пусто)
 
 ## test
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок для этого анализа (Stage 60, создан отдельно)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 74, собран `node tools/build-test-snapshot.mjs`)
 
 ==============================================================================
 03-config.txt
 ==============================================================================
 
-# Конфигурация сборки, зависимостей и темы
+# Конфигурация: сборка, зависимости и тема
 
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: composer.json =====
 
@@ -554,7 +650,6 @@ name: 'Elv Studio'
 code: elv-studio
 description: 'Лендинг Elv Kit: тема и модули для October CMS. CSS и JS инлайн, системные шрифты, ноль внешних запросов.'
 author: 'Elv Studio'
-homepage: 'https://elv-studio.by'
 form:
     fields:
         meta_title:
@@ -720,6 +815,7 @@ php artisan elv:kit:package         # ZIP темы и плагина для по
 
 # Плагин: точка входа Elv.Kit
 
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -759,7 +855,6 @@ class Plugin extends PluginBase
             'description' => 'Готовый сайт для бизнеса: онлайн-запись, заказы и оплата, блог и обратная связь.',
             'author' => 'Elv Studio',
             'icon' => 'icon-cubes',
-            'homepage' => 'https://elv-studio.by',
         ];
     }
 
@@ -923,6 +1018,18 @@ class Plugin extends PluginBase
             ->make(\Illuminate\Contracts\Http\Kernel::class)
             ->pushMiddleware(SecurityHeaders::class)
             ->pushMiddleware(CompressResponse::class);
+
+        \Event::listen('cms.page.beforeDisplay', function ($controller, $url, $page) {
+            $raw = (string) (parse_url((string) request()->getRequestUri(), PHP_URL_PATH) ?: '');
+
+            if ($raw === '' || $raw === '/' || str_ends_with($raw, '/') || request()->ajax() || !request()->isMethod('get')) {
+                return null;
+            }
+
+            $query = (string) request()->getQueryString();
+
+            return redirect()->to(url(ltrim($raw, '/')) . '/' . ($query !== '' ? '?' . $query : ''), 301);
+        });
     }
 
     public function registerMarkupTags()
@@ -955,6 +1062,12 @@ class Plugin extends PluginBase
                 },
                 'elv_plans' => function ($product = null) {
                     return Catalog::plans($product instanceof Product ? $product : null);
+                },
+                'elv_plan_keys' => function () {
+                    return Catalog::planKeys();
+                },
+                'elv_plan_label' => function ($key) {
+                    return Catalog::planLabel((string) $key);
                 },
                 'elv_calculator' => function () {
                     return Calculator::data();
@@ -1027,14 +1140,24 @@ class Plugin extends PluginBase
                 'elv_icon' => function ($name, $class = '') {
                     return Icons::svg((string) $name, (string) $class);
                 },
-                'elv_canonical' => function () {
-                    return Seo::canonical();
+                'elv_canonical' => function ($pageNo = 1) {
+                    return Seo::canonical((int) $pageNo);
+                },
+                'elv_page_no' => function () {
+                    return max(1, (int) request()->query('page', 1));
+                },
+                'elv_404_if' => function ($condition) {
+                    if ($condition) {
+                        abort(404);
+                    }
+
+                    return '';
                 },
                 'elv_jsonld' => function ($page = null) {
                     return Seo::jsonld($page);
                 },
-                'elv_seo_title' => function ($page = null) {
-                    return Seo::title($page);
+                'elv_seo_title' => function ($page = null, $pageNo = 1) {
+                    return Seo::title($page, (int) $pageNo);
                 },
                 'elv_seo_description' => function ($page = null) {
                     return Seo::description($page);
@@ -1084,6 +1207,12 @@ class Plugin extends PluginBase
                         'tag' => request()->query('tag'),
                         'q' => request()->query('q'),
                     ], (int) $perPage, (string) $audience);
+                },
+                'elv_blog_start' => function ($limit = 0) {
+                    return Blog::start((int) $limit);
+                },
+                'elv_blog_total' => function ($audience = Post::AUDIENCE_BUSINESS) {
+                    return Blog::total((string) $audience);
                 },
                 'elv_use_post' => function ($slug) {
                     $post = Blog::find((string) $slug);
@@ -1159,6 +1288,8 @@ class Plugin extends PluginBase
 ==============================================================================
 
 # Консультант: ответы, фильтр, контроллер и виджет
+
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -1278,9 +1409,20 @@ class Chat
         }
 
         if (static::has($text, ['лиценз', 'домен', 'активац', 'ключ'])) {
+            $limits = [];
+
+            foreach (Catalog::planKeys() as $key) {
+                $limit = Catalog::planDomainLimit($key);
+                $limits[] = '«' . Catalog::planLabel($key) . '» — ' . match (true) {
+                    $limit <= 1 => 'один домен',
+                    $limit >= 1000 => 'любое число доменов',
+                    default => 'до ' . $limit . ' доменов',
+                };
+            }
+
             return static::reply(
-                "Ключ привязан к домену: тариф «Один сайт» — 1 домен, «До 5 сайтов» — до 5, «Без ограничений» — любое число.\n"
-                . "Ключ приходит на e-mail после оплаты; в админке на своём домене есть поле для ключа.",
+                ($limits !== [] ? 'Ключ привязан к домену: ' . implode(', ', $limits) . ".\n" : '')
+                . 'Ключ приходит на e-mail после оплаты; в админке на своём домене есть поле для ключа.',
                 ['Сколько стоит?', 'Как оплатить?', 'Написать нам']
             );
         }
@@ -1332,15 +1474,21 @@ class Chat
         }
 
         if (static::has($text, ['аудит'])) {
-            return static::reply(
-                'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
-                ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
-                static::link('Бесплатный аудит', '/services/audit/')
-            );
+            $services = static::servicesText();
+
+            if ($services !== '' && mb_stripos($services, 'аудит') !== false) {
+                return static::reply(
+                    'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
+                    ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+                    static::servicesLink('Бесплатный аудит')
+                );
+            }
+
+            return static::servicesReply();
         }
 
         if (static::has($text, ['услуг'])) {
-            return static::reply(static::studioServicesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Услуги Elv Studio', '/services/'));
+            return static::servicesReply();
         }
 
         if (static::has($text, ['заказ', 'магазин', 'корзин', 'покупк', 'купить', 'shop'])) {
@@ -1360,8 +1508,16 @@ class Chat
         }
 
         if (static::has($text, ['обновлен', 'поддержк', 'гаранти', 'документац', 'док'])) {
+            $terms = [];
+
+            foreach (Catalog::plans() as $plan) {
+                $terms[] = '«' . $plan['label'] . '» — обновления ' . mb_strtolower((string) $plan['updates'])
+                    . ', поддержка ' . mb_strtolower((string) $plan['support']);
+            }
+
             return static::reply(
-                'Обновления: 12 месяцев на тарифах «Один сайт» и «До 5 сайтов», навсегда на «Без ограничений». Поддержка: 30, 90 и 365 дней. Обновление заменяет файлы сайта, база и заказы остаются.',
+                ($terms !== [] ? 'По тарифам: ' . implode('; ', $terms) . '. ' : '')
+                . 'Обновление заменяет файлы сайта, база и заказы остаются.',
                 ['Сколько стоит?', 'Как установить?', 'Написать нам']
             );
         }
@@ -1579,7 +1735,13 @@ class Chat
 
     protected static function link(string $label, string $path): array
     {
-        return ['label' => $label, 'url' => url($path)];
+        $url = url($path);
+
+        if (str_ends_with($path, '/')) {
+            $url = rtrim($url, '/') . '/';
+        }
+
+        return ['label' => $label, 'url' => $url];
     }
 
     protected static function normalize(string $text): string
@@ -1672,9 +1834,49 @@ class Chat
         return static::modulesText();
     }
 
-    protected static function studioServicesText(): string
+    protected static function servicesText(): string
     {
-        return 'Услуги Elv Studio: хостинг и запуск, поддержка сайта, модули и плагины October CMS, сайт с онлайн-записью, бесплатный аудит и SEO-продвижение.';
+        $raw = (string) Settings::get('chat_services');
+        $lines = [];
+
+        foreach (preg_split('/\R/u', $raw) ?: [] as $line) {
+            $line = trim((string) preg_replace('/^\s*[-•*]\s*/u', '', trim($line)));
+
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
+        return implode('; ', $lines);
+    }
+
+    protected static function servicesLink(string $label = 'Услуги сайта'): ?array
+    {
+        $url = trim((string) Settings::get('chat_services_url'));
+
+        if ($url === '' || $url[0] !== '/' || strlen($url) > 200) {
+            return null;
+        }
+
+        return static::link($label, $url);
+    }
+
+    protected static function servicesReply(): array
+    {
+        $services = static::servicesText();
+
+        if ($services === '') {
+            return static::reply(
+                'Список услуг на сайте не заполнен. Напишите в форме обратной связи — ответим и подскажем, что подойдёт.',
+                ['Сколько стоит?', 'Написать нам']
+            );
+        }
+
+        return static::reply(
+            'Услуги сайта: ' . $services . '.',
+            ['Сколько стоит?', 'Написать нам'],
+            static::servicesLink()
+        );
     }
 
     protected static function bookingServicesText(): string
@@ -1685,7 +1887,7 @@ class Chat
             return '';
         }
 
-        $lines = ["\nВ демо-записи:"];
+        $lines = ["\nУслуги для записи:"];
 
         foreach ($services as $service) {
             $lines[] = '• ' . $service['name'] . ' — ' . $service['duration'] . ' мин, ' . $service['price'] . '.';
@@ -2372,7 +2574,9 @@ class ChatController extends Controller
 06-search.txt
 ==============================================================================
 
-# Поиск: серверный индекс и страница /search/
+# Поиск: сервер, выдача и страница /search/
+
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -3354,10 +3558,12 @@ description = "Основной макет: шапка, подвал, инлай
 ==
 {% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
 {% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
-{% set seo_noindex = this.page.id in ['404', 'order-success'] %}
+{% set seo_filtered = this.page.id in ['blog', 'blog-tech'] and (elv_query('category') or elv_query('tag') or elv_query('q')) %}
+{% set seo_noindex = this.page.id in ['404', 'order-success'] or seo_filtered %}
+{% set seo_page_no = this.page.paginated and not seo_filtered ? elv_page_no() : 1 %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
-    : elv_seo_title(this.page) %}
+    : elv_seo_title(this.page, seo_page_no) %}
 {% set seo_description = seo_product
     ? (seo_product.description ?: seo_product.tagline)
     : (seo_post ? (seo_post.seo_description ?: seo_post.excerpt) : elv_seo_description(this.page)) %}
@@ -3376,14 +3582,14 @@ description = "Основной макет: шапка, подвал, инлай
     {% else %}
         <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     {% endif %}
-    <link rel="canonical" href="{{ elv_canonical() }}">
+    <link rel="canonical" href="{{ elv_canonical(seo_page_no) }}">
     <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
 
     <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
     <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">
     <meta property="og:title" content="{{ seo_title }}">
     <meta property="og:description" content="{{ seo_description|striptags|slice(0, 300) }}">
-    <meta property="og:url" content="{{ elv_canonical() }}">
+    <meta property="og:url" content="{{ elv_canonical(seo_page_no) }}">
     <meta property="og:image" content="{{ elv_og_image() }}">
     <meta property="og:locale" content="ru_RU">
     <meta name="twitter:card" content="summary_large_image">
@@ -3403,6 +3609,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% endif %}
     {% if this.page.id == 'search' %}
         <link rel="stylesheet" href="{{ 'assets/css/search.css'|theme }}?v=20261118-2">
+    {% endif %}
+    {% if this.page.id in ['blog', 'blog-tech', 'blog-post'] %}
+        <link rel="stylesheet" href="{{ 'assets/css/blog.css'|theme }}?v=20261118-11">
     {% endif %}
 </head>
 <body>
@@ -3435,6 +3644,8 @@ description = "Основной макет: шапка, подвал, инлай
 ==============================================================================
 
 # Карта сайта и SEO-разметка
+
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -3632,7 +3843,7 @@ class Seo
         return rtrim(url('/'), '/');
     }
 
-    public static function canonical(): string
+    public static function canonical(?int $pageNo = null): string
     {
         $path = '/' . ltrim((string) request()->path(), '/');
 
@@ -3640,7 +3851,13 @@ class Seo
             $path = rtrim($path, '/') . '/';
         }
 
-        return static::base() . $path;
+        $url = static::base() . $path;
+
+        if ($pageNo !== null && $pageNo > 1) {
+            $url .= '?page=' . $pageNo;
+        }
+
+        return $url;
     }
 
     public static function setPost(?Post $post): void
@@ -3666,16 +3883,26 @@ class Seo
     /**
      * title — заголовок страницы с суффиксом бренда.
      */
-    public static function title($page): string
+    public static function title($page, ?int $pageNo = null): string
     {
+        $suffix = ($pageNo !== null && $pageNo > 1) ? ' — страница ' . $pageNo : '';
+
         if (static::$post) {
             return ($page->meta_title ?: static::$post->seo_title ?: static::$post->title) . ' — ' . static::siteName();
         }
 
+        $brand = static::siteName();
         $raw = trim((string) ($page->meta_title ?? $page->title ?? ''));
-        $raw = $raw !== '' ? $raw : static::siteName();
 
-        return str_contains($raw, static::siteName()) ? $raw : $raw . ' — ' . static::siteName();
+        if ($raw === '') {
+            return $brand . $suffix;
+        }
+
+        if (str_contains($raw, $brand)) {
+            return $raw . $suffix;
+        }
+
+        return $raw . $suffix . ' — ' . $brand;
     }
 
     public static function description($page): string
@@ -4254,7 +4481,9 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 08-checks-docs.txt
 ==============================================================================
 
-# Проверки, версии прайса и документация
+# Проверки, доки и аудит приватности
+
+Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -4267,6 +4496,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Chat;
 use Elv\Kit\Classes\TextFilter;
+use Elv\Kit\Models\Settings;
 
 $errors = [];
 
@@ -4313,16 +4543,37 @@ $check(str_contains($empty['answer'], 'подробнее'), 'empty message does
 $long = Chat::answer(str_repeat('а', 10000));
 $check(is_array($long) && $long['rejected'] === true, 'long nonsense is not rejected');
 
-$services = Chat::answer('какие услуги вы оказываете');
-$check(str_contains($services['answer'], 'Услуги Elv Studio'), 'studio services answer is missing');
-$check(str_contains((string) ($services['link']['url'] ?? ''), '/services'), 'studio services link is missing');
-$check(!str_contains($services['answer'], 'В демо-записи'), 'studio services answer mixes booking services');
+$settingsModel = Settings::instance();
+$servicesBackup = $settingsModel->getAttribute('chat_services');
+$servicesUrlBackup = $settingsModel->getAttribute('chat_services_url');
+
+$settingsModel->forceFill(['chat_services' => '', 'chat_services_url' => '']);
+
+$neutral = Chat::answer('какие услуги вы оказываете');
+$check(!str_contains($neutral['answer'], 'Elv Studio'), 'empty services still advertise the studio');
+$check(($neutral['link'] ?? null) === null, 'empty services must not add a link');
+$check(str_contains($neutral['answer'], 'обратной связи'), 'empty services do not point to feedback');
+$check(!str_contains($neutral['answer'], 'В демо-записи'), 'services answer mixes booking services');
+
+$neutralAudit = Chat::answer('аудит сайта');
+$check(($neutralAudit['link'] ?? null) === null, 'audit without configured services must not link');
+
+$settingsModel->forceFill(['chat_services' => "Стрижка\nМаникюр", 'chat_services_url' => '/uslugi/']);
+
+$custom = Chat::answer('какие услуги вы оказываете');
+$check(str_contains($custom['answer'], 'Стрижка') && str_contains($custom['answer'], 'Маникюр'), 'configured services are not listed');
+$check(str_contains((string) ($custom['link']['url'] ?? ''), '/uslugi'), 'configured services link is not used');
+$check(str_ends_with((string) ($custom['link']['url'] ?? ''), '/'), 'configured services link lost the trailing slash');
+
+$settingsModel->forceFill(['chat_services' => "Стрижка\nМаникюр\nаудит"]);
+$audit = Chat::answer('аудит сайта');
+$check(str_contains((string) ($audit['link']['url'] ?? ''), '/uslugi'), 'audit link is missing when audit is listed');
+$check(str_contains($audit['answer'], 'аудит'), 'audit answer is missing');
+
+$settingsModel->forceFill(['chat_services' => $servicesBackup, 'chat_services_url' => $servicesUrlBackup]);
 
 $booking = Chat::answer('записаться на услугу');
 $check(str_contains($booking['answer'], 'Онлайн-запись'), 'booking answer is missing');
-
-$audit = Chat::answer('аудит сайта');
-$check(str_contains((string) ($audit['link']['url'] ?? ''), '/services/audit'), 'audit link is missing');
 
 $contact = Chat::answer('связаться с вами');
 $check($contact['rejected'] === false, 'contact request is rejected');
@@ -4447,7 +4698,9 @@ require __DIR__ . '/../bootstrap/autoload.php';
 $app = require __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Seo;
+use Elv\Kit\Models\Settings;
 
 $errors = [];
 
@@ -4473,6 +4726,45 @@ $robots = Seo::robots();
 $check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
 $check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
 
+$settings = Settings::instance();
+$faqKeys = ['faq_items', 'faq_calculator_items', 'faq_services_items', 'faq_seo_items', 'faq_post_items'];
+$faqBackup = [];
+
+foreach ($faqKeys as $key) {
+    $faqBackup[$key] = $settings->getAttribute($key);
+}
+
+$settings->forceFill(array_fill_keys($faqKeys, ''));
+$check(Faq::items() === [], 'empty settings still return a FAQ block');
+$check(Faq::items('calculator') === [], 'empty settings still return the calculator FAQ');
+$check(Faq::post('kak-sdelat-sajt') === [], 'empty settings still return the article FAQ');
+
+$settings->forceFill([
+    'faq_items' => "Первый вопрос | Первый ответ\n\n# комментарий\nВторой вопрос | Второй ответ | с чертой в ответе\nмусор без разделителя",
+]);
+$items = Faq::items();
+$check(count($items) === 2, 'FAQ pairs from settings are not parsed line by line');
+$check(($items[0]['q'] ?? '') === 'Первый вопрос', 'FAQ question is not trimmed');
+$check(($items[1]['a'] ?? '') === 'Второй ответ | с чертой в ответе', 'FAQ answer is cut at the first pipe');
+
+$settings->forceFill(['faq_calculator_items' => 'Вопрос калькулятора | Ответ калькулятора']);
+$check(count(Faq::items('calculator')) === 1, 'calculator FAQ key is not read from settings');
+$check(count(Faq::items('services')) === 0, 'calculator FAQ leaks into the services block');
+
+$settings->forceFill(['faq_post_items' => "demo-post | Вопрос статьи | Ответ статьи\nbroken post line"]);
+$postItems = Faq::post('demo-post');
+$check(count($postItems) === 1, 'article FAQ is not read from settings');
+$check(($postItems[0]['q'] ?? '') === 'Вопрос статьи', 'article FAQ question is not parsed');
+$check(Faq::post('other-post') === [], 'article FAQ leaks to another slug');
+
+$check(count(Faq::configItems('faq')) > 0, 'demo FAQ dataset is missing');
+$check(count(Faq::configItems('post-faq')) > 0, 'demo article FAQ dataset is missing');
+$check(Faq::postToLines(Faq::configPostItems()) !== '', 'demo article FAQ is not convertible to settings lines');
+
+foreach ($faqBackup as $key => $value) {
+    $settings->forceFill([$key => $value]);
+}
+
 if ($errors !== []) {
     foreach ($errors as $error) {
         fwrite(STDERR, 'FAIL: ' . $error . PHP_EOL);
@@ -4482,6 +4774,148 @@ if ($errors !== []) {
 }
 
 echo 'OK: SEO checks passed' . PHP_EOL;
+
+===== FILE: tools/booking-check.php =====
+
+<?php
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Elv\Kit\Classes\Slots;
+use Elv\Kit\Models\Settings;
+
+$errors = [];
+
+$check = function (bool $condition, string $message) use (&$errors) {
+    if (!$condition) {
+        $errors[] = $message;
+    }
+};
+
+$settings = Settings::instance();
+$backup = $settings->getAttribute('booking_services');
+
+$settings->forceFill(['booking_services' => '']);
+$check(Slots::services() === [], 'empty settings still return booking services');
+$check(!str_contains(json_encode(Slots::services(), JSON_UNESCAPED_UNICODE) ?: '', '120 BYN'), 'empty settings leak the demo price');
+$check(Slots::service('consult') === null, 'empty settings still resolve the demo service code');
+
+$settings->forceFill([
+    'booking_services' => "haircut | Стрижка | 60 | 40 BYN | Коротко о процедуре | scissors\n"
+        . "massage | Массаж | 90 | 80 BYN",
+]);
+$services = Slots::services();
+$check(count($services) === 2, 'booking services are not parsed from settings');
+$check(($services[0]['code'] ?? '') === 'haircut', 'booking service code is not parsed');
+$check(($services[0]['name'] ?? '') === 'Стрижка', 'booking service name is not parsed');
+$check((int) ($services[0]['duration'] ?? 0) === 60, 'booking service duration is not parsed');
+$check(($services[0]['price'] ?? '') === '40 BYN', 'booking service price is not parsed');
+$check(($services[0]['description'] ?? '') === 'Коротко о процедуре', 'booking service description is missing');
+$check(($services[0]['icon'] ?? '') === 'scissors', 'booking service icon is missing');
+$check(($services[1]['icon'] ?? 'x') === '', 'missing icon must stay empty');
+$check(($services[1]['description'] ?? 'x') === '', 'missing description must stay empty');
+$check((Slots::service('massage')['name'] ?? '') === 'Массаж', 'service lookup does not use settings');
+
+$settings->forceFill([
+    'booking_services' => "мусор без полей\n"
+        . "broken | Без часа и цены\n"
+        . "bad code! | Услуга | 0 | 10 BYN | x\n"
+        . "ok | Норм | 30 | 0 BYN",
+]);
+$check(count(Slots::services()) === 1, 'malformed booking lines are not skipped');
+
+$settings->forceFill(['booking_services' => "ok | Норм | 5 | 0 BYN\nlong | Долго | 481 | 0 BYN\nzero | Ноль | 4 | 0 BYN"]);
+$check(count(Slots::services()) === 1, 'duration bound is not enforced');
+
+$settings->forceFill(['booking_services' => "# комментарий\nok | Норм | 30 | 0 BYN | Труба | pipe"]);
+$check(count(Slots::services()) === 1, 'comment line is not skipped');
+
+$settings->forceFill(['booking_services' => "ok | Норм | 30 | 0 BYN | Труба | pipe"]);
+$lines = Slots::servicesToLines(Slots::services());
+$check(str_contains($lines, ' | '), 'settings lines must keep the pipe separator');
+$check((Slots::parseServices($lines) === Slots::services()), 'settings lines do not round-trip');
+
+$config = Slots::configServices();
+$check(count($config) > 0, 'demo booking dataset is missing');
+$check(Slots::servicesToLines($config) !== '', 'demo booking dataset is not convertible to settings lines');
+
+$settings->forceFill(['booking_services' => $backup]);
+
+if ($errors !== []) {
+    foreach ($errors as $error) {
+        fwrite(STDERR, 'FAIL: ' . $error . PHP_EOL);
+    }
+
+    exit(1);
+}
+
+echo 'OK: booking checks passed' . PHP_EOL;
+
+===== FILE: tools/check-php.mjs =====
+
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const SCRIPTS = ['tools/chat-check.php', 'tools/seo-check.php', 'tools/booking-check.php'];
+
+function commandWorks(command, args) {
+  const result = spawnSync(command, args, { stdio: 'ignore' });
+
+  return result.status === 0;
+}
+
+function resolvePhp() {
+  if (process.env.PHP_BIN) {
+    return process.env.PHP_BIN;
+  }
+
+  if (commandWorks('php', ['-v'])) {
+    return 'php';
+  }
+
+  if (process.platform === 'win32') {
+    const laragon = 'C:\\laragon\\bin\\php';
+
+    if (fs.existsSync(laragon)) {
+      const versions = fs.readdirSync(laragon)
+        .map((name) => path.join(laragon, name, 'php.exe'))
+        .filter((file) => fs.existsSync(file))
+        .sort()
+        .reverse();
+
+      if (versions.length) {
+        return versions[0];
+      }
+    }
+  }
+
+  throw new Error('PHP not found. Set PHP_BIN to the php executable.');
+}
+
+const php = resolvePhp();
+const failed = [];
+
+for (const script of SCRIPTS) {
+  console.log('\n== ' + script + ' ==');
+
+  const result = spawnSync(php, [script], { cwd: ROOT, stdio: 'inherit' });
+
+  if (result.status !== 0) {
+    failed.push(script);
+  }
+}
+
+if (failed.length) {
+  console.error('\nfailed: ' + failed.join(', '));
+  process.exit(1);
+}
+
+console.log('\nphp checks passed');
 
 ===== FILE: tools/check-seo.mjs =====
 
@@ -5329,11 +5763,12 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
 `Search.php`, `TextFilter.php`, `ChatController.php` и `widget.js` в отчёте
 не упомянуты. Упомянутые пути — рекомендации, а не факты чтения.
 
-Чтобы закрыть этот пробел, в `test/ai-chat/` лежит снимок кода Stage 56:
-`ALL-IN-ONE.txt` или отдельные файлы с `Chat.php`, `Search.php`,
+Чтобы закрыть этот пробел, в `test/ai-chat/` лежит снимок кода (на Stage 74 —
+актуальный): `ALL-IN-ONE.txt` или отдельные файлы с `Chat.php`, `Search.php`,
 `TextFilter.php`, `ChatController.php`, `widget.js`, `chat-check.php`,
-`Plugin.php`, `composer.json`, `theme.yaml`, `sitemap.htm`, `Seo.php`.
-Манифест — `test/ai-chat/README.md`.
+`booking-check.php`, `Plugin.php`, `composer.json`, `theme.yaml`,
+`sitemap.htm`, `Seo.php`. Снимок пересобирается командой
+`node tools/build-test-snapshot.mjs`; манифест — `test/ai-chat/README.md`.
 
 ### Что взято в работу
 
@@ -5837,4 +6272,3 @@ php tools/price-check.php
   `new Price([...])`.
 - `type: date` в списке печатает `17 Nov 2026`; формат `д.м.г` задаётся
   аксессором, а не типом колонки.
-

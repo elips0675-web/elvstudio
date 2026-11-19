@@ -10,7 +10,7 @@
 | Файл | Что внутри |
 |---|---|
 | `Для анализа.txt` | стек, роль площадок, что откуда (ядро/магазин/кастом), карта кода, тесты и гейты, факты HEAD, бэклог, ограничения, вопросы аудитору |
-| `ai-chat/` | снимок кода для глубокого разбора Консультанта, поиска и карты сайта: `Chat.php`, `Search.php`, `TextFilter.php`, `ChatController`, `widget.js`, `chat-check.php`, `Plugin.php`, `composer.json`, `theme.yaml`, `sitemap.htm`, `Seo.php` |
+| `ai-chat/` | снимок кода для глубокого разбора Консультанта, поиска и карты сайта: `Chat.php`, `Search.php`, `TextFilter.php`, `ChatController`, `widget.js`, `chat-check.php`, `booking-check.php`, `check-php.mjs`, `Plugin.php`, `composer.json`, `theme.yaml`, `sitemap.htm`, `Seo.php`; собирается `node tools/build-test-snapshot.mjs` |
 
 ## Как пользоваться
 
@@ -33,6 +33,10 @@
 
 - После каждого закрытого этапа: числа статей/страниц/гейтов и бэклог
   меняются — править разделы 5–8 и дату среза в шапке.
+- Снимок кода в `ai-chat/` пересобирается одной командой
+  `node tools/build-test-snapshot.mjs`: она берёт дату, Stage и хеш `HEAD`,
+  перезаписывает `02`–`08` и `ALL-IN-ONE.txt`. Вручную правится только
+  `test/ai-chat/01-context.txt` — там проза, а не код.
 - Перед отправкой на аудит проверить HEAD (`git log --oneline -1`) и то,
   что числа совпадают с фактическим прогоном `npm run check`.
 
