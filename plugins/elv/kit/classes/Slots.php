@@ -1,9 +1,10 @@
 <?php namespace Elv\Kit\Classes;
 
+use Elv\Kit\Models\Settings;
 use Elv\Kit\Models\Slot;
 
 /**
- * Slots — услуги демо-бронирования и сетка свободного времени.
+ * Slots — услуги записи и сетка свободного времени.
  *
  * Слоты лежат в базе, потому что `taken` меняется при брони. Сетку на
  * странице строим только из существующих строк: пустых «нарисованных»
@@ -12,6 +13,11 @@ use Elv\Kit\Models\Slot;
 class Slots
 {
     public static function services(): array
+    {
+        return static::parseServices((string) Settings::get('booking_services'));
+    }
+
+    public static function configServices(): array
     {
         $path = base_path('plugins/elv/kit/config/booking.php');
 
@@ -22,6 +28,85 @@ class Slots
         $services = require $path;
 
         return is_array($services) ? $services : [];
+    }
+
+    public static function parseServices(string $raw): array
+    {
+        $services = [];
+
+        foreach (preg_split('/\R/u', $raw) ?: [] as $line) {
+            $line = trim($line);
+
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            $parts = array_map('trim', explode('|', $line));
+
+            if (count($parts) < 4) {
+                continue;
+            }
+
+            $code = preg_replace('/[^a-z0-9-]/', '', strtolower($parts[0]));
+            $name = static::clean($parts[1], 80);
+            $duration = (int) $parts[2];
+            $price = static::clean($parts[3], 60);
+
+            if ($code === '' || $name === '' || $duration < 5 || $duration > 480 || $price === '') {
+                continue;
+            }
+
+            $services[] = [
+                'code' => $code,
+                'name' => $name,
+                'duration' => $duration,
+                'price' => $price,
+                'description' => static::clean($parts[4] ?? '', 400),
+                'icon' => preg_replace('/[^a-z0-9-]/', '', strtolower($parts[5] ?? '')),
+            ];
+        }
+
+        return $services;
+    }
+
+    public static function servicesToLines(array $services): string
+    {
+        $lines = [];
+
+        foreach ($services as $service) {
+            $code = (string) ($service['code'] ?? '');
+            $name = static::clean((string) ($service['name'] ?? ''), 80);
+
+            if ($code === '' || $name === '') {
+                continue;
+            }
+
+            $description = static::clean((string) ($service['description'] ?? ''), 400);
+            $icon = preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($service['icon'] ?? '')));
+
+            $parts = [
+                $code,
+                $name,
+                (string) (int) ($service['duration'] ?? 0),
+                static::clean((string) ($service['price'] ?? ''), 60),
+            ];
+
+            if ($icon !== '') {
+                $parts[] = $description;
+                $parts[] = $icon;
+            } elseif ($description !== '') {
+                $parts[] = $description;
+            }
+
+            $lines[] = implode(' | ', $parts);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    protected static function clean(string $value, int $limit): string
+    {
+        return mb_substr(trim(str_replace('|', '/', strip_tags($value))), 0, $limit);
     }
 
     public static function service(string $code): ?array

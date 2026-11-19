@@ -127,3 +127,10 @@
     `calculator.htm`, `services.htm`, `services-seo.htm`), `FAQPage` в JSON-LD
     не добавляется. Наш текст в `Faq::items()` как фолбэк — дефект. Проверка:
     `tools/seo-check.php` в `node tools/check-php.mjs`.
+13. Услуги записи — из настроек (`booking_services`, вкладка «Запись»): формат
+    `код | название | минут | цена | описание | иконка`, длительность 5–480,
+    код латиницей. `config/booking.php` — только демо-датасет для
+    `elv:kit:demo`. Пустое поле → `/booking/` показывает «Запись временно
+    недоступна», чат не перечисляет услуги; чужие цены («120 BYN») в коде
+    плагина — дефект. Проверка: `tools/booking-check.php` в
+    `node tools/check-php.mjs`.

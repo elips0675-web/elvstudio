@@ -126,6 +126,19 @@ class Demo
     }
 
     /**
+     * bookingServices — переносит демо-услуги записи из config/booking.php
+     * в настройки, если владелец их ещё не задал.
+     */
+    public static function bookingServices(): void
+    {
+        $lines = Slots::servicesToLines(Slots::configServices());
+
+        if ($lines !== '' && (string) \Elv\Kit\Models\Settings::get('booking_services') === '') {
+            \Elv\Kit\Models\Settings::set('booking_services', $lines);
+        }
+    }
+
+    /**
      * slots — генерирует сетку для всех услуг демо-бронирования.
      */    public static function slots(int $days = 21): int
     {

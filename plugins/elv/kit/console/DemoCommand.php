@@ -45,6 +45,8 @@ class DemoCommand extends Command
             ));
         }
 
+        Demo::bookingServices();
+
         $slots = Demo::slots($days);
         $pruned = Slots::prune();
 

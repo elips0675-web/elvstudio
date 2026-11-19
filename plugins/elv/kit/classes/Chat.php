@@ -592,7 +592,7 @@ class Chat
             return '';
         }
 
-        $lines = ["\nВ демо-записи:"];
+        $lines = ["\nУслуги для записи:"];
 
         foreach ($services as $service) {
             $lines[] = '• ' . $service['name'] . ' — ' . $service['duration'] . ' мин, ' . $service['price'] . '.';
