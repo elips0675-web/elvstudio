@@ -93,6 +93,8 @@ class Demo
     {
         $defaults = [
             'email' => 'sales@example.com',
+            'chat_services' => "Хостинг и запуск\nПоддержка сайта\nМодули и плагины October CMS\nСайт с онлайн-записью\nБесплатный аудит\nSEO-продвижение",
+            'chat_services_url' => '/services/',
         ];
 
         foreach ($defaults as $key => $value) {

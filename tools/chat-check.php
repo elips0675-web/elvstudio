@@ -7,6 +7,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Chat;
 use Elv\Kit\Classes\TextFilter;
+use Elv\Kit\Models\Settings;
 
 $errors = [];
 
@@ -53,16 +54,37 @@ $check(str_contains($empty['answer'], 'подробнее'), 'empty message does
 $long = Chat::answer(str_repeat('а', 10000));
 $check(is_array($long) && $long['rejected'] === true, 'long nonsense is not rejected');
 
-$services = Chat::answer('какие услуги вы оказываете');
-$check(str_contains($services['answer'], 'Услуги Elv Studio'), 'studio services answer is missing');
-$check(str_contains((string) ($services['link']['url'] ?? ''), '/services'), 'studio services link is missing');
-$check(!str_contains($services['answer'], 'В демо-записи'), 'studio services answer mixes booking services');
+$settingsModel = Settings::instance();
+$servicesBackup = $settingsModel->getAttribute('chat_services');
+$servicesUrlBackup = $settingsModel->getAttribute('chat_services_url');
+
+$settingsModel->forceFill(['chat_services' => '', 'chat_services_url' => '']);
+
+$neutral = Chat::answer('какие услуги вы оказываете');
+$check(!str_contains($neutral['answer'], 'Elv Studio'), 'empty services still advertise the studio');
+$check(($neutral['link'] ?? null) === null, 'empty services must not add a link');
+$check(str_contains($neutral['answer'], 'обратной связи'), 'empty services do not point to feedback');
+$check(!str_contains($neutral['answer'], 'В демо-записи'), 'services answer mixes booking services');
+
+$neutralAudit = Chat::answer('аудит сайта');
+$check(($neutralAudit['link'] ?? null) === null, 'audit without configured services must not link');
+
+$settingsModel->forceFill(['chat_services' => "Стрижка\nМаникюр", 'chat_services_url' => '/uslugi/']);
+
+$custom = Chat::answer('какие услуги вы оказываете');
+$check(str_contains($custom['answer'], 'Стрижка') && str_contains($custom['answer'], 'Маникюр'), 'configured services are not listed');
+$check(str_contains((string) ($custom['link']['url'] ?? ''), '/uslugi'), 'configured services link is not used');
+$check(str_ends_with((string) ($custom['link']['url'] ?? ''), '/'), 'configured services link lost the trailing slash');
+
+$settingsModel->forceFill(['chat_services' => "Стрижка\nМаникюр\nаудит"]);
+$audit = Chat::answer('аудит сайта');
+$check(str_contains((string) ($audit['link']['url'] ?? ''), '/uslugi'), 'audit link is missing when audit is listed');
+$check(str_contains($audit['answer'], 'аудит'), 'audit answer is missing');
+
+$settingsModel->forceFill(['chat_services' => $servicesBackup, 'chat_services_url' => $servicesUrlBackup]);
 
 $booking = Chat::answer('записаться на услугу');
 $check(str_contains($booking['answer'], 'Онлайн-запись'), 'booking answer is missing');
-
-$audit = Chat::answer('аудит сайта');
-$check(str_contains((string) ($audit['link']['url'] ?? ''), '/services/audit'), 'audit link is missing');
 
 $contact = Chat::answer('связаться с вами');
 $check($contact['rejected'] === false, 'contact request is rejected');

@@ -179,15 +179,21 @@ class Chat
         }
 
         if (static::has($text, ['аудит'])) {
-            return static::reply(
-                'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
-                ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
-                static::link('Бесплатный аудит', '/services/audit/')
-            );
+            $services = static::servicesText();
+
+            if ($services !== '' && mb_stripos($services, 'аудит') !== false) {
+                return static::reply(
+                    'Бесплатный аудит: проверяем скорость, SEO и безопасность сайта, показываем, что исправить в первую очередь.',
+                    ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'],
+                    static::servicesLink('Бесплатный аудит')
+                );
+            }
+
+            return static::servicesReply();
         }
 
         if (static::has($text, ['услуг'])) {
-            return static::reply(static::studioServicesText(), ['Сколько стоит?', 'Что входит в Kit?', 'Написать нам'], static::link('Услуги Elv Studio', '/services/'));
+            return static::servicesReply();
         }
 
         if (static::has($text, ['заказ', 'магазин', 'корзин', 'покупк', 'купить', 'shop'])) {
@@ -434,7 +440,13 @@ class Chat
 
     protected static function link(string $label, string $path): array
     {
-        return ['label' => $label, 'url' => url($path)];
+        $url = url($path);
+
+        if (str_ends_with($path, '/')) {
+            $url = rtrim($url, '/') . '/';
+        }
+
+        return ['label' => $label, 'url' => $url];
     }
 
     protected static function normalize(string $text): string
@@ -527,9 +539,49 @@ class Chat
         return static::modulesText();
     }
 
-    protected static function studioServicesText(): string
+    protected static function servicesText(): string
     {
-        return 'Услуги Elv Studio: хостинг и запуск, поддержка сайта, модули и плагины October CMS, сайт с онлайн-записью, бесплатный аудит и SEO-продвижение.';
+        $raw = (string) Settings::get('chat_services');
+        $lines = [];
+
+        foreach (preg_split('/\R/u', $raw) ?: [] as $line) {
+            $line = trim((string) preg_replace('/^\s*[-•*]\s*/u', '', trim($line)));
+
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
+        return implode('; ', $lines);
+    }
+
+    protected static function servicesLink(string $label = 'Услуги сайта'): ?array
+    {
+        $url = trim((string) Settings::get('chat_services_url'));
+
+        if ($url === '' || $url[0] !== '/' || strlen($url) > 200) {
+            return null;
+        }
+
+        return static::link($label, $url);
+    }
+
+    protected static function servicesReply(): array
+    {
+        $services = static::servicesText();
+
+        if ($services === '') {
+            return static::reply(
+                'Список услуг на сайте не заполнен. Напишите в форме обратной связи — ответим и подскажем, что подойдёт.',
+                ['Сколько стоит?', 'Написать нам']
+            );
+        }
+
+        return static::reply(
+            'Услуги сайта: ' . $services . '.',
+            ['Сколько стоит?', 'Написать нам'],
+            static::servicesLink()
+        );
     }
 
     protected static function bookingServicesText(): string

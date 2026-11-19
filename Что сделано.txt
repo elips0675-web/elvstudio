@@ -6,6 +6,60 @@
 
 ---
 
+(Stage 71 - 19.11.2026) - **Консультант перечисляет услуги из настроек, а не наши.**
+
+Что было: `Chat::studioServicesText()` (было `Chat.php:530-533`) возвращал
+зашитую строку «Услуги Elv Studio: хостинг и запуск…», а ветка «услуги»
+всегда ставила ссылку `/services/` (`Chat.php:189-191`). Ветка «аудит»
+ссылалась на `/services/audit/` безусловно. Покупатель получал сайт, где
+консультант продаёт услуги Elv Studio.
+
+Что сделано:
+- Настройки (`models/settings/fields.yaml:59-69`), вкладка «Виджет»:
+  `chat_services` — услуги по одной в строке, `chat_services_url` — ссылка на
+  страницу услуг (принимается только путь с `/`, короче 200 символов).
+- `Chat.php:542-585` — `servicesText()` собирает список из настроек (маркеры
+  `-`/`•`/`*` в начале строки срезаются), `servicesLink()` отдаёт ссылку
+  только из настроек, `servicesReply()` при пустом списке отвечает «Список
+  услуг на сайте не заполнен. Напишите в форме обратной связи…» — без ссылки
+  и без упоминания студии.
+- `Chat.php:181-193` — ветка «аудит»: рассказывает про аудит и даёт ссылку,
+  только если аудит есть в списке услуг; иначе отвечает как «услуги».
+- `Chat.php:441-450` — `link()` сохраняет завершающий слэш: `url('/pricing/')`
+  возвращал `/pricing`, и каждая ссылка чата уходила в лишний 301. Теперь
+  `/pricing/`, `/modules/`, `/blog/`, `/docs/`, `/kit/`, `/services/` —
+  канонические адреса.
+- `Demo.php:96-97` — `elv:kit:demo` заполняет `chat_services` и
+  `chat_services_url` демо-значениями, только если поля пустые. На стенде
+  выполнено `php artisan elv:kit:demo --days=1`.
+- `tools/chat-check.php:57-84` — проверки: пустой список → нет «Elv Studio»,
+  нет ссылки, есть «обратной связи»; заданный список («Стрижка», «Маникюр») →
+  перечислен, ссылка `/uslugi/` со слэшем; аудит в списке → ссылка есть.
+  Настройки меняются через `Settings::instance()->forceFill()` в памяти: БД
+  не мутирует (сверено `system_settings` до и после прогона).
+- `tools/check-chat.mjs` и `tools/gate.mjs:13` — `chat-check.php` в общем
+  гейте; PHP ищется по `PHP_BIN`, затем `php` в PATH, затем Laragon.
+
+Проверка: `node tools/check-chat.mjs` → `OK: chat checks passed`;
+`node tools/gate.mjs` → `all gates passed` (check-blog, check-seo,
+check-console — 111 страниц, perf p90 144 мс). Живой стенд 8090:
+`POST /chat {"message":"какие услуги вы оказываете"}` → «Услуги сайта: Хостинг
+и запуск; …», ссылка `http://localhost:8090/services/`; `{"message":"аудит
+сайта"}` → `/services/`; `{"message":"сколько стоит"}` → `/pricing/`.
+
+Обратная подстановка (три ломки, все красные, код возвращён):
+1. `servicesReply()` возвращает зашитый «Услуги Elv Studio» → 4 FAIL
+   (`empty services still advertise the studio`, `…must not add a link`,
+   `…do not point to feedback`, `audit…must not link`).
+2. `servicesText()` игнорирует настройки (пустой `$raw`) → 4 FAIL
+   (`configured services are not listed`, `…link is not used`, аудит).
+3. `link()` не восстанавливает слэш → 1 FAIL (`…lost the trailing slash`).
+
+Не проверено: FAQ (`config/faq.php`, `config/post-faq.php`) и блог
+(`BlogContent.php`) остаются демо-контентом — это вторая часть P0.
+
+---
+
 (Stage 70 - 19.11.2026) - **OPcache в старте: TTFB 383 → 115 мс, Performance 100 пять прогонов подряд.**
 
 Что было: `запуск.bat` поднимал `php artisan serve` без OPcache
