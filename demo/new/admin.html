@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Превью админки — Elv Kit (демо стилей)</title>
+<meta name="description" content="Статичное превью админки Elv Kit: заказы, лицензии, заявки и статьи. Без входа и без функционала.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/demo.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">К содержанию</a>
+
+<div class="demo-bar"><strong>Демо стилей</strong> Статический макет: данные примерные, кнопки внутри панели не нажимаются.</div>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">E</span>
+            <span class="brand-text">Elv Kit<small>витрина и шаблон на October CMS</small></span>
+        </a>
+
+        <nav class="nav" aria-label="Главное меню">
+            <a href="index.html#products">Elv Kit</a>
+            <a href="index.html#products">Шаблон October CMS</a>
+            <a href="index.html#pricing">Тарифы</a>
+            <a href="admin.html" aria-current="page">Демо админки</a>
+            <a href="index.html#faq">Блог</a>
+            <a href="index.html#faq">Документация</a>
+        </nav>
+
+        <button class="header-search" type="button" aria-label="Поиск по сайту">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </button>
+
+        <a class="btn btn--primary btn--sm header-cta" href="index.html#pricing">Купить</a>
+    </div>
+</header>
+
+<main id="main">
+    <div class="container">
+        <nav class="breadcrumbs" aria-label="Хлебные крошки">
+            <a href="index.html">Главная</a><span>/</span><span>Демо админки</span>
+        </nav>
+    </div>
+
+    <section class="section section--tight">
+        <div class="container">
+            <span class="eyebrow">Демонстрация</span>
+            <h1>Превью админки</h1>
+            <p class="lead" style="max-width:72ch">
+                Так выглядит рабочий экран владельца витрины: заказы, покупатели и статусы оплаты.
+                Данные ниже — пример. Вход, редактирование и оплата отключены.
+            </p>
+
+            <p class="note mt-24">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+                <span><strong>Демо.</strong> Это статичная картинка интерфейса, а не работающая админка. Кнопки внутри панели не нажимаются, данные не сохраняются.</span>
+            </p>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <div class="admin">
+                <aside class="admin-side">
+                    <p>Elv Kit</p>
+                    <a class="is-active" href="#main">Заказы</a>
+                    <a href="#main">Лицензии</a>
+                    <a href="#main">Товары</a>
+                    <a href="#main">Тарифы</a>
+                    <a href="#main">Заявки</a>
+                    <a href="#main">Статьи</a>
+                    <a href="#main">Настройки</a>
+                </aside>
+
+                <div class="admin-main">
+                    <div class="admin-top">
+                        <h2>Заказы</h2>
+                        <span class="badge badge--accent">пример данных</span>
+                    </div>
+
+                    <div class="admin-kpis">
+                        <div class="kpi"><b>128</b><span>заказов за месяц</span></div>
+                        <div class="kpi"><b>94</b><span>оплачено</span></div>
+                        <div class="kpi"><b>12</b><span>ждут письма</span></div>
+                    </div>
+
+                    <div class="admin-tools">
+                        <span class="admin-search">Поиск по e-mail или номеру заказа</span>
+                        <span class="badge badge--line">Все статусы</span>
+                        <span class="badge badge--line">За месяц</span>
+                    </div>
+
+                    <div class="table-wrap" tabindex="0">
+                        <table>
+                            <thead>
+                                <tr><th>Заказ</th><th>Покупатель</th><th>Тариф</th><th>Сумма</th><th>Статус</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#1042</td><td>studio@example.com</td><td>До 5 сайтов</td><td>— ₽</td>
+                                    <td><span class="badge badge--ok">Оплачен</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#1041</td><td>hello@example.com</td><td>Один сайт</td><td>— ₽</td>
+                                    <td><span class="badge badge--ok">Оплачен</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#1040</td><td>client@example.com</td><td>Один сайт</td><td>— ₽</td>
+                                    <td><span class="badge badge--warn">Ожидает оплаты</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#1039</td><td>agency@example.com</td><td>Без ограничений</td><td>— ₽</td>
+                                    <td><span class="badge badge--accent">Ключ выдан</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#1038</td><td>user@example.com</td><td>Один сайт</td><td>— ₽</td>
+                                    <td><span class="badge badge--danger">Отменён</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="tiny muted mt-16 mb-0">
+                        Демонстрационные данные. Суммы не заполнены: в боевой витрине они берутся из тарифов.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Что посмотреть</span>
+                <h2>Что можно проверить в демо</h2>
+                <p>Ни один пункт не требует регистрации и не отправляет данные.</p>
+            </div>
+
+            <div class="grid grid--3">
+                <article class="card card--hover card--stack">
+                    <h3>Витрину</h3>
+                    <p class="muted small">Главная, два продукта, тарифы и сравнение.</p>
+                    <p class="card__foot mb-0"><a href="index.html">Открыть главную →</a></p>
+                </article>
+                <article class="card card--hover card--stack">
+                    <h3>Компоненты</h3>
+                    <p class="muted small">Кнопки, бейджи, карточки, таблицы и формы.</p>
+                    <p class="card__foot mb-0"><a href="components.html">Открыть компоненты →</a></p>
+                </article>
+                <article class="card card--hover card--stack">
+                    <h3>Оформление</h3>
+                    <p class="muted small">Состав заказа, тариф и согласия. Оплата не подключена.</p>
+                    <p class="card__foot mb-0"><a href="index.html#pricing">Открыть тарифы →</a></p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="container">
+            <div class="cta-band">
+                <div>
+                    <h2>Нужен доступ к настоящей админке?</h2>
+                    <p>В рабочей версии — по запросу, с отдельным демо-стендом и тестовыми данными.</p>
+                </div>
+                <div class="btn-row">
+                    <a class="btn btn--light" href="index.html#faq">Написать</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <p class="footer-brand">Elv Kit</p>
+            <p class="muted small">Витрина цифровых товаров и универсальный шаблон сайта на October CMS. Формы, оплата и бронирование в этом макете отключены.</p>
+        </div>
+        <div>
+            <p class="footer-title">Продукт</p>
+            <ul class="footer-list">
+                <li><a href="index.html#products">Что входит</a></li>
+                <li><a href="index.html#pricing">Тарифы</a></li>
+                <li><a href="index.html#faq">Вопросы</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Демо</p>
+            <ul class="footer-list">
+                <li><a href="admin.html">Админка</a></li>
+                <li><a href="components.html">Компоненты</a></li>
+                <li><a href="index.html">Главная</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Услуги студии</p>
+            <ul class="footer-list">
+                <li><a href="index.html#faq">Хостинг</a></li>
+                <li><a href="index.html#faq">Поддержка</a></li>
+                <li><a href="index.html#faq">Аудит сайта</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <p>© 2026 Elv Kit · демо стилей, без функционала оплаты</p>
+        <p>October CMS 4.4 · PHP 8.2+</p>
+    </div>
+</footer>
+
+</body>
+</html>

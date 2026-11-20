@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elv Kit — стилевые компоненты (демо)</title>
+<meta name="description" content="Страница компонентов нового оформления: палитра, типографика, кнопки, бейджи, карточки, формы, тарифы, таблицы, подвал.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/demo.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">К содержанию</a>
+
+<div class="demo-bar"><strong>Демо стилей</strong> Страница компонентов: палитра, кнопки, карточки, формы.</div>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">E</span>
+            <span class="brand-text">Elv Kit<small>витрина и шаблон на October CMS</small></span>
+        </a>
+        <nav class="nav" aria-label="Главное меню">
+            <a href="index.html">Макет главной</a>
+            <a href="admin.html">Демо админки</a>
+            <a href="components.html" aria-current="page">Компоненты</a>
+        </nav>
+        <a class="btn btn--primary btn--sm header-cta" href="index.html">Купить</a>
+    </div>
+</header>
+
+<main id="main">
+
+    <section class="section section--tight">
+        <div class="container">
+            <span class="kicker">Компоненты</span>
+            <h1>Стилевые элементы витрины</h1>
+            <p class="lead">Всё, из чего собраны страницы: палитра, типографика, кнопки, бейджи, карточки, шаги, тарифы, таблицы и формы.</p>
+        </div>
+    </section>
+
+    <!-- Палитра -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <h2>Палитра</h2>
+                <p>Синий остаётся брендовым, фиолетовый добавляет живости в градиентах, бирюзовый — для галочек и акцентов.</p>
+            </div>
+
+            <div class="swatches">
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#1c5cf0"></div>
+                    <div class="swatch__meta"><b>Brand</b><code>#1c5cf0</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#7c3aed"></div>
+                    <div class="swatch__meta"><b>Violet</b><code>#7c3aed</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#16c2a3"></div>
+                    <div class="swatch__meta"><b>Accent</b><code>#16c2a3</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#0f172a"></div>
+                    <div class="swatch__meta"><b>Ink</b><code>#0f172a</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#f7f8fc"></div>
+                    <div class="swatch__meta"><b>Background</b><code>#f7f8fc</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:#fbfaff"></div>
+                    <div class="swatch__meta"><b>Footer</b><code>#fbfaff</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:linear-gradient(135deg,#2563eb 0%,#7c3aed 58%,#9333ea 100%)"></div>
+                    <div class="swatch__meta"><b>Gradient</b><code>blue → violet</code></div>
+                </div>
+                <div class="swatch">
+                    <div class="swatch__color" style="background:linear-gradient(135deg,#10b981,#16a34a)"></div>
+                    <div class="swatch__meta"><b>Gradient green</b><code>#10b981 → #16a34a</code></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Типографика -->
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <h2>Типографика</h2>
+                <p>Одна гарнитура, крупные заголовки с плотным трекингом, спокойный основной текст.</p>
+            </div>
+
+            <div class="card">
+                <h1>Сайт, который принимает записи и заказы</h1>
+                <h2>Два продукта на одной платформе</h2>
+                <h3>Онлайн-запись без накладок</h3>
+                <h4>Что входит в комплект</h4>
+                <p class="lead">Лид-абзац: крупнее основного текста, цвет приглушённый.</p>
+                <p>Основной текст: 16 px, интерлиньяж 1.65, цвет <code>#334155</code>. Ссылка выглядит <a href="#main">вот так</a>, а код — <code>elv_plan_label()</code>.</p>
+                <p class="muted">Приглушённый текст для пояснений и подписей.</p>
+                <p class="small">Мелкий текст 14 px — для карточек и таблиц.</p>
+                <p class="tiny mb-0">Совсем мелкий 12.5 px — для сносок и подписей под графикой.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Кнопки и бейджи -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <h2>Кнопки и бейджи</h2>
+                <p>Основное действие — градиент, второстепенное — белая кнопка с рамкой, третье — текстовая.</p>
+            </div>
+
+            <div class="card">
+                <div class="btn-row">
+                    <a class="btn btn--primary" href="#main">Купить</a>
+                    <a class="btn btn--secondary" href="#main">Смотреть демо</a>
+                    <a class="btn btn--ghost" href="#main">Подробнее</a>
+                    <button class="btn btn--primary btn--sm" type="button">Маленькая</button>
+                    <button class="btn btn--primary btn--lg" type="button">Крупная</button>
+                    <button class="btn" type="button" disabled>Недоступна</button>
+                </div>
+
+                <div class="btn-row mt-24">
+                    <span class="badge">Нейтральный</span>
+                    <span class="badge badge--ok">Почти готов</span>
+                    <span class="badge badge--warn">В разработке</span>
+                    <span class="badge badge--accent">Выбирают чаще</span>
+                    <span class="badge badge--line">28 страниц</span>
+                </div>
+            </div>
+
+            <div class="cta-band mt-24">
+                <div>
+                    <h2>Кнопки на градиентной полосе</h2>
+                    <p>Белая кнопка и прозрачная с белым текстом.</p>
+                </div>
+                <div class="btn-row">
+                    <a class="btn btn--light" href="#main">Превью админки</a>
+                    <a class="btn btn--ghost" href="#main">Инструкция</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Карточки -->
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <h2>Карточки</h2>
+                <p>Белые, с мягкой тенью и подъёмом при наведении. Иконки — в градиентных квадратах, по цвету модуля.</p>
+            </div>
+
+            <div class="grid grid--4">
+                <article class="card card--hover">
+                    <div class="card__icon"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+                    <h3>Запись</h3>
+                    <p class="muted small">Синий градиент — основной.</p>
+                </article>
+                <article class="card card--hover">
+                    <div class="card__icon is-green"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6"/></svg></div>
+                    <h3>Блог</h3>
+                    <p class="muted small">Зелёный — контент.</p>
+                </article>
+                <article class="card card--hover">
+                    <div class="card__icon is-orange"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18l-2 13H5L3 7z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg></div>
+                    <h3>Заказы</h3>
+                    <p class="muted small">Оранжевый — продажи.</p>
+                </article>
+                <article class="card card--hover">
+                    <div class="card__icon is-pink"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16v11H8l-4 4V5z"/></svg></div>
+                    <h3>Обратная связь</h3>
+                    <p class="muted small">Розовый — общение.</p>
+                </article>
+            </div>
+
+            <div class="grid grid--2 mt-24">
+                <article class="card">
+                    <h3>Что входит</h3>
+                    <ul class="list-check mt-16">
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Каталог и карточки товаров</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Оплата и выдача ZIP</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Лицензии и домены</li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <h3>Чего не делаем</h3>
+                    <ul class="list-check list-check--no mt-16">
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg> Не обещаем кабинет, которого нет</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg> Не рисуем цены без админки</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg> Не продаём несуществующий бандл</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Шаги -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <h2>Шаги</h2>
+                <p>Номера в градиентных кружках — вместо скучного списка.</p>
+            </div>
+
+            <ol class="steps">
+                <li><b>Выбирает товар и тариф</b> Каталог редактируется в админке: название, цена, число доменов.</li>
+                <li><b>Оформляет заказ</b> Форма принимает e-mail и тариф.</li>
+                <li><b>Оплачивает</b> ЮKassa или Stripe, статус по подписи шлюза.</li>
+                <li><b>Получает ключ и архив</b> Ссылка по токену работает только для оплаченного заказа.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Тарифы и таблица -->
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <h2>Тарифы</h2>
+                <p>Featured-карточка выделена градиентной рамкой, цена не выдумана — «задаётся в админке».</p>
+            </div>
+
+            <div class="price-grid">
+                <div class="price-card">
+                    <span class="price-card__label">Тариф</span>
+                    <h3>Один сайт</h3>
+                    <p class="price-card__desc">Один боевой домен.</p>
+                    <div class="price-card__value">— ₽<small>цена задаётся в админке</small></div>
+                    <ul>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> 1 домен</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> 12 месяцев обновлений</li>
+                    </ul>
+                    <a class="btn btn--secondary btn--block" href="#main">Выбрать</a>
+                </div>
+                <div class="price-card price-card--featured">
+                    <span class="price-card__tag">Выбирают чаще</span>
+                    <span class="price-card__label">Тариф</span>
+                    <h3>До 5 сайтов</h3>
+                    <p class="price-card__desc">До пяти клиентских проектов.</p>
+                    <div class="price-card__value">— ₽<small>цена задаётся в админке</small></div>
+                    <ul>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> До 5 доменов</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Приоритетная поддержка</li>
+                    </ul>
+                    <a class="btn btn--primary btn--block" href="#main">Выбрать</a>
+                </div>
+            </div>
+
+            <div class="table-wrap mt-24">
+                <table>
+                    <thead>
+                        <tr><th>Возможность</th><th>Один сайт</th><th>До 5 сайтов</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Домены</td><td>1</td><td>5</td></tr>
+                        <tr><td>Обновления</td><td>12 месяцев</td><td>12 месяцев</td></tr>
+                        <tr><td>Поддержка</td><td>30 дней</td><td>90 дней</td></tr>
+                        <tr><td>Выдача ZIP</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Формы -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <h2>Формы</h2>
+                <p>Поля с фиолетовым фокусом, понятные подписи и подсказки. Ничего лишнего.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <div class="card">
+                    <form class="form" action="#main" method="post">
+                        <div class="form-row">
+                            <div class="field">
+                                <label for="f-name">Имя</label>
+                                <input id="f-name" type="text" placeholder="Как к вам обращаться">
+                            </div>
+                            <div class="field">
+                                <label for="f-email">E-mail</label>
+                                <input id="f-email" type="email" placeholder="mail@example.com">
+                                <span class="hint">Ключ и ссылка на архив придут на этот адрес.</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="f-plan">Тариф</label>
+                            <select id="f-plan">
+                                <option>Один сайт</option>
+                                <option>До 5 сайтов</option>
+                                <option>Без ограничений</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="f-note">Комментарий</label>
+                            <textarea id="f-note" placeholder="Домен, пожелания, вопросы"></textarea>
+                        </div>
+                        <label class="check">
+                            <input type="checkbox">
+                            <span>Принимаю оферту и понимаю, что цифровой товар возврату не подлежит после выдачи ключа.</span>
+                        </label>
+                        <button class="btn btn--primary" type="button">Оформить заказ</button>
+                    </form>
+                </div>
+
+                <div>
+                    <p class="note">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+                        <span><strong>Подсказка.</strong> Продукт на русском языке, нужен October CMS 4.4+ и PHP 8.2+. Ключ и ссылка приходят на e-mail сразу после оплаты.</span>
+                    </p>
+
+                    <p class="note note--violet mt-16">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg>
+                        <span><strong>Честность.</strong> Пустая база — «Прайс пока пуст», а не выдуманная цена. Неизвестный товар — 404, а не заглушка.</span>
+                    </p>
+
+                    <div class="card mt-16">
+                        <h3>Заголовок карточки</h3>
+                        <p class="muted mb-0">Карточки одинаково работают и в сетке на три колонки, и в одну на мобильном.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <p class="footer-brand">Elv Kit</p>
+            <p class="muted small">Светлый подвал с градиентной полосой сверху, четыре колонки и нижняя строка с копирайтом.</p>
+        </div>
+        <div>
+            <p class="footer-title">Продукт</p>
+            <ul class="footer-list">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="index.html#pricing">Тарифы</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Документы</p>
+            <ul class="footer-list">
+                <li><a href="index.html#faq">Вопросы</a></li>
+                <li><a href="admin.html">Демо админки</a></li>
+                <li><a href="components.html">Компоненты</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Услуги студии</p>
+            <ul class="footer-list">
+                <li><a href="index.html">Хостинг</a></li>
+                <li><a href="index.html">SEO</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <p>© 2026 Elv Kit · демо стилей</p>
+        <p>October CMS 4.4 · PHP 8.2+</p>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elv Kit — демо нового оформления (только стили)</title>
+<meta name="description" content="Статический макет нового оформления витрины Elv Kit: светлая база, градиентные акценты, светлый подвал, два продукта на одном экране.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/demo.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">К содержанию</a>
+
+<div class="demo-bar"><strong>Демо стилей</strong> Статический макет: только внешний вид, формы и оплата не работают.</div>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true">E</span>
+            <span class="brand-text">Elv Kit<small>витрина и шаблон на October CMS</small></span>
+        </a>
+
+        <nav class="nav" aria-label="Главное меню">
+            <a href="#products">Elv Kit</a>
+            <a href="#products">Шаблон October CMS</a>
+            <a href="#pricing">Тарифы</a>
+            <a href="#demo">Модули</a>
+            <a href="admin.html">Демо админки</a>
+            <a href="#faq">Блог</a>
+        </nav>
+
+        <button class="header-search" type="button" aria-label="Поиск по сайту">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </button>
+
+        <a class="btn btn--primary btn--sm header-cta" href="#pricing">Купить</a>
+    </div>
+</header>
+
+<main id="main">
+
+    <!-- 1. Первый экран: два продукта, светлый фон, градиентный акцент -->
+    <section class="hero">
+        <div class="container hero__grid">
+            <div>
+                <span class="eyebrow">October CMS 4.4 · PHP 8.2+ · только RU</span>
+                <h1>Витрина цифровых товаров и <em>шаблон сайта</em> — два продукта на одной платформе</h1>
+                <p class="lead">
+                    Elv Kit продаёт ваши шаблоны, плагины и архивы: каталог, оплата, лицензии и выдача файлов.
+                    Универсальный шаблон — 110 страниц для сайта услуг, каталога и записи. Покупайте по отдельности или оба.
+                </p>
+
+                <div class="hero__chips">
+                    <span class="hero__chip"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg> Запись без накладок</span>
+                    <span class="hero__chip"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg> Оплата и выдача ZIP</span>
+                    <span class="hero__chip"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> SEO и быстрая загрузка</span>
+                </div>
+
+                <div class="hero__actions">
+                    <a class="btn btn--primary btn--lg" href="#products">Что входит в комплект</a>
+                    <a class="btn btn--secondary btn--lg" href="#demo">Посмотреть демо</a>
+                </div>
+
+                <div class="hero__note">
+                    <span><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Сайт на вашем домене</span>
+                    <span><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Данные остаются у вас</span>
+                    <span><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Без подписки</span>
+                </div>
+            </div>
+
+            <div class="mock" aria-hidden="true">
+                <div class="mock__bar">
+                    <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
+                    <span class="mock__url">example.com/admin</span>
+                </div>
+                <div class="mock__body">
+                    <div class="mock__side">
+                        <span class="mock__nav is-active"></span>
+                        <span class="mock__nav"></span>
+                        <span class="mock__nav"></span>
+                        <span class="mock__nav"></span>
+                        <span class="mock__nav"></span>
+                    </div>
+                    <div class="mock__main">
+                        <div class="mock__tiles">
+                            <div class="mock__tile"><b>128</b><span>заказов</span></div>
+                            <div class="mock__tile"><b>34</b><span>записи</span></div>
+                            <div class="mock__tile"><b>12</b><span>статей</span></div>
+                        </div>
+                        <table class="mini-table">
+                            <thead>
+                                <tr><th>Заказ</th><th>Тариф</th><th>Статус</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>#1042</td><td>Один сайт</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
+                                <tr><td>#1041</td><td>До 5 сайтов</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
+                                <tr><td>#1040</td><td>Один сайт</td><td><span class="badge badge--warn">Ожидает</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="mock__foot">Ключи и архивы выдаются автоматически после подтверждения оплаты.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Два продукта — главный блок, которого сейчас не хватает -->
+    <section class="section" id="products">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Два продукта</span>
+                <h2>Одна витрина — два готовых продукта</h2>
+                <p>Витрина продаёт сама себя и второй продукт: универсальный шаблон сайта на October CMS. Это независимые вещи, их можно купить по отдельности.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <article class="card card--hover card--center card--stack">
+                    <div class="card__icon" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18l-2 13H5L3 7z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+                    </div>
+                    <h3>Elv Kit — движок витрины</h3>
+                    <p class="muted">Тема и плагин для продажи цифровых товаров: каталог, тарифы, приём оплаты, лицензионные ключи и выдача ZIP-архивов после покупки.</p>
+                    <div class="card-meta">
+                        <span class="badge badge--ok">Почти готов</span>
+                        <span class="badge badge--line">28 страниц</span>
+                        <span class="badge badge--line">RU</span>
+                    </div>
+                    <p class="card__foot mb-0"><a href="#pricing">Что входит в комплект →</a></p>
+                </article>
+
+                <article class="card card--hover card--center card--stack">
+                    <div class="card__icon is-green" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
+                    </div>
+                    <h3>Универсальный шаблон сайта</h3>
+                    <p class="muted">Многостраничный шаблон для корпоративного сайта, каталога услуг и онлайн-записи. Ставится на October CMS отдельно, витрина для него не нужна.</p>
+                    <div class="card-meta">
+                        <span class="badge badge--warn">В разработке</span>
+                        <span class="badge badge--line">110 страниц</span>
+                        <span class="badge badge--line">RU</span>
+                    </div>
+                    <p class="card__foot mb-0"><a href="#faq">Что уже готово →</a></p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Путь покупателя -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Как это работает</span>
+                <h2>Путь покупателя: от каталога до архива</h2>
+                <p>Четыре шага, которые уже есть в коде: без сторонних сервисов и ручной выдачи файлов.</p>
+            </div>
+
+            <ol class="steps">
+                <li>
+                    <b>Покупатель выбирает товар и тариф</b>
+                    Каталог и карточки товаров редактируются в админке: название, описание, состав, цена, число доменов.
+                </li>
+                <li>
+                    <b>Оформляет заказ</b>
+                    Форма принимает e-mail и тариф. В демо-режиме оплата не подключена и заказ не создаётся.
+                </li>
+                <li>
+                    <b>Оплачивает</b>
+                    ЮKassa или Stripe. Статус приходит по подписи платёжного шлюза, повторное событие не выдаёт файл дважды.
+                </li>
+                <li>
+                    <b>Получает ключ и архив</b>
+                    Лицензионный ключ привязан к домену, ссылка на ZIP выдаётся по токену и работает только для оплаченного заказа.
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 4. Модули -->
+    <section class="section" id="demo">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Модули</span>
+                <h2>Что уже работает внутри</h2>
+                <p>Четыре модуля, которые продаются вместе с витриной: запись, заказы, обратная связь и блог.</p>
+            </div>
+
+            <div class="grid grid--4">
+                <article class="card card--hover card--center">
+                    <div class="card__icon is-sky" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+                    </div>
+                    <h3>Запись</h3>
+                    <p class="muted small">Слоты, услуги и защита от двойного бронирования на уровне базы.</p>
+                </article>
+
+                <article class="card card--hover card--center">
+                    <div class="card__icon is-orange" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18l-2 13H5L3 7z"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+                    </div>
+                    <h3>Заказы и оплата</h3>
+                    <p class="muted small">Каталог, тарифы, заказы и выдача цифровых товаров после оплаты.</p>
+                </article>
+
+                <article class="card card--hover card--center">
+                    <div class="card__icon is-pink" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5z"/></svg>
+                    </div>
+                    <h3>Обратная связь</h3>
+                    <p class="muted small">Формы с антиспамом, запись в базу и письма через очередь.</p>
+                </article>
+
+                <article class="card card--hover card--center">
+                    <div class="card__icon is-green" aria-hidden="true">
+                        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+                    </div>
+                    <h3>Блог</h3>
+                    <p class="muted small">Статьи, рубрики, RSS и разметка BlogPosting для поиска.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Тарифы -->
+    <section class="section section--alt" id="pricing">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Тарифы</span>
+                <h2>Лицензия на проект, обновления — на год</h2>
+                <p>Цены задаются в админке витрины. В демо они не заполнены намеренно: выдуманных чисел здесь нет.</p>
+            </div>
+
+            <div class="price-grid">
+                <div class="price-card">
+                    <span class="price-card__label">Тариф</span>
+                    <h3>Один сайт</h3>
+                    <p class="price-card__desc">Один боевой домен, свой проект.</p>
+                    <div class="price-card__value">— ₽<small>цена задаётся в админке</small></div>
+                    <ul>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> 1 домен</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> 12 месяцев обновлений</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Поддержка 30 дней</li>
+                    </ul>
+                    <a class="btn btn--secondary btn--block" href="#pricing">Выбрать</a>
+                </div>
+
+                <div class="price-card price-card--featured">
+                    <span class="price-card__tag">Выбирают чаще</span>
+                    <span class="price-card__label">Тариф</span>
+                    <h3>До 5 сайтов</h3>
+                    <p class="price-card__desc">До пяти клиентских проектов.</p>
+                    <div class="price-card__value">— ₽<small>цена задаётся в админке</small></div>
+                    <ul>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> До 5 доменов</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> 12 месяцев обновлений</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Приоритетная поддержка 90 дней</li>
+                    </ul>
+                    <a class="btn btn--primary btn--block" href="#pricing">Выбрать</a>
+                </div>
+
+                <div class="price-card">
+                    <span class="price-card__label">Тариф</span>
+                    <h3>Без ограничений</h3>
+                    <p class="price-card__desc">Безлимит доменов и установка.</p>
+                    <div class="price-card__value">— ₽<small>цена задаётся в админке</small></div>
+                    <ul>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Без ограничений по доменам</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Обновления навсегда</li>
+                        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Поддержка 1 год</li>
+                    </ul>
+                    <a class="btn btn--secondary btn--block" href="#pricing">Выбрать</a>
+                </div>
+            </div>
+
+            <p class="note note--violet mt-24">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+                <span><strong>Комплект «витрина + шаблон»</strong> появится, когда шаблон выйдет из разработки: у него будет отдельный товар, два архива и общий лимит доменов. Рисовать цену заранее — обманывать покупателя.</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- 6. Сравнение двух продуктов -->
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Разница</span>
+                <h2>Что выбрать: витрину или шаблон</h2>
+                <p>Оба продукта ставятся на October CMS, но решают разные задачи. Покупать оба нужно только студиям, которые и продают, и делают сайты клиентам.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Критерий</th>
+                            <th>Elv Kit</th>
+                            <th>Универсальный шаблон</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Задача</strong></td>
+                            <td>Продавать цифровые товары и выдавать файлы</td>
+                            <td>Сайт компании, каталог услуг, запись</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Страниц</strong></td>
+                            <td>28</td>
+                            <td>110</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Оплата и лицензии</strong></td>
+                            <td><span class="yes">Да</span></td>
+                            <td><span class="no">Нет, подключается отдельно</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Статус</strong></td>
+                            <td><span class="badge badge--ok">Почти готов</span></td>
+                            <td><span class="badge badge--warn">В разработке</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FAQ -->
+    <section class="section section--alt" id="faq">
+        <div class="container">
+            <div class="section-head">
+                <span class="kicker">Вопросы</span>
+                <h2>Коротко о главном</h2>
+            </div>
+
+            <div class="faq">
+                <details open>
+                    <summary>Нужен ли Elv Kit, если мне нужен только шаблон сайта?</summary>
+                    <div class="answer">Нет. Это независимые продукты: шаблон ставится сам по себе, витрина нужна только тем, кто продаёт цифровые товары и принимает оплату.</div>
+                </details>
+                <details>
+                    <summary>Что нужно на сервере?</summary>
+                    <div class="answer">October CMS 4.4+, PHP 8.2+ с расширениями <code>pdo_mysql</code>, <code>mbstring</code>, <code>json</code>, <code>gd</code>, MySQL 8 или MariaDB 10.6+, HTTPS и cron для планировщика.</div>
+                </details>
+                <details>
+                    <summary>Как выдаются файлы после оплаты?</summary>
+                    <div class="answer">Автоматически: письмо с лицензионным ключом и ссылкой на ZIP уходит после подтверждения платежа. Ссылка выдаётся по токену и работает только для оплаченного заказа.</div>
+                </details>
+                <details>
+                    <summary>Что происходит через год, когда заканчивается период обновлений?</summary>
+                    <div class="answer">Сайт продолжает работать без ограничений — лицензия на скачанную версию бессрочная. Заканчивается только доступ к новым версиям и техподдержке.</div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. CTA -->
+    <section class="section section--tight">
+        <div class="container">
+            <div class="cta-band">
+                <div>
+                    <h2>Посмотрите, как это выглядит изнутри</h2>
+                    <p>Превью админки и страниц витрины — без регистрации и без установки.</p>
+                </div>
+                <div class="btn-row">
+                    <a class="btn btn--light" href="admin.html">Превью админки</a>
+                    <a class="btn btn--ghost" href="#faq">Инструкция по установке</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- 9. Светлый подвал -->
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <p class="footer-brand">Elv Kit</p>
+            <p class="muted small">Витрина цифровых товаров и универсальный шаблон сайта на October CMS. Формы, оплата и бронирование в этом макете отключены.</p>
+        </div>
+        <div>
+            <p class="footer-title">Продукт</p>
+            <ul class="footer-list">
+                <li><a href="#products">Что входит</a></li>
+                <li><a href="#demo">Модули</a></li>
+                <li><a href="#pricing">Тарифы</a></li>
+                <li><a href="admin.html">Демо админки</a></li>
+                <li><a href="#faq">Вопросы</a></li>
+            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Документы</p>
+            <ul class="footer-list">
+                <li><a href="#faq">Установка</a></li>
+                <li><a href="#faq">Требования</a></li>
+                <li><a href="#faq">Оферта и политика</a></li>
+                <li><a href="#faq">Контакты</a></li>            </ul>
+        </div>
+        <div>
+            <p class="footer-title">Услуги студии</p>
+            <ul class="footer-list">
+                <li><a href="#faq">Хостинг</a></li>
+                <li><a href="#faq">Поддержка</a></li>
+                <li><a href="#faq">Аудит сайта</a></li>
+                <li><a href="#faq">SEO</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <p>© 2026 Elv Kit · демо стилей, без функционала оплаты</p>
+        <p>October CMS 4.4 · PHP 8.2+</p>
+    </div>
+</footer>
+
+</body>
+</html>
