@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://elvstudio.vercel.app</loc>
-    <lastmod>2026-11-20T08:28:37+00:00</lastmod>
+    <lastmod>2026-11-20T09:28:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/blog</loc>
@@ -314,27 +314,27 @@
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/modules/blog</loc>
-    <lastmod>2026-11-15T08:05:33+00:00</lastmod>
+    <lastmod>2026-11-20T08:51:37+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/modules/booking</loc>
-    <lastmod>2026-11-15T08:05:33+00:00</lastmod>
+    <lastmod>2026-11-20T08:51:37+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/modules/feedback</loc>
-    <lastmod>2026-11-15T08:05:33+00:00</lastmod>
+    <lastmod>2026-11-20T08:51:37+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/modules/shop</loc>
-    <lastmod>2026-11-15T08:05:33+00:00</lastmod>
+    <lastmod>2026-11-20T08:51:37+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/order</loc>
-    <lastmod>2026-11-19T05:36:37+00:00</lastmod>
+    <lastmod>2026-11-20T09:32:10+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/pricing</loc>
-    <lastmod>2026-11-19T06:44:46+00:00</lastmod>
+    <lastmod>2026-11-20T09:19:14+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/privacy</loc>
@@ -370,7 +370,11 @@
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/sitemap</loc>
-    <lastmod>2026-11-18T08:03:58+00:00</lastmod>
+    <lastmod>2026-11-20T09:19:43+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://elvstudio.vercel.app/template</loc>
+    <lastmod>2026-11-20T09:19:56+00:00</lastmod>
   </url>
   <url>
     <loc>https://elvstudio.vercel.app/terms</loc>

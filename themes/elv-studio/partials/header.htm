@@ -9,7 +9,8 @@
         </a>
 
         <nav class="nav" id="site-nav" aria-label="Главное меню">
-            <a href="{{ 'kit'|page }}" {% if this.page.id == 'kit' %}aria-current="page"{% endif %}>Возможности</a>
+            <a href="{{ 'kit'|page }}" {% if this.page.id == 'kit' %}aria-current="page"{% endif %}>Elv Kit</a>
+            <a href="{{ 'template'|page }}" {% if this.page.id == 'template' %}aria-current="page"{% endif %}>Шаблон</a>
             <a href="{{ 'services'|page }}" {% if this.page.id in ['services', 'services-hosting', 'services-support', 'services-plugins', 'services-booking', 'services-audit', 'services-seo'] %}aria-current="page"{% endif %}>Услуги</a>
             <a href="{{ 'pricing'|page }}" {% if this.page.id == 'pricing' %}aria-current="page"{% endif %}>Цены</a>
             <a href="{{ 'demo'|page }}" {% if this.page.id == 'demo' %}aria-current="page"{% endif %}>Демо</a>

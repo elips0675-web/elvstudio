@@ -1,0 +1,102 @@
+title = "Универсальный шаблон для October CMS"
+url = "/template/"
+layout = "default"
+meta_title = "Универсальный шаблон для October CMS — 110 страниц"
+meta_description = "Универсальный шаблон на October CMS для студий и веб-мастеров: готовые блоки, SEO, адаптив и поиск. Статус — в разработке, цена и дата не объявлены."
+==
+{% set crumbs = elv_breadcrumbs() %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            {% partial 'breadcrumbs' crumbs=crumbs %}
+            <span class="eyebrow">Второй продукт</span>
+            <h1>Универсальный шаблон для October CMS</h1>
+            <p class="lead">
+                Каркас на 110 страниц для студий и веб-мастеров: блоки, стили и SEO уже есть,
+                остаётся собрать сайт клиента. Без привязки к нише и без демо-каталога Elv Kit.
+            </p>
+            <p class="mt-24"><span class="badge badge--line">В разработке</span></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Сравнение</span>
+                <h2>Чем отличается от Elv Kit</h2>
+                <p>Это два разных продукта, а не один набор. Витрина продаёт услуги и товары, шаблон — база для сайтов клиентов.</p>
+            </div>
+
+            {% partial 'product-switch' active='template' %}
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="split">
+                <div>
+                    <span class="eyebrow">Что уже готово</span>
+                    <h2>Основа, на которой можно собирать</h2>
+                    <p class="lead">Всё это работает в текущей теме и переносится в шаблон как есть — без внешних библиотек и CDN.</p>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Дизайн-система: один CSS-файл, системные шрифты, SVG-иконки</li>
+                        <li>{{ elv_icon('check')|raw }} SEO: canonical, sitemap.xml, robots.txt, llms.txt и JSON-LD</li>
+                        <li>{{ elv_icon('check')|raw }} Адаптив от 360 px: сетки, меню и таблицы без горизонтального скролла</li>
+                        <li>{{ elv_icon('check')|raw }} Поиск по сайту и индекс без внешнего сервиса</li>
+                        <li>{{ elv_icon('check')|raw }} Блог с категориями, тегами и пагинацией</li>
+                        <li>{{ elv_icon('check')|raw }} Формы с защитой от спама и сообщениями в админке</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>{{ elv_icon('info')|raw }} Статус</h3>
+                    <ul class="specs mt-24">
+                        <li><span>Что это</span><span>каркас для сайтов клиентов</span></li>
+                        <li><span>Объём</span><span>110 страниц</span></li>
+                        <li><span>Платформа</span><span>October CMS</span></li>
+                        <li><span>Цена</span><span>не объявлена</span></li>
+                        <li><span>Дата релиза</span><span>не объявлена</span></li>
+                        <li><span>Владение</span><span>файлы остаются у вас</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="grid grid--2">
+                <div class="card">
+                    <h3>{{ elv_icon('check-circle')|raw }} Чего пока нет</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} Собранного архива на 110 страниц</li>
+                        <li>{{ elv_icon('close')|raw }} Отдельной лицензии и лимита доменов</li>
+                        <li>{{ elv_icon('close')|raw }} Цены и тарифа — решение ещё не принято</li>
+                        <li>{{ elv_icon('close')|raw }} Даты релиза: обещать без готовой сборки нельзя</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>{{ elv_icon('user')|raw }} Кому подходит</h3>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Студиям, которые делают сайты на October CMS</li>
+                        <li>{{ elv_icon('check')|raw }} Веб-мастерам, которым нужен готовый каркас, а не конструктор</li>
+                        <li>{{ elv_icon('check')|raw }} Тем, кто хочет один код на все проекты</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            {% set ctaUrl = 'feedback'|page %}
+            {% partial 'cta'
+                title='Нужен сайт для клиента уже сейчас?'
+                text='Соберите его на Elv Kit: те же блоки и SEO, плюс запись, заказы и оплата. Шаблон выйдет отдельно — напишите, если нужен именно каркас.'
+                cta_url=ctaUrl
+                cta_label='Обсудить шаблон'
+            %}
+        </div>
+    </section>
+</main>

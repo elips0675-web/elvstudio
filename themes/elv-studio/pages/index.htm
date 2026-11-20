@@ -13,11 +13,11 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             <div class="hero__grid">
                 <div>
                     <span class="eyebrow">Сайт для бизнеса · запись · оплата · блог</span>
-                    <h1>Сайт, который принимает записи и заказы — <em>без конструктора</em></h1>
+                    <h1>Запустите сайт с записью и оплатой — <em>за 1–3 дня</em></h1>
                     <p class="lead">
-                        Elv Kit — готовый сайт для небольших компаний и мастеров: услуги, онлайн-запись,
-                        продажа товаров, блог и удобная админка. Установим на ваш домен и хостинг,
-                        поможем с запуском — дальше вы управляете сами.
+                        Elv Kit — готовый сайт для мастеров и небольших компаний: услуги, запись,
+                        продажа товаров, блог и понятная админка. Один платёж, без подписки.
+                        Установим на ваш домен и поможем с запуском.
                     </p>
 
                     <div class="hero__chips">
@@ -40,9 +40,11 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                         <span>{{ elv_icon('check')|raw }} Данные остаются у вас</span>
                         <span>{{ elv_icon('check')|raw }} Оплата картой или через ЮKassa</span>
                     </div>
+                    <p class="hero__note"><a href="#products">Не уверены, что выбрать? Сравнить два продукта →</a></p>
                 </div>
 
-                <div class="mock" aria-hidden="true">
+                <div>
+                <div class="mock" role="group" aria-label="Пример админки Elv Kit">
                     <div class="mock__bar">
                         <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
                         <span class="mock__url">example.com/admin</span>
@@ -56,25 +58,40 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                             <span class="mock__nav"></span>
                         </div>
                         <div class="mock__main">
-                            <div class="mock__row">
-                                <div class="mock__tile"><b>128</b><span>заказов</span></div>
-                                <div class="mock__tile"><b>34</b><span>записи</span></div>
-                                <div class="mock__tile"><b>12</b><span>статей</span></div>
-                            </div>
-                            <div class="mock__chart">
-                                <span class="mock__bar-i h-38"></span>
-                                <span class="mock__bar-i h-56"></span>
-                                <span class="mock__bar-i h-44"></span>
-                                <span class="mock__bar-i h-72"></span>
-                                <span class="mock__bar-i h-61"></span>
-                                <span class="mock__bar-i h-86"></span>
-                                <span class="mock__bar-i h-68"></span>
-                                <span class="mock__bar-i h-94"></span>
+                            <div class="mock__tabs">
+                                <input type="radio" name="mock-tab" id="t1" checked>
+                                <label for="t1">Заказы</label>
+                                <input type="radio" name="mock-tab" id="t2">
+                                <label for="t2">Записи</label>
+                                <input type="radio" name="mock-tab" id="t3">
+                                <label for="t3">Товары</label>
+
+                                <div class="mock__panel">
+                                    <div class="mock__line"><span>#1042 · Оплачен</span><i></i></div>
+                                    <div class="mock__line"><span>#1041 · Ожидает</span><i class="wait"></i></div>
+                                    <div class="mock__line"><span>#1040 · Оплачен</span><i></i></div>
+                                    <div class="mock__line"><span>#1039 · Оплачен</span><i></i></div>
+                                </div>
+                                <div class="mock__panel">
+                                    <div class="mock__row">
+                                        <div class="mock__tile"><b>10:00</b><span>свободно</span></div>
+                                        <div class="mock__tile"><b>12:00</b><span>занято</span></div>
+                                        <div class="mock__tile"><b>14:00</b><span>свободно</span></div>
+                                    </div>
+                                </div>
+                                <div class="mock__panel">
+                                    <div class="mock__row">
+                                        <div class="mock__tile"><b>128</b><span>заказов</span></div>
+                                        <div class="mock__tile"><b>34</b><span>записи</span></div>
+                                        <div class="mock__tile"><b>12</b><span>товаров</span></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <p class="muted mt-16"><small>Пример статистики в админке</small></p>
+                </div>
             </div>
         </div>
     </section>
@@ -86,6 +103,33 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                 <div class="stat"><b>1</b><span>админка для всех задач</span></div>
                 <div class="stat"><b>4</b><span>инструмента: запись, заказы, связь, блог</span></div>
                 <div class="stat"><b>1–3</b><span>дня на запуск</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--paper" id="products">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Два продукта</span>
+                <h2>Готовый сайт для бизнеса или каркас для студии</h2>
+                <p>Это два разных продукта, а не один набор. Выберите тот, который закрывает вашу задачу.</p>
+            </div>
+
+            <div class="grid grid--2">
+                <a class="card card--link" href="{{ 'kit'|page }}">
+                    <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
+                    <h3>Elv Kit — готовый сайт с записью и оплатой</h3>
+                    <p><span class="badge badge--accent">Основной продукт</span></p>
+                    <p class="mt-16">Услуги, онлайн-запись, заказы, оплата и блог. Для салона, магазина или мастера — запуск за 1–3 дня.</p>
+                    <span class="card__more">Что входит {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
+                <a class="card card--link" href="{{ 'template'|page }}">
+                    <div class="card__icon">{{ elv_icon('cube')|raw }}</div>
+                    <h3>Универсальный шаблон — 110 страниц</h3>
+                    <p><span class="badge badge--line">В разработке</span></p>
+                    <p class="mt-16">Каркас для студий и веб-мастеров: без привязки к нише, с готовыми блоками и SEO.</p>
+                    <span class="card__more">Подробнее {{ elv_icon('arrow-right')|raw }}</span>
+                </a>
             </div>
         </div>
     </section>
@@ -151,7 +195,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
-    <section class="section">
+    <section class="section section--paper">
         <div class="container">
             <div class="split">
                 <div>
@@ -204,7 +248,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
-    <section class="section section--paper" id="pricing">
+    <section class="section" id="pricing">
         <div class="container">
             <div class="section-head center">
                 <span class="eyebrow">Цены</span>
@@ -243,7 +287,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
     </section>
 
     {% if plans %}
-    <section class="section">
+    <section class="section section--paper">
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Сравнение</span>
@@ -286,7 +330,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
     </section>
     {% endif %}
 
-    <section class="section section--paper">
+    <section class="section">
         <div class="container">
             <div class="grid grid--2">
                 <div class="card">
@@ -305,29 +349,6 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                         {% endfor %}
                     </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <div class="section-head">
-                <span class="eyebrow">Кому подходит</span>
-                <h2>Три ситуации, для которых сделан Elv Kit</h2>
-            </div>
-
-            <div class="grid grid--3">
-                {% for scenario in elv_scenarios() %}
-                    <div class="card">
-                        <div class="scenario">
-                            <span class="avatar">{{ elv_icon(scenario.icon ?: 'user')|raw }}</span>
-                            <div>
-                                <h3>{{ scenario.role }}</h3>
-                                <p>{{ scenario.text }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
             </div>
         </div>
     </section>
@@ -363,9 +384,29 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Кому подходит</span>
+                <h2>Три ситуации, для которых сделан Elv Kit</h2>
+                <p>Запись, продажа и контент — в одном сайте. Отдельный конструктор под каждую задачу не нужен.</p>
+            </div>
+
+            <div class="grid grid--3">
+                {% for scenario in elv_scenarios() %}
+                    <article class="card card--center">
+                        <div class="card__icon">{{ elv_icon(scenario.icon ?: 'user')|raw }}</div>
+                        <h3>{{ scenario.role }}</h3>
+                        <p>{{ scenario.text }}</p>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
     {% set faqItems = elv_faq() %}
     {% if faqItems|length %}
-    <section class="section">
+    <section class="section section--paper">
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Частые вопросы</span>

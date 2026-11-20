@@ -5,8 +5,9 @@ meta_title = "Заказать готовый сайт Elv Kit"
 meta_description = "Заказ готового сайта и разделов: выбор тарифа, оплата картой через ЮKassa или Stripe, файлы сайта и ключ на e-mail. Поможем с установкой на ваш домен."
 ==
 {% set requestedProduct = elv_query('product') %}
+{% set isTemplate = requestedProduct == 'template' %}
 {% set product = elv_product(requestedProduct) %}
-{% if not product and requestedProduct %}
+{% if not product and requestedProduct and not isTemplate %}
     {{ elv_not_found() }}
 {% endif %}
 {% set product = product ?: elv_kit() %}
@@ -31,7 +32,23 @@ meta_description = "Заказ готового сайта и разделов: 
         </div>
     </section>
 
-    {% if product %}
+    {% if isTemplate %}
+    <section class="section">
+        <div class="container">
+            <div class="empty">
+                <h2>Шаблон ещё в разработке</h2>
+                <p>
+                    Универсальный шаблон на 110 страниц пока не продаётся: цена и дата релиза не объявлены.
+                    Если нужен именно каркас для сайтов клиентов — напишите, сообщим, когда будет готов.
+                </p>
+                <div class="stack-actions">
+                    <a class="btn btn--ghost" href="{{ 'template'|page }}">О шаблоне</a>
+                    <a class="btn btn--primary" href="{{ 'feedback'|page }}">Написать нам</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% elseif product %}
     <section class="section">
         <div class="container">
             <div class="chips mb-24">
@@ -49,6 +66,7 @@ meta_description = "Заказ готового сайта и разделов: 
                     {% endif %}
                 {% endfor %}
             </div>
+            <p class="small muted">Оформляется Elv Kit. <a href="{{ 'template'|page }}">Шаблон для студий</a> ещё в разработке — цена не объявлена.</p>
 
             {% if elv_flash('elv_error') %}
                 <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
