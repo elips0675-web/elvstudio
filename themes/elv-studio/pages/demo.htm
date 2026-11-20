@@ -37,32 +37,32 @@ meta_description = "Посмотрите готовый сайт вживую: �
             </div>
 
             <div class="grid grid--3">
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('store')|raw }}</div>
                     <h3>Страницы и услуги</h3>
                     <p>Главная, услуги, цены и контакты. Понятно, что вы предлагаете и как с вами связаться.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('calendar-check')|raw }}</div>
                     <h3>Онлайн-запись</h3>
                     <p>Клиент выбирает услугу, дату и свободное время. Занятый час исчезает — накладок не будет.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
                     <h3>Заказы и оплата</h3>
                     <p>Покупатель оформляет заказ и платит картой. После оплаты автоматически получает файл.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
                     <h3>Блог и поиск</h3>
                     <p>Статьи с категориями и тегами, карта сайта и разметка для Google и Яндекса.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
                     <h3>Админка и права</h3>
                     <p>Заказы, записи и сообщения в одном меню. Показываем, как менять статусы и выдавать доступы.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('message')|raw }}</div>
                     <h3>Обучение и поддержка</h3>
                     <p>После запуска показываем админку и остаёмся на связи по выбранному тарифу.</p>
@@ -86,7 +86,7 @@ meta_description = "Посмотрите готовый сайт вживую: �
 
             <div class="grid grid--3">
                 {% for service in services %}
-                    <div class="card">
+                    <div class="card card--center">
                         <div class="card__icon">{{ elv_icon(service.icon ?: 'calendar')|raw }}</div>
                         <h3>{{ service.name }}</h3>
                         <p>{{ service.description }}</p>

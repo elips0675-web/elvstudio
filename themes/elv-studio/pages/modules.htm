@@ -23,7 +23,7 @@ meta_description = "Модули Elv Kit: онлайн-запись, заказ�
         <div class="container">
             <div class="grid grid--2">
                 {% for module in elv_modules() %}
-                    <article class="card">
+                    <article class="card card--center">
                         <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
                         <div class="chips mb-24">
                             {% if module.badge %}
@@ -77,17 +77,17 @@ meta_description = "Модули Elv Kit: онлайн-запись, заказ�
             </div>
 
             <div class="grid grid--3">
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('database')|raw }}</div>
                     <h3>Всё в одном месте</h3>
                     <p>Заказы, записи и сообщения не нужно искать по разным сервисам и таблицам.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
                     <h3>Доступы для сотрудников</h3>
                     <p>Администратор видит всё, менеджер — только свои разделы: записи, заказы или статьи.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
                     <h3>Без ежемесячной платы</h3>
                     <p>Купили один раз — сайт ваш. Обновления и поддержка входят в выбранный тариф.</p>

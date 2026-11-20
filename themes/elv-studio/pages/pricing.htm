@@ -163,7 +163,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 
                 <div class="grid grid--3">
                     {% for module in elv_modules() %}
-                        <div class="card">
+                        <div class="card card--center">
                             <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
                             <h3>{{ module.name }}</h3>
                             <p>{{ module.tagline }}</p>
@@ -209,12 +209,12 @@ meta_description = "Сколько стоит готовый сайт: тари�
     <section class="section section--paper">
         <div class="container">
             <div class="grid grid--2">
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('wallet')|raw }}</div>
                     <h3>Как проходит оплата</h3>
                     <p>Заказ создаётся на сайте, оплата — на защищённой странице ЮKassa или Stripe. Данные карты не проходят через ваш сервер. После подтверждения приходит письмо со ссылкой на файлы сайта и ключом.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
                     <h3>Возврат</h3>
                     <p>Сайт передаётся сразу после оплаты, поэтому возврат возможен, пока файлы не скачаны. Если что-то не работает — сначала чиним; возврат остаётся крайней мерой.</p>

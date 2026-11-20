@@ -1,12 +1,12 @@
 <div class="grid grid--2">
-    <a class="card card--link{% if active == 'kit' %} card--selected{% endif %}" href="{{ 'kit'|page }}">
+    <a class="card card--link card--center{% if active == 'kit' %} card--selected{% endif %}" href="{{ 'kit'|page }}">
         <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
         <h3>Elv Kit — готовый сайт</h3>
         <p><span class="badge badge--accent">Основной продукт</span></p>
         <p class="mt-16">Запись, заказы, оплата, блог и админка. Для салона, магазина или мастера — запуск за 1–3 дня.</p>
         <span class="card__more">Смотреть Elv Kit {{ elv_icon('arrow-right')|raw }}</span>
     </a>
-    <a class="card card--link{% if active == 'template' %} card--selected{% endif %}" href="{{ 'template'|page }}">
+    <a class="card card--link card--center{% if active == 'template' %} card--selected{% endif %}" href="{{ 'template'|page }}">
         <div class="card__icon">{{ elv_icon('cube')|raw }}</div>
         <h3>Универсальный шаблон для бизнеса</h3>
         <p><span class="badge badge--line">В разработке</span></p>

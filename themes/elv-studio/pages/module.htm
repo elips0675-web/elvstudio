@@ -91,22 +91,22 @@ layout = "default"
             </div>
 
             <div class="grid grid--2">
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('play')|raw }}</div>
                     <h3>1. Смотрите демо</h3>
                     <p>Показываем раздел на живом примере и отвечаем на вопросы.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('download')|raw }}</div>
                     <h3>2. Подключаем</h3>
                     <p>Добавляем раздел на ваш сайт и оформляем под ваш бренд.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
                     <h3>3. Настраиваем</h3>
                     <p>Вносим услуги, цены, письма и оплату — по вашим данным.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('check-circle')|raw }}</div>
                     <h3>4. Вы управляете</h3>
                     <p>Записи, заказы и сообщения появляются в админке. Показываем, как всё устроено.</p>
@@ -148,7 +148,7 @@ layout = "default"
             <div class="grid grid--3">
                 {% for other in elv_modules() %}
                     {% if other.slug != product.slug %}
-                        <a class="card card--link" href="{{ 'module'|page({ slug: other.slug }) }}">
+                        <a class="card card--center card--link" href="{{ 'module'|page({ slug: other.slug }) }}">
                             <div class="card__icon">{{ elv_icon(other.icon ?: 'puzzle')|raw }}</div>
                             <h3>{{ other.name }}</h3>
                             <p>{{ other.tagline }}</p>

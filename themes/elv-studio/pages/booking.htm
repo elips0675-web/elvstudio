@@ -39,7 +39,7 @@ meta_description = "Запишитесь на бесплатный показ с
                 <div class="grid grid--3 mb-24">
                     {% for item in services %}
                         <a
-                            class="card card--link{% if item.code == service.code %} card--selected{% endif %}"
+                            class="card card--center card--link{% if item.code == service.code %} card--selected{% endif %}"
                             href="{{ 'booking'|page }}?service={{ item.code }}">
                             <div class="card__icon">{{ elv_icon(item.icon ?: 'calendar')|raw }}</div>
                             <h3>{{ item.name }}</h3>
@@ -163,17 +163,17 @@ meta_description = "Запишитесь на бесплатный показ с
     <section class="section section--paper">
         <div class="container">
             <div class="grid grid--3">
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('shield')|raw }}</div>
                     <h3>Без накладок</h3>
                     <p>Занятое время исчезает из списка, поэтому две записи на один час не появятся.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>
                     <h3>Отмена освобождает время</h3>
                     <p>Если планы изменились, отмена сразу возвращает время в расписание.</p>
                 </div>
-                <div class="card">
+                <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('mail')|raw }}</div>
                     <h3>Письмо с подтверждением</h3>
                     <p>Клиент получает подтверждение, вы — карточку записи с контактами.</p>
