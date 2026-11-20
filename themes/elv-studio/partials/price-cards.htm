@@ -1,0 +1,20 @@
+{% for plan in plans %}
+    <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
+        {% if plan.featured %}
+            <span class="badge price-card__flag">Выбирают чаще</span>
+        {% endif %}
+        <span class="price-card__label">{{ plan.label }}</span>
+        <div class="price-card__value">
+            <b>{{ elv_money(plan.price) }}</b>
+        </div>
+        <span class="price-card__period">{{ plan.period }}</span>
+        <ul>
+            {% for feature in plan.features %}
+                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+            {% endfor %}
+        </ul>
+        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
+            Выбрать «{{ plan.label }}»
+        </a>
+    </div>
+{% endfor %}

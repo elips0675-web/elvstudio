@@ -207,11 +207,7 @@ meta_description = "Заказ готового сайта и разделов: 
                         <b data-total="{{ elv_money(product.planPrice(selectedPlan)) }}">{{ elv_money(product.planPrice(selectedPlan)) }}</b>
                     </div>
 
-                    <ul class="list-check mt-24">
-                        {% for item in elv_includes()|slice(0, 4) %}
-                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% partial 'check-items' items=elv_includes()|slice(0, 4) %}
 
                     <div class="notice mt-24">
                         {{ elv_icon('shield')|raw }}

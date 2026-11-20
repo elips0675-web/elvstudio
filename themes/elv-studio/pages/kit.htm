@@ -110,11 +110,7 @@ meta_description = "Готовый сайт для бизнеса: страни�
                     <div class="card card--flat">
                         <h3>Чего не будет</h3>
                         <p class="muted">Честный список, чтобы не было сюрпризов после покупки.</p>
-                        <ul class="list-check list-check--no mt-24">
-                            {% for item in elv_excludes() %}
-                                <li>{{ elv_icon('close')|raw }} {{ item }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% partial 'check-items' items=elv_excludes() tone='no' %}
                     </div>
                 </div>
             </div>

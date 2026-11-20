@@ -1,0 +1,31 @@
+<div class="table-wrap">
+    <table class="compare">
+        <thead>
+            <tr>
+                <th>Возможность</th>
+                {% for plan in plans %}
+                    <th>{{ plan.label }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in elv_compare() %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    {% for plan in plans %}
+                        {% set value = row.values[plan.key] ?? '' %}
+                        <td>
+                            {% if value == 'yes' %}
+                                <span class="yes" aria-label="Да">✓</span>
+                            {% elseif value == 'no' %}
+                                <span class="no" aria-label="Нет">—</span>
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

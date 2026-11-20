@@ -49,26 +49,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
         <div class="container">
             {% if plans %}
             <div class="grid grid--3">
-                {% for plan in plans %}
-                    <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
-                        {% if plan.featured %}
-                            <span class="badge price-card__flag">Выбирают чаще</span>
-                        {% endif %}
-                        <span class="price-card__label">{{ plan.label }}</span>
-                        <div class="price-card__value">
-                            <b>{{ elv_money(plan.price) }}</b>
-                        </div>
-                        <span class="price-card__period">{{ plan.period }}</span>
-                        <ul>
-                            {% for feature in plan.features %}
-                                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
-                            {% endfor %}
-                        </ul>
-                        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
-                            Выбрать «{{ plan.label }}»
-                        </a>
-                    </div>
-                {% endfor %}
+                {% partial 'price-cards' plans=plans %}
             </div>
             {% else %}
             <div class="empty">
@@ -88,37 +69,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
                 <p>Функции одинаковые. Отличаются число сайтов, срок обновлений и поддержка.</p>
             </div>
 
-            <div class="table-wrap">
-                <table class="compare">
-                    <thead>
-                        <tr>
-                            <th>Возможность</th>
-                            {% for plan in plans %}
-                                <th>{{ plan.label }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in elv_compare() %}
-                            <tr>
-                                <td>{{ row.name }}</td>
-                                {% for plan in plans %}
-                                    {% set value = row.values[plan.key] ?? '' %}
-                                    <td>
-                                        {% if value == 'yes' %}
-                                            <span class="yes" aria-label="Да">✓</span>
-                                        {% elseif value == 'no' %}
-                                            <span class="no" aria-label="Нет">—</span>
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% partial 'compare-table' plans=plans %}
         </div>
     </section>
     {% endif %}
@@ -134,19 +85,11 @@ meta_description = "Сколько стоит готовый сайт: тари�
             <div class="grid grid--2">
                 <div class="card">
                     <h3>{{ elv_icon('check-circle')|raw }} Входит в стоимость</h3>
-                    <ul class="list-check mt-24">
-                        {% for item in elv_includes() %}
-                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% partial 'check-items' items=elv_includes() %}
                 </div>
                 <div class="card">
                     <h3>{{ elv_icon('info')|raw }} Оплачивается отдельно</h3>
-                    <ul class="list-check list-check--no mt-24">
-                        {% for item in elv_excludes() %}
-                            <li>{{ elv_icon('close')|raw }} {{ item }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% partial 'check-items' items=elv_excludes() tone='no' %}
                 </div>
             </div>
         </div>

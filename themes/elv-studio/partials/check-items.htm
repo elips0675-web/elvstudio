@@ -1,0 +1,5 @@
+<ul class="list-check{% if tone == 'no' %} list-check--no{% endif %} mt-24">
+    {% for item in items %}
+        <li>{{ elv_icon(tone == 'no' ? 'close' : 'check')|raw }} {{ item }}</li>
+    {% endfor %}
+</ul>

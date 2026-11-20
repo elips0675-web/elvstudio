@@ -115,22 +115,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                 <p>Это два разных продукта, а не один набор. Elv Kit сразу принимает записи и оплату, шаблон даёт 110 страниц для сайта компании.</p>
             </div>
 
-            <div class="grid grid--2">
-                <a class="card card--link card--center" href="{{ 'kit'|page }}">
-                    <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
-                    <h3>Elv Kit — готовый сайт с записью и оплатой</h3>
-                    <p><span class="badge badge--accent">Основной продукт</span></p>
-                    <p class="mt-16">Услуги, онлайн-запись, заказы, оплата и блог. Для салона, магазина или мастера — запуск за 1–3 дня.</p>
-                    <span class="card__more">Что входит {{ elv_icon('arrow-right')|raw }}</span>
-                </a>
-                <a class="card card--link card--center" href="{{ 'template'|page }}">
-                    <div class="card__icon">{{ elv_icon('cube')|raw }}</div>
-                    <h3>Универсальный шаблон для бизнеса</h3>
-                    <p><span class="badge badge--line">В разработке</span></p>
-                    <p class="mt-16">110 страниц для сайта компании: главная, новости, события, услуги, каталог и контакты. Без привязки к нише.</p>
-                    <span class="card__more">Подробнее {{ elv_icon('arrow-right')|raw }}</span>
-                </a>
-            </div>
+            {% partial 'product-switch' %}
         </div>
     </section>
 
@@ -258,26 +243,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             </div>
 
             <div class="grid grid--3">
-                {% for plan in plans %}
-                    <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
-                        {% if plan.featured %}
-                            <span class="badge price-card__flag">Выбирают чаще</span>
-                        {% endif %}
-                        <span class="price-card__label">{{ plan.label }}</span>
-                        <div class="price-card__value">
-                            <b>{{ elv_money(plan.price) }}</b>
-                        </div>
-                        <span class="price-card__period">{{ plan.period }}</span>
-                        <ul>
-                            {% for feature in plan.features %}
-                                <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
-                            {% endfor %}
-                        </ul>
-                        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
-                            Выбрать «{{ plan.label }}»
-                        </a>
-                    </div>
-                {% endfor %}
+                {% partial 'price-cards' plans=plans %}
             </div>
 
             <div class="center mt-32">
@@ -296,37 +262,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                 <p>Набор функций одинаковый. Отличаются число сайтов, срок обновлений и поддержка.</p>
             </div>
 
-            <div class="table-wrap">
-                <table class="compare">
-                    <thead>
-                        <tr>
-                            <th>Возможность</th>
-                            {% for plan in plans %}
-                                <th>{{ plan.label }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in elv_compare() %}
-                            <tr>
-                                <td>{{ row.name }}</td>
-                                {% for plan in plans %}
-                                    {% set value = row.values[plan.key] ?? '' %}
-                                    <td>
-                                        {% if value == 'yes' %}
-                                            <span class="yes" aria-label="Да">✓</span>
-                                        {% elseif value == 'no' %}
-                                            <span class="no" aria-label="Нет">—</span>
-                                        {% else %}
-                                            {{ value }}
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% partial 'compare-table' plans=plans %}
         </div>
     </section>
     {% endif %}
@@ -336,19 +272,11 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             <div class="grid grid--2">
                 <div class="card">
                     <h3>{{ elv_icon('check-circle')|raw }} Что входит</h3>
-                    <ul class="list-check mt-24">
-                        {% for item in elv_includes() %}
-                            <li>{{ elv_icon('check')|raw }} {{ item }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% partial 'check-items' items=elv_includes() %}
                 </div>
                 <div class="card">
                     <h3>{{ elv_icon('info')|raw }} Чего не делаем</h3>
-                    <ul class="list-check list-check--no mt-24">
-                        {% for item in elv_excludes() %}
-                            <li>{{ elv_icon('close')|raw }} {{ item }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% partial 'check-items' items=elv_excludes() tone='no' %}
                 </div>
             </div>
         </div>

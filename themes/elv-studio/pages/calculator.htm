@@ -293,17 +293,9 @@ meta_description = "Соберите смету за две минуты: тар
 
                     <div class="card">
                         <h3>Что входит</h3>
-                        <ul class="list-check mt-24">
-                            {% for item in elv_includes() %}
-                                <li>{{ elv_icon('check')|raw }} {{ item }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% partial 'check-items' items=elv_includes() %}
                         <h3 class="mt-32">Что оплачивается отдельно</h3>
-                        <ul class="list-check list-check--no mt-24">
-                            {% for item in elv_excludes() %}
-                                <li>{{ elv_icon('close')|raw }} {{ item }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% partial 'check-items' items=elv_excludes() tone='no' %}
                     </div>
                 </div>
 
