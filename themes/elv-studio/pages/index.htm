@@ -95,30 +95,48 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             <div class="section-head">
                 <span class="eyebrow">Что умеет сайт</span>
                 <h2>Всё для приёма клиентов — в одном месте</h2>
-                <p>Клиент выбирает услугу или товар, оставляет заявку и платит. Вы видите заказ, запись и сообщение в одной админке.</p>
+                <p>Клиент выбирает услугу или товар, оставляет заявку и платит. Любой раздел можно взять отдельно — или весь сайт сразу.</p>
             </div>
 
+            {% set modules = elv_modules() %}
+
             <div class="grid grid--3">
-                <article class="card">
-                    <div class="card__icon">{{ elv_icon('calendar-check')|raw }}</div>
-                    <h3>Онлайн-запись</h3>
-                    <p>Клиент выбирает услугу, дату и свободное время. Занятый час исчезает из списка, поэтому накладок не будет.</p>
-                </article>
-                <article class="card">
-                    <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
-                    <h3>Заказы и оплата</h3>
-                    <p>Покупатель оформляет заказ и платит картой. После оплаты автоматически получает файл или подтверждение.</p>
-                </article>
-                <article class="card">
-                    <div class="card__icon">{{ elv_icon('message')|raw }}</div>
-                    <h3>Обратная связь</h3>
-                    <p>Форма с защитой от спама: сообщение сохраняется в админке и приходит вам на почту.</p>
-                </article>
-                <article class="card">
-                    <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
-                    <h3>Блог</h3>
-                    <p>Пишите об услугах и товарах. Категории, теги, подписка и красивые карточки уже готовы.</p>
-                </article>
+                {% for module in modules %}
+                    <a class="card card--link" href="{{ 'module'|page({ slug: module.slug }) }}">
+                        <div class="card__icon">{{ elv_icon(module.icon ?: 'cube')|raw }}</div>
+                        <h3>{{ module.name }}</h3>
+                        <p class="mb-0">
+                            <span class="badge {{ module.price_cents > 0 ? 'badge--line' : 'badge--accent' }}">{{ module.price_cents > 0 ? 'Можно отдельно' : 'Входит в Elv Kit' }}</span>
+                        </p>
+                        <p class="mt-16">{{ module.tagline }}</p>
+                        <span class="card__more">
+                            {% if module.price_cents > 0 %}{{ elv_money(module.price_cents) }}{% else %}Подробнее{% endif %}
+                            {{ elv_icon('arrow-right')|raw }}
+                        </span>
+                    </a>
+                {% else %}
+                    <article class="card">
+                        <div class="card__icon">{{ elv_icon('calendar-check')|raw }}</div>
+                        <h3>Онлайн-запись</h3>
+                        <p>Клиент выбирает услугу, дату и свободное время. Занятый час исчезает из списка, поэтому накладок не будет.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
+                        <h3>Заказы и оплата</h3>
+                        <p>Покупатель оформляет заказ и платит картой. После оплаты автоматически получает файл или подтверждение.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card__icon">{{ elv_icon('message')|raw }}</div>
+                        <h3>Обратная связь</h3>
+                        <p>Форма с защитой от спама: сообщение сохраняется в админке и приходит вам на почту.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card__icon">{{ elv_icon('pencil')|raw }}</div>
+                        <h3>Блог</h3>
+                        <p>Пишите об услугах и товарах. Категории, теги, подписка и красивые карточки уже готовы.</p>
+                    </article>
+                {% endfor %}
+
                 <article class="card">
                     <div class="card__icon">{{ elv_icon('search')|raw }}</div>
                     <h3>Продвижение в поиске</h3>
@@ -129,33 +147,6 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                     <h3>Скорость</h3>
                     <p>Страницы открываются быстро даже на мобильном интернете. Без тяжёлых скриптов и внешних шрифтов.</p>
                 </article>
-            </div>
-        </div>
-    </section>
-
-    <section class="section section--paper" id="modules">
-        <div class="container">
-            <div class="section-head">
-                <span class="eyebrow">Модули</span>
-                <h2>Можно взять весь сайт или одну функцию</h2>
-                <p>Начните с готового сайта и подключите только то, что нужно сейчас. Остальное добавите позже без переделки.</p>
-            </div>
-
-            <div class="grid grid--3">
-                {% for module in elv_modules() %}
-                    <a class="card card--link" href="{{ 'module'|page({ slug: module.slug }) }}">
-                        <div class="card__icon">{{ elv_icon(module.icon ?: 'cube')|raw }}</div>
-                        <h3>{{ module.name }}</h3>
-                        {% if module.badge %}
-                            <span class="badge badge--line">{{ module.badge }}</span>
-                        {% endif %}
-                        <p class="mt-24">{{ module.tagline }}</p>
-                        <span class="card__more">
-                            {% if module.price_cents > 0 %}{{ elv_money(module.price_cents) }}{% else %}Входит в Elv Kit{% endif %}
-                            {{ elv_icon('arrow-right')|raw }}
-                        </span>
-                    </a>
-                {% endfor %}
             </div>
         </div>
     </section>

@@ -47,7 +47,6 @@
             <a href="#products">Elv Kit</a>
             <a href="#template">Шаблон</a>
             <a href="#features">Возможности</a>
-            <a href="#modules">Модули</a>
             <a href="#pricing">Цены</a>
             <a href="#demo">Демо</a>
         </nav>
@@ -100,40 +99,45 @@
                 </div>
             </div>
 
-            <div>
-                <div class="mock" aria-hidden="true">
-                    <div class="mock__bar">
-                        <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
-                        <span class="mock__url">example.com/admin</span>
-                    </div>
-                    <div class="mock__body">
-                        <div class="mock__side">
-                            <span class="mock__nav is-active"></span>
-                            <span class="mock__nav"></span>
-                            <span class="mock__nav"></span>
-                            <span class="mock__nav"></span>
-                            <span class="mock__nav"></span>
+            <div class="hero__admin">
+                <div class="admin admin--compact" aria-hidden="true">
+                    <aside class="admin-side">
+                        <p>Elv Kit</p>
+                        <a class="is-active">Заказы</a>
+                        <a>Записи</a>
+                        <a>Товары</a>
+                        <a>Статьи</a>
+                        <a>Настройки</a>
+                    </aside>
+
+                    <div class="admin-main">
+                        <div class="admin-top">
+                            <h2>Заказы</h2>
+                            <span class="badge badge--accent">пример</span>
                         </div>
-                        <div class="mock__main">
-                            <div class="mock__tiles">
-                                <div class="mock__tile"><b>128</b><span>заказов</span></div>
-                                <div class="mock__tile"><b>34</b><span>записи</span></div>
-                                <div class="mock__tile"><b>12</b><span>статей</span></div>
-                            </div>
-                            <table class="mini-table">
+
+                        <div class="admin-kpis">
+                            <div class="kpi"><b>128</b><span>за месяц</span></div>
+                            <div class="kpi"><b>94</b><span>оплачено</span></div>
+                            <div class="kpi"><b>12</b><span>ждут</span></div>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
                                 <thead>
                                     <tr><th>Заказ</th><th>Тариф</th><th>Статус</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>#1042</td><td>Один сайт</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
-                                    <tr><td>#1041</td><td>До 5 сайтов</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
+                                    <tr><td>#1042</td><td>До 5 сайтов</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
+                                    <tr><td>#1041</td><td>Один сайт</td><td><span class="badge badge--ok">Оплачен</span></td></tr>
                                     <tr><td>#1040</td><td>Один сайт</td><td><span class="badge badge--warn">Ожидает</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="mock__foot">Пример статистики в админке</div>
                 </div>
+
+                <p class="tiny muted mt-16 mb-0">Демо админки: данные примерные, кнопки внутри панели не нажимаются.</p>
             </div>
         </div>
     </section>
@@ -153,7 +157,7 @@
     <!-- Главный блок переделки: два продукта -->
     <section class="section" id="products">
         <div class="container">
-            <div class="section-head">
+            <div class="section-head section-head--center">
                 <span class="kicker">Два продукта</span>
                 <h2>Одна витрина — два готовых продукта</h2>
                 <p>Elv Kit продаёт цифровые товары и принимает оплату. Универсальный шаблон делает сайт компании, каталог услуг и запись. Это независимые вещи, их можно купить по отдельности.</p>
@@ -187,87 +191,83 @@
         </div>
     </section>
 
-    <!-- Возможности: шесть карточек с главной -->
-    <section class="section section--alt" id="features">
+    <!-- Как проходит покупка: шаги, которые есть в коде -->
+    <section class="section section--alt" id="how">
         <div class="container">
-            <div class="section-head">
+            <div class="section-head section-head--center">
+                <span class="kicker">Как это работает</span>
+                <h2>Путь покупателя: от каталога до архива</h2>
+                <p>Четыре шага, которые уже есть в коде. Руками файлы выдавать не нужно, сторонние сервисы для этого не требуются.</p>
+            </div>
+
+            <ol class="steps narrow" style="margin: 0 auto;">
+                <li>
+                    <b>Выбираете товар и тариф</b>
+                    Каталог и тарифы редактируются в админке: название, описание, состав, цена и число доменов.
+                </li>
+                <li>
+                    <b>Оформляете заказ</b>
+                    Форма принимает почту и тариф. В этом макете оплата отключена, поэтому заказ не создаётся.
+                </li>
+                <li>
+                    <b>Платите картой</b>
+                    ЮKassa или Stripe. Статус приходит по подписи платёжного шлюза, повторное событие не выдаёт файл дважды.
+                </li>
+                <li>
+                    <b>Получаете ключ и архив</b>
+                    Лицензионный ключ привязан к домену, ссылка на ZIP выдаётся по токену и работает только для оплаченного заказа.
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Возможности: шесть карточек, четыре из них — модули со ссылкой -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-head section-head--center">
                 <span class="kicker">Что умеет сайт</span>
                 <h2>Всё для приёма клиентов — в одном месте</h2>
-                <p>Клиент выбирает услугу или товар, оставляет заявку и платит. Вы видите заказ, запись и сообщение в одной админке.</p>
+                <p>Клиент выбирает услугу или товар, оставляет заявку и платит. Любой раздел можно взять отдельно — или весь сайт сразу.</p>
             </div>
 
             <div class="grid grid--3">
-                <article class="card card--hover">
+                <a class="card card--hover card--center card--stack card--link" href="#demo">
                     <div class="card__icon is-sky" aria-hidden="true"><svg class="i"><use href="#i-calendar"/></svg></div>
                     <h3>Онлайн-запись</h3>
-                    <p class="muted small">Клиент выбирает услугу, дату и свободное время. Занятый час исчезает из списка, поэтому накладок не будет.</p>
-                </article>
-                <article class="card card--hover">
+                    <p class="mb-0"><span class="badge badge--line">Можно отдельно</span></p>
+                    <p class="muted small mt-16">Клиент выбирает услугу, дату и свободное время. Занятый час исчезает из списка, поэтому накладок не будет.</p>
+                    <span class="card__more">Подробнее →</span>
+                </a>
+                <a class="card card--hover card--center card--stack card--link" href="#demo">
                     <div class="card__icon is-orange" aria-hidden="true"><svg class="i"><use href="#i-cart"/></svg></div>
                     <h3>Заказы и оплата</h3>
-                    <p class="muted small">Покупатель оформляет заказ и платит картой. После оплаты автоматически получает файл или подтверждение.</p>
-                </article>
-                <article class="card card--hover">
+                    <p class="mb-0"><span class="badge badge--line">Можно отдельно</span></p>
+                    <p class="muted small mt-16">Покупатель оформляет заказ и платит картой. После оплаты автоматически получает файл или подтверждение.</p>
+                    <span class="card__more">Подробнее →</span>
+                </a>
+                <a class="card card--hover card--center card--stack card--link" href="#demo">
                     <div class="card__icon is-pink" aria-hidden="true"><svg class="i"><use href="#i-message"/></svg></div>
                     <h3>Обратная связь</h3>
-                    <p class="muted small">Форма с защитой от спама: сообщение сохраняется в админке и приходит вам на почту.</p>
-                </article>
-                <article class="card card--hover">
+                    <p class="mb-0"><span class="badge badge--line">Можно отдельно</span></p>
+                    <p class="muted small mt-16">Форма с защитой от спама: сообщение сохраняется в админке и приходит вам на почту.</p>
+                    <span class="card__more">Подробнее →</span>
+                </a>
+                <a class="card card--hover card--center card--stack card--link" href="#demo">
                     <div class="card__icon is-green" aria-hidden="true"><svg class="i"><use href="#i-pencil"/></svg></div>
                     <h3>Блог</h3>
-                    <p class="muted small">Пишите об услугах и товарах. Категории, теги, подписка и красивые карточки уже готовы.</p>
-                </article>
-                <article class="card card--hover">
+                    <p class="mb-0"><span class="badge badge--accent">Входит в Elv Kit</span></p>
+                    <p class="muted small mt-16">Пишите об услугах и товарах. Категории, теги, подписка и красивые карточки уже готовы.</p>
+                    <span class="card__more">Подробнее →</span>
+                </a>
+                <article class="card card--hover card--center">
                     <div class="card__icon is-violet" aria-hidden="true"><svg class="i"><use href="#i-search"/></svg></div>
                     <h3>Продвижение в поиске</h3>
                     <p class="muted small">Понятные адреса, заголовки и описания, карта сайта и разметка для Google и Яндекса.</p>
                 </article>
-                <article class="card card--hover">
+                <article class="card card--hover card--center">
                     <div class="card__icon is-sky" aria-hidden="true"><svg class="i"><use href="#i-speed"/></svg></div>
                     <h3>Скорость</h3>
                     <p class="muted small">Страницы открываются быстро даже на мобильном интернете. Без тяжёлых скриптов и внешних шрифтов.</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- Модули: реальные четыре раздела -->
-    <section class="section" id="modules">
-        <div class="container">
-            <div class="section-head">
-                <span class="kicker">Модули</span>
-                <h2>Можно взять весь сайт или одну функцию</h2>
-                <p>Начните с готового сайта и подключите только то, что нужно сейчас. Остальное добавите позже без переделки.</p>
-            </div>
-
-            <div class="grid grid--4">
-                <article class="card card--hover card--stack">
-                    <div class="card__icon is-sky" aria-hidden="true"><svg class="i"><use href="#i-calendar"/></svg></div>
-                    <h3>Онлайн-запись</h3>
-                    <p class="muted small">Клиенты записываются сами, без звонков и переписки.</p>
-                    <span class="badge badge--line">Раздел</span>
-                    <p class="card__foot mb-0"><a href="#demo">Подробнее →</a></p>
-                </article>
-                <article class="card card--hover card--stack">
-                    <div class="card__icon is-orange" aria-hidden="true"><svg class="i"><use href="#i-cart"/></svg></div>
-                    <h3>Заказы и оплата</h3>
-                    <p class="muted small">Продажа товаров и файлов с оплатой картой.</p>
-                    <span class="badge badge--line">Раздел</span>
-                    <p class="card__foot mb-0"><a href="#demo">Подробнее →</a></p>
-                </article>
-                <article class="card card--hover card--stack">
-                    <div class="card__icon is-pink" aria-hidden="true"><svg class="i"><use href="#i-message"/></svg></div>
-                    <h3>Обратная связь</h3>
-                    <p class="muted small">Форма вопросов и заявок с защитой от спама.</p>
-                    <span class="badge badge--line">Раздел</span>
-                    <p class="card__foot mb-0"><a href="#demo">Подробнее →</a></p>
-                </article>
-                <article class="card card--hover card--stack">
-                    <div class="card__icon is-green" aria-hidden="true"><svg class="i"><use href="#i-pencil"/></svg></div>
-                    <h3>Блог</h3>
-                    <p class="muted small">Статьи, которые приводят клиентов из поиска.</p>
-                    <span class="badge badge--accent">Входит в Elv Kit</span>
-                    <p class="card__foot mb-0"><a href="#demo">Подробнее →</a></p>
                 </article>
             </div>
         </div>
@@ -570,7 +570,6 @@
                 <li><a href="#products">Elv Kit</a></li>
                 <li><a href="#template">Шаблон October CMS</a></li>
                 <li><a href="#features">Возможности</a></li>
-                <li><a href="#modules">Модули</a></li>
                 <li><a href="#pricing">Цены</a></li>
             </ul>
         </div>
