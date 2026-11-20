@@ -1,8 +1,8 @@
-title = "Универсальный шаблон для October CMS"
+title = "Универсальный шаблон для бизнеса"
 url = "/template/"
 layout = "default"
-meta_title = "Универсальный шаблон для October CMS — 110 страниц"
-meta_description = "Универсальный шаблон на October CMS для студий и веб-мастеров: готовые блоки, SEO, адаптив и поиск. Статус — в разработке, цена и дата не объявлены."
+meta_title = "Универсальный шаблон для бизнеса на October CMS — 110 страниц"
+meta_description = "Универсальный шаблон для бизнеса на October CMS: главная, новости, события, услуги, каталог продукции и контакты. 110 страниц, готовые блоки, SEO, адаптив и поиск. Статус — в разработке, цена и дата не объявлены."
 ==
 {% set crumbs = elv_breadcrumbs() %}
 
@@ -11,12 +11,56 @@ meta_description = "Универсальный шаблон на October CMS д�
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
             <span class="eyebrow">Второй продукт</span>
-            <h1>Универсальный шаблон для October CMS</h1>
+            <h1>Универсальный шаблон для бизнеса</h1>
             <p class="lead">
-                Каркас на 110 страниц для студий и веб-мастеров: блоки, стили и SEO уже есть,
-                остаётся собрать сайт клиента. Без привязки к нише и без демо-каталога Elv Kit.
+                110 страниц для сайта компании на October CMS: главная, новости, события,
+                услуги, каталог продукции и контакты. Блоки, стили и SEO уже есть — остаётся
+                наполнить содержимым. Без демо-каталога Elv Kit.
             </p>
             <p class="mt-24"><span class="badge badge--line">В разработке</span></p>
+        </div>
+    </section>
+
+    <section class="section section--paper">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Состав</span>
+                <h2>Шесть базовых разделов</h2>
+                <p>Из них собирается сайт клиента. Остальные страницы шаблона — их внутренние и служебные варианты: карточки, списки, формы, ошибки и правовые документы.</p>
+            </div>
+
+            <div class="grid grid--3">
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('grid')|raw }}</div>
+                    <h3>Главная</h3>
+                    <p>Первый экран, услуги, преимущества, отзывы и блок призыва к действию.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('book')|raw }}</div>
+                    <h3>Новости</h3>
+                    <p>Лента с датами, категориями, тегами и постраничной навигацией.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('calendar')|raw }}</div>
+                    <h3>События</h3>
+                    <p>Афиша с датой, местом проведения и записью на событие.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('wrench')|raw }}</div>
+                    <h3>Услуги</h3>
+                    <p>Карточки услуг, цены, описание и форма заявки.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('store')|raw }}</div>
+                    <h3>Каталог продукции</h3>
+                    <p>Сетка товаров, карточка товара, фильтры и категории.</p>
+                </div>
+                <div class="card">
+                    <div class="card__icon">{{ elv_icon('map-pin')|raw }}</div>
+                    <h3>Контакты</h3>
+                    <p>Адрес, карта, реквизиты и форма обратной связи.</p>
+                </div>
+            </div>
         </div>
     </section>
 
