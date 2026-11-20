@@ -85,22 +85,7 @@ meta_description = "Посмотрите готовый сайт вживую: �
             </div>
 
             <div class="grid grid--3">
-                {% for service in services %}
-                    <div class="card card--center">
-                        <div class="card__icon">{{ elv_icon(service.icon ?: 'calendar')|raw }}</div>
-                        <h3>{{ service.name }}</h3>
-                        <p>{{ service.description }}</p>
-                        <ul class="specs mt-24">
-                            <li><span>Длительность</span><span>{{ service.duration }} мин</span></li>
-                            <li><span>Стоимость</span><span>{{ service.price }}</span></li>
-                        </ul>
-                        <div class="stack-actions">
-                            <a class="btn btn--ghost" href="{{ 'booking'|page }}?service={{ service.code }}">
-                                Выбрать время {{ elv_icon('arrow-right')|raw }}
-                            </a>
-                        </div>
-                    </div>
-                {% endfor %}
+                {% partial 'service-cards' services=services variant='demo' %}
             </div>
         </div>
     </section>

@@ -16,7 +16,7 @@ layout = "default"
                 {% if product.badge %}
                     <span class="badge badge--line">{{ product.badge }}</span>
                 {% endif %}
-                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Elv Kit' }}</span>
+                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : elv_badge('included') }}</span>
             </div>
             <h1>{{ product.name }}</h1>
             <p class="lead">{{ product.tagline }}</p>
@@ -56,7 +56,7 @@ layout = "default"
                     <h3>Коротко</h3>
                     <ul class="specs mt-24">
                         <li><span>Что это</span><span>{{ product.kind == 'kit' ? 'Готовый сайт' : 'Дополнительный раздел' }}</span></li>
-                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : 'Входит в Elv Kit' }}</span></li>
+                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : elv_badge('included') }}</span></li>
                         <li><span>Запуск</span><span>1–3 рабочих дня</span></li>
                         <li><span>Поддержка</span><span>По выбранному тарифу</span></li>
                         <li><span>Где работает</span><span>На вашем домене</span></li>
@@ -146,18 +146,7 @@ layout = "default"
                 <h2>Другие разделы</h2>
             </div>
             <div class="grid grid--3">
-                {% for other in elv_modules() %}
-                    {% if other.slug != product.slug %}
-                        <a class="card card--center card--link" href="{{ 'module'|page({ slug: other.slug }) }}">
-                            <div class="card__icon">{{ elv_icon(other.icon ?: 'puzzle')|raw }}</div>
-                            <h3>{{ other.name }}</h3>
-                            <p>{{ other.tagline }}</p>
-                            <span class="card__more">
-                                Подробно {{ elv_icon('arrow-right')|raw }}
-                            </span>
-                        </a>
-                    {% endif %}
-                {% endfor %}
+                {% partial 'module-cards' modules=elv_modules() exclude=product.slug badge=false meta='more' %}
             </div>
         </div>
     </section>

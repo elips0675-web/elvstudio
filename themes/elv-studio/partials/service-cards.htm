@@ -1,0 +1,36 @@
+{#
+    Карточки услуг записи — одна коллекция `elv_booking_services()` в двух видах.
+
+    variant: booking (по умолчанию) — карточка-ссылка на выбор услуги;
+             demo — карточка с длительностью, ценой и кнопкой «Выбрать время».
+    services: коллекция услуг записи.
+    active:   код выбранной услуги (booking) — карточка получает card--selected.
+#}
+{% set variant = variant|default('booking') %}
+{% set active = active ?? '' %}
+
+{% for service in services %}
+    {% if variant == 'demo' %}
+        <div class="card card--center">
+            <div class="card__icon">{{ elv_icon(service.icon ?: 'calendar')|raw }}</div>
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.description }}</p>
+            <ul class="specs mt-24">
+                <li><span>Длительность</span><span>{{ service.duration }} мин</span></li>
+                <li><span>Стоимость</span><span>{{ service.price }}</span></li>
+            </ul>
+            <div class="stack-actions">
+                <a class="btn btn--ghost" href="{{ 'booking'|page }}?service={{ service.code }}">
+                    Выбрать время {{ elv_icon('arrow-right')|raw }}
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <a class="card card--center card--link{% if service.code == active %} card--selected{% endif %}" href="{{ 'booking'|page }}?service={{ service.code }}">
+            <div class="card__icon">{{ elv_icon(service.icon ?: 'calendar')|raw }}</div>
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.description }}</p>
+            <span class="card__more">{{ service.duration }} мин · {{ service.price }}</span>
+        </a>
+    {% endif %}
+{% endfor %}

@@ -254,7 +254,7 @@ class Seo
 
         if ($pageId === 'index') {
             $graph[] = static::softwareNode();
-            $graph[] = static::faqNode();
+            $graph[] = static::faqNode(null, 'faq', Faq::HOME_LIMIT);
         }
 
         if ($pageId === 'pricing') {
@@ -346,9 +346,9 @@ class Seo
         ]);
     }
 
-    protected static function faqNode(?string $id = null, string $source = 'faq'): array
+    protected static function faqNode(?string $id = null, string $source = 'faq', ?int $limit = null): array
     {
-        return static::faqNodeFromItems($id, Faq::items($source));
+        return static::faqNodeFromItems($id, Faq::items($source, $limit));
     }
 
     protected static function faqNodeFromItems(?string $id, array $source): array

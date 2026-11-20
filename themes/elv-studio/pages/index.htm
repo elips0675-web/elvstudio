@@ -131,19 +131,8 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
             {% set tones = ['sky', 'orange', 'pink', 'green', 'violet'] %}
 
             <div class="grid grid--3">
-                {% for module in modules %}
-                    <a class="card card--link card--center" href="{{ 'module'|page({ slug: module.slug }) }}">
-                        <div class="card__icon card__icon--{{ tones[loop.index0 % 5] }}">{{ elv_icon(module.icon ?: 'cube')|raw }}</div>
-                        <h3>{{ module.name }}</h3>
-                        <p class="mb-0">
-                            <span class="badge {{ module.price_cents > 0 ? 'badge--line' : 'badge--accent' }}">{{ module.price_cents > 0 ? 'Можно отдельно' : 'Входит в Elv Kit' }}</span>
-                        </p>
-                        <p class="mt-16">{{ module.tagline }}</p>
-                        <span class="card__more">
-                            {% if module.price_cents > 0 %}{{ elv_money(module.price_cents) }}{% else %}Подробнее{% endif %}
-                            {{ elv_icon('arrow-right')|raw }}
-                        </span>
-                    </a>
+                {% if modules %}
+                    {% partial 'module-cards' modules=modules tones=tones %}
                 {% else %}
                     <article class="card card--center">
                         <div class="card__icon card__icon--sky">{{ elv_icon('calendar-check')|raw }}</div>
@@ -165,7 +154,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                         <h3>Блог</h3>
                         <p>Пишите об услугах и товарах. Категории, теги, подписка и красивые карточки уже готовы.</p>
                     </article>
-                {% endfor %}
+                {% endif %}
 
                 <article class="card card--center">
                     <div class="card__icon card__icon--violet">{{ elv_icon('search')|raw }}</div>
@@ -333,7 +322,7 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
-    {% set faqItems = elv_faq() %}
+    {% set faqItems = elv_faq_home() %}
     {% if faqItems|length %}
     <section class="section section--paper">
         <div class="container">
@@ -350,6 +339,14 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                     </details>
                 {% endfor %}
             </div>
+
+            {% if elv_faq()|length > faqItems|length %}
+                <div class="center mt-32">
+                    <a class="btn btn--ghost" href="{{ 'pricing'|page }}/#pricing-faq">
+                        Все вопросы о тарифах и оплате {{ elv_icon('arrow-right')|raw }}
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </section>
     {% endif %}

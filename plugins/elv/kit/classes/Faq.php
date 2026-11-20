@@ -7,9 +7,16 @@ use Elv\Kit\Models\Settings;
  */
 class Faq
 {
-    public static function items(string $name = 'faq'): array
+    /**
+     * Сколько вопросов показываем на главной: остальные — на /pricing/#pricing-faq.
+     */
+    public const HOME_LIMIT = 4;
+
+    public static function items(string $name = 'faq', ?int $limit = null): array
     {
-        return static::parse((string) Settings::get(static::settingKey($name)));
+        $items = static::parse((string) Settings::get(static::settingKey($name)));
+
+        return $limit === null ? $items : array_slice($items, 0, $limit);
     }
 
     public static function post(string $slug): array

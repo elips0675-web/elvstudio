@@ -2,6 +2,7 @@
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Faq;
@@ -315,6 +316,12 @@ class Plugin extends PluginBase
                 },
                 'elv_faq' => function () {
                     return Faq::items();
+                },
+                'elv_faq_home' => function () {
+                    return Faq::items('faq', Faq::HOME_LIMIT);
+                },
+                'elv_badge' => function ($key) {
+                    return Badges::label((string) $key);
                 },
                 'elv_icon' => function ($name, $class = '') {
                     return Icons::svg((string) $name, (string) $class);

@@ -3,14 +3,14 @@
     <a class="card card--link card--center{% if active == 'kit' %} card--selected{% endif %}" href="{{ 'kit'|page }}">
         <div class="card__icon">{{ elv_icon('cart')|raw }}</div>
         <h3>Elv Kit — готовый сайт с записью и оплатой</h3>
-        <p><span class="badge badge--accent">Основной продукт</span></p>
+        <p><span class="badge badge--accent">{{ elv_badge('primary') }}</span></p>
         <p class="mt-16">Услуги, онлайн-запись, заказы, оплата и блог. Для салона, магазина или мастера — запуск за 1–3 дня.</p>
         <span class="card__more">Что входит {{ elv_icon('arrow-right')|raw }}</span>
     </a>
     <a class="card card--link card--center{% if active == 'template' %} card--selected{% endif %}" href="{{ 'template'|page }}">
         <div class="card__icon">{{ elv_icon('cube')|raw }}</div>
         <h3>Универсальный шаблон для бизнеса</h3>
-        <p><span class="badge badge--line">В разработке</span></p>
+        <p><span class="badge badge--line">{{ elv_badge('wip') }}</span></p>
         <p class="mt-16">110 страниц для сайта компании: главная, новости, события, услуги, каталог и контакты. Без привязки к нише.</p>
         <span class="card__more">Подробнее {{ elv_icon('arrow-right')|raw }}</span>
     </a>

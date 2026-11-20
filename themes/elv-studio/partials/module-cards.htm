@@ -1,0 +1,95 @@
+﻿{#
+    Карточки модулей каталога — один источник для главной, /modules/, /pricing/ и «Другие разделы».
+
+    variant: compact (по умолчанию) — карточка-ссылка на модуль;
+             full — большая карточка каталога с описанием и кнопками;
+             price — карточка с ценой и двумя кнопками (/pricing/).
+    modules: коллекция elv_modules().
+    tones:   список цветовых вариантов иконки (compact), по кругу.
+    exclude: slug модуля, который не показываем (текущая страница).
+    badge:   false — без бейджа «Можно отдельно / Входит в Elv Kit» (compact).
+    meta:    'price' — цена в нижней строке, 'more' — «Подробно» (compact).
+#}
+{% set variant = variant|default('compact') %}
+{% set tones = tones|default([]) %}
+{% set badge = badge ?? true %}
+{% set meta = meta|default('price') %}
+
+{% for module in modules %}
+    {% if not exclude or module.slug != exclude %}
+        {% if variant == 'full' %}
+            <article class="card card--center">
+                <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
+                <div class="chips mb-24">
+                    {% if module.badge %}
+                        <span class="badge badge--line">{{ module.badge }}</span>
+                    {% endif %}
+                    <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : elv_badge('included') }}</span>
+                </div>
+                <h2>{{ module.name }}</h2>
+                <p class="lead">{{ module.tagline }}</p>
+                <p>{{ module.description }}</p>
+
+                {% if module.features %}
+                    <ul class="list-check mt-24">
+                        {% for feature in module.features %}
+                            <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="stack-actions">
+                    <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">
+                        Подробно {{ elv_icon('arrow-right')|raw }}
+                    </a>
+                    {% if module.price_cents > 0 %}
+                        <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug, plan: 'single' }) }}">
+                            {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(module.price_cents) }}
+                        </a>
+                    {% else %}
+                        <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
+                            {{ elv_icon('cart')|raw }} Заказать сайт
+                        </a>
+                    {% endif %}
+                </div>
+            </article>
+        {% elseif variant == 'price' %}
+            <div class="card card--center">
+                <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
+                <h3>{{ module.name }}</h3>
+                <p>{{ module.tagline }}</p>
+                <div class="summary__total">
+                    <span class="muted small">Цена</span>
+                    <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : elv_badge('included') }}</b>
+                </div>
+                <div class="stack-actions">
+                    <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
+                    {% if module.price_cents > 0 %}
+                        <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Подключить</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <a class="card card--link card--center" href="{{ 'module'|page({ slug: module.slug }) }}">
+                <div class="card__icon{% if tones|length %} card__icon--{{ tones[loop.index0 % tones|length] }}{% endif %}">{{ elv_icon(module.icon ?: 'cube')|raw }}</div>
+                <h3>{{ module.name }}</h3>
+                {% if badge %}
+                    <p class="mb-0">
+                        <span class="badge {{ module.price_cents > 0 ? 'badge--line' : 'badge--accent' }}">{{ module.price_cents > 0 ? elv_badge('separate') : elv_badge('included') }}</span>
+                    </p>
+                {% endif %}
+                <p{% if badge %} class="mt-16"{% endif %}>{{ module.tagline }}</p>
+                <span class="card__more">
+                    {% if meta == 'more' %}
+                        Подробно
+                    {% elseif module.price_cents > 0 %}
+                        {{ elv_money(module.price_cents) }}
+                    {% else %}
+                        Подробнее
+                    {% endif %}
+                    {{ elv_icon('arrow-right')|raw }}
+                </span>
+            </a>
+        {% endif %}
+    {% endif %}
+{% endfor %}

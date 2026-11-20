@@ -105,23 +105,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
                 </div>
 
                 <div class="grid grid--3">
-                    {% for module in elv_modules() %}
-                        <div class="card card--center">
-                            <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
-                            <h3>{{ module.name }}</h3>
-                            <p>{{ module.tagline }}</p>
-                            <div class="summary__total">
-                                <span class="muted small">Цена</span>
-                                <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Elv Kit' }}</b>
-                            </div>
-                            <div class="stack-actions">
-                                <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
-                                {% if module.price_cents > 0 %}
-                                    <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Подключить</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
+                    {% partial 'module-cards' modules=elv_modules() variant='price' %}
                 </div>
             </div>
         </section>

@@ -1,7 +1,7 @@
 {% for plan in plans %}
     <div class="card price-card{% if plan.featured %} price-card--featured{% endif %}">
         {% if plan.featured %}
-            <span class="badge price-card__flag">Выбирают чаще</span>
+            <span class="badge price-card__flag">{{ elv_badge('featured') }}</span>
         {% endif %}
         <span class="price-card__label">{{ plan.label }}</span>
         <div class="price-card__value">

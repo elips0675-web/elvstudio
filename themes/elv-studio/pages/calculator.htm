@@ -103,7 +103,7 @@ meta_description = "Соберите смету за две минуты: тар
                                             <span class="calc-plan__body">
                                                 <span class="calc-plan__top">
                                                     <span class="calc-plan__name">{{ plan.label }}</span>
-                                                    {% if plan.featured %}<span class="badge">Выбирают чаще</span>{% endif %}
+                                                    {% if plan.featured %}<span class="badge">{{ elv_badge('featured') }}</span>{% endif %}
                                                 </span>
                                                 <b class="calc-plan__price">{{ plan.price_label }}</b>
                                                 <small>{{ plan.period }}</small>

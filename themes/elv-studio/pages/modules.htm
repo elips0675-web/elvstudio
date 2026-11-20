@@ -22,48 +22,14 @@ meta_description = "Модули Elv Kit: онлайн-запись, заказ�
     <section class="section">
         <div class="container">
             <div class="grid grid--2">
-                {% for module in elv_modules() %}
-                    <article class="card card--center">
-                        <div class="card__icon">{{ elv_icon(module.icon ?: 'puzzle')|raw }}</div>
-                        <div class="chips mb-24">
-                            {% if module.badge %}
-                                <span class="badge badge--line">{{ module.badge }}</span>
-                            {% endif %}
-                            <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : 'Входит в Elv Kit' }}</span>
-                        </div>
-                        <h2>{{ module.name }}</h2>
-                        <p class="lead">{{ module.tagline }}</p>
-                        <p>{{ module.description }}</p>
-
-                        {% if module.features %}
-                            <ul class="list-check mt-24">
-                                {% for feature in module.features %}
-                                    <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-
-                        <div class="stack-actions">
-                            <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">
-                                Подробно {{ elv_icon('arrow-right')|raw }}
-                            </a>
-                            {% if module.price_cents > 0 %}
-                                <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug, plan: 'single' }) }}">
-                                    {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(module.price_cents) }}
-                                </a>
-                            {% else %}
-                                <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
-                                    {{ elv_icon('cart')|raw }} Заказать сайт
-                                </a>
-                            {% endif %}
-                        </div>
-                    </article>
+                {% if elv_modules() %}
+                    {% partial 'module-cards' modules=elv_modules() variant='full' %}
                 {% else %}
                     <div class="empty">
                         <h2>Разделы наполняются</h2>
                         <p>Скоро здесь появятся возможности сайта. Если нужно раньше — <a href="{{ 'contacts'|page }}">напишите нам</a>.</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </section>
