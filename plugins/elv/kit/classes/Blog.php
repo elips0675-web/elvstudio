@@ -82,6 +82,31 @@ class Blog
     }
 
     /**
+     * byCategory — последние опубликованные статьи рубрики.
+     */
+    public static function byCategory(
+        string $slug,
+        int $limit = 5,
+        string $audience = Post::AUDIENCE_BUSINESS
+    ) {
+        $slug = trim($slug);
+
+        if ($slug === '' || $limit < 1) {
+            return collect();
+        }
+
+        return Post::query()
+            ->published()
+            ->audience($audience)
+            ->with('category')
+            ->whereHas('category', function ($q) use ($slug) {
+                $q->where('slug', $slug);
+            })
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * total — число опубликованных статей аудитории.
      */
     public static function total(string $audience = Post::AUDIENCE_BUSINESS): int

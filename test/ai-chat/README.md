@@ -1,6 +1,7 @@
 # `test/ai-chat` — снимок кода для AI-анализа
 
-Срез: 21.11.2026. Stage 84. Коммит: `8ec0261`.
+Срез: 21.11.2026. Точный Stage и коммит — в шапке любого файла снимка
+(их проставляет `node tools/build-test-snapshot.mjs`).
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 Набор закрывает пробел, который был у аудита Qwen: отчёт
@@ -9,7 +10,7 @@
 структуру папок. Здесь эти файлы и код Консультанта/поиска лежат в виде
 обычных `.txt`, которые можно загрузить в чат.
 
-В папке **10 файлов**: 8 тематических срезов, `ALL-IN-ONE.txt` и этот
+В папке **11 файлов**: 9 тематических срезов, `ALL-IN-ONE.txt` и этот
 `README.md`. Разрозненные файлы свёрнуты в тематические блоки, чтобы
 не путаться при загрузке.
 
@@ -30,6 +31,7 @@
 | `06-search.txt` | `Search.php`, `search.htm`, `search.js`, `search.css`, `default.htm` — индекс, страница `/search/` и версия ассета |
 | `07-sitemap-seo.txt` | `sitemap.htm`, `Seo.php`, `Sitemap.php`, `routes.php` |
 | `08-checks-docs.txt` | `chat-check`, `search-check`, `seo-check`, `booking-check`, раннер `check-php.mjs`, `check-seo`, `check-headers`, `SecurityHeaders.php`, `docs/search.md`, `docs/content-policy.md`, `docs/00-audit-documents.md`, `price-check`, `docs/prices.md` |
+| `09-plans.txt` | `Что доделать.txt` (полный план) и `Что доделать коротко.txt` (открытые пункты) |
 | `ALL-IN-ONE.txt` | всё перечисленное одним файлом |
 | `README.md` | этот манифест |
 
@@ -39,7 +41,8 @@
 2. Если чат принимает несколько файлов — загрузить `01-context.txt`,
    `02-structure.txt`, `03-config.txt`, `04-plugin.php.txt`, `05-chat.txt`
    и `06-search.txt`. Для вопроса про карту сайта/SEO добавить
-   `07-sitemap-seo.txt`, для проверок и политики — `08-checks-docs.txt`.
+   `07-sitemap-seo.txt`, для проверок и политики — `08-checks-docs.txt`,
+   для планов и открытых решений — `09-plans.txt`.
 3. Если у модели маленький контекст — начать с `01-context.txt`,
    `05-chat.txt`, `06-search.txt` и `08-checks-docs.txt`.
 
@@ -71,6 +74,7 @@
 - `.env`, пароли, ключи, дампы БД.
 - `vendor/`, `modules/` (ядро October) и `demo-static` целиком.
 - Полный бэклог и журнал — они в корне: `Что доделать.txt`, `Что сделано.txt`.
+  Планы в снимок входят (`09-plans.txt`), журнал — нет.
 
 ## Важно
 

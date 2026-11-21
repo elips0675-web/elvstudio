@@ -418,6 +418,9 @@ class Plugin extends PluginBase
                 'elv_blog_start' => function ($limit = 0) {
                     return Blog::start((int) $limit);
                 },
+                'elv_blog_category' => function ($slug, $limit = 5) {
+                    return Blog::byCategory((string) $slug, (int) $limit);
+                },
                 'elv_blog_total' => function ($audience = Post::AUDIENCE_BUSINESS) {
                     return Blog::total((string) $audience);
                 },

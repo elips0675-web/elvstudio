@@ -61,21 +61,35 @@ meta_description = "Статьи о сайтах простым языком: к
                         {% endfor %}
                     </div>
 
-                    <p class="mt-24">
-                        <a href="{{ techLink }}">Технический раздел: {{ techTotal }} разборов для разработчиков →</a> ·
-                        <a href="{{ 'blog'|page }}#blog-start">С чего начать →</a>
-                    </p>
-
-                    <div class="card card--flat mt-24">
-                        <p class="muted">
-                            <strong>SEO-гид:</strong>
-                            <a href="{{ 'blog-post'|page({ slug: 'seo-fundament-sajta' }) }}">фундамент сайта</a> ·
-                            <a href="{{ 'blog-post'|page({ slug: 'seo-for-google-ai' }) }}">Google и ИИ-поиск</a> ·
-                            <a href="{{ 'blog-post'|page({ slug: 'kak-vybrat-seo-studiyu' }) }}">как выбрать студию</a> ·
-                            <a href="{{ 'blog-post'|page({ slug: 'seo-audit-sajta' }) }}">SEO-аудит</a> ·
-                            <a href="{{ 'services-seo'|page }}">как мы работаем с SEO</a>
-                        </p>
-                    </div>
+                    {% set seoPosts = elv_blog_category('seo', 5) %}
+                    {% set seoCategory = categories|filter(item => item.slug == 'seo')|first %}
+                    {% if seoPosts|length or techTotal %}
+                        <div class="blog-picks">
+                            {% if seoPosts|length %}
+                                <section class="blog-picks__col">
+                                    <h2 class="blog-picks__title">SEO-гид</h2>
+                                    <ol class="blog-picks__list">
+                                        {% for item in seoPosts %}
+                                            <li><a href="{{ 'blog-post'|page({ slug: item.slug }) }}">{{ item.title }}</a></li>
+                                        {% endfor %}
+                                    </ol>
+                                    <p class="blog-picks__more">
+                                        <a href="{{ 'blog'|page }}?category=seo">Все статьи о SEO{% if seoCategory %} ({{ seoCategory.posts_count }}){% endif %} →</a>
+                                        <a href="{{ 'services-seo'|page }}">Как мы работаем с SEO →</a>
+                                    </p>
+                                </section>
+                            {% endif %}
+                            {% if techTotal %}
+                                <section class="blog-picks__col">
+                                    <h2 class="blog-picks__title">Для разработчиков</h2>
+                                    <p class="blog-picks__note">{{ techTotal }} разборов в отдельном разделе.</p>
+                                    <p class="blog-picks__more">
+                                        <a href="{{ techLink }}">Открыть технический раздел →</a>
+                                    </p>
+                                </section>
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
                     {% if start|length and not hasFilters %}
                         <section class="blog-start" id="blog-start" aria-labelledby="blog-start-title">
