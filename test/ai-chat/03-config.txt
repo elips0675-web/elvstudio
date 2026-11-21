@@ -1,6 +1,6 @@
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
+Срез: 21.11.2026. Stage 83. Коммит: `534a1a3`.
 
 ===== FILE: composer.json =====
 
@@ -154,7 +154,7 @@ Booking, Shop, Feedback, Blog.
 |---|---|
 | `plugins/elv/kit` | плагин: модели, миграции, маршруты форм, оплата, лицензии, Seo, админка |
 | `themes/elv-studio` | тема лендинга: макет, партиалы, страницы, `styles.css`, `app.js` |
-| `docs/` | аудит источников, решения этапа 0, аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), калькулятор и студийные функции (`docs/studio-features-roadmap.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`), поиск (`docs/search.md`), версионность прайса (`docs/prices.md`) и QA-снимок (`docs/qa/`) |
+| `docs/` | аудит источников и решений (`docs/00-audit-documents.md`), исходные документы в `docs/html/` (42 файла), аудит блога (`docs/blog-audit.md`), план развития блога (`docs/blog-content-plan.md`), калькулятор и студийные функции (`docs/studio-features-roadmap.md`), краткая карта этапов 01–11 (`docs/stages-01-11.md`), политика контактов/чата/фильтра (`docs/content-policy.md`), поиск (`docs/search.md`), версионность прайса (`docs/prices.md`) и QA-снимок (`docs/qa/`) |
 | `Что сделано.txt` / `Что доделать.txt` | журнал этапов и открытый бэклог |
 | `test/Для анализа.txt` | самодостаточный срез для внешнего AI-аудита (DeepSeek/Qwen): стек, карта кода, гейты, бэклог; `test/README.md` — как пользоваться |
 | `config/`, `app/`, `bootstrap/` | конфигурация инсталляции October CMS |

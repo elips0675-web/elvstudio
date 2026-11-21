@@ -1,6 +1,6 @@
 # Карта сайта и SEO-разметка
 
-Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
+Срез: 21.11.2026. Stage 83. Коммит: `534a1a3`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -42,6 +42,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                     <ul class="mt-24">
                         <li><a href="{{ 'index'|page }}">Главная</a></li>
                         <li><a href="{{ 'kit'|page }}">Возможности Elv Kit</a></li>
+                        <li><a href="{{ 'template'|page }}">Универсальный шаблон для бизнеса</a></li>
                         <li><a href="{{ 'modules'|page }}">Модули Elv Kit</a></li>
                         <li><a href="{{ 'calculator'|page }}">Калькулятор стоимости</a></li>
                         <li><a href="{{ 'pricing'|page }}">Цены и тарифы</a></li>
@@ -401,7 +402,7 @@ class Seo
 
         if ($pageId === 'index') {
             $graph[] = static::softwareNode();
-            $graph[] = static::faqNode();
+            $graph[] = static::faqNode(null, 'faq', Faq::HOME_LIMIT);
         }
 
         if ($pageId === 'pricing') {
@@ -493,9 +494,9 @@ class Seo
         ]);
     }
 
-    protected static function faqNode(?string $id = null, string $source = 'faq'): array
+    protected static function faqNode(?string $id = null, string $source = 'faq', ?int $limit = null): array
     {
-        return static::faqNodeFromItems($id, Faq::items($source));
+        return static::faqNodeFromItems($id, Faq::items($source, $limit));
     }
 
     protected static function faqNodeFromItems(?string $id, array $source): array

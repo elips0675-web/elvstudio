@@ -1,6 +1,6 @@
 # Плагин: точка входа Elv.Kit
 
-Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
+Срез: 21.11.2026. Stage 83. Коммит: `534a1a3`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -8,6 +8,7 @@
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Faq;
@@ -321,6 +322,12 @@ class Plugin extends PluginBase
                 },
                 'elv_faq' => function () {
                     return Faq::items();
+                },
+                'elv_faq_home' => function () {
+                    return Faq::items('faq', Faq::HOME_LIMIT);
+                },
+                'elv_badge' => function ($key) {
+                    return Badges::label((string) $key);
                 },
                 'elv_icon' => function ($name, $class = '') {
                     return Icons::svg((string) $name, (string) $class);

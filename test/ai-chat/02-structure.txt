@@ -1,9 +1,9 @@
 # Структура репозитория Elv Landing
 
-Срез: 19.11.2026. Stage 74. Коммит: `a54cf8b`.
+Срез: 21.11.2026. Stage 83. Коммит: `534a1a3`.
 
-Отслеживаемые файлы (`git ls-files`), всего 465.
-`demo-static` — 111 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 498.
+`demo-static` — 112 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -19,19 +19,14 @@
 - `artisan`
 - `composer.json`
 - `composer.lock`
-- `elv-kit-audit-report.html`
-- `elv-kit-audit-report.txt`
 - `index.php`
 - `package.json`
 - `phpunit.xml`
 - `server.php`
 - `vercel.json`
-- `Аудит и план улучшения Elv Studio  Elv Kit Qwen.html`
-- `Как улучшить Консультанта, поиск и карту сайта deepseek.html`
 - `Что доделать.txt`
 - `Что сделано.txt`
 - `админка.bat`
-- `весь план и техническая инструкция для разработчика.txt`
 - `запуск.bat`
 
 ## plugins/elv/kit
@@ -41,6 +36,7 @@
 - `plugins/elv/kit/assets/widget.js`
 - `plugins/elv/kit/classes/AntiSpam.php`
 - `plugins/elv/kit/classes/Assets.php`
+- `plugins/elv/kit/classes/Badges.php`
 - `plugins/elv/kit/classes/Blog.php`
 - `plugins/elv/kit/classes/BookingService.php`
 - `plugins/elv/kit/classes/Calculator.php`
@@ -232,14 +228,21 @@
 - `themes/elv-studio/pages/services-support.htm`
 - `themes/elv-studio/pages/services.htm`
 - `themes/elv-studio/pages/sitemap.htm`
+- `themes/elv-studio/pages/template.htm`
 - `themes/elv-studio/pages/terms.htm`
 - `themes/elv-studio/partials/analytics.htm`
 - `themes/elv-studio/partials/blog-aside.htm`
 - `themes/elv-studio/partials/breadcrumbs.htm`
+- `themes/elv-studio/partials/check-items.htm`
+- `themes/elv-studio/partials/compare-table.htm`
 - `themes/elv-studio/partials/cta.htm`
 - `themes/elv-studio/partials/feedback-form.htm`
 - `themes/elv-studio/partials/footer.htm`
 - `themes/elv-studio/partials/header.htm`
+- `themes/elv-studio/partials/module-cards.htm`
+- `themes/elv-studio/partials/price-cards.htm`
+- `themes/elv-studio/partials/product-switch.htm`
+- `themes/elv-studio/partials/service-cards.htm`
 - `themes/elv-studio/partials/subscribe.htm`
 - `themes/elv-studio/screenshot.png`
 - `themes/elv-studio/theme.yaml`
@@ -277,6 +280,7 @@
 - `tools/search-check.php`
 - `tools/seo-check.php`
 - `tools/serve-static.php`
+- `tools/static-chat-data.php`
 - `tools/warmup.ps1`
 
 ## docs
@@ -286,27 +290,47 @@
 - `docs/blog-content-plan.md`
 - `docs/content-policy.md`
 - `docs/html/50 статей ELV Studio что есть, где пробелы и о чём писать дальше deepseek.html`
+- `docs/html/Elv Kit — Digital Store Kit deepseek.html`
+- `docs/html/Elv Landing или October CMS что делать первым.html`
 - `docs/html/Elv Studio что уже работает в блоге и как двигаться дальше deepseek.html`
 - `docs/html/Laravel + Filament.txt`
 - `docs/html/October CMS Booking deepseek.html`
 - `docs/html/October CMS для лендинга с бронированием, заказами и чатом deepseek.html`
+- `docs/html/ThemeForest Live Preview .txt`
+- `docs/html/elv-kit-audit-report.html`
+- `docs/html/elv-kit-audit-report.txt`
+- `docs/html/elv_kit_universal_demo_prompt.txt`
+- `docs/html/elv_master_plan_v2.txt`
+- `docs/html/release_master_light.html`
 - `docs/html/«Стучалка» установок с проверкой Ключа (License Key) Qwen.html`
+- `docs/html/Анализ opencode deepseek.txt`
+- `docs/html/Аудит и план улучшения Elv Studio  Elv Kit Qwen.html`
 - `docs/html/Аудит и точки роста блога Elv Studio Qwen.html`
 - `docs/html/Бренд Elv шаблон функционал.txt`
 - `docs/html/Готовые статьи для блога от выбора CMS до воронки продаж deepseek.html`
+- `docs/html/Деобрендинг и доведение до релиза (4 задачи).txt`
 - `docs/html/Доработка студии.txt`
 - `docs/html/Доступ к товару после оплаты.txt`
+- `docs/html/Запуск продаж Elv Kit + Универсальный шаблон October CMS deepseek (2).html`
 - `docs/html/Идеальный сайт для бизнеса как подружить CMS, хостинг, скорость seo deepseek deepseek.html`
 - `docs/html/Как монетизировать шаблон и функционал для October CMS deepseek.html`
 - `docs/html/Как сделать стучалку (счетчик) установок плагинов и шаблонов в October CMS deepseek.html`
+- `docs/html/Как улучшить Консультанта, поиск и карту сайта deepseek.html`
+- `docs/html/Критически важно (без этого поддержка утонет в рутине).txt`
 - `docs/html/Промт Промт для создания сайта на October CMS для продажи Elv Kit (универсальный конструктор).txt`
 - `docs/html/Промты Elv.txt`
 - `docs/html/Стратегия развития блога ELV Studio deepseek.html`
 - `docs/html/Улучшение шаблона .txt`
+- `docs/html/Улучшение шаблона new.txt`
+- `docs/html/в полноценную автономную платформу для продаж.txt`
+- `docs/html/весь план и техническая инструкция для разработчика.txt`
 - `docs/html/гайда по Yoast SEO deepseek.html`
 - `docs/html/код Qwen.html`
 - `docs/html/код гугл режим ИИ.txt`
 - `docs/html/на October CMS процесс оплаты заказа был таким же безопасным и удобным.txt`
+- `docs/html/проект идеально подходит для продаж софта.txt`
+- `docs/html/профиль клиента и чат тикет системы.txt`
+- `docs/html/шаблонный конструктор или готовое решение на продажу аренду.html`
 - `docs/prices.md`
 - `docs/qa/README.md`
 - `docs/qa/firefox-360-blog-article.png`
@@ -329,4 +353,4 @@
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 74, собран `node tools/build-test-snapshot.mjs`)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 83, собран `node tools/build-test-snapshot.mjs`)
