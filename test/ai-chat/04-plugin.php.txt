@@ -1,6 +1,6 @@
 # Плагин: точка входа Elv.Kit
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -256,6 +256,13 @@ class Plugin extends PluginBase
                 },
                 'elv_plan_label' => function ($key) {
                     return Catalog::planLabel((string) $key);
+                },
+                'elv_order_url' => function (array $params = []) {
+                    $query = array_filter($params, function ($value) {
+                        return $value !== null && $value !== '';
+                    });
+
+                    return url('order') . '/' . ($query ? '?' . http_build_query($query) : '');
                 },
                 'elv_menu_products' => function () {
                     return Menu::products();

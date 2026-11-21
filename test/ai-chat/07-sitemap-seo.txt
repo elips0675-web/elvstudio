@@ -1,6 +1,6 @@
 # Карта сайта и SEO-разметка
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 

@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки и аудит приватности. Файлы разделены, чтобы каждый был понятен.
@@ -228,7 +228,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 Отслеживаемые файлы (`git ls-files`), всего 522.
 `demo-static` — 125 HTML-страниц, показан не развёрнуто.
@@ -598,7 +598,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: composer.json =====
 
@@ -859,7 +859,7 @@ php artisan elv:kit:package         # ZIP темы и плагина для по
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -1116,6 +1116,13 @@ class Plugin extends PluginBase
                 'elv_plan_label' => function ($key) {
                     return Catalog::planLabel((string) $key);
                 },
+                'elv_order_url' => function (array $params = []) {
+                    $query = array_filter($params, function ($value) {
+                        return $value !== null && $value !== '';
+                    });
+
+                    return url('order') . '/' . ($query ? '?' . http_build_query($query) : '');
+                },
                 'elv_menu_products' => function () {
                     return Menu::products();
                 },
@@ -1354,7 +1361,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -2641,7 +2648,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -3710,7 +3717,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -4549,7 +4556,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
+Срез: 21.11.2026. Stage 84. Коммит: `1808b74`.
 
 ===== FILE: tools/chat-check.php =====
 
