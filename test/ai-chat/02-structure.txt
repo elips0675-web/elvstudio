@@ -1,9 +1,9 @@
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 83. Коммит: `534a1a3`.
+Срез: 21.11.2026. Stage 84. Коммит: `8ec0261`.
 
-Отслеживаемые файлы (`git ls-files`), всего 498.
-`demo-static` — 112 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 503.
+`demo-static` — 115 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -24,6 +24,7 @@
 - `phpunit.xml`
 - `server.php`
 - `vercel.json`
+- `Что доделать коротко.txt`
 - `Что доделать.txt`
 - `Что сделано.txt`
 - `админка.bat`
@@ -262,6 +263,7 @@
 - `tools/check-common.mjs`
 - `tools/check-console.mjs`
 - `tools/check-empty-install.mjs`
+- `tools/check-encoding.mjs`
 - `tools/check-headers.mjs`
 - `tools/check-orphans.mjs`
 - `tools/check-package.mjs`
@@ -353,4 +355,4 @@
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 83, собран `node tools/build-test-snapshot.mjs`)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 84, собран `node tools/build-test-snapshot.mjs`)

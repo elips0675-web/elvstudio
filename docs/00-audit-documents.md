@@ -171,7 +171,7 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
 `Search.php`, `TextFilter.php`, `ChatController.php` и `widget.js` в отчёте
 не упомянуты. Упомянутые пути — рекомендации, а не факты чтения.
 
-Чтобы закрыть этот пробел, в `test/ai-chat/` лежит снимок кода (на Stage 83 —
+Чтобы закрыть этот пробел, в `test/ai-chat/` лежит снимок кода (на Stage 84 —
 актуальный): `ALL-IN-ONE.txt` или отдельные файлы с `Chat.php`, `Search.php`,
 `TextFilter.php`, `ChatController.php`, `widget.js`, `chat-check.php`,
 `booking-check.php`, `Plugin.php`, `composer.json`, `theme.yaml`,
