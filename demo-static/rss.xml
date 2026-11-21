@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Review и AggregateRating в JSON-LD: разметка отзывов без ошибок</title>
+      <link>https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</guid>
+      <description>Звёзды в поиске не появляются от одного тега. Какие поля нужны Review и AggregateRating, где разметка уместна и почему пустые отзывы её ломают.</description>
+      <pubDate>Fri, 20 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Модерация отзывов: правила, ответы и отрицательные отзывы</title>
+      <link>https://elvstudio.vercel.app/blog/moderaciya-otzyvov</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/moderaciya-otzyvov</guid>
+      <description>Отзывы нельзя публиковать без проверки, но и удалять всё неприятное нельзя. Правила модерации, алгоритм ответа на критику и шаблон без оправданий.</description>
+      <pubDate>Thu, 19 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Как попросить отзыв после покупки: 7 правил без навязчивости</title>
+      <link>https://elvstudio.vercel.app/blog/kak-prosit-otzyv-posle-pokupki</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-prosit-otzyv-posle-pokupki</guid>
+      <description>Отзыв появляется не сам: нужно вовремя попросить и помочь сформулировать. Семь правил, три вопроса и шаблоны сообщений без давления и подкупа.</description>
+      <pubDate>Wed, 18 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Кейс на демо: 12 синхронных скриптов — LCP 2,9 → 1,6 с</title>
       <link>https://elvstudio.vercel.app/blog/kejs-lcp-12-skriptov</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kejs-lcp-12-skriptov</guid>
@@ -218,28 +239,28 @@
       <title>Почему клиенты не приходят на запись и как это исправить</title>
       <link>https://elvstudio.vercel.app/blog/pochemu-klienty-ne-prihodyat-na-zapis</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pochemu-klienty-ne-prihodyat-na-zapis</guid>
-      <description>Неявки съедают расписание и деньги. Причины, подтверждение, напоминания, предоплата, лист ожидания и метрики, которые стоит считать.</description>
+      <description>Неявка — не одна причина, а сумма мелочей: непонятное подтверждение, отсутствие напоминания, неудобный перенос. Что проверить и как считать потери.</description>
       <pubDate>Sat, 14 Nov 2026 08:30:00 +0000</pubDate>
     </item>
     <item>
       <title>Напоминания клиентам: за день, за час, после визита</title>
       <link>https://elvstudio.vercel.app/blog/napominaniya-klientam</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/napominaniya-klientam</guid>
-      <description>Три сообщения, время отправки, шаблоны текстов, что не писать и как получить согласие клиента. Напоминания без навязчивости.</description>
+      <description>Три коротких сообщения снижают неявки и звонки администратору. Когда отправлять, что писать, как получить согласие и не превратить помощь в спам.</description>
       <pubDate>Sat, 14 Nov 2026 08:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Что подготовить к запуску сайта: чек-лист</title>
       <link>https://elvstudio.vercel.app/blog/chto-podgotovit-k-zapusku-sajta</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/chto-podgotovit-k-zapusku-sajta</guid>
-      <description>Тексты, фото, услуги и цены, документы, домен, почта, доступы, аналитика и обучение администратора. Чек-лист, который экономит недели.</description>
+      <description>Тексты, фото, цены, документы, доступы и аналитика — что собрать до старта, чтобы запуск не сдвигался, а первый экран не заполнялся заглушками.</description>
       <pubDate>Sat, 14 Nov 2026 07:30:00 +0000</pubDate>
     </item>
     <item>
       <title>Онлайн-запись или переписка в мессенджере: что выбрать</title>
       <link>https://elvstudio.vercel.app/blog/onlajn-zapis-ili-messendzher</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/onlajn-zapis-ili-messendzher</guid>
-      <description>Скорость ответа, потерянные заявки, напоминания, предоплата и аналитика. Когда хватает мессенджера, а когда нужна онлайн-запись.</description>
+      <description>Мессенджер быстрее для вопроса, онлайн-запись — для конкретного времени. Сравниваем по скорости, потерям, напоминаниям, оплате и стоимости владения.</description>
       <pubDate>Sat, 14 Nov 2026 07:00:00 +0000</pubDate>
     </item>
     <item>
@@ -267,7 +288,7 @@
       <title>Отзывы и доверие на сайте: как собрать социальные доказательства</title>
       <link>https://elvstudio.vercel.app/blog/otzyvy-i-doverie-na-sajte</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/otzyvy-i-doverie-na-sajte</guid>
-      <description>Типы отзывов, где разместить, как просить, модерировать и не попасться на фейках. Что проверить, чтобы отзывы действительно помогали.</description>
+      <description>Отзыв убеждает, когда в нём есть имя, дата, услуга и конкретный результат. Как собирать, где показывать и что делать с критикой — без выдуманных оценок.</description>
       <pubDate>Sat, 14 Nov 2026 05:00:00 +0000</pubDate>
     </item>
     <item>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/static-cache-headers</guid>
       <description>Ассеты можно кэшировать на год, HTML — нет. Разбираем Cache-Control, ETag и gzip без риска показать чужую страницу.</description>
       <pubDate>Tue, 03 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Антиспам без капчи: honeypot, лимиты и время заполнения</title>
-      <link>https://elvstudio.vercel.app/blog/form-spam-without-captcha</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/form-spam-without-captcha</guid>
-      <description>Капча снижает конверсию и не спасает от всего. Три невидимые проверки, которые отсекают ботов в форме обратной связи.</description>
-      <pubDate>Sun, 01 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Чек-лист статьи перед публикацией: 12 пунктов</title>
-      <link>https://elvstudio.vercel.app/blog/article-checklist</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/article-checklist</guid>
-      <description>Текст, SEO и техника: короткий список, который ловит ошибки до публикации, а не через месяц в поиске.</description>
-      <pubDate>Sat, 31 Oct 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Миграции без страха: forward-only и проверка схемы</title>
-      <link>https://elvstudio.vercel.app/blog/october-migrations-discipline</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/october-migrations-discipline</guid>
-      <description>Миграция выполнится на проде однажды и откатить её нельзя. Правила, которые дешевле восстановления из бэкапа.</description>
-      <pubDate>Fri, 30 Oct 2026 10:00:00 +0000</pubDate>
     </item>
 </channel></rss>

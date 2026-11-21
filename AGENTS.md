@@ -26,7 +26,7 @@
 |---|---|
 | `themes/elv-studio/` | лендинг: `layouts/`, `pages/` (index, kit, modules, module, pricing, demo, blog, blog-tech, blog-post, docs, order, order-success, booking, feedback, contacts, terms, privacy, sitemap, 404), `partials/`, `assets/`, `content/` |
 | `plugins/elv/kit/classes/` | `Catalog`, `Demo`, `Seo`, `Sitemap`, `Rss`, `DownloadService`, `LicenseService`, `OrderService`, `BookingService`, `Slots`, `Chat`, `AntiSpam`, `Http/*` |
-| `plugins/elv/kit/demo/` | `blog.json` — демо-статьи блога (38 базовых + 48 переопределений + 25 блоков перелинковки); в товарный архив не входит |
+| `plugins/elv/kit/demo/` | `blog.json` — демо-статьи блога (38 базовых + 51 переопределение + 25 блоков перелинковки); в товарный архив не входит |
 | `plugins/elv/kit/models/` | `Product`, `Post`, `Order`, `Booking`, `Slot`, `Message`, `Subscriber`, `License`, `Install`, `Category`, `Settings` |
 | `plugins/elv/kit/controllers/` | админка: `posts`, `products`, `categories`, `orders`, `bookings`, `messages`, `subscribers`, `licenses`, `install` |
 | `plugins/elv/kit/console/` | `elv:kit:demo`, `elv:kit:reset`, `elv:kit:package` |
