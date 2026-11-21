@@ -4,6 +4,8 @@
 {% set allLabel = allLabel ?? 'Все статьи' %}
 {% set moreHref = moreHref ?? null %}
 {% set moreLabel = moreLabel ?? '' %}
+{% set moreCount = moreCount ?? null %}
+{% set totalNote = totalNote ?? '' %}
 <details class="blog-aside">
     <summary class="aside-toggle">Разделы и стоимость</summary>
     <aside class="aside-body" aria-label="Меню блога">
@@ -26,7 +28,10 @@
                 {% endfor %}
             </ul>
             {% if moreHref %}
-                <p class="aside-more"><a href="{{ moreHref }}">{{ moreLabel }} →</a></p>
+                <p class="aside-more"><a href="{{ moreHref }}">{{ moreLabel }}{% if moreCount %} <span class="aside-count">{{ moreCount }}</span>{% endif %} →</a></p>
+            {% endif %}
+            {% if totalNote %}
+                <p class="muted">{{ totalNote }}</p>
             {% endif %}
         </div>
 

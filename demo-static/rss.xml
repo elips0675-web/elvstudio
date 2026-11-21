@@ -5,6 +5,27 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Tilda, WordPress и October CMS: сравнение по задачам</title>
+      <link>https://elvstudio.vercel.app/blog/tilda-wordpress-october</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/tilda-wordpress-october</guid>
+      <description>Не «какая платформа лучше», а какая задача и кто будет поддерживать сайт. Критерии, таблица и что не потерять при переносе.</description>
+      <pubDate>Sat, 21 Nov 2026 06:20:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Как выбрать модуль: запись, магазин, формы или блог</title>
+      <link>https://elvstudio.vercel.app/blog/kak-vybrat-modul</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-modul</guid>
+      <description>Четыре модуля, четыре задачи и один главный сценарий. Как выбрать первый модуль, что проверить в демо и почему не стоит включать всё сразу.</description>
+      <pubDate>Sat, 21 Nov 2026 06:10:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Что входит в Elv Kit и чего в нём нет</title>
+      <link>https://elvstudio.vercel.app/blog/chto-vhodit-v-elv-kit</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/chto-vhodit-v-elv-kit</guid>
+      <description>Тема, плагин, модули и честный список того, чего в поставке нет: кабинета, форума, мультиязычности и демо-статей. Чтобы не покупать вслепую.</description>
+      <pubDate>Sat, 21 Nov 2026 06:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Review и AggregateRating в JSON-LD: разметка отзывов без ошибок</title>
       <link>https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</guid>
@@ -332,26 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/backup-restore-plan</guid>
       <description>Бэкап существует не тогда, когда файл создан, а когда из него восстановили данные. Что копировать и как проверить.</description>
       <pubDate>Sat, 07 Nov 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Инлайн CSS и бюджет 36 КБ: что выкинуть первым</title>
-      <link>https://elvstudio.vercel.app/blog/css-inline-budget</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/css-inline-budget</guid>
-      <description>Инлайн CSS ускоряет первый экран и замедляет следующие страницы. Бюджет — причина сказать «нет» новой утилите.</description>
-      <pubDate>Fri, 06 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Защита от овербукинга: UNIQUE против «проверил и записал»</title>
-      <link>https://elvstudio.vercel.app/blog/booking-without-race</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/booking-without-race</guid>
-      <description>Проверка доступности слота без блокировки — это гонка. Показываем схему с UNIQUE и lockForUpdate, которая держит нагрузку.</description>
-      <pubDate>Thu, 05 Nov 2026 10:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Кэш и заголовки: как не отдавать HTML заново</title>
-      <link>https://elvstudio.vercel.app/blog/static-cache-headers</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/static-cache-headers</guid>
-      <description>Ассеты можно кэшировать на год, HTML — нет. Разбираем Cache-Control, ETag и gzip без риска показать чужую страницу.</description>
-      <pubDate>Tue, 03 Nov 2026 10:00:00 +0000</pubDate>
     </item>
 </channel></rss>

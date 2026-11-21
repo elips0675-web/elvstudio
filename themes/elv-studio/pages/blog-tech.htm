@@ -8,6 +8,9 @@ meta_description = "Как устроен сайт на October CMS: скоро�
 {% set crumbs = elv_breadcrumbs() %}
 {% set categories = elv_categories('tech') %}
 {% set businessBlog = 'blog'|page %}
+{% set businessTotal = elv_blog_total('business') %}
+{% set techTotal = elv_blog_total('tech') %}
+{% set allTotal = businessTotal + techTotal %}
 
 <main id="main">
     <section class="page-hero">
@@ -16,9 +19,10 @@ meta_description = "Как устроен сайт на October CMS: скоро�
             <span class="eyebrow">Технический раздел</span>
             <h1>Как устроен сайт: разборы для разработчиков</h1>
             <p class="lead">Скорость, миграции, оплата, бронирование и SEO — с деталями, которые важны при внедрении и поддержке. Для владельца бизнеса у нас есть отдельный блог.</p>
+            <p class="muted mt-16">Технических разборов: {{ techTotal }}. Статей о бизнесе: {{ businessTotal }}. Всего: {{ allTotal }}.</p>
 
             <div class="stack-actions mt-24">
-                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Статьи для бизнеса {{ elv_icon('arrow-right')|raw }}</a>
+                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Статьи для бизнеса · {{ businessTotal }} {{ elv_icon('arrow-right')|raw }}</a>
             </div>
         </div>
     </section>
@@ -63,10 +67,13 @@ meta_description = "Как устроен сайт на October CMS: скоро�
                 {% partial 'blog-aside'
                     categories=categories
                     activeCategory=elv_query('category')
-                    total=elv_blog_total('tech')
+                    total=techTotal
+                    allLabel='Технические разборы'
                     indexPage=('blog-tech'|page)
                     moreHref=businessBlog
-                    moreLabel='Блог для бизнеса' %}
+                    moreLabel='Статьи о бизнесе'
+                    moreCount=businessTotal
+                    totalNote='Всего статей: ' ~ allTotal ~ ' — ' ~ techTotal ~ ' технических и ' ~ businessTotal ~ ' о бизнесе.' %}
             </div>
         </div>
     </section>

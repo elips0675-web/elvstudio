@@ -14,6 +14,9 @@ meta_description = "Статьи о сайтах простым языком: к
 {% set crumbs = elv_breadcrumbs() %}
 {% set start = elv_blog_start(5) %}
 {% set techLink = 'blog-tech'|page %}
+{% set businessTotal = elv_blog_total('business') %}
+{% set techTotal = elv_blog_total('tech') %}
+{% set allTotal = businessTotal + techTotal %}
 
 <main id="main">
     <section class="page-hero">
@@ -22,6 +25,7 @@ meta_description = "Статьи о сайтах простым языком: к
             <span class="eyebrow">Блог</span>
             <h1>Статьи о сайтах простым языком</h1>
             <p class="lead">Как выбрать сайт, принимать записи и оплату, писать статьи и продвигаться в поиске. Понятным языком, без маркетингового шума.</p>
+            <p class="muted mt-16">Статей о бизнесе: {{ businessTotal }}. Технических разборов: {{ techTotal }}. Всего: {{ allTotal }} — технические материалы собраны в <a href="{{ techLink }}">отдельном разделе</a>.</p>
 
             <form class="subscribe mt-24" method="get" action="{{ 'blog'|page }}" role="search">
                 <label class="sr-only" for="blog-search">Поиск по статьям</label>
@@ -47,7 +51,7 @@ meta_description = "Статьи о сайтах простым языком: к
 
                     {% set hasFilters = activeCategory or activeTag or query %}
                     <div class="chips{% if not hasFilters %} chips--aside{% endif %}">
-                        <a class="chip{% if not activeCategory and not activeTag and not query %} chip--active{% endif %}" href="{{ 'blog'|page }}">Все статьи</a>
+                        <a class="chip{% if not activeCategory and not activeTag and not query %} chip--active{% endif %}" href="{{ 'blog'|page }}">О бизнесе <span class="muted">{{ businessTotal }}</span></a>
                         {% for category in categories %}
                             <a
                                 class="chip{% if activeCategory == category.slug %} chip--active{% endif %}"
@@ -58,7 +62,7 @@ meta_description = "Статьи о сайтах простым языком: к
                     </div>
 
                     <p class="mt-24">
-                        <a href="{{ 'blog-tech'|page }}">Технический раздел: разборы для разработчиков →</a> ·
+                        <a href="{{ techLink }}">Технический раздел: {{ techTotal }} разборов для разработчиков →</a> ·
                         <a href="{{ 'blog'|page }}#blog-start">С чего начать →</a>
                     </p>
 
@@ -140,7 +144,7 @@ meta_description = "Статьи о сайтах простым языком: к
                     {% endif %}
                 </div>
 
-                {% partial 'blog-aside' categories=categories activeCategory=activeCategory total=elv_blog_total('business') moreHref=techLink moreLabel='Технический раздел' %}
+                {% partial 'blog-aside' categories=categories activeCategory=activeCategory total=businessTotal allLabel='Статьи о бизнесе' moreHref=techLink moreLabel='Технический раздел' moreCount=techTotal totalNote='Всего статей: ' ~ allTotal ~ ' — ' ~ businessTotal ~ ' о бизнесе и ' ~ techTotal ~ ' технических.' %}
             </div>
         </div>
     </section>
