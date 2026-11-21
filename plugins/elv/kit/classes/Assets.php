@@ -41,8 +41,9 @@ class Assets
 
     /**
      * Сжатие CSS без разбора грамматики: комментарии, переносы и пробелы вокруг
-     * служебных символов. Пробелы вокруг `:` не трогаем — `a :hover` и `a:hover`
-     * это разные селекторы.
+     * служебных символов. Пробел перед `:` не трогаем — `a :hover` и `a:hover`
+     * это разные селекторы. Пробел после `:` в объявлении не нужен, поэтому
+     * `color: red` сжимается до `color:red` (строк с `content: "…: …"` в теме нет).
      */
     protected static function minifyCss(string $css): string
     {
@@ -53,7 +54,7 @@ class Assets
         $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
         $css = (string) preg_replace('~\s+~', ' ', $css);
         $css = (string) preg_replace('~\s*([{};,])\s*~', '$1', $css);
-        $css = str_replace(';}', '}', $css);
+        $css = str_replace([';}', ': '], ['}', ':'], $css);
 
         return trim($css);
     }

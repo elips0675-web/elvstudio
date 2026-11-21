@@ -8,6 +8,7 @@ use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
+use Elv\Kit\Classes\Menu;
 use Elv\Kit\Classes\Money;
 use Elv\Kit\Classes\CompressResponse;
 use Elv\Kit\Classes\Prices;
@@ -248,6 +249,15 @@ class Plugin extends PluginBase
                 },
                 'elv_plan_label' => function ($key) {
                     return Catalog::planLabel((string) $key);
+                },
+                'elv_menu_products' => function () {
+                    return Menu::products();
+                },
+                'elv_menu_products_label' => function () {
+                    return Menu::label();
+                },
+                'elv_menu_products_current' => function () {
+                    return Menu::hasCurrent();
                 },
                 'elv_calculator' => function () {
                     return Calculator::data();

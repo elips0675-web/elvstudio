@@ -17,6 +17,19 @@ tabs:
             size: small
             default: 'Elv Kit — тема, модули и демо-данные для October CMS 4.x.'
 
+        menu_products_label:
+            label: 'Название раздела'
+            tab: 'Меню'
+            span: left
+            default: 'Продукты'
+            comment: 'Пункт в шапке сайта. Пусто — «Продукты».'
+        menu_products:
+            label: 'Разработки в меню'
+            tab: 'Меню'
+            type: textarea
+            size: small
+            comment: 'Название | адрес | подпись — по одной строке. Подпись необязательна, адрес может быть внешним. Пусто — в меню «Elv Kit» и «Шаблон».'
+
         email:
             label: 'E-mail'
             tab: 'Контакты'

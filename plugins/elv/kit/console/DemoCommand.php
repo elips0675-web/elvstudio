@@ -27,6 +27,7 @@ class DemoCommand extends Command
         if (!$this->option('refresh-slots')) {
             $created = Demo::seed((bool) $this->option('refresh-posts'), (bool) $this->option('refresh-catalog'));
             Demo::contacts();
+            Demo::menu();
             Demo::faq();
 
             if (!Demo::hasPostsDataset()) {

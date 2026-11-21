@@ -105,6 +105,26 @@ class Demo
     }
 
     /**
+     * menu — демонстрационный список раздела «Продукты» в шапке.
+     * Пустые настройки владельца не перетирает: пункты добавляются в админке.
+     */
+    public static function menu(): void
+    {
+        $defaults = [
+            'menu_products_label' => 'Продукты',
+            'menu_products' => "Elv Kit | /kit/ | Тема и плагин для October CMS\n"
+                . "Шаблон | /template/ | Готовый сайт под свой контент\n"
+                . "Модули | /modules/ | Запись, магазин, формы, блог",
+        ];
+
+        foreach ($defaults as $key => $value) {
+            if ((string) \Elv\Kit\Models\Settings::get($key) === '') {
+                \Elv\Kit\Models\Settings::set($key, $value);
+            }
+        }
+    }
+
+    /**
      * faq — переносит демонстрационные вопросы из config/*.php в настройки,
      * если владелец их ещё не задал. Консультант и блоки FAQ читают только настройки.
      */
