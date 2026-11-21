@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки и аудит приватности. Файлы разделены, чтобы каждый был понятен.
@@ -228,10 +228,10 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
-Отслеживаемые файлы (`git ls-files`), всего 508.
-`demo-static` — 119 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 522.
+`demo-static` — 125 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -273,6 +273,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/classes/Chat.php`
 - `plugins/elv/kit/classes/CompressResponse.php`
 - `plugins/elv/kit/classes/Demo.php`
+- `plugins/elv/kit/classes/DemoLinks.php`
 - `plugins/elv/kit/classes/DownloadService.php`
 - `plugins/elv/kit/classes/Faq.php`
 - `plugins/elv/kit/classes/Http/BookingController.php`
@@ -422,15 +423,18 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 - `themes/elv-studio/assets/css/blog.css`
 - `themes/elv-studio/assets/css/calculator.css`
+- `themes/elv-studio/assets/css/preview.css`
 - `themes/elv-studio/assets/css/search.css`
 - `themes/elv-studio/assets/css/styles.css`
 - `themes/elv-studio/assets/img/favicon.svg`
 - `themes/elv-studio/assets/img/og-default.png`
 - `themes/elv-studio/assets/js/app.js`
 - `themes/elv-studio/assets/js/calculator.js`
+- `themes/elv-studio/assets/js/preview.js`
 - `themes/elv-studio/assets/js/search.js`
 - `themes/elv-studio/composer.json`
 - `themes/elv-studio/layouts/default.htm`
+- `themes/elv-studio/layouts/preview.htm`
 - `themes/elv-studio/pages/404.htm`
 - `themes/elv-studio/pages/blog-post.htm`
 - `themes/elv-studio/pages/blog-tech.htm`
@@ -447,6 +451,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `themes/elv-studio/pages/modules.htm`
 - `themes/elv-studio/pages/order-success.htm`
 - `themes/elv-studio/pages/order.htm`
+- `themes/elv-studio/pages/preview.htm`
 - `themes/elv-studio/pages/pricing.htm`
 - `themes/elv-studio/pages/privacy.htm`
 - `themes/elv-studio/pages/search.htm`
@@ -470,6 +475,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `themes/elv-studio/partials/footer.htm`
 - `themes/elv-studio/partials/header.htm`
 - `themes/elv-studio/partials/module-cards.htm`
+- `themes/elv-studio/partials/preview.htm`
 - `themes/elv-studio/partials/price-cards.htm`
 - `themes/elv-studio/partials/product-switch.htm`
 - `themes/elv-studio/partials/service-cards.htm`
@@ -592,7 +598,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: composer.json =====
 
@@ -853,7 +859,7 @@ php artisan elv:kit:package         # ZIP темы и плагина для по
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -864,6 +870,7 @@ use Elv\Kit\Classes\Assets;
 use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\DemoLinks;
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
@@ -1118,6 +1125,9 @@ class Plugin extends PluginBase
                 'elv_menu_products_current' => function () {
                     return Menu::hasCurrent();
                 },
+                'elv_demo_links' => function () {
+                    return DemoLinks::items();
+                },
                 'elv_calculator' => function () {
                     return Calculator::data();
                 },
@@ -1344,7 +1354,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -2631,7 +2641,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -3700,7 +3710,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -4539,7 +4549,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -5208,7 +5218,7 @@ const errors = [];
 
 const pages = ['/', '/kit/', '/pricing/', '/blog/', '/modules/booking/'];
 const required = {
-  'x-frame-options': 'deny',
+  'x-frame-options': 'sameorigin',
   'x-content-type-options': 'nosniff',
   'referrer-policy': '',
   'permissions-policy': '',
@@ -5251,7 +5261,7 @@ for (const path of pages) {
   if (!csp) {
     errors.push(`${path}: CSP missing`);
   } else {
-    for (const token of ["default-src 'self'", "frame-ancestors 'none'", "object-src 'none'"]) {
+    for (const token of ["default-src 'self'", "frame-ancestors 'self'", "frame-src 'self'", "object-src 'none'"]) {
       if (!csp.includes(token)) {
         errors.push(`${path}: CSP without ${token}`);
       }
@@ -5271,6 +5281,25 @@ for (const path of pages) {
   }
 
   console.log(`${path} -> ${response.status} ${body.byteLength} bytes gzip`);
+}
+
+const preview = await fetch(BASE + '/preview/', { redirect: 'follow' });
+const previewBody = await preview.text();
+
+if (preview.status !== 200) {
+  errors.push(`/preview/: status ${preview.status}`);
+}
+
+if (!/noindex/i.test(preview.headers.get('x-robots-tag') || '')) {
+  errors.push('/preview/: x-robots-tag noindex missing');
+}
+
+if (!/no-store/i.test(preview.headers.get('cache-control') || '')) {
+  errors.push('/preview/: cache-control no-store missing');
+}
+
+if (!/<meta\s+name="robots"[^>]*noindex/i.test(previewBody)) {
+  errors.push('/preview/: meta robots noindex missing');
 }
 
 const assets = [
@@ -5364,7 +5393,8 @@ class SecurityHeaders
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'none'",
+            "frame-ancestors 'self'",
+            "frame-src 'self' https:",
             "img-src 'self' data:",
             "font-src 'self'",
             "style-src 'self' 'nonce-" . $nonce . "'",
@@ -5381,12 +5411,18 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'DENY');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         header_remove('X-Powered-By');
         $response->headers->remove('X-Powered-By');
+
+        // Живой предпросмотр не индексируется и не кэшируется.
+        if ($request->is('preview', 'preview/*')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+            $response->headers->set('Cache-Control', 'no-store, max-age=0');
+        }
 
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

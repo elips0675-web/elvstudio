@@ -1,9 +1,9 @@
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 21.11.2026. Stage 84. Коммит: `dfad973`.
 
-Отслеживаемые файлы (`git ls-files`), всего 508.
-`demo-static` — 119 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 522.
+`demo-static` — 125 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -45,6 +45,7 @@
 - `plugins/elv/kit/classes/Chat.php`
 - `plugins/elv/kit/classes/CompressResponse.php`
 - `plugins/elv/kit/classes/Demo.php`
+- `plugins/elv/kit/classes/DemoLinks.php`
 - `plugins/elv/kit/classes/DownloadService.php`
 - `plugins/elv/kit/classes/Faq.php`
 - `plugins/elv/kit/classes/Http/BookingController.php`
@@ -194,15 +195,18 @@
 
 - `themes/elv-studio/assets/css/blog.css`
 - `themes/elv-studio/assets/css/calculator.css`
+- `themes/elv-studio/assets/css/preview.css`
 - `themes/elv-studio/assets/css/search.css`
 - `themes/elv-studio/assets/css/styles.css`
 - `themes/elv-studio/assets/img/favicon.svg`
 - `themes/elv-studio/assets/img/og-default.png`
 - `themes/elv-studio/assets/js/app.js`
 - `themes/elv-studio/assets/js/calculator.js`
+- `themes/elv-studio/assets/js/preview.js`
 - `themes/elv-studio/assets/js/search.js`
 - `themes/elv-studio/composer.json`
 - `themes/elv-studio/layouts/default.htm`
+- `themes/elv-studio/layouts/preview.htm`
 - `themes/elv-studio/pages/404.htm`
 - `themes/elv-studio/pages/blog-post.htm`
 - `themes/elv-studio/pages/blog-tech.htm`
@@ -219,6 +223,7 @@
 - `themes/elv-studio/pages/modules.htm`
 - `themes/elv-studio/pages/order-success.htm`
 - `themes/elv-studio/pages/order.htm`
+- `themes/elv-studio/pages/preview.htm`
 - `themes/elv-studio/pages/pricing.htm`
 - `themes/elv-studio/pages/privacy.htm`
 - `themes/elv-studio/pages/search.htm`
@@ -242,6 +247,7 @@
 - `themes/elv-studio/partials/footer.htm`
 - `themes/elv-studio/partials/header.htm`
 - `themes/elv-studio/partials/module-cards.htm`
+- `themes/elv-studio/partials/preview.htm`
 - `themes/elv-studio/partials/price-cards.htm`
 - `themes/elv-studio/partials/product-switch.htm`
 - `themes/elv-studio/partials/service-cards.htm`
