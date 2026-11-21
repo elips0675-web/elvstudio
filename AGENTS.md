@@ -33,6 +33,7 @@
 | `plugins/elv/kit/updates/` | `version.yaml` (единственный источник версии плагина) + миграции и сиды |
 | `plugins/elv/kit/routes.php` | формы, оплата, `/download/{token}`, `/api/v1/license/*`, sitemap/robots/llms/rss |
 | `tools/` | гейты `check-*.mjs`, `production-check.php`, `export-static.php`, `blog-content-audit.php`, `build-test-snapshot.mjs` (снимок `test/ai-chat`) |
+| `docs/` | `00-audit-documents.md` (аудит источников и решений), `html/` (42 исходных документа), `blog-audit.md`, `blog-content-plan.md`, `content-policy.md`, `prices.md`, `search.md`, `stages-01-11.md`, `studio-features-roadmap.md`, `qa/` |
 | `demo-static/` | статический экспорт демо для Vercel |
 | `exports/` | выгрузки статей блога (данные, не для импорта в October CMS) |
 

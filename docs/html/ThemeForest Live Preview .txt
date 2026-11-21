@@ -1,0 +1,166 @@
+Чтобы сделать предпросмотр продуктов в стиле ThemeForest Live Preview (верхняя панель управления с логотипом, выбором продукта/демо, переключателями экранов Десктоп/Планшет/Смартфон, кнопками «Купить» и «Закрыть фрейм», а снизу — полноэкранный <iframe> с самим демо-сайтом), нужно добавить специальную страницу-обёртку в тему elv-studio и маршрут в плагин Elv.Kit.
+Это идеально вписывается в вашу архитектуру (без внешних библиотек, всё на чистом HTML/CSS/JS).
+
+Как это устроено (Архитектура решения)
+
+1. Единый маршрут предпросмотра: /preview/:slug/ (например, /preview/elv-kit/ или /preview/booking-module/).
+2. Верхняя панель (Preview Bar, высота 54px):
+	• Слева: Логотип Elv Studio + выпадающий список (<select> или кастомный дропдаун) для быстрого переключения между демо всех ваших продуктов без возврата в каталог.
+	• По центру: Переключатели разрешения экрана (Desktop 100%, Tablet 768px, Mobile 375px) — по клику меняют ширину <iframe> с плавной CSS-анимацией.
+	• Справа: Цена продукта, кнопка «Купить сейчас» (ведет сразу на /order/?product=:slug) и крестик «Закрыть фрейм» (открывает прямой URL демо без верхней панели).
+3. Нижняя область (<iframe>):
+	• Занимает всю оставшуюся высоту экрана (height: calc(100vh - 54px)).
+	• Загружает реальную демо-версию продукта (например, ваш шаблон или отдельный поддомен demo.elv-studio.by/kit/).
+
+Пошаговая инструкция по внедрению в ваш проект
+
+
+Шаг 1. Добавить поле demo_url в модель продукта (Elv.Kit)
+
+В таблице ваших продуктов/модулей добавьте строковое поле demo_url (ссылка на живое демо конкретного продукта, например, https://vercel.app или /demo/booking/).
+
+Шаг 2. Создать страницу themes/elv-studio/pages/preview.htm
+
+Создайте отдельную страницу без стандартного хедера и футера (используйте пустой макет или layout = ""), чтобы ничего не мешало фрейму:
+twig
+title = "Предпросмотр продукта"
+url = "/preview/:slug?"
+==
+<?php
+function onStart()
+{
+    // Получаем все продукты с демо-ссылками из плагина Elv.Kit
+    $products = \Elv\Kit\Models\Product::whereNotNull('demo_url')->get();
+    $slug = $this->param('slug');
+    
+    $current = $slug 
+        ? $products->where('slug', $slug)->first() 
+        : $products->first();
+
+    if (!$current) {
+        return \Redirect::to('/demo/');
+    }
+
+    $this['products'] = $products;
+    $this['current'] = $current;
+}
+?>
+==
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демо: {{ current.title }} — Elv Studio</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #1e1e24; color: #fff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Верхняя панель как на ThemeForest */
+        .preview-bar {
+            height: 54px; background: #26262c; border-bottom: 1px solid #383842;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; flex-shrink: 0; gap: 16px;
+        }
+        .bar-left, .bar-center, .bar-right { display: flex; align-items: center; gap: 12px; }
+        .brand { font-weight: 700; color: #fff; text-decoration: none; font-size: 16px; }
+        
+        /* Селектор продуктов */
+        .product-select {
+            background: #18181c; color: #fff; border: 1px solid #3f3f4a;
+            padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer;
+        }
+        
+        /* Кнопки устройств */
+        .device-btn {
+            background: transparent; border: 1px solid transparent; color: #a1a1aa;
+            padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center;
+        }
+        .device-btn:hover, .device-btn.active { background: #32323a; color: #fff; border-color: #4a4a55; }
+        
+        /* Кнопка покупки */
+        .btn-buy {
+            background: #82b440; color: #fff; text-decoration: none; font-weight: 600;
+            padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: background 0.2s;
+        }
+        .btn-buy:hover { background: #729e36; }
+        
+        .btn-close { color: #a1a1aa; text-decoration: none; font-size: 13px; padding: 6px; }
+        .btn-close:hover { color: #fff; }
+
+        /* Область фрейма */
+        .iframe-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: flex-start;
+            background: #141418; overflow: auto;
+        }
+        iframe {
+            width: 100%; height: 100%; border: none; background: #fff;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+        iframe.tablet { width: 768px; border-left: 1px solid #333; border-right: 1px solid #333; }
+        iframe.mobile { width: 375px; border-left: 1px solid #333; border-right: 1px solid #333; }
+
+        @media (max-width: 768px) {
+            .bar-center { display: none; } /* На телефонах скрываем переключатель экранов */
+        }
+    </style>
+</head>
+<body>
+
+<header class="preview-bar">
+    <div class="bar-left">
+        <a href="/" class="brand">Elv Studio</a>
+        <select class="product-select" onchange="if(this.value) window.location.href=this.value">
+            {% for item in products %}
+                <option value="/preview/{{ item.slug }}/" {{ item.id == current.id ? 'selected' : '' }}>
+                    {{ item.title }} — ${{ item.price }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="bar-center">
+        <button class="device-btn active" onclick="setDevice('desktop', this)" title="Десктоп">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </button>
+        <button class="device-btn" onclick="setDevice('tablet', this)" title="Планшет">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </button>
+        <button class="device-btn" onclick="setDevice('mobile', this)" title="Смартфон">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </button>
+    </div>
+
+    <div class="bar-right">
+        <a href="/order/?product={{ current.slug }}" class="btn-buy">Купить за ${{ current.price }}</a>
+        <a href="{{ current.demo_url }}" class="btn-close" title="Убрать панель">✕ Без рамки</a>
+    </div>
+</header>
+
+<main class="iframe-wrapper">
+    <iframe id="demoFrame" src="{{ current.demo_url }}" title="Демо {{ current.title }}"></iframe>
+</main>
+
+<script>
+    function setDevice(mode, btn) {
+        const frame = document.getElementById('demoFrame');
+        frame.className = mode === 'desktop' ? '' : mode;
+        document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
+Используйте код с осторожностью.
+
+3 важных нюанса для вашего проекта (elvstudio)
+
+1. Заголовки безопасности X-Frame-Options:
+Если демо-сайты размещены на другом домене или поддомене (например, elips0675-web-nlbbootstrap.vercel.app), убедитесь, что они разрешают загрузку внутри <iframe> (не отдают заголовок X-Frame-Options: DENY). В vercel.json или .htaccess демо-проекта не должно быть запрета на фреймы.
+2. Интеграция с вашим статическим экспортером (tools/export-static.php):
+Поскольку вы собираете статическую демо-версию для Vercel через php tools/export-static.php, добавьте генерацию страниц /preview/<slug>/index.html в ваш скрипт экспорта, чтобы демо-бар работал даже на статическом хостинге Vercel.
+3. Кнопка предпросмотра админки (Переключатель «Сайт / Админка»):
+Для софта и CMS-модулей клиенту важно посмотреть не только витрину, но и панель управления. Вы можете добавить в .bar-center еще одну кнопку-переключатель: Витрина / Админка, которая меняет src у <iframe> между публичной частью демо и демо-админкой с автологином.
+Хотите, чтобы я помог адаптировать ваш скрипт tools/export-static.php, чтобы он автоматически собирал эти страницы /preview/:slug/ при экспорте на Vercel?
