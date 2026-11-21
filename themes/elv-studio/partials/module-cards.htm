@@ -43,11 +43,11 @@
                         Подробно {{ elv_icon('arrow-right')|raw }}
                     </a>
                     {% if module.price_cents > 0 %}
-                        <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug, plan: 'single' }) }}">
+                        <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug, plan: 'single' }) }}">
                             {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(module.price_cents) }}
                         </a>
                     {% else %}
-                        <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
+                        <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
                             {{ elv_icon('cart')|raw }} Заказать сайт
                         </a>
                     {% endif %}
@@ -65,7 +65,7 @@
                 <div class="stack-actions">
                     <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
                     {% if module.price_cents > 0 %}
-                        <a class="btn btn--primary" href="{{ 'order'|page({ product: module.slug }) }}">Подключить</a>
+                        <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug }) }}">Подключить</a>
                     {% endif %}
                 </div>
             </div>

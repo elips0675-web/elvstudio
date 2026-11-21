@@ -31,7 +31,7 @@ meta_description = "Готовый сайт для бизнеса: страни�
                             {% endfor %}
                         </ul>
                         <div class="stack-actions">
-                            <a class="btn btn--primary" href="{{ 'order'|page({ product: kit.slug }) }}">
+                            <a class="btn btn--primary" href="{{ elv_order_url({ product: kit.slug }) }}">
                                 {{ elv_icon('cart')|raw }} Заказать сайт за {{ elv_money(kit.price_cents) }}
                             </a>
                             <a class="btn btn--ghost" href="{{ 'demo'|page }}">

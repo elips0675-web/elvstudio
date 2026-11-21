@@ -251,6 +251,13 @@ class Plugin extends PluginBase
                 'elv_plan_label' => function ($key) {
                     return Catalog::planLabel((string) $key);
                 },
+                'elv_order_url' => function (array $params = []) {
+                    $query = array_filter($params, function ($value) {
+                        return $value !== null && $value !== '';
+                    });
+
+                    return url('order') . '/' . ($query ? '?' . http_build_query($query) : '');
+                },
                 'elv_menu_products' => function () {
                     return Menu::products();
                 },

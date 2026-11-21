@@ -22,11 +22,11 @@ layout = "default"
             <p class="lead">{{ product.tagline }}</p>
             <div class="stack-actions">
                 {% if product.price_cents > 0 %}
-                    <a class="btn btn--primary" href="{{ 'order'|page({ product: product.slug, plan: 'single' }) }}">
+                    <a class="btn btn--primary" href="{{ elv_order_url({ product: product.slug, plan: 'single' }) }}">
                         {{ elv_icon('cart')|raw }} Подключить раздел
                     </a>
                 {% else %}
-                    <a class="btn btn--primary" href="{{ 'order'|page({ product: 'elv-kit' }) }}">
+                    <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
                         {{ elv_icon('cart')|raw }} Заказать сайт
                     </a>
                 {% endif %}

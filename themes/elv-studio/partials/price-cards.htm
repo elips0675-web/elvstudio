@@ -13,7 +13,7 @@
                 <li>{{ elv_icon('check')|raw }} {{ feature }}</li>
             {% endfor %}
         </ul>
-        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ 'order'|page({ plan: plan.key }) }}">
+        <a class="btn {{ plan.featured ? 'btn--primary' : 'btn--ghost' }}" href="{{ elv_order_url({ plan: plan.key }) }}">
             Выбрать «{{ plan.label }}»
         </a>
     </div>

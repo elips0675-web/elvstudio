@@ -163,3 +163,10 @@
     демо в шаблоне — дефект. Проверка: `node tools/check-headers.mjs`
     (входит в `node tools/gate.mjs`), `tools/export-static.php` собирает
     `/preview/` и `/preview/<slug>/`.
+17. Ссылки на заказ — `elv_order_url({ product: …, plan: … })`
+    (`Plugin.php`), а не `'order'|page({ … })`: фильтр `|page` подставляет
+    параметры только в плейсхолдеры адреса (`/blog/:slug`), а у `/order/`
+    их нет — `?product=` и `?plan=` теряются, и все кнопки ведут на заказ
+    с тарифом по умолчанию. Бесплатный раздел (`price_cents = 0`) отдельно
+    не продаётся: `/order/?product=<slug>` показывает «входит в Elv Kit»,
+    а не форму с нулевой суммой.

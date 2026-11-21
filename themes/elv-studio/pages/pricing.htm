@@ -8,7 +8,7 @@ meta_description = "Сколько стоит готовый сайт: тари�
 {% set plans = elv_plans(kit) %}
 {% set pricesLabel = elv_prices_updated_at() %}
 {% set crumbs = elv_breadcrumbs() %}
-{% set orderUrl = plans ? 'order'|page : 'booking'|page %}
+{% set orderUrl = plans ? elv_order_url() : 'booking'|page %}
 {% set calcUrl = 'calculator'|page %}
 
 <main id="main">
