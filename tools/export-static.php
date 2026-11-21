@@ -116,7 +116,7 @@ function staticFinalize(string $html, string $base, string $origin, string $inje
 
     $bar = '<div id="elv-demo-bar" role="status">Статическая демо-версия Elv Kit: формы, бронирование и оплата отключены. Полная версия работает на PHP-хостинге.</div>';
 
-    if (!str_contains($html, 'elv-demo-bar')) {
+    if (!str_contains($html, 'elv-demo-bar') && !str_contains($html, 'class="preview-body"')) {
         $html = (string) preg_replace('~(<body[^>]*>)~i', '$1' . $bar, $html, 1);
     }
 
@@ -347,6 +347,30 @@ if ($techStatus === 200 && $techHtml !== '') {
         staticWrite($out, '/blog/tech/category/' . $slug, staticFinalize($html, $base, $origin, $inject), $stable);
         $extra++;
         echo 'page: blog/tech/category/' . $slug . '/index.html' . PHP_EOL;
+    }
+}
+
+$previewBase = $base . '/preview/';
+[$previewStatus, $previewHtml] = staticFetch($previewBase);
+
+if ($previewStatus === 200 && $previewHtml !== '') {
+    staticWrite($out, '/preview', staticFinalize($previewHtml, $base, $origin, $inject), $stable);
+    $extra++;
+    echo 'page: preview/index.html' . PHP_EOL;
+
+    preg_match_all('~value="/preview/([a-z0-9-]+)/"~i', $previewHtml, $previewMatches);
+
+    foreach (array_unique($previewMatches[1] ?? []) as $slug) {
+        [$status, $html] = staticFetch($previewBase . $slug . '/');
+
+        if ($status !== 200 || $html === '') {
+            fwrite(STDERR, 'skip: /preview/' . $slug . '/ (' . $status . ')' . PHP_EOL);
+            continue;
+        }
+
+        staticWrite($out, '/preview/' . $slug, staticFinalize($html, $base, $origin, $inject), $stable);
+        $extra++;
+        echo 'page: preview/' . $slug . '/index.html' . PHP_EOL;
     }
 }
 

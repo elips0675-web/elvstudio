@@ -5,6 +5,7 @@ use Elv\Kit\Classes\Assets;
 use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\DemoLinks;
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
@@ -258,6 +259,9 @@ class Plugin extends PluginBase
                 },
                 'elv_menu_products_current' => function () {
                     return Menu::hasCurrent();
+                },
+                'elv_demo_links' => function () {
+                    return DemoLinks::items();
                 },
                 'elv_calculator' => function () {
                     return Calculator::data();

@@ -5,7 +5,7 @@ const errors = [];
 
 const pages = ['/', '/kit/', '/pricing/', '/blog/', '/modules/booking/'];
 const required = {
-  'x-frame-options': 'deny',
+  'x-frame-options': 'sameorigin',
   'x-content-type-options': 'nosniff',
   'referrer-policy': '',
   'permissions-policy': '',
@@ -48,7 +48,7 @@ for (const path of pages) {
   if (!csp) {
     errors.push(`${path}: CSP missing`);
   } else {
-    for (const token of ["default-src 'self'", "frame-ancestors 'none'", "object-src 'none'"]) {
+    for (const token of ["default-src 'self'", "frame-ancestors 'self'", "frame-src 'self'", "object-src 'none'"]) {
       if (!csp.includes(token)) {
         errors.push(`${path}: CSP without ${token}`);
       }
@@ -68,6 +68,25 @@ for (const path of pages) {
   }
 
   console.log(`${path} -> ${response.status} ${body.byteLength} bytes gzip`);
+}
+
+const preview = await fetch(BASE + '/preview/', { redirect: 'follow' });
+const previewBody = await preview.text();
+
+if (preview.status !== 200) {
+  errors.push(`/preview/: status ${preview.status}`);
+}
+
+if (!/noindex/i.test(preview.headers.get('x-robots-tag') || '')) {
+  errors.push('/preview/: x-robots-tag noindex missing');
+}
+
+if (!/no-store/i.test(preview.headers.get('cache-control') || '')) {
+  errors.push('/preview/: cache-control no-store missing');
+}
+
+if (!/<meta\s+name="robots"[^>]*noindex/i.test(previewBody)) {
+  errors.push('/preview/: meta robots noindex missing');
 }
 
 const assets = [

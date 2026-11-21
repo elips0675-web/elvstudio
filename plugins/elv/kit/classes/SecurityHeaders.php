@@ -47,7 +47,8 @@ class SecurityHeaders
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'none'",
+            "frame-ancestors 'self'",
+            "frame-src 'self' https:",
             "img-src 'self' data:",
             "font-src 'self'",
             "style-src 'self' 'nonce-" . $nonce . "'",
@@ -64,12 +65,18 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'DENY');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         header_remove('X-Powered-By');
         $response->headers->remove('X-Powered-By');
+
+        // Живой предпросмотр не индексируется и не кэшируется.
+        if ($request->is('preview', 'preview/*')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+            $response->headers->set('Cache-Control', 'no-store, max-age=0');
+        }
 
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

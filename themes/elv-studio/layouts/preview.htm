@@ -1,0 +1,18 @@
+description = "Макет предпросмотра: панель и iframe без шапки и подвала сайта"
+==
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111827">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ previewTitle|default('Предпросмотр — Elv Kit') }}</title>
+    <link rel="icon" href="{{ 'assets/img/favicon.svg'|theme }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ 'assets/css/preview.css'|theme }}?v=20261121-1">
+</head>
+<body class="preview-body">
+{% page %}
+<script src="{{ 'assets/js/preview.js'|theme }}?v=20261121-1" defer></script>
+</body>
+</html>

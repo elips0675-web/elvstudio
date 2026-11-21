@@ -25,9 +25,10 @@
 - [ ] Тип продукта и `compatibility`; `partials/product-cards.htm`.
 - [ ] Страница продукта: версия, changelog, требования, `demo_url` / `docs_url`, цена из `Prices`.
 - [ ] `/modules/` → 301 на `/products/?type=module` или оставить отдельной (решить).
-- [ ] Предпросмотр `/preview/`: панель, устройства, iframe, `?device=`, `noindex`.
-- [ ] CSP: `frame-src` для демо-хоста; `frame-ancestors 'self'` только для демо и `/preview/`.
-- [ ] `export-static.php`: генерировать `/preview/<slug>/`.
+- [x] Предпросмотр `/preview/`: панель, устройства, iframe, `?device=`, `noindex` (21.11.2026).
+- [x] CSP: `frame-src 'self' https:`, `frame-ancestors 'self'` и `X-Frame-Options: SAMEORIGIN` (21.11.2026).
+- [x] `export-static.php`: генерирует `/preview/` и `/preview/<slug>/` (21.11.2026).
+- [x] Список демо на `/demo/`: продукты с `demo_url` + `demo_links` из настроек (21.11.2026).
 - [ ] Отзывы: `elv_kit_reviews`, токен из письма, модерация, звёзды, JSON-LD только по реальным.
 - [ ] Счётчик установок, промокоды, комплект «Два в одном», релизы в админке, лид-магниты.
 - [ ] Убрать обещания непостроенного: корзина, кабинет, BM25, REST API, чат; `/offer` → `/terms/`.

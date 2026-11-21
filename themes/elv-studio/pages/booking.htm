@@ -5,8 +5,10 @@ meta_title = "Записаться на показ сайта — Elv Kit"
 meta_description = "Запишитесь на бесплатный показ сайта, консультацию по запуску или проверку скорости. Выберите услугу, дату и удобное время — подтверждение придёт на почту."
 ==
 {% set services = elv_booking_services() %}
-{% set service = services|filter(item => item.code == elv_query('service'))|first %}
-{% set service = service ?: services|first %}
+{% set requested = elv_query('service') %}
+{% set matched = requested ? services|filter(item => item.code == requested) : [] %}
+{% set service = matched|length ? matched|first : services|first %}
+{% set services = matched|length ? matched : services %}
 {% set days = service ? elv_slots(service.code, 21) : [] %}
 {% set day = days|filter(item => item.date == elv_query('date'))|first %}
 {% set day = day ?: days|first %}

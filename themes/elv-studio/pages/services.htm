@@ -7,6 +7,7 @@ meta_description = "Помогаем с хостингом, поддержкой
 {% set crumbs = elv_breadcrumbs() %}
 {% set calcUrl = 'calculator'|page %}
 {% set auditUrl = 'services-audit'|page %}
+{% set bookingServices = elv_booking_services()|filter(item => item.code in ['consult', 'speed-audit']) %}
 
 <main id="main">
     <section class="page-hero">
@@ -77,6 +78,27 @@ meta_description = "Помогаем с хостингом, поддержкой
                     <span class="link-more">Как мы работаем с SEO {{ elv_icon('arrow-right')|raw }}</span>
                 </a>
             </div>
+        </div>
+    </section>
+
+    <section class="section" id="booking-services">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Запись</span>
+                <h2>Консультация по запуску и проверка скорости</h2>
+                <p>Это отдельные услуги с записью на время. Показ сайта и админки — бесплатный, он живёт на странице демо. Цена и длительность — из настроек записи, оплата после подтверждения времени.</p>
+            </div>
+
+            {% if bookingServices|length %}
+                <div class="grid grid--2">
+                    {% partial 'service-cards' services=bookingServices variant='demo' %}
+                </div>
+            {% else %}
+                <div class="notice">
+                    {{ elv_icon('info')|raw }}
+                    <p>Запись на консультацию временно недоступна. Напишите нам — предложим время вручную.</p>
+                </div>
+            {% endif %}
         </div>
     </section>
 

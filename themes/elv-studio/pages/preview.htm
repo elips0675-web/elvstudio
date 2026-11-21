@@ -1,0 +1,35 @@
+title = "Предпросмотр продукта"
+url = "/preview/:slug?"
+layout = "preview"
+meta_robots = "noindex, nofollow"
+==
+<?php
+
+use Elv\Kit\Models\Product;
+
+function onStart()
+{
+    $products = Product::query()
+        ->where('is_active', true)
+        ->whereNotNull('demo_url')
+        ->where('demo_url', '<>', '')
+        ->orderBy('sort_order')
+        ->get();
+
+    $slug = (string) $this->param('slug');
+    $current = $slug !== '' ? $products->firstWhere('slug', $slug) : $products->first();
+
+    if (!$current) {
+        abort(404);
+    }
+
+    $device = (string) request()->query('device', 'desktop');
+    $this['previewProducts'] = $products;
+    $this['previewCurrent'] = $current;
+    $this['previewDevice'] = in_array($device, ['tablet', 'mobile'], true) ? $device : 'desktop';
+    $this['previewTitle'] = 'Демо: ' . $current->name . ' — Elv Kit';
+}
+
+?>
+==
+{% partial 'preview' products=previewProducts current=previewCurrent device=previewDevice mode='page' %}

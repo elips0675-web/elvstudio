@@ -228,7 +228,7 @@ class Demo
                 'price_extended_cents' => 49900,
                 'badge' => 'Сайт и все разделы',
                 'icon' => 'kit',
-                'demo_url' => '/demo/',
+                'demo_url' => '/',
                 'docs_url' => '/docs/',
                 'features' => static::json([
                     'Готовые страницы: главная, услуги, запись, блог, контакты',

@@ -153,3 +153,13 @@
     «Шаблон» (`Menu::fallback()`), поэтому шапка работает на чистой установке.
     Демо-значения ставит `elv:kit:demo` (`Demo::menu()`). Зашитый список
     разработок в `header.htm` — дефект.
+16. Живой предпросмотр — `/preview/:slug?` (`layouts/preview.htm`,
+    `partials/preview.htm`): без шапки и подвала, `noindex, nofollow`,
+    `no-store`, вне sitemap и `llms.txt`. Фрейм разрешён только своему
+    источнику: `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN`,
+    `frame-src 'self' https:`. Список демо на `/demo/` — продукты с
+    `demo_url` плюс `demo_links` из настроек (вкладка «Продажи», формат
+    «Название | адрес демо | адрес страницы | подпись»); зашитый список
+    демо в шаблоне — дефект. Проверка: `node tools/check-headers.mjs`
+    (входит в `node tools/gate.mjs`), `tools/export-static.php` собирает
+    `/preview/` и `/preview/<slug>/`.

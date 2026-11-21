@@ -4,7 +4,27 @@ layout = "default"
 meta_title = "Демо готового сайта для бизнеса — Elv Kit"
 meta_description = "Посмотрите готовый сайт вживую: услуги, онлайн-запись, заказы, оплата, блог и админка. Покажем онлайн за 30 минут и ответим на вопросы."
 ==
-{% set services = elv_booking_services() %}
+<?php
+
+use Elv\Kit\Models\Product;
+
+function onStart()
+{
+    $products = Product::query()
+        ->where('is_active', true)
+        ->whereNotNull('demo_url')
+        ->where('demo_url', '<>', '')
+        ->orderBy('sort_order')
+        ->get();
+
+    $this['previewProducts'] = $products;
+    $this['previewCurrent'] = $products->firstWhere('kind', 'kit') ?: $products->first();
+}
+
+?>
+==
+{% set services = elv_booking_services()|filter(item => item.code == 'demo-tour') %}
+{% set extraDemos = elv_demo_links() %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -18,8 +38,8 @@ meta_description = "Посмотрите готовый сайт вживую: �
                 и посмотреть админку. Покажем всё онлайн за 30 минут.
             </p>
             <div class="stack-actions">
-                <a class="btn btn--primary" href="{{ 'booking'|page }}">
-                    {{ elv_icon('calendar-check')|raw }} Записаться на 30 минут
+                <a class="btn btn--primary" href="{{ 'booking'|page }}?service=demo-tour">
+                    {{ elv_icon('calendar-check')|raw }} Записаться на показ
                 </a>
                 <a class="btn btn--ghost" href="{{ 'docs'|page }}">
                     {{ elv_icon('book')|raw }} Инструкция по запуску
@@ -27,6 +47,58 @@ meta_description = "Посмотрите готовый сайт вживую: �
             </div>
         </div>
     </section>
+
+    {% if previewProducts|length or extraDemos|length %}
+        <section class="section section--tight" id="demo-list">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Список демо</span>
+                    <h2>Что можно открыть</h2>
+                    <p>Каждый пункт — отдельная страница живого сайта. Ссылки меняются в админке: у продукта — в карточке, у шаблона — в настройках, в разделе «Продажи».</p>
+                </div>
+
+                <div class="grid grid--3">
+                    {% for product in previewProducts %}
+                        <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">{{ '%02d'|format(loop.index) }}</span>
+                                <span class="badge">{{ product.kind == 'kit' ? 'Сайт' : 'Раздел' }}</span>
+                            </div>
+                            <h3 class="mt-16">{{ product.name }}</h3>
+                            <p class="muted">{{ product.tagline }}</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="{{ product.demo_url }}" target="_blank" rel="noopener">
+                                    {{ elv_icon('play')|raw }} Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/{{ product.slug }}/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% for item in extraDemos %}
+                        <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">{{ '%02d'|format(previewProducts|length + loop.index) }}</span>
+                                <span class="badge">Шаблон</span>
+                            </div>
+                            <h3 class="mt-16">{{ item.name }}</h3>
+                            {% if item.note %}<p class="muted">{{ item.note }}</p>{% endif %}
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="{{ item.demo_url }}" target="_blank" rel="noopener">
+                                    {{ elv_icon('play')|raw }} Открыть демо
+                                </a>
+                                {% if item.page_url %}
+                                    <a class="btn btn--ghost btn--sm" href="{{ item.page_url }}">О шаблоне</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     <section class="section">
         <div class="container">
@@ -64,8 +136,8 @@ meta_description = "Посмотрите готовый сайт вживую: �
                 </div>
                 <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('message')|raw }}</div>
-                    <h3>Обучение и поддержка</h3>
-                    <p>После запуска показываем админку и остаёмся на связи по выбранному тарифу.</p>
+                    <h3>Обратная связь</h3>
+                    <p>Виджет на сайте и сообщения в админке: клиент пишет, вы отвечаете. Без сторонних сервисов.</p>
                 </div>
             </div>
 
@@ -76,17 +148,24 @@ meta_description = "Посмотрите готовый сайт вживую: �
         </div>
     </section>
 
-    <section class="section section--paper">
+    <section class="section section--paper" id="demo-booking">
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Запись</span>
-                <h2>Выберите удобное время</h2>
-                <p>Показ сайта — 30 минут, бесплатно. Консультация и проверка скорости — платные услуги, оплата после подтверждения времени.</p>
+                <h2>Покажем админку онлайн</h2>
+                <p>Показ сайта и админки — 30 минут, бесплатно. Платные консультации и проверка скорости — <a href="{{ 'services'|page }}#booking-services">на странице услуг</a>.</p>
             </div>
 
-            <div class="grid grid--3">
-                {% partial 'service-cards' services=services variant='demo' %}
-            </div>
+            {% if services|length %}
+                <div class="grid grid--3">
+                    {% partial 'service-cards' services=services variant='demo' %}
+                </div>
+            {% else %}
+                <div class="notice">
+                    {{ elv_icon('info')|raw }}
+                    <p>Запись на показ временно недоступна. Напишите нам — предложим время вручную.</p>
+                </div>
+            {% endif %}
         </div>
     </section>
 

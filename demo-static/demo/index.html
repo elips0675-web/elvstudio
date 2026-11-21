@@ -129,8 +129,8 @@
                 и посмотреть админку. Покажем всё онлайн за 30 минут.
             </p>
             <div class="stack-actions">
-                <a class="btn btn--primary" href="/booking">
-                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg> Записаться на 30 минут
+                <a class="btn btn--primary" href="/booking?service=demo-tour">
+                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg> Записаться на показ
                 </a>
                 <a class="btn btn--ghost" href="/docs">
                     <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 1-2-2z"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg> Инструкция по запуску
@@ -139,6 +139,113 @@
         </div>
     </section>
 
+            <section class="section section--tight" id="demo-list">
+            <div class="container">
+                <div class="section-head">
+                    <span class="eyebrow">Список демо</span>
+                    <h2>Что можно открыть</h2>
+                    <p>Каждый пункт — отдельная страница живого сайта. Ссылки меняются в админке: у продукта — в карточке, у шаблона — в настройках, в разделе «Продажи».</p>
+                </div>
+
+                <div class="grid grid--3">
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">01</span>
+                                <span class="badge">Сайт</span>
+                            </div>
+                            <h3 class="mt-16">Elv Kit</h3>
+                            <p class="muted">Готовый сайт для бизнеса: запись, заказы и блог</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/elv-kit/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">02</span>
+                                <span class="badge">Раздел</span>
+                            </div>
+                            <h3 class="mt-16">Онлайн-запись</h3>
+                            <p class="muted">Клиенты записываются сами, без звонков и переписки</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="/booking/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/booking/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">03</span>
+                                <span class="badge">Раздел</span>
+                            </div>
+                            <h3 class="mt-16">Заказы и оплата</h3>
+                            <p class="muted">Продажа товаров и файлов с оплатой картой</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="/order/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/shop/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">04</span>
+                                <span class="badge">Раздел</span>
+                            </div>
+                            <h3 class="mt-16">Обратная связь</h3>
+                            <p class="muted">Форма вопросов и заявок с защитой от спама</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="/feedback/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/feedback/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">05</span>
+                                <span class="badge">Раздел</span>
+                            </div>
+                            <h3 class="mt-16">Блог</h3>
+                            <p class="muted">Статьи, которые приводят клиентов из поиска</p>
+                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="/blog/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                <a class="btn btn--ghost btn--sm" href="/preview/blog/">
+                                    В рамке
+                                </a>
+                            </div>
+                        </div>
+                    
+                                            <div class="card">
+                            <div class="chips">
+                                <span class="badge badge--line">06</span>
+                                <span class="badge">Шаблон</span>
+                            </div>
+                            <h3 class="mt-16">Универсальный шаблон</h3>
+                            <p class="muted">Готовый сайт под свой контент</p>                            <div class="stack-actions mt-24">
+                                <a class="btn btn--primary btn--sm" href="https://elips0675-web.github.io/" target="_blank" rel="noopener">
+                                    <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg> Открыть демо
+                                </a>
+                                                                    <a class="btn btn--ghost btn--sm" href="/template/">О шаблоне</a>
+                                                            </div>
+                        </div>
+                                    </div>
+            </div>
+        </section>
+    
     <section class="section">
         <div class="container">
             <div class="section-head">
@@ -175,8 +282,8 @@
                 </div>
                 <div class="card card--center">
                     <div class="card__icon"><svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-5A8 8 0 1 1 21 12Z"/><path d="M8 11h8M8 15h5"/></svg></div>
-                    <h3>Обучение и поддержка</h3>
-                    <p>После запуска показываем админку и остаёмся на связи по выбранному тарифу.</p>
+                    <h3>Обратная связь</h3>
+                    <p>Виджет на сайте и сообщения в админке: клиент пишет, вы отвечаете. Без сторонних сервисов.</p>
                 </div>
             </div>
 
@@ -187,16 +294,16 @@
         </div>
     </section>
 
-    <section class="section section--paper">
+    <section class="section section--paper" id="demo-booking">
         <div class="container">
             <div class="section-head">
                 <span class="eyebrow">Запись</span>
-                <h2>Выберите удобное время</h2>
-                <p>Показ сайта — 30 минут, бесплатно. Консультация и проверка скорости — платные услуги, оплата после подтверждения времени.</p>
+                <h2>Покажем админку онлайн</h2>
+                <p>Показ сайта и админки — 30 минут, бесплатно. Платные консультации и проверка скорости — <a href="/services#booking-services">на странице услуг</a>.</p>
             </div>
 
-            <div class="grid grid--3">
-                
+                            <div class="grid grid--3">
+                    
             <div class="card card--center">
             <div class="card__icon"><svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg></div>
             <h3>Показ сайта</h3>
@@ -211,36 +318,8 @@
                 </a>
             </div>
         </div>
-                <div class="card card--center">
-            <div class="card__icon"><svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-5A8 8 0 1 1 21 12Z"/><path d="M8 11h8M8 15h5"/></svg></div>
-            <h3>Консультация по запуску</h3>
-            <p>Разберём ваш бизнес и подскажем, какие разделы и функции нужны сайту в первую очередь.</p>
-            <ul class="specs mt-24">
-                <li><span>Длительность</span><span>60 мин</span></li>
-                <li><span>Стоимость</span><span>120 BYN</span></li>
-            </ul>
-            <div class="stack-actions">
-                <a class="btn btn--ghost" href="/booking?service=consult">
-                    Выбрать время <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
-                </a>
-            </div>
-        </div>
-                <div class="card card--center">
-            <div class="card__icon"><svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 18a8 8 0 1 1 16 0"/><path d="m12 14 4-4"/><path d="M4 18h16"/></svg></div>
-            <h3>Проверка скорости сайта</h3>
-            <p>Посмотрим, что замедляет ваш текущий сайт, и дадим понятный план ускорения на одну страницу.</p>
-            <ul class="specs mt-24">
-                <li><span>Длительность</span><span>45 мин</span></li>
-                <li><span>Стоимость</span><span>180 BYN</span></li>
-            </ul>
-            <div class="stack-actions">
-                <a class="btn btn--ghost" href="/booking?service=speed-audit">
-                    Выбрать время <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
-                </a>
-            </div>
-        </div>
-                </div>
-        </div>
+                    </div>
+                    </div>
     </section>
 
     <section class="section">
@@ -324,7 +403,7 @@
                 <h3>Продукты</h3>
                 <ul>
                     <li><a href="/kit">Elv Kit — готовый сайт</a></li>
-                    <li><a href="/template">Шаблон для бизнеса — 110 страниц</a></li>
+                    <li><a href="/template">Шаблон для бизнеса</a></li>
                     <li><a href="/modules">Модули</a></li>
                 </ul>
             </div>
