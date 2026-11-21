@@ -1,8 +1,8 @@
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
-Отслеживаемые файлы (`git ls-files`), всего 507.
+Отслеживаемые файлы (`git ls-files`), всего 508.
 `demo-static` — 119 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
@@ -66,6 +66,7 @@
 - `plugins/elv/kit/classes/Mail/OrderAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderCustomer.php`
 - `plugins/elv/kit/classes/Mail/SubscribeConfirm.php`
+- `plugins/elv/kit/classes/Menu.php`
 - `plugins/elv/kit/classes/Money.php`
 - `plugins/elv/kit/classes/OrderService.php`
 - `plugins/elv/kit/classes/Payment/PaymentManager.php`

@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки и аудит приватности. Файлы разделены, чтобы каждый был понятен.
@@ -21,7 +21,7 @@
 
 # Elv Landing — срез для AI-анализа: Консультант, поиск и карта сайта
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 ## Что это за проект
@@ -30,12 +30,14 @@
 тема `elv-studio` и плагин `Elv.Kit` (Booking, Shop, Feedback, Blog).
 Это не код продукта `D:\October CMS`: общих файлов нет, каждая инсталляция
 October своя. Витрина продаёт Elv Kit, модули, консультации и услуги;
-блог из 73 статей продаёт через контент. В шапке пять пунктов: Возможности,
-Услуги, Цены, Демо, Блог + CTA «Заказать сайт»; «Контакты» и «Модули» — в
-подвале, чтобы не перегружать шапку.
+блог из 73 статей продаёт через контент. В шапке пять пунктов: «Продукты»
+(Elv Kit, Шаблон, Модули), Услуги, Цены, Демо, Блог + CTA «Заказать сайт»;
+«Контакты» — в подвале, чтобы не перегружать шапку. Пункты «Продуктов» —
+из настроек, вкладка «Меню».
 
-Данные покупателя витрина не подставляет: услуги Консультанта, FAQ и услуги
-записи читаются только из настроек (вкладка «Виджет», «FAQ», «Запись»).
+Данные покупателя витрина не подставляет: услуги Консультанта, FAQ, меню
+и услуги записи читаются только из настроек (вкладки «Виджет», «FAQ», «Меню»,
+«Запись»).
 Пустая настройка — честное пустое состояние, а не наш текст.
 
 Исходные документы проекта (42 файла) собраны в `docs/html/`; их разбор,
@@ -171,7 +173,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   товар, расхождение с `/pricing/`, калькулятором, сметой и Консультантом,
   а также битый конфиг колонок админки.
 - `node tools/check-package.mjs` — плагин 1.0.6, тема 1.0.0; товарный архив
-  212 файлов / 386 КБ без `demo/blog.json`, демо-архив 215 файлов / 518 КБ
+  213 файлов / 389 КБ без `demo/blog.json`, демо-архив 216 файлов / 520 КБ
   с ним; `Demo::posts()` отдаёт 73 статьи и совпадает с числом уникальных
   `slug` в датасете.
 - `node tools/check-headers.mjs` — CSP без `upgrade-insecure-requests` на
@@ -226,9 +228,9 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
-Отслеживаемые файлы (`git ls-files`), всего 507.
+Отслеживаемые файлы (`git ls-files`), всего 508.
 `demo-static` — 119 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
@@ -292,6 +294,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/classes/Mail/OrderAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderCustomer.php`
 - `plugins/elv/kit/classes/Mail/SubscribeConfirm.php`
+- `plugins/elv/kit/classes/Menu.php`
 - `plugins/elv/kit/classes/Money.php`
 - `plugins/elv/kit/classes/OrderService.php`
 - `plugins/elv/kit/classes/Payment/PaymentManager.php`
@@ -589,7 +592,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: composer.json =====
 
@@ -850,7 +853,7 @@ php artisan elv:kit:package         # ZIP темы и плагина для по
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -864,6 +867,7 @@ use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Icons;
 use Elv\Kit\Classes\LicenseService;
+use Elv\Kit\Classes\Menu;
 use Elv\Kit\Classes\Money;
 use Elv\Kit\Classes\CompressResponse;
 use Elv\Kit\Classes\Prices;
@@ -1105,6 +1109,15 @@ class Plugin extends PluginBase
                 'elv_plan_label' => function ($key) {
                     return Catalog::planLabel((string) $key);
                 },
+                'elv_menu_products' => function () {
+                    return Menu::products();
+                },
+                'elv_menu_products_label' => function () {
+                    return Menu::label();
+                },
+                'elv_menu_products_current' => function () {
+                    return Menu::hasCurrent();
+                },
                 'elv_calculator' => function () {
                     return Calculator::data();
                 },
@@ -1331,7 +1344,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -2618,7 +2631,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -3687,7 +3700,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -4526,7 +4539,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 21.11.2026. Stage 84. Коммит: `8fc38d0`.
+Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -5923,7 +5936,8 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
 
 ### Что осталось решением владельца
 
-Пункт «Продукты» в меню, типы продуктов, языки и схема URL, подход к
+Пункт «Продукты» в меню решён 21.11.2026: это выпадающий список из настроек.
+Открыты типы продуктов, языки и схема URL, подход к
 конструктору страниц, способ входа в кабинет, кто отвечает в тикетах и SLA,
 модерация форума, `noindex` для текстов пустой базы, публичность счётчика
 установок, комплект «Два в одном», сроки промокодов, платёжные провайдеры для
