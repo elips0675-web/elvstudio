@@ -177,8 +177,8 @@ class Catalog
     public static function comparison(): array
     {
         return [
-            ['name' => 'Готовые страницы и дизайн', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
             ['name' => 'Онлайн-запись', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
+            ['name' => 'Готовые страницы и дизайн', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
             ['name' => 'Заказы и оплата', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
             ['name' => 'Форма обратной связи', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
             ['name' => 'Блог и SEO', 'values' => ['single' => 'yes', 'multi' => 'yes', 'extended' => 'yes']],
