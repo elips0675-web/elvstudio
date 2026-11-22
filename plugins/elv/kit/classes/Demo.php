@@ -417,6 +417,7 @@ class Demo
             'digital-delivery-token',
             'backup-restore-plan',
             'booking-without-race',
+            'onlajn-zapis-na-sajte',
             'form-spam-without-captcha',
             'core-web-vitals-lcp',
             'kejs-lcp-12-skriptov',
