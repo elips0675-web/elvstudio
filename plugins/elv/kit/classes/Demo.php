@@ -61,6 +61,8 @@ class Demo
             $categorySlug = (string) ($post['category'] ?? '');
             unset($post['category']);
             $post['category_id'] = $post['category_id'] ?: (int) ($categoryIds[$categorySlug] ?? $categoryId);
+            // Время чтения считается из тела (Post::readingMinutes()), поле — auto.
+            $post['reading_time'] = 0;
 
             if ($hasAudience) {
                 $post['audience'] = static::audienceFor((string) $post['slug']);

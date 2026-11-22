@@ -98,15 +98,24 @@ class Post extends Model
         return is_array($tags) ? array_values(array_filter($tags)) : [];
     }
 
+    /**
+     * Время чтения — всегда из видимого текста, без ручного поля.
+     *
+     * Правило: 180 слов в минуту, минимум 1 минута. Считаются слова на
+     * кириллице и латинице, числа и слова через дефис. Хранимое значение
+     * игнорируется: иначе демо-статьи и статьи покупателя показывали бы
+     * разное время при одинаковом тексте.
+     */
     public function getReadingTimeAttribute($value): int
     {
-        if ((int) $value > 0) {
-            return (int) $value;
-        }
+        return $this->readingMinutes();
+    }
 
-        $words = str_word_count(strip_tags((string) $this->body), 0, 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ');
-        $minutes = (int) ceil(max(1, $words) / 180);
+    public function readingMinutes(): int
+    {
+        $text = html_entity_decode(strip_tags((string) $this->body), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        preg_match_all('/[\p{L}\p{N}]+(?:[-\x{2019}\'][\p{L}\p{N}]+)*/u', $text, $matches);
 
-        return max(1, $minutes);
+        return max(1, (int) ceil(count($matches[0]) / 180));
     }
 }
