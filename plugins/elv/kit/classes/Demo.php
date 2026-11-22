@@ -421,6 +421,14 @@ class Demo
             'jsonld-ecommerce',
             'sitemap-robots-llms',
             'article-checklist',
+            'csrf-xss-sql-bazovaya-zashchita',
+            'validaciya-form-server-i-klient',
+            'rezervnoe-kopirovanie-sajta',
+            'csp-v-iframe-widget',
+            'sitemap-i-noindex-chto-kuda',
+            'pustye-sostoyaniya-v-cms',
+            'kak-uskorit-october-cms',
+            'migracii-v-october-cms',
         ];
     }
 

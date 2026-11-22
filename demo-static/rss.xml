@@ -26,11 +26,25 @@
       <pubDate>Sat, 21 Nov 2026 06:00:00 +0000</pubDate>
     </item>
     <item>
+      <title>Лид-магнит для B2B-сайта: что предложить клиенту до продажи</title>
+      <link>https://elvstudio.vercel.app/blog/lid-magnit-dlya-b2b-sajta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/lid-magnit-dlya-b2b-sajta</guid>
+      <description>Какие лид-магниты работают на B2B-сайте: аудит, чек-лист, разбор задачи, расчёт бюджета. Как связать их с формой заявки и не превратить сайт в сборщик адресов.</description>
+      <pubDate>Fri, 20 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Review и AggregateRating в JSON-LD: разметка отзывов без ошибок</title>
       <link>https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/review-aggregaterating-jsonld</guid>
       <description>Звёзды в поиске не появляются от одного тега. Какие поля нужны Review и AggregateRating, где разметка уместна и почему пустые отзывы её ломают.</description>
       <pubDate>Fri, 20 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Промокоды и комплекты: как упаковать предложение без скидочной гонки</title>
+      <link>https://elvstudio.vercel.app/blog/promokody-i-komplekty</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/promokody-i-komplekty</guid>
+      <description>Как использовать промокоды, наборы и комплекты на сайте услуг или товаров, чтобы не обесценить продукт. Сценарии, ограничения и связка с оплатой на сайте.</description>
+      <pubDate>Thu, 19 Nov 2026 10:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Модерация отзывов: правила, ответы и отрицательные отзывы</title>
@@ -40,11 +54,25 @@
       <pubDate>Thu, 19 Nov 2026 09:00:00 +0000</pubDate>
     </item>
     <item>
+      <title>Changelog и версии продукта: как показать, что решение живое и поддерживается</title>
+      <link>https://elvstudio.vercel.app/blog/changelog-i-versii-produkta</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/changelog-i-versii-produkta</guid>
+      <description>Зачем на странице цифрового продукта нужен блок истории версий, какие поля включать в changelog и как короткий список релизов повышает доверие покупателя.</description>
+      <pubDate>Wed, 18 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Как попросить отзыв после покупки: 7 правил без навязчивости</title>
       <link>https://elvstudio.vercel.app/blog/kak-prosit-otzyv-posle-pokupki</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-prosit-otzyv-posle-pokupki</guid>
       <description>Отзыв появляется не сам: нужно вовремя попросить и помочь сформулировать. Семь правил, три вопроса и шаблоны сообщений без давления и подкупа.</description>
       <pubDate>Wed, 18 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Страница продукта: что показать покупателю кроме цены</title>
+      <link>https://elvstudio.vercel.app/blog/stranica-produkta-chto-pokazat-krome-ceny</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/stranica-produkta-chto-pokazat-krome-ceny</guid>
+      <description>Какие блоки должны быть на карточке товара или услуги, чтобы посетитель не ушёл думать. Версия, требования, сценарии использования, демо и ответы на частые вопросы.</description>
+      <pubDate>Tue, 17 Nov 2026 10:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Кейс на демо: 12 синхронных скриптов — LCP 2,9 → 1,6 с</title>
@@ -152,6 +180,13 @@
       <pubDate>Mon, 16 Nov 2026 12:00:00 +0000</pubDate>
     </item>
     <item>
+      <title>Лицензия на сайт и лимит доменов: что именно покупает клиент</title>
+      <link>https://elvstudio.vercel.app/blog/licenziya-i-limit-domenov</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/licenziya-i-limit-domenov</guid>
+      <description>Как устроена лицензия Elv Kit: что происходит после оплаты, зачем нужен ключ активации, как учитываются домены и что будет с сайтом после окончания срока обновлений.</description>
+      <pubDate>Mon, 16 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Как выбрать SEO-студию: 12 вопросов и красные флаги</title>
       <link>https://elvstudio.vercel.app/blog/kak-vybrat-seo-studiyu</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-seo-studiyu</guid>
@@ -164,6 +199,13 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/seo-audit-sajta</guid>
       <description>Что входит в SEO-аудит, чем он отличается от проверки скорости, какие пункты отчёта действительно важны и что делать после.</description>
       <pubDate>Mon, 16 Nov 2026 09:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Один сайт, до пяти или без ограничений: как выбрать тариф</title>
+      <link>https://elvstudio.vercel.app/blog/kak-vybrat-tarif-elv-kit</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-tarif-elv-kit</guid>
+      <description>Разбор тарифов Elv Kit по числу доменов, срокам обновлений и поддержки. Как понять, какой вариант подойдёт для одного проекта, сети филиалов или веб-студии.</description>
+      <pubDate>Sun, 15 Nov 2026 10:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Сколько стоит сайт с онлайн-записью и из чего складывается цена</title>
@@ -227,6 +269,13 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/bezopasnost-sajta</guid>
       <description>Взлом — это письма клиентам, утечка данных и пометка «опасный сайт» в поиске. Семь слоёв защиты, проверка доступов, обновлений и бэкапов, действия в первые часы.</description>
       <pubDate>Sat, 14 Nov 2026 10:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Миграции в October CMS: без потери данных</title>
+      <link>https://elvstudio.vercel.app/blog/migracii-v-october-cms</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/migracii-v-october-cms</guid>
+      <description>Как работают миграции в October CMS: создание, откат, данные в миграциях и продакшн-стратегия. Что делать, чтобы не потерять заказы клиентов при обновлении.</description>
+      <pubDate>Sat, 14 Nov 2026 10:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Доступность сайта: зачем бизнесу и как проверить</title>
@@ -304,54 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-magazina</guid>
       <description>Каталог, корзина или форма заказа, доставка, оплата, остатки, возвраты и админка. Что важно магазину, чтобы заказы не терялись.</description>
       <pubDate>Sat, 14 Nov 2026 05:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Отзывы и доверие на сайте: как собрать социальные доказательства</title>
-      <link>https://elvstudio.vercel.app/blog/otzyvy-i-doverie-na-sajte</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/otzyvy-i-doverie-na-sajte</guid>
-      <description>Отзыв убеждает, когда в нём есть имя, дата, услуга и конкретный результат. Как собирать, где показывать и что делать с критикой — без выдуманных оценок.</description>
-      <pubDate>Sat, 14 Nov 2026 05:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Core Web Vitals на практике: LCP, CLS и INP без магии</title>
-      <link>https://elvstudio.vercel.app/blog/core-web-vitals-lcp</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/core-web-vitals-lcp</guid>
-      <description>LCP, CLS и INP измеряются, а не угадываются. Показываем, какие правки дают 100 в Lighthouse на реальном лендинге.</description>
-      <pubDate>Fri, 13 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>JSON-LD для магазина: Product, Offer и BreadcrumbList без ошибок</title>
-      <link>https://elvstudio.vercel.app/blog/jsonld-ecommerce</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/jsonld-ecommerce</guid>
-      <description>Микроразметка не поднимает сайт в выдаче, но снимает неопределённость. Какие типы нужны магазину и где чаще всего ломается валидатор.</description>
-      <pubDate>Thu, 12 Nov 2026 12:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Вебхук оплаты: идемпотентность и повторные события</title>
-      <link>https://elvstudio.vercel.app/blog/payment-webhook-idempotency</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/payment-webhook-idempotency</guid>
-      <description>Шлюз может прислать одно событие дважды. Если вебхук просто ставит paid, заказ спишется два раза или уйдёт два письма.</description>
-      <pubDate>Tue, 10 Nov 2026 09:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Ноль внешних запросов: как страница грузится за 1,3 секунды</title>
-      <link>https://elvstudio.vercel.app/blog/no-external-requests</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/no-external-requests</guid>
-      <description>Каждый внешний запрос — чужой DNS и чужое время ответа. Что мы убрали из лендинга и чем за это заплатили.</description>
-      <pubDate>Mon, 09 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Выдача файла по токену: почему нельзя давать ссылку на storage</title>
-      <link>https://elvstudio.vercel.app/blog/digital-delivery-token</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/digital-delivery-token</guid>
-      <description>Ссылка на файл расходится по чатам за минуту. Показываем схему с токеном, проверкой оплаты и потоковой отдачей.</description>
-      <pubDate>Sun, 08 Nov 2026 11:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Бэкап, который восстанавливается: дамп, файлы и проверка</title>
-      <link>https://elvstudio.vercel.app/blog/backup-restore-plan</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/backup-restore-plan</guid>
-      <description>Бэкап существует не тогда, когда файл создан, а когда из него восстановили данные. Что копировать и как проверить.</description>
-      <pubDate>Sat, 07 Nov 2026 09:00:00 +0000</pubDate>
     </item>
 </channel></rss>
