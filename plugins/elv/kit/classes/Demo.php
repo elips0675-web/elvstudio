@@ -383,7 +383,12 @@ class Demo
                 $html .= '<p><strong>Полезные материалы:</strong> ' . implode(', ', $items) . '.</p>';
             }
 
-            if (isset($extra['cta'])) {
+            // Один призыв на статью: если в тексте он уже есть (абзац или раздел
+            // «Следующий шаг»), второй не дописываем. Фраза «Следующий шаг.» внутри
+            // примера — не призыв, её не считаем.
+            $hasCta = (bool) preg_match('/Следующий шаг:?<\/strong>|Следующий шаг<\/h2>/u', (string) $bySlug[$slug]['body']);
+
+            if (isset($extra['cta']) && ! $hasCta) {
                 $html .= '<p><strong>Следующий шаг:</strong> <a href="' . $extra['cta'][0] . '">' . $extra['cta'][1] . '</a>.</p>';
             }
 
