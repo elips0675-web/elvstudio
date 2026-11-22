@@ -39,7 +39,7 @@ class DownloadController
             $order->save();
         }
 
-        $filename = 'elv-kit-' . DownloadService::VERSION . '-' . $order->order_no . '.zip';
+        $filename = 'elv-kit-' . DownloadService::version() . '-' . $order->order_no . '.zip';
 
         return response()->download($path, $filename, [
             'Content-Type' => 'application/zip',

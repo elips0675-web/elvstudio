@@ -82,7 +82,11 @@
    `Chat` и `Calculator` берут `Catalog::planLabels()`/`plans()`, лимит доменов
    считается только в `Catalog::planDomainLimit()`. Проверка:
    `node tools/check-plans.mjs` (входит в `node tools/gate.mjs`); поиск подписи
-   идёт подстрокой по теме и коду плагина.
+   идёт подстрокой по теме и коду плагина. Микроразметка
+   `SoftwareApplication` берёт цены оттуда же (`Catalog::plans()` →
+   `Prices::resolve()`), а не из `price_cents` и не из константы: иначе JSON-LD
+   расходится с `/pricing/` и чатом. `AggregateOffer` с low/high/offerCount;
+   нет продукта — узла нет.
 8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-studio`),
    нет нашего домена и контактов: `elv-studio.by`, `sales@elv-studio`,
    `t.me/elvstudio`. Контакты — только из Settings (`email`, `telegram`), валюта —
@@ -94,7 +98,10 @@
    canonical `?page=N` и свой `<title>` «— страница N» (`Seo::canonical()`,
    `Seo::title()`), страница за последней — 404 (`pages/blog.htm`), фильтры
    `?category/?tag/?q` — `noindex` и canonical на общий список
-   (`layouts/default.htm`). Ссылки October генерирует без слэша, поэтому первый
+   (`layouts/default.htm`). Подписи хлебных крошек — `Seo::SECTIONS`: страница
+   без строки в списке получает крошки без названия раздела, поэтому новая
+   страница добавляется туда вместе с шаблоном. Ссылки October генерирует без
+   слэша, поэтому первый
    переход по ним получает 301 (он кэшируется). Проверка:
    `node tools/check-blog.mjs` (входит в `tools/gate.mjs`). Метрика:
    `node tools/check-perf.mjs` — Lighthouse mobile, медиана Performance 100,

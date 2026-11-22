@@ -16,6 +16,7 @@ class Seo
 {
     public const SECTIONS = [
         'kit' => 'Возможности',
+        'template' => 'Шаблон',
         'modules' => 'Разделы',
         'services' => 'Услуги',
         'calculator' => 'Калькулятор',
@@ -30,6 +31,7 @@ class Seo
         'terms' => 'Оферта',
         'privacy' => 'Политика конфиденциальности',
         'sitemap' => 'Карта сайта',
+        'search' => 'Поиск',
     ];
 
     protected static $post = null;
@@ -325,7 +327,36 @@ class Seo
     protected static function softwareNode(): array
     {
         $kit = Product::kit();
-        $price = $kit ? $kit->price_cents / 100 : 79;
+
+        if (!$kit) {
+            return [];
+        }
+
+        // Цены — из версий прайса (Prices::resolve внутри Catalog::plans),
+        // а не из карточки товара: иначе микроразметка расходится с /pricing/.
+        $prices = [];
+
+        foreach (Catalog::plans($kit) as $plan) {
+            $price = (int) ($plan['price'] ?? 0);
+
+            if ($price > 0) {
+                $prices[] = $price;
+            }
+        }
+
+        $offers = null;
+
+        if ($prices !== []) {
+            $offers = [
+                '@type' => 'AggregateOffer',
+                'lowPrice' => (string) (min($prices) / 100),
+                'highPrice' => (string) (max($prices) / 100),
+                'offerCount' => (string) count($prices),
+                'priceCurrency' => Money::currency(),
+                'url' => static::base() . '/pricing/',
+                'availability' => 'https://schema.org/InStock',
+            ];
+        }
 
         return static::withoutEmpty([
             '@type' => 'SoftwareApplication',
@@ -335,13 +366,7 @@ class Seo
             'operatingSystem' => 'Web',
             'description' => (string) (Settings::get('brand_description') ?: static::tagline()),
             'url' => static::base() . '/kit/',
-            'offers' => [
-                '@type' => 'Offer',
-                'price' => (string) $price,
-                'priceCurrency' => Money::currency(),
-                'url' => static::base() . '/pricing/',
-                'availability' => 'https://schema.org/InStock',
-            ],
+            'offers' => $offers,
             'featureList' => $kit && is_array($kit->features) ? array_values($kit->features) : [],
         ]);
     }
