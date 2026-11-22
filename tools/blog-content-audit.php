@@ -122,6 +122,7 @@ foreach ($posts as $post) {
     }
 
     $ctaByText = (bool) preg_match('/\b(оставьте заявку|оставить заявку|заказать|записаться|запишитесь|попробовать|попробуйте|смотреть демо|подключить|консультац|напишите|позвоните|перейти в демо|выбрать тариф|скачать)\b/iu', $text);
+    $ctaByBlock = str_contains($text, 'Следующий шаг');
 
     $rows[] = [
         'id' => $post->id,
@@ -138,7 +139,7 @@ foreach ($posts as $post) {
         'internal_links' => $internalLinks,
         'internal_link_count' => count($internalLinks),
         'cta_links' => $ctaLinks,
-        'cta' => $ctaLinks !== [] || $ctaByText,
+        'cta' => $ctaLinks !== [] || $ctaByText || $ctaByBlock,
         'faq' => $faq,
         'images' => count($images),
         'images_without_alt' => count($imagesWithoutAlt),
