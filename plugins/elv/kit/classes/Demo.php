@@ -413,6 +413,7 @@ class Demo
             'laravel-queue-without-redis',
             'why-october-cms',
             'payment-webhook-idempotency',
+            'priem-oplat-na-sajte',
             'digital-delivery-token',
             'backup-restore-plan',
             'booking-without-race',
