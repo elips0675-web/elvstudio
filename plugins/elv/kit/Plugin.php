@@ -46,6 +46,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('elv.kit.demo', \Elv\Kit\Console\DemoCommand::class);
         $this->registerConsoleCommand('elv.kit.reset', \Elv\Kit\Console\ResetCommand::class);
         $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
+        $this->registerConsoleCommand('elv.kit.remind', \Elv\Kit\Console\RemindCommand::class);
     }
 
     public function registerSettings()
@@ -204,6 +205,7 @@ class Plugin extends PluginBase
     public function registerSchedule($schedule)
     {
         $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
+        $schedule->command('elv:kit:remind')->hourly()->withoutOverlapping();
         $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
     }
 

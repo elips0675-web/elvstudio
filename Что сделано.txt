@@ -6,6 +6,43 @@
 
 ---
 
+(Правка - 23.11.2026) — **Письма: бренд из настроек и напоминания о записи.**
+
+Что было: в темах писем оставались наши названия строкой — «Подтвердите
+подписку на блог Elv Studio» (`SubscribeConfirm`) и «Elv Kit: заказ … оплачен»
+(`OrderCustomer`), в тексте письма о заказе и кнопке тоже стоял «Elv Kit»;
+«Смета Elv Kit» и вопросы чата «Сколько стоит Elv Kit?» — та же проблема.
+Покупатель с другим `brand_name` видел в письмах и на сайте чужое имя.
+Напоминаний о записи не было вовсе: клиент получал только подтверждение.
+
+Что сделано:
+- Бренд в письмах и смете — из настроек: `Settings::get('brand_name',
+  'Elv Kit')` в темах `SubscribeConfirm` и `OrderCustomer`, `elv_setting()` в
+  `order-customer.htm`, `quote-pdf.htm` и вопросах `widget.htm`.
+  `tools/check-brand.mjs` теперь отдельно сканирует `classes/Mail` и
+  `views/mail` и падает на «Elv Kit»/«Elv Studio» в строке без `brand_name`.
+- Напоминание клиенту: миграция `add_booking_reminder.php` (поле
+  `reminded_at`), класс `BookingReminders` (выбор броней за N часов, отметка,
+  повторно не отправляет), письмо `BookingReminder` + шаблон, команда
+  `php artisan elv:kit:remind` (`--hours`, `--force`) и расписание раз в час
+  в `Plugin::registerSchedule`. Настройки — вкладка «Запись»:
+  `booking_reminder_enabled` (по умолчанию выключено) и
+  `booking_reminder_hours` (1–72, по умолчанию 24).
+- Версия плагина — 1.0.8 (`updates/version.yaml`), README и `docs/blog-audit.md`
+  обновлены.
+
+Чем проверено: `php artisan october:migrate` применил 1.0.8; `php
+tools/booking-check.php` — OK, в том числе выбор ровно одной брони, границы
+часов, пропуск отменённой/без e-mail/уже напомненной, `Mail::assertQueued`
+и повторный выбор после отправки; `node tools/check-php.mjs`,
+`node tools/check-brand.mjs`, `node tools/check-package.mjs` — OK;
+`php artisan elv:kit:remind` при выключенной настройке пишет об этом и не
+падает, с `--force` — «0 (за 24 ч)».
+
+Что **не** проверено: реальная доставка через SMTP (на стенде
+`MAIL_MAILER=log`), cron `schedule:run` на хостинге и клики в браузере;
+SMS и напоминание мастеру не сделаны — остались открытым пунктом.
+
 (Правка - 23.11.2026) — **Короткий список очищен: в нём только открытые пункты.**
 
 Что было: `Что доделать коротко.txt` в шапке обещал «здесь только открытые

@@ -20,6 +20,10 @@ class Booking extends Model
         'phone', 'email', 'comment', 'status', 'source', 'ip',
     ];
 
+    protected $casts = [
+        'reminded_at' => 'datetime',
+    ];
+
     public $rules = [
         'service_code' => 'required|max:64',
         'date' => 'required|date',

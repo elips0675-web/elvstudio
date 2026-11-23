@@ -118,6 +118,63 @@ templateRoots.forEach((relative) => {
   walkTemplates(dir);
 });
 
+/*
+ * Письма: тема письма и текст — тоже лицо сайта покупателя. Бренд в них берётся
+ * из настроек (`Settings::get('brand_name', 'Elv Kit')` в PHP, `elv_setting()`
+ * в шаблоне), а не пишется строкой. «Elv Kit» допустим только как значение по
+ * умолчанию рядом с `brand_name`.
+ */
+const mailRoots = [
+  'plugins/elv/kit/classes/Mail',
+  'plugins/elv/kit/views/mail',
+];
+const mailBrand = /Elv (?:Kit|Studio)/;
+let mailFiles = 0;
+
+const walkMail = (dir) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      walkMail(full);
+      continue;
+    }
+
+    if (!['.php', '.htm', '.html'].includes(path.extname(entry.name))) {
+      continue;
+    }
+
+    mailFiles += 1;
+    const relative = path.relative(root, full).replace(/\\/g, '/');
+    const lines = fs.readFileSync(full, 'utf8').split(/\r?\n/);
+
+    lines.forEach((line, index) => {
+      if (!mailBrand.test(line)) {
+        return;
+      }
+
+      if (/brand_name|elv_setting\(/.test(line)) {
+        return;
+      }
+
+      problems.push(
+        relative + ':' + (index + 1) + ' — бренд зашит в письмо, возьмите brand_name из настроек'
+      );
+    });
+  }
+};
+
+mailRoots.forEach((relative) => {
+  const dir = path.join(root, relative);
+
+  if (!fs.existsSync(dir)) {
+    problems.push(relative + ' — каталога нет');
+    return;
+  }
+
+  walkMail(dir);
+});
+
 if (problems.length) {
   problems.forEach((problem) => console.error('FAIL: ' + problem));
   process.exit(1);
@@ -125,5 +182,6 @@ if (problems.length) {
 
 console.log(
   'проверено ' + scanned + ' файлов плагина и темы: чужих контактов нет; ' +
-    templates + ' шаблонов: бренд из настроек'
+    templates + ' шаблонов: бренд из настроек; ' +
+    mailFiles + ' файлов писем: бренд из настроек'
 );

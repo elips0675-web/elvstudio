@@ -273,3 +273,15 @@ tabs:
             type: textarea
             size: large
             comment: 'Код | Название | Минут | Цена | Описание | Иконка — по одной услуге в строке. Код латиницей, иконка необязательна. Пусто — страница записи пишет «Запись временно недоступна» и ведёт в контакты.'
+        booking_reminder_enabled:
+            label: 'Напоминания о записи'
+            tab: 'Запись'
+            type: switch
+            default: false
+            comment: 'Письмо клиенту перед визитом. Нужен cron: `php artisan schedule:run` раз в минуту.'
+        booking_reminder_hours:
+            label: 'За сколько часов'
+            tab: 'Запись'
+            type: number
+            default: 24
+            comment: 'От 1 до 72 часов. Пусто — 24.'

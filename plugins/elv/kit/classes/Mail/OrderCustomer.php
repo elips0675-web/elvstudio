@@ -3,6 +3,7 @@
 use Elv\Kit\Classes\Money;
 use Elv\Kit\Models\License;
 use Elv\Kit\Models\Order;
+use Elv\Kit\Models\Settings;
 use October\Rain\Mail\Mailable;
 
 /**
@@ -16,7 +17,9 @@ class OrderCustomer extends Mailable
 
     public function build()
     {
-        return $this->subject('Elv Kit: заказ ' . $this->order->order_no . ' оплачен')
+        $brand = (string) Settings::get('brand_name', 'Elv Kit');
+
+        return $this->subject($brand . ': заказ ' . $this->order->order_no . ' оплачен')
             ->view('elv.kit::mail.order-customer')
             ->with([
                 'order' => [

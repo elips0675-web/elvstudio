@@ -5,10 +5,14 @@ require __DIR__ . '/../bootstrap/autoload.php';
 $app = require __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+use Elv\Kit\Classes\BookingReminders;
+use Elv\Kit\Classes\Mail\BookingReminder;
 use Elv\Kit\Classes\Slots;
+use Elv\Kit\Models\Booking;
 use Elv\Kit\Models\Settings;
 use Elv\Kit\Models\Slot;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 $errors = [];
@@ -21,6 +25,8 @@ $check = function (bool $condition, string $message) use (&$errors) {
 
 $settings = Settings::instance();
 $backup = $settings->getAttribute('booking_services');
+$backupReminderEnabled = $settings->getAttribute('booking_reminder_enabled');
+$backupReminderHours = $settings->getAttribute('booking_reminder_hours');
 
 $settings->forceFill(['booking_services' => '']);
 $check(Slots::services() === [], 'empty settings still return booking services');
@@ -151,12 +157,62 @@ try {
     $slot->save();
     $slot->delete();
     $check(Slot::query()->find($id) === null, 'free slot is not deleted');
+
+    $check(BookingReminders::normalizeHours(0) === BookingReminders::DEFAULT_HOURS, 'zero reminder hours are not defaulted');
+    $check(BookingReminders::normalizeHours(500) === 72, 'reminder hours are not capped at 72');
+    $check(BookingReminders::normalizeHours(1) === 1, 'one hour reminder is not allowed');
+
+    $settings->forceFill(['booking_reminder_enabled' => true, 'booking_reminder_hours' => 12]);
+    $check(BookingReminders::enabled() === true, 'reminder switch is not read from settings');
+    $check(BookingReminders::hours() === 12, 'reminder hours are not read from settings');
+
+    $settings->forceFill(['booking_reminder_hours' => 500]);
+    $check(BookingReminders::hours() === 72, 'reminder hours from settings are not capped');
+
+    $now = \Carbon\Carbon::parse('2026-12-01 10:00:00');
+    $makeBooking = function (array $attributes = []) {
+        return Booking::create(array_merge([
+            'service_code' => 'zz-check',
+            'service' => 'Проверка',
+            'price' => '0 BYN',
+            'date' => '2026-12-01',
+            'time' => '18:00',
+            'person' => 'Тест',
+            'email' => 'zz-check@example.com',
+            'status' => Booking::STATUS_NEW,
+        ], $attributes));
+    };
+
+    $due = $makeBooking();
+    $makeBooking(['date' => '2026-12-03']);
+    $makeBooking(['time' => '12:00', 'status' => Booking::STATUS_CANCELLED]);
+    $makeBooking(['time' => '12:30', 'email' => '']);
+    $alreadyReminded = $makeBooking(['time' => '13:00']);
+    $alreadyReminded->reminded_at = $now->copy()->subHour();
+    $alreadyReminded->save();
+
+    $pending = BookingReminders::pending(24, $now);
+    $check($pending->count() === 1, 'reminder selection does not return exactly the due booking');
+    $check((int) ($pending->first()->id ?? 0) === (int) $due->id, 'reminder selection picked the wrong booking');
+    $check(BookingReminders::moment($due) !== null, 'reminder moment is not parsed from date and time');
+    $check(BookingReminders::moment($makeBooking(['time' => 'nonsense'])) === null, 'broken booking time still produces a moment');
+
+    Mail::fake();
+    $sent = BookingReminders::send(24, $now);
+    $check($sent === 1, 'reminder send does not report one letter');
+    $check($due->fresh()->reminded_at !== null, 'reminder mark is not saved');
+    Mail::assertQueued(BookingReminder::class);
+    $check(BookingReminders::pending(24, $now)->count() === 0, 'reminded booking is selected twice');
 }
 finally {
     DB::rollBack();
 }
 
 $settings->forceFill(['booking_services' => $backup]);
+$settings->forceFill([
+    'booking_reminder_enabled' => $backupReminderEnabled,
+    'booking_reminder_hours' => $backupReminderHours,
+]);
 
 if ($errors !== []) {
     foreach ($errors as $error) {
