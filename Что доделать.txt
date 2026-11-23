@@ -13,13 +13,14 @@
 
 ### Блокеры релиза (6)
 
-- [ ] **1. Цена заказа и прайс расходятся.** `OrderService::create()` берёт
-      `Product::planPrice()` (базовые поля), а витрина, калькулятор и
-      `SoftwareApplication` — `Prices::resolve()`. Новая версия прайса меняет
-      `/pricing/`, но не счёт. Те же базовые поля читают `Seo::productNode()`
-      (`Product.offer`), `Seo::llms()` («цена от»), `module.htm` и
-      `partials/module-cards.htm`. Перевести все точки на `Prices::resolve()`
-      (для модулей — с фолбэком на поле), добавить тест в `tools/price-check.php`.
+- [x] **1. Цена заказа и прайс расходятся — исправлено 23.11.2026.**
+      `OrderService::create()` переведён на `Prices::resolve()`; тем же
+      источником теперь живут `Seo::productNode()` (`Product.offer`),
+      `Seo::llms()` («цена от», без литерала `7900`), `kit.htm`, `module.htm`,
+      `partials/module-cards.htm`, `order.htm` и `Calculator::data()` (через
+      `elv_price()` и `Prices::resolve()`). `Product::price`/`price_label` тоже
+      считаются из прайса. `tools/price-check.php` проверяет сумму заказа,
+      доп. услугу и аксессоры на временной версии цены.
 - [x] **2. Обещания непостроенного в теме, письмах и оферте** — чисто:
       `{cabinet_url}`, BM25, REST API и ссылки `/offer` нет. «Корзина»
       встречается только как описание типа сайта в калькуляторе, а не как
@@ -65,10 +66,11 @@
       из `Catalog::planDomainLimit()`.
 - [x] `columns.yaml` прайса: аксессоры только через `valueFrom`, без
       `select/sortable/searchable`.
-- [ ] `Price::beforeUpdate()`: запретить менять `price_cents`, `plan`,
-      `valid_from` у сохранённой версии (сейчас можно).
-- [ ] `Prices::current()`: фильтр по `Money::currency()` — версия в чужой
-      валюте сейчас применяется.
+- [x] `Price::beforeUpdate()` — 23.11.2026: менять `price_cents`, `plan`,
+      `product_slug`, `currency` и `valid_from` у сохранённой версии нельзя;
+      остаются `valid_to`, `is_active`, `note`.
+- [x] `Prices::current()` — 23.11.2026: версия в чужой валюте не применяется;
+      `Prices::updatedAt()` фильтрует валюту так же.
 - [ ] `Chat::looksBroken()`: латинские технические слова и англицизмы
       (`nginx`, `stripe`, `webhook`, `телеграм`) всё ещё считаются опечатками.
 - [ ] `widget.js`: пузырь пользователя удаляется при любом `rejected`, а не

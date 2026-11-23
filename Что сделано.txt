@@ -6,6 +6,52 @@
 
 ---
 
+(Правка - 23.11.2026) - **Один источник цены: заказ, SEO и карточки читают прайс.**
+
+Что было: блокер №1 из `docs/html/221126/elv kit full`. `OrderService::create()`
+брал `Product::planPrice()` (базовые поля карточки), а `/pricing/`, калькулятор,
+`SoftwareApplication` и `llms.txt` — `Prices::resolve()`. Новая версия прайса
+меняла витрину, но не счёт; `module.htm`, `partials/module-cards.htm`,
+`kit.htm`, `order.htm` и `Seo::productNode()` тоже читали `price_cents`.
+В `llms.txt` был литерал `7900`.
+
+Что сделано:
+- `OrderService` считает сумму через `Prices::resolve($product, $plan)`;
+  доп. услуга (`bump`) прибавляется к действующей цене.
+- В `Plugin.php` добавлена функция шаблонов `elv_price($product, $plan)`.
+  На неё переведены `kit.htm`, `module.htm`, `partials/module-cards.htm`,
+  `partials/preview.htm` и `order.htm` (включая `data-price` и список модулей).
+- `Seo::productNode()` (`Product.offer`) и `Seo::llms()` берут цену из
+  `Prices::resolve()`; «цена от» печатается только при цене больше нуля,
+  литерала `7900` больше нет.
+- `Product::price` и `price_label` считаются из прайса, поэтому
+  `/services/booking/`, `/services/plugins/`, `/services/support/` и
+  калькулятор показывают то же значение.
+- `Calculator::data()` берёт цену модуля из `Prices::resolve()`, а не из поля.
+- `Prices::current()` и `Prices::updatedAt()` фильтруют версии по
+  `Money::currency()`: после смены валюты старые цифры не выдаются за новые.
+- `Price::beforeUpdate()` запрещает менять `price_cents`, `plan`,
+  `product_slug`, `currency`, `valid_from` у сохранённой версии; остаются
+  `valid_to`, `is_active`, `note`. В форме правки — предупреждение.
+- `tools/price-check.php` расширен: временная версия цены, проверка суммы
+  заказа и `bump`, аксессора `price_label`, игнора версии в чужой валюте,
+  запрета правки истории и разрешённой правки заметки. Проверка идёт в
+  транзакции с откатом.
+- `docs/prices.md` обновлён: источник цены, фильтр валюты, защита истории,
+  новые проверки.
+
+Чем проверено: `php tools/price-check.php` — OK (versions=3, plans=3,
+base=7900, fresh=8600); `node tools/gate.mjs` — все гейты, TTFB медиана
+101 мс. Живые страницы `/`, `/kit/`, `/modules/booking/`, `/modules/blog/`,
+`/modules/`, `/pricing/`, `/order/`, `/order/?product=booking`, `/calculator/`,
+`/preview/`, `/llms.txt` — 200, цены совпадают ($79, $49, $39, $29),
+`price_cents` в HTML — 0.
+
+Что **не** проверено: сохранение версии через форму админки в браузере
+(проверено на уровне модели); реальный платёж с новой ценой; чистая установка.
+
+---
+
 (Правка - 23.11.2026) - **Блог: исправлены 7 ложных утверждений о продукте.**
 
 Что было: проверка всех 101 статьи по коду и списку продуктов (`elv-kit`,

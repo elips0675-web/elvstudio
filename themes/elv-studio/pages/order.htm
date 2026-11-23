@@ -20,7 +20,7 @@ meta_description = "Заказ готового сайта и разделов: 
     {% set selectedPlan = planKeys|first ?: 'single' %}
 {% endif %}
 {% set planLabel = elv_plan_label(selectedPlan) %}
-{% set isFree = product and product.kind != 'kit' and product.price_cents <= 0 %}
+{% set isFree = product and product.kind != 'kit' and elv_price(product) <= 0 %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -76,9 +76,9 @@ meta_description = "Заказ готового сайта и разделов: 
                     </a>
                 {% endif %}
                 {% for item in elv_modules() %}
-                    {% if item.price_cents > 0 %}
+                    {% if elv_price(item) > 0 %}
                         <a class="chip{% if product.slug == item.slug %} chip--active{% endif %}" href="{{ elv_order_url({ product: item.slug }) }}">
-                            {{ item.name }} — {{ elv_money(item.price_cents) }}
+                            {{ item.name }} — {{ elv_money(elv_price(item)) }}
                         </a>
                     {% endif %}
                 {% endfor %}
@@ -128,7 +128,7 @@ meta_description = "Заказ готового сайта и разделов: 
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <input type="hidden" name="plan" value="single" data-price="{{ product.price_cents }}">
+                            <input type="hidden" name="plan" value="single" data-price="{{ elv_price(product) }}">
                             <div class="plan-picker">
                                 <div class="plan-option">
                                     <label>
@@ -136,7 +136,7 @@ meta_description = "Заказ готового сайта и разделов: 
                                             <b>{{ planLabel }}</b>
                                             <small>{{ planLabel|lower }}</small>
                                         </span>
-                                        <span class="price">{{ elv_money(product.price_cents) }}</span>
+                                        <span class="price">{{ elv_money(elv_price(product)) }}</span>
                                     </label>
                                 </div>
                             </div>

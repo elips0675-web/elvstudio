@@ -11,8 +11,8 @@
 Источник — `docs/html/221126/elv kit full`, сверен с кодом. Детали — в
 `Что доделать.txt`.
 
-- [ ] Цена: `OrderService`, `Seo::productNode()`, `llms.txt` и карточки модулей
-      читают `price_cents`, а витрина — `Prices::resolve()`. Один источник цены.
+- [x] Цена: `OrderService`, `Seo::productNode()`, `llms.txt`, карточки модулей и
+      оформление заказа читают `Prices::resolve()` — один источник (23.11.2026).
 - [x] Обещания в теме, письмах и оферте: `{cabinet_url}`, BM25, REST API,
       `/offer` — нет.
 - [ ] RU-пометка на `/kit/` и в README; бренд «Elv Studio» — решить:
@@ -25,9 +25,9 @@
 - [ ] Этап 3: отзывы, промокоды, апгрейд тарифа, B2B-счёт, Team Seats.
 - [ ] Этап 4: update-сервер, конструктор страниц, EN/валюты, рефералка,
       песочница.
-- [ ] Stage 84 блок 2: защита истории прайса, валюта в `Prices::current()`,
-      `looksBroken`, пузырь `widget.js`, `config/search.php`,
-      `elv_blog_total` в sitemap.
+- [x] Stage 84 блок 2: защита истории прайса и валюта в `Prices::current()` —
+      сделаны 23.11.2026. Открыты `looksBroken`, пузырь `widget.js`,
+      `config/search.php`, `elv_blog_total` в sitemap.
 - [x] Блог: 7 ложных утверждений о продукте исправлены 23.11.2026 («Elv Shop»,
       корзина, модуль отзывов, WebP/lazy, аудит, «мультиязычности нет»).
 

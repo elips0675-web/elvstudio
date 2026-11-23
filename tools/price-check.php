@@ -15,9 +15,11 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\OrderService;
 use Elv\Kit\Classes\Prices;
 use Elv\Kit\Models\Price;
 use Elv\Kit\Models\Product;
+use Illuminate\Validation\ValidationException;
 
 function priceFail(string $message): void
 {
@@ -43,6 +45,8 @@ function insertVersion(array $row): int
         'created_at' => $now,
         'updated_at' => $now,
     ], $row));
+
+    Prices::flush();
 }
 
 function dropVersion(array $ids): void
@@ -209,6 +213,72 @@ try {
     if (($answer['rejected'] ?? false) !== false || mb_strpos((string) ($answer['answer'] ?? ''), Money::format($freshPrice)) === false) {
         priceFail('Консультант отвечает старой ценой');
     }
+
+    \Illuminate\Support\Facades\Mail::fake();
+
+    $order = (new OrderService())->create([
+        'plan' => 'single',
+        'customer_name' => 'price-check',
+        'email' => 'price-check@example.com',
+    ], $kit);
+
+    if ((int) $order->amount_cents !== $freshPrice) {
+        priceFail('OrderService создаёт счёт по старой цене: ' . $order->amount_cents . ' вместо ' . $freshPrice);
+    }
+
+    $bumped = (new OrderService())->create([
+        'plan' => 'single',
+        'bump' => 1,
+        'customer_name' => 'price-check',
+        'email' => 'price-check@example.com',
+    ], $kit);
+
+    if ((int) $bumped->amount_cents !== $freshPrice + 1900) {
+        priceFail('доп. услуга считается не от действующей цены');
+    }
+
+    if ($kit->price_label !== Money::format($freshPrice)) {
+        priceFail('аксессор price_label показывает старую цену');
+    }
+
+    $created[] = insertVersion([
+        'price_cents' => $base + 8000,
+        'currency' => 'BYN',
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+    ]);
+
+    if (Prices::current($slug, 'single') !== $freshPrice) {
+        priceFail('версия в чужой валюте применена к текущей');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $immutable = new Price([
+        'product_slug' => $slug,
+        'plan' => 'single',
+        'price_cents' => $freshPrice,
+        'valid_from' => $today,
+        'note' => 'price-check immutable',
+    ]);
+    $immutable->save();
+
+    $immutable->note = 'price-check editable';
+    $immutable->is_active = true;
+    $immutable->valid_to = null;
+    $immutable->save();
+
+    $immutable->price_cents = $freshPrice + 1;
+
+    try {
+        $immutable->save();
+        priceFail('модель разрешила изменить цену сохранённой версии');
+    } catch (ValidationException $e) {
+        $immutable->price_cents = $freshPrice;
+    }
+
+    Db::table('elv_kit_price_versions')->where('id', $immutable->id)->delete();
+    Prices::flush();
 
     dropVersion($created);
     $created = [];

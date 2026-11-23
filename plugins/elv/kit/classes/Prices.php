@@ -44,6 +44,7 @@ class Prices
                 'product_slug' => (string) $version->product_slug,
                 'plan' => (string) $version->plan,
                 'price_cents' => (int) $version->price_cents,
+                'currency' => (string) $version->currency,
                 'valid_from' => $version->valid_from ? $version->valid_from->format('Y-m-d') : '',
                 'valid_to' => $version->valid_to ? $version->valid_to->format('Y-m-d') : '',
                 'is_active' => (bool) $version->is_active,
@@ -56,10 +57,15 @@ class Prices
     public static function current(string $productSlug, string $plan, ?string $onDate = null): ?int
     {
         $date = $onDate ?: date('Y-m-d');
+        $currency = Money::currency();
         $found = null;
 
         foreach (static::rows() as $row) {
             if (!$row['is_active'] || $row['product_slug'] !== $productSlug || $row['plan'] !== $plan) {
+                continue;
+            }
+
+            if ($row['currency'] !== $currency) {
                 continue;
             }
 
@@ -96,6 +102,10 @@ class Prices
 
         foreach (static::rows() as $row) {
             if ($row['product_slug'] !== $productSlug || !$row['is_active']) {
+                continue;
+            }
+
+            if ($row['currency'] !== Money::currency()) {
                 continue;
             }
 

@@ -9,7 +9,7 @@
 {% set mode = mode|default('page') %}
 {% set device = device|default('desktop') %}
 {% set kitProduct = elv_kit() %}
-{% set buyProduct = current.kind == 'kit' or current.price_cents > 0 ? current : kitProduct %}
+{% set buyProduct = current.kind == 'kit' or elv_price(current) > 0 ? current : kitProduct %}
 
 <div class="preview preview--{{ mode }}" data-preview data-preview-mode="{{ mode }}" data-device="{{ device }}">
     <div class="preview__bar">
@@ -22,7 +22,7 @@
                         <option
                             value="{{ mode == 'page' ? '/preview/' ~ product.slug ~ '/' : product.slug }}"
                             data-src="{{ product.demo_url }}"
-                            data-order="{{ elv_order_url({ product: product.kind == 'kit' or product.price_cents > 0 ? product.slug : (kitProduct ? kitProduct.slug : product.slug) }) }}"
+                            data-order="{{ elv_order_url({ product: product.kind == 'kit' or elv_price(product) > 0 ? product.slug : (kitProduct ? kitProduct.slug : product.slug) }) }}"
                             data-preview-url="/preview/{{ product.slug }}/"
                             {% if current and product.id == current.id %}selected{% endif %}>
                             {{ product.name }}

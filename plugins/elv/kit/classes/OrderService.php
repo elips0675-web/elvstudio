@@ -28,7 +28,7 @@ class OrderService
             $plan = (string) ($known[0] ?? 'single');
         }
 
-        $amount = $product->planPrice($plan);
+        $amount = Prices::resolve($product, $plan);
 
         if (!empty($data['bump'])) {
             $amount += 1900;

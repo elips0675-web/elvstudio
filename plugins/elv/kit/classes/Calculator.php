@@ -38,13 +38,15 @@ class Calculator
                 continue;
             }
 
+            $modulePrice = Prices::resolve($module, 'single');
+
             $modules[] = [
                 'slug' => (string) $module->slug,
                 'label' => (string) $module->name,
                 'tagline' => (string) $module->tagline,
-                'price' => (int) $module->price_cents,
-                'price_label' => (int) $module->price_cents > 0
-                    ? Money::format((int) $module->price_cents)
+                'price' => $modulePrice,
+                'price_label' => $modulePrice > 0
+                    ? Money::format($modulePrice)
                     : 'включён в Elv Kit',
                 'icon' => (string) ($module->icon ?: 'puzzle'),
                 'url' => (string) $module->url,

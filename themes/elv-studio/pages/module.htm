@@ -16,12 +16,12 @@ layout = "default"
                 {% if product.badge %}
                     <span class="badge badge--line">{{ product.badge }}</span>
                 {% endif %}
-                <span class="badge">{{ product.price_cents > 0 ? elv_money(product.price_cents) : elv_badge('included') }}</span>
+                <span class="badge">{{ elv_price(product) > 0 ? elv_money(elv_price(product)) : elv_badge('included') }}</span>
             </div>
             <h1>{{ product.name }}</h1>
             <p class="lead">{{ product.tagline }}</p>
             <div class="stack-actions">
-                {% if product.price_cents > 0 %}
+                {% if elv_price(product) > 0 %}
                     <a class="btn btn--primary" href="{{ elv_order_url({ product: product.slug, plan: 'single' }) }}">
                         {{ elv_icon('cart')|raw }} Подключить раздел
                     </a>
@@ -56,7 +56,7 @@ layout = "default"
                     <h3>Коротко</h3>
                     <ul class="specs mt-24">
                         <li><span>Что это</span><span>{{ product.kind == 'kit' ? 'Готовый сайт' : 'Дополнительный раздел' }}</span></li>
-                        <li><span>Цена</span><span>{{ product.price_cents > 0 ? elv_money(product.price_cents) : elv_badge('included') }}</span></li>
+                        <li><span>Цена</span><span>{{ elv_price(product) > 0 ? elv_money(elv_price(product)) : elv_badge('included') }}</span></li>
                         <li><span>Запуск</span><span>1–3 рабочих дня</span></li>
                         <li><span>Поддержка</span><span>По выбранному тарифу</span></li>
                         <li><span>Где работает</span><span>На вашем домене</span></li>

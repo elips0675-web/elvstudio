@@ -32,7 +32,7 @@ meta_description = "Готовый сайт для бизнеса: страни�
                         </ul>
                         <div class="stack-actions">
                             <a class="btn btn--primary" href="{{ elv_order_url({ product: kit.slug }) }}">
-                                {{ elv_icon('cart')|raw }} Заказать сайт за {{ elv_money(kit.price_cents) }}
+                                {{ elv_icon('cart')|raw }} Заказать сайт за {{ elv_money(elv_price(kit)) }}
                             </a>
                             <a class="btn btn--ghost" href="{{ 'demo'|page }}">
                                 {{ elv_icon('play')|raw }} Посмотреть демо
@@ -45,7 +45,7 @@ meta_description = "Готовый сайт для бизнеса: страни�
                         <ul class="specs mt-24">
                             <li><span>Что это</span><span>Готовый сайт для бизнеса</span></li>
                             <li><span>Домен</span><span>Ваш</span></li>
-                            <li><span>Оплата</span><span>{{ elv_money(kit.price_cents) }} разово</span></li>
+                            <li><span>Оплата</span><span>{{ elv_money(elv_price(kit)) }} разово</span></li>
                             <li><span>Обновления</span><span>12 месяцев</span></li>
                             <li><span>Поддержка</span><span>30 дней после запуска</span></li>
                             <li><span>Владение</span><span>сайт и файлы остаются у вас</span></li>

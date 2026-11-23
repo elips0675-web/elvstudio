@@ -3,6 +3,7 @@
 use BackendAuth;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Money;
+use Illuminate\Validation\ValidationException;
 use Model;
 
 /**
@@ -65,6 +66,49 @@ class Price extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * beforeUpdate — история цен неизменяема.
+     *
+     * Менять можно только valid_to, is_active и note: новая цена оформляется
+     * новой версией, иначе старые заказы и счета теряют опору.
+     */
+    public function beforeUpdate()
+    {
+        $locked = [
+            'price_cents' => 'цена',
+            'plan' => 'тариф',
+            'product_slug' => 'продукт',
+            'currency' => 'валюта',
+            'valid_from' => 'дата начала',
+        ];
+        $changed = [];
+
+        foreach ($locked as $field => $label) {
+            if ($this->priceFieldChanged($field)) {
+                $changed[] = $label;
+            }
+        }
+
+        if ($changed !== []) {
+            throw ValidationException::withMessages([
+                'price_cents' => 'Версия цены неизменяема: ' . implode(', ', $changed) . '. Создайте новую версию с новой датой начала.',
+            ]);
+        }
+    }
+
+    protected function priceFieldChanged(string $field): bool
+    {
+        $original = $this->getOriginal($field);
+        $current = $this->getAttribute($field);
+
+        if ($field === 'valid_from') {
+            $original = $original ? date('Y-m-d', strtotime((string) $original)) : null;
+            $current = $current ? $current->format('Y-m-d') : null;
+        }
+
+        return (string) $original !== (string) $current;
     }
 
     public function getPlanLabelAttribute(): string

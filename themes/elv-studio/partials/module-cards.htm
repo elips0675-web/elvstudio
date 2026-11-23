@@ -24,7 +24,7 @@
                     {% if module.badge %}
                         <span class="badge badge--line">{{ module.badge }}</span>
                     {% endif %}
-                    <span class="badge">{{ module.price_cents > 0 ? elv_money(module.price_cents) : elv_badge('included') }}</span>
+                    <span class="badge">{{ elv_price(module) > 0 ? elv_money(elv_price(module)) : elv_badge('included') }}</span>
                 </div>
                 <h2>{{ module.name }}</h2>
                 <p class="lead">{{ module.tagline }}</p>
@@ -42,9 +42,9 @@
                     <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">
                         Подробно {{ elv_icon('arrow-right')|raw }}
                     </a>
-                    {% if module.price_cents > 0 %}
+                    {% if elv_price(module) > 0 %}
                         <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug, plan: 'single' }) }}">
-                            {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(module.price_cents) }}
+                            {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(elv_price(module)) }}
                         </a>
                     {% else %}
                         <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
@@ -60,11 +60,11 @@
                 <p>{{ module.tagline }}</p>
                 <div class="summary__total">
                     <span class="muted small">Цена</span>
-                    <b>{{ module.price_cents > 0 ? elv_money(module.price_cents) : elv_badge('included') }}</b>
+                    <b>{{ elv_price(module) > 0 ? elv_money(elv_price(module)) : elv_badge('included') }}</b>
                 </div>
                 <div class="stack-actions">
                     <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
-                    {% if module.price_cents > 0 %}
+                    {% if elv_price(module) > 0 %}
                         <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug }) }}">Подключить</a>
                     {% endif %}
                 </div>
@@ -75,15 +75,15 @@
                 <h3>{{ module.name }}</h3>
                 {% if badge %}
                     <p class="mb-0">
-                        <span class="badge {{ module.price_cents > 0 ? 'badge--line' : 'badge--accent' }}">{{ module.price_cents > 0 ? elv_badge('separate') : elv_badge('included') }}</span>
+                        <span class="badge {{ elv_price(module) > 0 ? 'badge--line' : 'badge--accent' }}">{{ elv_price(module) > 0 ? elv_badge('separate') : elv_badge('included') }}</span>
                     </p>
                 {% endif %}
                 <p{% if badge %} class="mt-16"{% endif %}>{{ module.tagline }}</p>
                 <span class="card__more">
                     {% if meta == 'more' %}
                         Подробно
-                    {% elseif module.price_cents > 0 %}
-                        {{ elv_money(module.price_cents) }}
+                    {% elseif elv_price(module) > 0 %}
+                        {{ elv_money(elv_price(module)) }}
                     {% else %}
                         Подробнее
                     {% endif %}

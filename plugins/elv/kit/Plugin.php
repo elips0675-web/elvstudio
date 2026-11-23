@@ -224,6 +224,11 @@ class Plugin extends PluginBase
                 'elv_money' => function ($cents, $currency = null) {
                     return Money::format((int) $cents, $currency);
                 },
+                'elv_price' => function ($product, $plan = 'single') {
+                    return $product instanceof Product
+                        ? Prices::resolve($product, (string) $plan)
+                        : 0;
+                },
                 'elv_currency_symbol' => function () {
                     return Money::symbol();
                 },

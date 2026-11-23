@@ -1,6 +1,8 @@
 <?php namespace Elv\Kit\Models;
 
 use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\Prices;
 use Model;
 
 /**
@@ -47,14 +49,14 @@ class Product extends Model
 
     public function getPriceAttribute(): float
     {
-        return round(((int) $this->price_cents) / 100, 2);
+        return round(Prices::resolve($this, 'single') / 100, 2);
     }
 
     public function getPriceLabelAttribute(): string
     {
-        return (int) $this->price_cents > 0
-            ? \Elv\Kit\Classes\Money::format((int) $this->price_cents)
-            : 'Бесплатно';
+        $price = Prices::resolve($this, 'single');
+
+        return $price > 0 ? Money::format($price) : 'Бесплатно';
     }
 
     /**

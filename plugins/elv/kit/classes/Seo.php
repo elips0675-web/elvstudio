@@ -413,7 +413,7 @@ class Seo
 
         $node['offers'] = [
             '@type' => 'Offer',
-            'price' => (string) (max(0, (int) $product->price_cents) / 100),
+            'price' => (string) (max(0, Prices::resolve($product, 'single')) / 100),
             'priceCurrency' => Money::currency(),
             'url' => static::canonical(),
             'availability' => 'https://schema.org/InStock',
@@ -486,6 +486,7 @@ class Seo
     public static function llms(): string
     {
         $kit = Product::kit();
+        $kitPrice = $kit ? Prices::resolve($kit, 'single') : 0;
 
         $lines = [
             '# ' . static::siteName(),
@@ -495,7 +496,7 @@ class Seo
             (string) (Settings::get('brand_description') ?: ''),
             '',
             '## Что это',
-            '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка; цена от ' . Money::format($kit ? $kit->price_cents : 7900) . '.',
+            '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка' . ($kitPrice > 0 ? '; цена от ' . Money::format($kitPrice) : '') . '.',
             '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
             '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
             '- [Калькулятор](' . static::base() . '/calculator/): лицензия и модули, три суммы и разбивка без скрытых платежей.',
