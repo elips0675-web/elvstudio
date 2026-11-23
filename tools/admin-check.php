@@ -67,6 +67,11 @@ foreach ($controllers as $configFile) {
     $listFile = $resolve((string) ($config['list'] ?? ''));
     $check(is_file($listFile), $name . ': файл списка не найден (' . $listFile . ')');
 
+    if (($config['toolbar']['buttons'] ?? '') === 'list_toolbar') {
+        $toolbarFile = dirname($configFile) . '/_list_toolbar.htm';
+        $check(is_file($toolbarFile), $name . ': кнопки list_toolbar, но нет _list_toolbar.htm');
+    }
+
     if (!is_file($listFile)) {
         continue;
     }

@@ -10,6 +10,7 @@ fields:
         label: 'Тип'
         type: dropdown
         span: left
+        default: kit
         options:
             kit: 'Kit'
             module: 'Модуль'
@@ -72,7 +73,9 @@ fields:
         label: 'Активен'
         type: switch
         span: left
+        default: 1
     sort_order:
         label: 'Порядок'
         type: number
         span: right
+        default: 0

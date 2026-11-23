@@ -10,5 +10,6 @@ defaultSort:
     column: id
     direction: desc
 toolbar:
+    buttons: list_toolbar
     search:
         prompt: 'Название или слаг'

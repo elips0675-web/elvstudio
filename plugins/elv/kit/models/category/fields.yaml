@@ -13,3 +13,4 @@ fields:
         label: 'Порядок'
         type: number
         span: left
+        default: 0

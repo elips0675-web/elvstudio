@@ -35,6 +35,8 @@ fields:
         label: 'Время чтения, мин'
         type: number
         span: right
+        disabled: true
+        comment: 'Считается из текста: 180 слов в минуту, минимум 1.'
     published_at:
         label: 'Дата публикации'
         type: datepicker
