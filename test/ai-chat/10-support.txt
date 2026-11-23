@@ -1,0 +1,1730 @@
+# Поддержка: обращения, SLA и Telegram ChatOps
+
+Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+
+===== FILE: plugins/elv/kit/classes/Support.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Carbon\Carbon;
+
+/**
+ * Support — рабочее время поддержки и срок первого ответа.
+ *
+ * SLA считается по рабочим часам, а не по календарным суткам: обращение,
+ * пришедшее в пятницу вечером, не должно «просрочиваться» за выходные.
+ * Рабочее время — Пн–Пт 10:00–18:00 Europe/Minsk, срок — 24 рабочих часа.
+ */
+class Support
+{
+    public const TIMEZONE = 'Europe/Minsk';
+    public const WORK_START = 10;
+    public const WORK_END = 18;
+    public const SLA_HOURS = 24;
+
+    /**
+     * dueAt — срок первого ответа от момента создания обращения.
+     */
+    public static function dueAt($start = null): Carbon
+    {
+        // Строка трактуется как местное время поддержки: `now()` приходит
+        // в UTC приложения, а «пятница 17:30» в коде и тестах — это Минск.
+        if ($start instanceof \DateTimeInterface) {
+            $time = Carbon::instance($start)->setTimezone(self::TIMEZONE);
+        }
+        elseif ($start) {
+            $time = Carbon::parse((string) $start, self::TIMEZONE);
+        }
+        else {
+            $time = now()->setTimezone(self::TIMEZONE);
+        }
+
+        $remaining = self::SLA_HOURS * 3600;
+
+        while ($remaining > 0) {
+            $time = self::nextWorkingMoment($time);
+
+            $endOfDay = $time->copy()->setTime(self::WORK_END, 0, 0);
+            $available = $endOfDay->getTimestamp() - $time->getTimestamp();
+
+            if ($available <= 0) {
+                $time = self::nextWorkingMoment($endOfDay->copy()->addMinute());
+                continue;
+            }
+
+            if ($available >= $remaining) {
+                $time = $time->copy()->addSeconds($remaining);
+                $remaining = 0;
+                continue;
+            }
+
+            $remaining -= $available;
+            $time = self::nextWorkingMoment($endOfDay);
+        }
+
+        return $time->setTimezone((string) config('app.timezone', 'UTC'));
+    }
+
+    /**
+     * nextWorkingMoment — ближайшая минута внутри рабочего окна.
+     */
+    public static function nextWorkingMoment(Carbon $time): Carbon
+    {
+        $time = $time->copy()->setTimezone(self::TIMEZONE);
+
+        while (true) {
+            if (!self::isWorkday($time)) {
+                $time = $time->copy()->addDay()->setTime(self::WORK_START, 0, 0);
+                continue;
+            }
+
+            if ($time->hour < self::WORK_START) {
+                return $time->setTime(self::WORK_START, 0, 0);
+            }
+
+            if ($time->hour >= self::WORK_END) {
+                $time = $time->copy()->addDay()->setTime(self::WORK_START, 0, 0);
+                continue;
+            }
+
+            return $time;
+        }
+    }
+
+    public static function isWorkday(Carbon $time): bool
+    {
+        return $time->dayOfWeekIso >= 1 && $time->dayOfWeekIso <= 5;
+    }
+
+    public static function isWorkingMoment(Carbon $time): bool
+    {
+        $time = $time->copy()->setTimezone(self::TIMEZONE);
+
+        return self::isWorkday($time)
+            && $time->hour >= self::WORK_START
+            && $time->hour < self::WORK_END;
+    }
+
+    /**
+     * label — срок в часовом поясе поддержки, без машинного UTC.
+     */
+    public static function label($time): string
+    {
+        if (!$time instanceof Carbon) {
+            return '';
+        }
+
+        return $time->copy()->setTimezone(self::TIMEZONE)->format('d.m.Y H:i');
+    }
+
+    /**
+     * isOverdue — первый ответ не отправлен, а срок уже прошёл.
+     */
+    public static function isOverdue($ticket): bool
+    {
+        if (!$ticket || !$ticket->sla_due_at instanceof Carbon) {
+            return false;
+        }
+
+        if ($ticket->first_response_at instanceof Carbon) {
+            return false;
+        }
+
+        if ((string) $ticket->status === 'closed') {
+            return false;
+        }
+
+        return $ticket->sla_due_at->isPast();
+    }
+
+    /**
+     * describe — человеческая строка для писем и админки.
+     */
+    public static function describe($ticket): string
+    {
+        if (!$ticket || !$ticket->sla_due_at instanceof Carbon) {
+            return '';
+        }
+
+        if ($ticket->first_response_at instanceof Carbon) {
+            return 'Первый ответ: ' . self::label($ticket->first_response_at);
+        }
+
+        return 'Первый ответ до: ' . self::label($ticket->sla_due_at);
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/TicketService.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Elv\Kit\Classes\Mail\TicketAdmin;
+use Elv\Kit\Classes\Mail\TicketCustomer;
+use Elv\Kit\Models\Customer;
+use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Ticket;
+use Elv\Kit\Models\TicketMessage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+/**
+ * TicketService — создание обращений, ответы и уведомления.
+ *
+ * Обращение сначала сохраняется, потом ставятся письма и Telegram: если
+ * внешний канал лежит, история остаётся в базе и видна в кабинете и админке.
+ */
+class TicketService
+{
+    /**
+     * open — новое обращение покупателя с первым сообщением.
+     *
+     * @param  array{subject: string, body: string, order_id?: int|null}  $data
+     */
+    public function open(Customer $customer, array $data): Ticket
+    {
+        $ticket = new Ticket();
+        $ticket->fill([
+            'customer_id' => (int) $customer->id,
+            'email' => (string) $customer->email,
+            'order_id' => !empty($data['order_id']) ? (int) $data['order_id'] : null,
+            'subject' => (string) $data['subject'],
+            'status' => Ticket::STATUS_NEW,
+            'priority' => Ticket::PRIORITY_NORMAL,
+            'source' => 'account',
+        ]);
+        $ticket->save();
+
+        $this->addMessage($ticket, Ticket::AUTHOR_CUSTOMER, (string) $data['body'], $customer->display_name);
+        $this->notifyAdmin($ticket);
+        Telegram::notifyNew($ticket);
+
+        return $ticket->fresh();
+    }
+
+    /**
+     * customerReply — сообщение покупателя в существующем обращении.
+     */
+    public function customerReply(Ticket $ticket, string $body, string $name = ''): TicketMessage
+    {
+        $message = $this->addMessage($ticket, Ticket::AUTHOR_CUSTOMER, $body, $name);
+
+        $ticket->status = Ticket::STATUS_OPEN;
+        $ticket->closed_at = null;
+        $ticket->save();
+
+        $this->notifyAdmin($ticket);
+        Telegram::notifyCustomerMessage($ticket, $message);
+
+        return $message;
+    }
+
+    /**
+     * supportReply — ответ поддержки. Первый ответ закрывает SLA.
+     */
+    public function supportReply(Ticket $ticket, string $body, string $authorName = 'Поддержка'): TicketMessage
+    {
+        $message = $this->addMessage($ticket, Ticket::AUTHOR_SUPPORT, $body, $authorName);
+
+        if (!$ticket->first_response_at) {
+            $ticket->first_response_at = now();
+        }
+
+        $ticket->status = Ticket::STATUS_WAITING;
+        $ticket->closed_at = null;
+        $ticket->save();
+
+        $this->notifyCustomer($ticket, $message);
+
+        return $message;
+    }
+
+    /**
+     * close — обращение закрыто, в истории остаётся служебная запись.
+     */
+    public function close(Ticket $ticket, string $authorName = 'Поддержка'): void
+    {
+        if ($ticket->is_closed) {
+            return;
+        }
+
+        $ticket->status = Ticket::STATUS_CLOSED;
+        $ticket->closed_at = now();
+        $ticket->save();
+
+        $this->addMessage($ticket, Ticket::AUTHOR_SYSTEM, 'Обращение закрыто.', $authorName);
+    }
+
+    protected function addMessage(Ticket $ticket, string $author, string $body, string $name = ''): TicketMessage
+    {
+        $body = trim($body);
+
+        return $ticket->messages()->create([
+            'author' => $author,
+            'author_name' => mb_substr($name, 0, 160),
+            'body' => $body,
+        ]);
+    }
+
+    protected function notifyAdmin(Ticket $ticket): void
+    {
+        $admin = (string) (Settings::get('order_notify_email') ?: Settings::get('email'));
+
+        if ($admin === '') {
+            Log::warning('Elv Kit: некуда отправить письмо о обращении', ['ticket' => $ticket->number]);
+
+            return;
+        }
+
+        try {
+            Mail::to($admin)->queue(new TicketAdmin($ticket));
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: письмо о обращении не отправлено', [
+                'ticket' => $ticket->number,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function notifyCustomer(Ticket $ticket, TicketMessage $message): void
+    {
+        if (trim((string) $ticket->email) === '') {
+            return;
+        }
+
+        try {
+            Mail::to($ticket->email)->queue(new TicketCustomer($ticket, $message));
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: письмо с ответом поддержки не отправлено', [
+                'ticket' => $ticket->number,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Telegram.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Ticket;
+use Elv\Kit\Models\TicketMessage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Telegram — уведомления поддержки и ChatOps без внешней библиотеки.
+ *
+ * Бот шлёт только служебные строки: номер обращения, тему, адрес покупателя
+ * и срок ответа. Токен и chat_id берутся из настроек или `.env`; пустой токен
+ * выключает канал, а сайт продолжает работать.
+ */
+class Telegram
+{
+    public static function token(): string
+    {
+        return trim((string) (Settings::get('telegram_bot_token') ?: env('ELV_TELEGRAM_BOT_TOKEN', '')));
+    }
+
+    public static function chatId(): string
+    {
+        return trim((string) (Settings::get('telegram_chat_id') ?: env('ELV_TELEGRAM_CHAT_ID', '')));
+    }
+
+    public static function secret(): string
+    {
+        return trim((string) (Settings::get('telegram_webhook_secret') ?: env('ELV_TELEGRAM_WEBHOOK_SECRET', '')));
+    }
+
+    public static function enabled(): bool
+    {
+        return static::token() !== '' && static::chatId() !== '';
+    }
+
+    public static function webhookUrl(): string
+    {
+        $secret = static::secret();
+
+        return $secret === '' ? '' : url('/telegram/webhook/' . $secret);
+    }
+
+    public static function secretMatches(string $secret): bool
+    {
+        $expected = static::secret();
+
+        return $expected !== '' && hash_equals($expected, trim($secret));
+    }
+
+    public static function chatMatches(string $chatId): bool
+    {
+        $expected = static::chatId();
+
+        return $expected !== '' && hash_equals($expected, trim($chatId));
+    }
+
+    /**
+     * send — одно сообщение в настроенный чат. Ошибка не ломает обращение.
+     */
+    public static function send(string $text): bool
+    {
+        if (!static::enabled()) {
+            return false;
+        }
+
+        $text = mb_substr(trim($text), 0, 4000);
+
+        if ($text === '') {
+            return false;
+        }
+
+        try {
+            $response = Http::timeout(6)
+                ->asForm()
+                ->post('https://api.telegram.org/bot' . static::token() . '/sendMessage', [
+                    'chat_id' => static::chatId(),
+                    'text' => $text,
+                    'disable_web_page_preview' => 'true',
+                ]);
+
+            if (!$response->successful()) {
+                Log::warning('Elv Kit: Telegram отклонил сообщение', [
+                    'status' => $response->status(),
+                    'description' => (string) ($response->json('description') ?? ''),
+                ]);
+
+                return false;
+            }
+
+            return true;
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: Telegram недоступен', ['error' => $e->getMessage()]);
+
+            return false;
+        }
+    }
+
+    public static function notifyNew(Ticket $ticket): bool
+    {
+        return static::send(implode("\n", [
+            'Новое обращение ' . $ticket->number,
+            'Тема: ' . $ticket->subject,
+            'Покупатель: ' . $ticket->email,
+            Support::describe($ticket),
+            '',
+            'Ответить: /reply ' . $ticket->number . ' текст',
+        ]));
+    }
+
+    public static function notifyCustomerMessage(Ticket $ticket, TicketMessage $message): bool
+    {
+        return static::send(implode("\n", [
+            'Сообщение покупателя в ' . $ticket->number,
+            'Тема: ' . $ticket->subject,
+            'Покупатель: ' . $ticket->email,
+            '',
+            mb_substr((string) $message->body, 0, 1200),
+            '',
+            'Ответить: /reply ' . $ticket->number . ' текст',
+        ]));
+    }
+
+    public static function helpText(): string
+    {
+        return implode("\n", [
+            'Elv Kit: поддержка',
+            '/reply TK-000001 текст — ответить покупателю',
+            '/close TK-000001 — закрыть обращение',
+            '/status TK-000001 — статус и срок',
+        ]);
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Http/TicketController.php =====
+
+<?php namespace Elv\Kit\Classes\Http;
+
+use Elv\Kit\Classes\AccountService;
+use Elv\Kit\Classes\AntiSpam;
+use Elv\Kit\Classes\TicketService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+/**
+ * TicketController — обращения покупателя: создать, ответить, закрыть.
+ *
+ * Доступ только из кабинета: покупатель опознаётся по сессии Magic Link, а
+ * обращение проверяется по `customer_id`/e-mail. Чужое обращение отвечает 404,
+ * как несуществующее.
+ */
+class TicketController
+{
+    public function __construct(
+        protected AccountService $account = new AccountService(),
+        protected TicketService $tickets = new TicketService()
+    ) {
+    }
+
+    /**
+     * store создаёт обращение с первым сообщением.
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request)
+    {
+        $customer = $this->account->user();
+
+        if (!$customer) {
+            return $this->denied($request);
+        }
+
+        if (AntiSpam::isBot($request)) {
+            return $this->created($request, null);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'subject' => 'required|string|min:5|max:200',
+            'body' => 'required|string|min:10|max:5000',
+            'order_id' => 'nullable|integer|min:1',
+            'consent' => 'accepted',
+        ], [
+            'subject.required' => 'Укажите тему обращения.',
+            'subject.min' => 'Тема слишком короткая.',
+            'body.required' => 'Опишите вопрос.',
+            'body.min' => 'Опишите вопрос подробнее — минимум 10 символов.',
+            'consent.accepted' => 'Нужно согласие на обработку персональных данных.',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->invalid($request, $validator->errors()->toArray());
+        }
+
+        $orderId = (int) $request->input('order_id', 0);
+        $order = null;
+
+        if ($orderId > 0) {
+            $order = $this->account->orders($customer)->firstWhere('id', $orderId);
+
+            if (!$order) {
+                return $this->invalid($request, ['order_id' => ['Заказ не найден среди ваших заказов.']]);
+            }
+        }
+
+        $ticket = $this->tickets->open($customer, [
+            'subject' => AntiSpam::clean((string) $request->input('subject'), 200),
+            'body' => AntiSpam::clean((string) $request->input('body'), 5000),
+            'order_id' => $order ? (int) $order->id : null,
+        ]);
+
+        return $this->created($request, $ticket);
+    }
+
+    /**
+     * reply добавляет сообщение покупателя в обращение.
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function reply(Request $request, int $id)
+    {
+        $customer = $this->account->user();
+
+        if (!$customer) {
+            return $this->denied($request);
+        }
+
+        $ticket = $this->account->ticket($customer, $id);
+
+        if (!$ticket) {
+            abort(404);
+        }
+
+        if (AntiSpam::isBot($request)) {
+            return $this->replied($request, $id);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'body' => 'required|string|min:2|max:5000',
+        ], [
+            'body.required' => 'Напишите сообщение.',
+            'body.min' => 'Сообщение слишком короткое.',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->invalid($request, $validator->errors()->toArray(), $id);
+        }
+
+        $this->tickets->customerReply(
+            $ticket,
+            AntiSpam::clean((string) $request->input('body'), 5000),
+            $customer->display_name
+        );
+
+        return $this->replied($request, $id);
+    }
+
+    /**
+     * close закрывает обращение по просьбе покупателя.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function close(Request $request, int $id)
+    {
+        $customer = $this->account->user();
+
+        if (!$customer) {
+            return $this->denied($request);
+        }
+
+        $ticket = $this->account->ticket($customer, $id);
+
+        if (!$ticket) {
+            abort(404);
+        }
+
+        $this->tickets->close($ticket, $customer->display_name);
+
+        return redirect(url('/tickets') . '/?id=' . (int) $ticket->id . '&closed=1#thread')
+            ->with('elv_success', 'Обращение закрыто. Если понадобится, напишите снова — оно откроется.');
+    }
+
+    protected function created(Request $request, $ticket)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'id' => $ticket ? (int) $ticket->id : null,
+                'number' => $ticket ? (string) $ticket->number : '',
+                'url' => $ticket ? (string) $ticket->url : '',
+            ], 201);
+        }
+
+        $url = $ticket
+            ? url('/tickets') . '/?id=' . (int) $ticket->id . '&created=1#thread'
+            : url('/tickets') . '/?created=1';
+
+        return redirect($url)->with('elv_success', 'Обращение создано. Ответ придёт на e-mail и появится здесь.');
+    }
+
+    protected function replied(Request $request, int $id)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true], 201);
+        }
+
+        return redirect(url('/tickets') . '/?id=' . $id . '&sent=1#thread')
+            ->with('elv_success', 'Сообщение отправлено.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $errors
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    protected function invalid(Request $request, array $errors, ?int $id = null)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => false,
+                'code' => 'VALIDATION',
+                'errors' => $errors,
+            ], 422);
+        }
+
+        $first = '';
+
+        foreach ($errors as $messages) {
+            $first = (string) (is_array($messages) ? reset($messages) : $messages);
+            break;
+        }
+
+        $url = url('/tickets') . '/' . ($id ? '?id=' . $id . '#thread' : '#new-ticket');
+
+        return redirect($url)
+            ->withInput()
+            ->withErrors($errors)
+            ->with('elv_errors', $errors)
+            ->with('elv_error', $first);
+    }
+
+    protected function denied(Request $request)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => false,
+                'code' => 'AUTH',
+                'message' => 'Войдите в кабинет, чтобы написать в поддержку.',
+            ], 401);
+        }
+
+        return redirect(url('/account') . '/')
+            ->with('elv_error', 'Войдите в кабинет, чтобы написать в поддержку.');
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Http/TelegramController.php =====
+
+<?php namespace Elv\Kit\Classes\Http;
+
+use Elv\Kit\Classes\Telegram;
+use Elv\Kit\Classes\TicketService;
+use Elv\Kit\Models\Ticket;
+use Illuminate\Http\Request;
+
+/**
+ * TelegramController — вебхук ChatOps.
+ *
+ * Команды принимаются только из настроенного чата и только с секретом в
+ * адресе. Ответ покупателю уходит письмом, а подтверждение — в Telegram.
+ * Вебхук всегда отвечает 200, иначе Telegram повторяет одно и то же сообщение.
+ */
+class TelegramController
+{
+    public function __construct(protected TicketService $tickets = new TicketService())
+    {
+    }
+
+    public function webhook(Request $request, string $secret)
+    {
+        if (!Telegram::secretMatches($secret)) {
+            abort(404);
+        }
+
+        $update = (array) $request->json()->all();
+        $message = (array) ($update['message'] ?? $update['edited_message'] ?? []);
+        $chatId = (string) ($message['chat']['id'] ?? '');
+
+        if (!Telegram::chatMatches($chatId)) {
+            return response()->json(['ok' => true]);
+        }
+
+        $text = trim((string) ($message['text'] ?? ''));
+
+        if ($text === '') {
+            return response()->json(['ok' => true]);
+        }
+
+        $author = trim((string) ($message['from']['first_name'] ?? '')) ?: 'Поддержка';
+
+        if (preg_match('~^/(start|help)\b~u', $text)) {
+            Telegram::send(Telegram::helpText());
+
+            return response()->json(['ok' => true]);
+        }
+
+        if (preg_match('~^/reply\s+(TK-\d{6})\s+([\s\S]+)$~u', $text, $match)) {
+            $ticket = Ticket::query()->where('number', $match[1])->first();
+
+            if (!$ticket) {
+                Telegram::send('Обращение ' . $match[1] . ' не найдено.');
+
+                return response()->json(['ok' => true]);
+            }
+
+            $this->tickets->supportReply($ticket, trim($match[2]), $author);
+            Telegram::send('Ответ отправлен в ' . $ticket->number . '. Статус: ждём ответа покупателя.');
+
+            return response()->json(['ok' => true]);
+        }
+
+        if (preg_match('~^/close\s+(TK-\d{6})$~u', $text, $match)) {
+            $ticket = Ticket::query()->where('number', $match[1])->first();
+
+            if (!$ticket) {
+                Telegram::send('Обращение ' . $match[1] . ' не найдено.');
+
+                return response()->json(['ok' => true]);
+            }
+
+            $this->tickets->close($ticket, $author);
+            Telegram::send('Обращение ' . $ticket->number . ' закрыто.');
+
+            return response()->json(['ok' => true]);
+        }
+
+        if (preg_match('~^/status\s+(TK-\d{6})$~u', $text, $match)) {
+            $ticket = Ticket::query()->where('number', $match[1])->first();
+
+            if (!$ticket) {
+                Telegram::send('Обращение ' . $match[1] . ' не найдено.');
+
+                return response()->json(['ok' => true]);
+            }
+
+            Telegram::send(implode("\n", [
+                $ticket->number . ' — ' . $ticket->status_label,
+                'Тема: ' . $ticket->subject,
+                'Покупатель: ' . $ticket->email,
+                $ticket->sla_label,
+            ]));
+
+            return response()->json(['ok' => true]);
+        }
+
+        Telegram::send('Не понял команду. ' . "\n" . Telegram::helpText());
+
+        return response()->json(['ok' => true]);
+    }
+}
+
+===== FILE: plugins/elv/kit/models/Ticket.php =====
+
+<?php namespace Elv\Kit\Models;
+
+use Elv\Kit\Classes\Support;
+use Model;
+
+/**
+ * Ticket — обращение покупателя в поддержку.
+ *
+ * Номер вида `TK-000123` присваивается после вставки: он нужен в письмах,
+ * Telegram и админке, но не должен зависеть от ввода покупателя. Срок первого
+ * ответа считается по рабочим часам (`Support::dueAt()`).
+ */
+class Ticket extends Model
+{
+    public const STATUS_NEW = 'new';
+    public const STATUS_OPEN = 'open';
+    public const STATUS_WAITING = 'waiting';
+    public const STATUS_CLOSED = 'closed';
+
+    public const PRIORITY_LOW = 'low';
+    public const PRIORITY_NORMAL = 'normal';
+    public const PRIORITY_HIGH = 'high';
+
+    public const AUTHOR_CUSTOMER = 'customer';
+    public const AUTHOR_SUPPORT = 'support';
+    public const AUTHOR_SYSTEM = 'system';
+
+    public $table = 'elv_kit_tickets';
+
+    public $fillable = [
+        'number', 'customer_id', 'email', 'order_id', 'subject',
+        'status', 'priority', 'source', 'sla_due_at', 'first_response_at', 'closed_at',
+    ];
+
+    public $rules = [
+        'email' => 'required|email|max:191',
+        'subject' => 'required|max:200',
+        'status' => 'required|in:new,open,waiting,closed',
+        'priority' => 'required|in:low,normal,high',
+    ];
+
+    protected $casts = [
+        'sla_due_at' => 'datetime',
+        'first_response_at' => 'datetime',
+        'closed_at' => 'datetime',
+    ];
+
+    public $belongsTo = [
+        'customer' => Customer::class,
+        'order' => Order::class,
+    ];
+
+    public $hasMany = [
+        'messages' => [TicketMessage::class, 'key' => 'ticket_id', 'order' => 'id asc'],
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function (self $ticket) {
+            if (!$ticket->sla_due_at) {
+                $ticket->sla_due_at = Support::dueAt(now());
+            }
+        });
+
+        static::created(function (self $ticket) {
+            if (trim((string) $ticket->number) === '') {
+                $ticket->number = 'TK-' . str_pad((string) $ticket->id, 6, '0', STR_PAD_LEFT);
+                $ticket->saveQuietly();
+            }
+        });
+    }
+
+    /**
+     * forCustomer — обращения покупателя по id или e-mail.
+     */
+    public function scopeForCustomer($query, Customer $customer)
+    {
+        return $query->where(function ($inner) use ($customer) {
+            $inner->where('customer_id', (int) $customer->id)
+                ->orWhere('email', $customer->email);
+        });
+    }
+
+    public function scopeUnanswered($query)
+    {
+        return $query->whereIn('status', [self::STATUS_NEW, self::STATUS_OPEN]);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ((string) $this->status) {
+            self::STATUS_OPEN => 'В работе',
+            self::STATUS_WAITING => 'Ждём ответа',
+            self::STATUS_CLOSED => 'Закрыто',
+            default => 'Новое',
+        };
+    }
+
+    public function getPriorityLabelAttribute(): string
+    {
+        return match ((string) $this->priority) {
+            self::PRIORITY_HIGH => 'Высокий',
+            self::PRIORITY_LOW => 'Низкий',
+            default => 'Обычный',
+        };
+    }
+
+    public function getIsClosedAttribute(): bool
+    {
+        return (string) $this->status === self::STATUS_CLOSED;
+    }
+
+    public function getUrlAttribute(): string
+    {
+        // url() срезает слэш на конце, поэтому канонический адрес собирается
+        // из двух частей: иначе каждая ссылка на обращение даёт 301.
+        return url('/tickets') . '/?id=' . (int) $this->id;
+    }
+
+    public function getSlaLabelAttribute(): string
+    {
+        return Support::describe($this);
+    }
+
+    public function getSlaOverdueAttribute(): bool
+    {
+        return Support::isOverdue($this);
+    }
+
+    public function getLastMessageAtAttribute()
+    {
+        $message = $this->messages->last();
+
+        return $message ? $message->created_at : $this->created_at;
+    }
+
+}
+
+===== FILE: plugins/elv/kit/models/TicketMessage.php =====
+
+<?php namespace Elv\Kit\Models;
+
+use Model;
+
+/**
+ * TicketMessage — сообщение в обращении.
+ *
+ * Автор хранится строкой, а не ссылкой на пользователя: покупатель входит по
+ * ссылке без учётной записи, а сотрудник поддержки может смениться. Имя
+ * сохраняется на момент отправки, чтобы история не переписывалась.
+ */
+class TicketMessage extends Model
+{
+    public $table = 'elv_kit_ticket_messages';
+
+    public $fillable = [
+        'ticket_id', 'author', 'author_name', 'body',
+    ];
+
+    public $rules = [
+        'ticket_id' => 'required|integer',
+        'author' => 'required|in:customer,support,system',
+        'body' => 'required|max:5000',
+    ];
+
+    public $belongsTo = [
+        'ticket' => Ticket::class,
+    ];
+
+    public function getAuthorLabelAttribute(): string
+    {
+        return match ((string) $this->author) {
+            Ticket::AUTHOR_SUPPORT => 'Поддержка',
+            Ticket::AUTHOR_SYSTEM => 'Система',
+            default => 'Покупатель',
+        };
+    }
+
+    public function getIsSupportAttribute(): bool
+    {
+        return (string) $this->author === Ticket::AUTHOR_SUPPORT;
+    }
+}
+
+===== FILE: themes/elv-studio/pages/tickets.htm =====
+
+title = "Поддержка"
+url = "/tickets/"
+layout = "default"
+meta_title = "Поддержка"
+meta_description = "Обращения покупателя Elv Kit: переписка с поддержкой, срок первого ответа и история в личном кабинете."
+meta_robots = "noindex, nofollow"
+==
+{% set account = elv_account() %}
+{% set tickets = account ? elv_account_tickets() : [] %}
+{% set orders = account ? elv_account_orders() : [] %}
+{% set ticketId = elv_query('id') %}
+{% set ticket = account and ticketId ? elv_ticket(ticketId) : null %}
+{{ elv_404_if(account and ticketId and not ticket) }}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Поддержка</span>
+            {% if ticket %}
+                <h1>Обращение {{ ticket.number }}</h1>
+                <p class="lead">{{ ticket.subject }}</p>
+            {% elseif account %}
+                <h1>Поддержка</h1>
+                <p class="lead">
+                    Опишите вопрос — ответ придёт на {{ account.email }} и появится здесь.
+                    Первый ответ — в течение 24 рабочих часов, Пн–Пт 10:00–18:00 (Минск).
+                </p>
+            {% else %}
+                <h1>Поддержка</h1>
+                <p class="lead">
+                    Обращения доступны покупателям: войдите в кабинет по одноразовой ссылке,
+                    чтобы написать в поддержку и увидеть историю.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            {% if not account %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Вход</span>
+                        <h2>Сначала в кабинет</h2>
+                        <p class="muted">
+                            Поддержка видит ваши заказы и лицензии, поэтому обращение привязано
+                            к адресу, на который оформлена покупка.
+                        </p>
+                        <div class="stack-actions mt-24">
+                            <a class="btn btn--primary" href="{{ 'account'|page }}">Войти в кабинет</a>
+                            <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать без входа</a>
+                        </div>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Как это работает</span>
+                        <ol class="account-steps">
+                            <li>Входите в кабинет по ссылке из письма.</li>
+                            <li>Описываете вопрос и при желании выбираете заказ.</li>
+                            <li>Получаете ответ на e-mail и видите переписку здесь.</li>
+                        </ol>
+                        <div class="notice mt-24">
+                            {{ elv_icon('shield')|raw }}
+                            <p>Обращение видит только поддержка и владелец адреса. Публично оно не показывается.</p>
+                        </div>
+                    </aside>
+                </div>
+            {% elseif ticket %}
+                <div class="account-head">
+                    <div>
+                        <span class="tiny muted">Обращение</span>
+                        <b>{{ ticket.number }} · {{ ticket.status_label }}</b>
+                    </div>
+                    <a class="btn btn--ghost btn--sm" href="{{ 'tickets'|page }}">К списку</a>
+                </div>
+
+                <div class="card mt-24">
+                    <div class="split">
+                        <div>
+                            <h2 class="mb-0">{{ ticket.subject }}</h2>
+                            <p class="tiny muted mt-8 mb-0">
+                                Создано {{ ticket.created_at ? ticket.created_at|date('d.m.Y H:i') : '—' }}
+                                {% if ticket.order_id %} · заказ #{{ ticket.order_id }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="ticket-meta">
+                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span>
+                            <span class="tiny {{ ticket.sla_overdue ? 'ticket-overdue' : 'muted' }}">{{ ticket.sla_label }}</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-thread mt-24">
+                        {% for message in ticket.messages %}
+                            <article class="ticket-message {{ message.is_support ? 'ticket-message--support' : '' }}">
+                                <header>
+                                    <b>{{ message.author_label }}</b>
+                                    {% if message.author_name %}<span class="tiny muted">· {{ message.author_name }}</span>{% endif %}
+                                    <span class="tiny muted">· {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}</span>
+                                </header>
+                                <div class="ticket-message__body">{{ message.body|elv_text|raw }}</div>
+                            </article>
+                        {% endfor %}
+                    </div>
+
+                    {% if not ticket.is_closed %}
+                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="ticket-reply">Сообщение</label>
+                                <textarea class="input" id="ticket-reply" name="body" rows="5" required maxlength="5000" placeholder="Дополните вопрос или ответьте поддержке.">{{ elv_old('body') }}</textarea>
+                            </div>
+
+                            <div class="stack-actions">
+                                <button class="btn btn--primary" type="submit">Отправить</button>
+                            </div>
+                        </form>
+
+                        <form method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/close') }}" class="mt-16"
+                              onsubmit="return confirm('Закрыть обращение? Если понадобится, вы сможете написать снова.');">
+                            {{ elv_csrf()|raw }}
+                            <button class="btn btn--ghost btn--sm" type="submit">Закрыть обращение</button>
+                        </form>
+                    {% else %}
+                        <div class="notice mt-24">
+                            {{ elv_icon('check')|raw }}
+                            <p>Обращение закрыто. Новое сообщение откроет его снова.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Новое обращение</span>
+                        <h2>Написать в поддержку</h2>
+                        <p class="muted">
+                            Опишите вопрос подробнее: что делали, что ожидали и что получили.
+                            Так ответ будет точнее.
+                        </p>
+
+                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="ticket-subject">Тема</label>
+                                <input class="input" id="ticket-subject" type="text" name="subject" required minlength="5" maxlength="200" value="{{ elv_old('subject') }}" placeholder="Например: не активируется ключ лицензии">
+                            </div>
+
+                            {% if orders|length %}
+                                <div class="field">
+                                    <label for="ticket-order">Заказ (необязательно)</label>
+                                    <select class="input" id="ticket-order" name="order_id">
+                                        <option value="">Без привязки к заказу</option>
+                                        {% for order in orders %}
+                                            <option value="{{ order.id }}" {{ elv_old('order_id') == order.id ? 'selected' : '' }}>
+                                                {{ order.order_no }} — {{ order.product_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+
+                            <div class="field">
+                                <label for="ticket-body">Сообщение</label>
+                                <textarea class="input" id="ticket-body" name="body" rows="6" required minlength="10" maxlength="5000" placeholder="Что случилось и чем помочь?">{{ elv_old('body') }}</textarea>
+                            </div>
+
+                            <label class="check">
+                                <input type="checkbox" name="consent" value="1" required {{ elv_old('consent') ? 'checked' : '' }}>
+                                <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                            </label>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">Отправить обращение</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Срок ответа</span>
+                        <p class="account-limit mb-0">24 рабочих часа</p>
+                        <p class="tiny muted">Пн–Пт, 10:00–18:00 по Минску. Выходные и праздники не считаются.</p>
+                        <div class="notice mt-24">
+                            {{ elv_icon('mail')|raw }}
+                            <p>Ответ придёт на {{ account.email }}. Если письмо не пришло, проверьте папку «Спам» — история всё равно останется здесь.</p>
+                        </div>
+                    </aside>
+                </div>
+
+                <h2 class="mt-32" id="tickets">Мои обращения</h2>
+
+                {% if tickets|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                    <th>Обновлено</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tickets %}
+                                    <tr>
+                                        <td><b>{{ item.number }}</b></td>
+                                        <td>{{ item.subject }}</td>
+                                        <td><span class="badge {{ item.is_closed ? 'badge--line' : 'badge--accent' }}">{{ item.status_label }}</span></td>
+                                        <td>{{ item.last_message_at ? item.last_message_at|date('d.m.Y H:i') : '—' }}</td>
+                                        <td><a class="btn btn--ghost btn--sm" href="{{ item.url }}">Открыть</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <h2>Обращений пока нет</h2>
+                        <p>Когда появится вопрос, напишите в форме выше — он появится в этом списке.</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+===== FILE: themes/elv-studio/pages/account.htm =====
+
+title = "Личный кабинет"
+url = "/account/"
+layout = "default"
+meta_title = "Личный кабинет"
+meta_description = "Заказы, лицензии и домены покупателя Elv Kit. Вход по одноразовой ссылке на e-mail, без пароля."
+meta_robots = "noindex, nofollow"
+==
+{% set account = elv_account() %}
+{% set orders = account ? elv_account_orders() : [] %}
+{% set licenses = account ? elv_account_licenses() : [] %}
+{% set domains = account ? elv_account_domains() : [] %}
+{% set tickets = account ? elv_account_tickets() : [] %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Кабинет</span>
+            {% if account %}
+                <h1>Здравствуйте, {{ account.short_name }}</h1>
+                <p class="lead">
+                    Здесь заказы, лицензии и домены, привязанные к адресу {{ account.email }}.
+                    Файлы сайта доступны после оплаты.
+                </p>
+            {% else %}
+                <h1>Вход в кабинет</h1>
+                <p class="lead">
+                    Пароля нет: пришлём одноразовую ссылку на e-mail. Она действует 30 минут
+                    и работает один раз.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            {% if elv_query('login') == 'invalid' %}
+                <div class="alert alert--err mb-24" role="alert">
+                    Ссылка не подошла: она уже использована или срок действия истёк. Запросите новую.
+                </div>
+            {% endif %}
+
+            {% if not account %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Вход</span>
+                        <h2>Ссылка на e-mail</h2>
+                        <p class="muted">
+                            Укажите адрес, на который оформляли заказ. Если адрес есть в базе,
+                            письмо придёт в течение минуты.
+                        </p>
+
+                        <form
+                            class="form mt-24"
+                            id="account-login"
+                            method="post"
+                            action="{{ url('/account/login') }}"
+                            data-elv-form
+                            data-success="Если адрес есть в заказах, письмо отправлено. Проверьте почту и папку «Спам».">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="account-email">E-mail</label>
+                                <input
+                                    class="input"
+                                    id="account-email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    maxlength="191"
+                                    autocomplete="email"
+                                    value="{{ elv_old('email') }}">
+                            </div>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">
+                                    {{ elv_icon('mail')|raw }} Получить ссылку
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Как это работает</span>
+                        <ol class="account-steps">
+                            <li>Указываете e-mail, на который оформлен заказ.</li>
+                            <li>Получаете письмо с кнопкой входа.</li>
+                            <li>Открываете кабинет: заказы, ключ, домены и файлы.</li>
+                        </ol>
+                        <div class="notice mt-24">
+                            {{ elv_icon('shield')|raw }}
+                            <p>Пароля нет, поэтому украсть его нельзя. Ссылка одноразовая: после входа её нельзя использовать снова.</p>
+                        </div>
+                        <p class="tiny muted mt-24 mb-0">
+                            Нет заказа? <a href="{{ 'pricing'|page }}">Посмотрите тарифы</a> или
+                            <a href="{{ 'contacts'|page }}">напишите нам</a>.
+                        </p>
+                    </aside>
+                </div>
+            {% else %}
+                <div class="account-head">
+                    <div>
+                        <span class="tiny muted">Вы вошли как</span>
+                        <b>{{ account.email }}</b>
+                    </div>
+                    <form method="post" action="{{ url('/account/logout') }}">
+                        {{ elv_csrf()|raw }}
+                        <button class="btn btn--ghost btn--sm" type="submit">Выйти</button>
+                    </form>
+                </div>
+
+                <h2 class="mt-32">Заказы</h2>
+
+                {% if orders|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Заказ</th>
+                                    <th>Дата</th>
+                                    <th>Состав</th>
+                                    <th>Сумма</th>
+                                    <th>Статус</th>
+                                    <th>Файлы</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td><b>{{ order.order_no }}</b></td>
+                                        <td>{{ order.created_at ? order.created_at|date('d.m.Y') : '—' }}</td>
+                                        <td>
+                                            {{ order.product_name }}
+                                            <span class="tiny muted account-table__sub">{{ order.plan_label }}</span>
+                                        </td>
+                                        <td>{{ order.amount_label }}</td>
+                                        <td>{{ order.status_label }}</td>
+                                        <td>
+                                            {% if order.status == 'paid' and order.download_token %}
+                                                <a class="btn btn--ghost btn--sm" href="{{ order.download_url }}">Скачать</a>
+                                            {% elseif order.status == 'paid' %}
+                                                <span class="tiny muted">файл выдаётся поддержкой</span>
+                                            {% else %}
+                                                <span class="tiny muted">после оплаты</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="tiny muted mt-24">
+                        Ссылка на скачивание персональная. Если файл не открывается, напишите на
+                        <a href="mailto:{{ elv_setting('email', 'sales@example.com') }}">{{ elv_setting('email', 'sales@example.com') }}</a>.
+                    </p>
+                {% else %}
+                    <div class="empty">
+                        <h2>Заказов пока нет</h2>
+                        <p>На этот адрес ещё ничего не оформляли. Если заказ был с другим e-mail, войдите с него.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'pricing'|page }}">Тарифы</a>
+                            <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать нам</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <h2 class="mt-32" id="tickets">Обращения в поддержку</h2>
+
+                {% if tickets|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                    <th>Обновлено</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets|slice(0, 5) %}
+                                    <tr>
+                                        <td><b>{{ ticket.number }}</b></td>
+                                        <td>{{ ticket.subject }}</td>
+                                        <td><span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span></td>
+                                        <td>{{ ticket.last_message_at ? ticket.last_message_at|date('d.m.Y H:i') : '—' }}</td>
+                                        <td><a class="btn btn--ghost btn--sm" href="{{ ticket.url }}">Открыть</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="stack-actions mt-16">
+                        <a class="btn btn--primary" href="{{ 'tickets'|page }}">Все обращения</a>
+                        <a class="btn btn--ghost" href="{{ 'tickets'|page }}#new-ticket">Новое обращение</a>
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <h2>Обращений пока нет</h2>
+                        <p>Если что-то не работает или нужен совет по установке — напишите в поддержку.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'tickets'|page }}#new-ticket">Написать в поддержку</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <h2 class="mt-32" id="domains">Лицензии и домены</h2>
+
+                {% if licenses|length %}
+                    {% for license in licenses %}
+                        <div class="card mb-24">
+                            <div class="split">
+                                <div>
+                                    <span class="eyebrow">Ключ лицензии</span>
+                                    <h3 class="account-key">{{ license.license_key }}</h3>
+                                    <p class="tiny muted mb-0">
+                                        {{ license.status_label }}
+                                        {% if license.activated_at %} · активирована {{ license.activated_at|date('d.m.Y') }}{% endif %}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="tiny muted">Лимит доменов</span>
+                                    <b class="account-limit">{{ license.domain_limit }}</b>
+                                </div>
+                            </div>
+
+                            {% set licenseDomains = domains|filter(item => item.license_id == license.id) %}
+
+                            <h3 class="mt-24">Домены</h3>
+
+                            {% if licenseDomains|length %}
+                                <ul class="account-domains">
+                                    {% for install in licenseDomains %}
+                                        <li>
+                                            <span>
+                                                <b>{{ install.domain_label }}</b>
+                                                <span class="tiny muted">
+                                                    активирован {{ install.created_at ? install.created_at|date('d.m.Y') : '—' }}
+                                                    {% if install.app_version %} · версия {{ install.app_version }}{% endif %}
+                                                </span>
+                                            </span>
+                                            {% set unbind = elv_account_can_unbind(install) %}
+                                            {% if unbind.ok %}
+                                                <form
+                                                    method="post"
+                                                    action="{{ url('/account/domain/' ~ install.id ~ '/unbind') }}"
+                                                    onsubmit="return confirm('Отвязать домен? Он освободит место в лимите, повторная отвязка — через 30 дней.');">
+                                                    {{ elv_csrf()|raw }}
+                                                    <button class="btn btn--ghost btn--sm" type="submit">Отвязать</button>
+                                                </form>
+                                            {% else %}
+                                                <span class="tiny muted account-unbind-note">{{ unbind.message }}</span>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="muted">
+                                    Доменов пока нет. Активируйте ключ на сайте — он появится здесь.
+                                </p>
+                            {% endif %}
+
+                            {% set nextUnbind = elv_account_next_unbind(license) %}
+                            {% if nextUnbind %}
+                                <p class="tiny muted mt-24 mb-0">
+                                    Следующая отвязка по этой лицензии — {{ nextUnbind|date('d.m.Y') }}.
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty">
+                        <h2>Лицензий пока нет</h2>
+                        <p>Ключ выдаётся после оплаты и приходит на e-mail вместе с файлами сайта.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'pricing'|page }}">Тарифы</a>
+                            <a class="btn btn--ghost" href="{{ 'docs'|page }}">Инструкция по установке</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+===== FILE: tools/tickets-check.php =====
+
+<?php
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Carbon\Carbon;
+use Elv\Kit\Classes\AccountService;
+use Elv\Kit\Classes\Http\TelegramController;
+use Elv\Kit\Classes\SecurityHeaders;
+use Elv\Kit\Classes\Support;
+use Elv\Kit\Classes\Telegram;
+use Elv\Kit\Classes\TicketService;
+use Elv\Kit\Models\Customer;
+use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Ticket;
+use Elv\Kit\Models\TicketMessage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+/*
+ * tickets-check — обращения, SLA по рабочим часам, права кабинета и ChatOps.
+ *
+ * Проверка не ходит в сеть: Telegram выключен пустым токеном, почта уходит в
+ * array-транспорт. Всё, что создаётся, удаляется в конце.
+ */
+
+$errors = [];
+
+$check = function (bool $condition, string $message) use (&$errors) {
+    if (!$condition) {
+        $errors[] = $message;
+    }
+};
+
+// Почта не должна уходить в SMTP: очередь синхронная, транспорт — массив.
+config(['mail.default' => 'array']);
+
+$at = function ($moment) {
+    return Support::dueAt($moment)->setTimezone(Support::TIMEZONE)->format('Y-m-d H:i');
+};
+
+$check($at('2026-11-27 17:30') === '2026-12-02 17:30', 'SLA from Friday 17:30 is not Wednesday 17:30: ' . $at('2026-11-27 17:30'));
+$check($at('2026-11-28 12:00') === '2026-12-02 18:00', 'SLA from Saturday is not Wednesday 18:00: ' . $at('2026-11-28 12:00'));
+$check($at('2026-11-30 09:00') === '2026-12-02 18:00', 'SLA from Monday morning is not Wednesday 18:00: ' . $at('2026-11-30 09:00'));
+$check($at('2026-11-27 18:30') === '2026-12-02 18:00', 'SLA from Friday evening is not Wednesday 18:00: ' . $at('2026-11-27 18:30'));
+
+$check(Support::isWorkingMoment(Carbon::parse('2026-11-27 17:59', Support::TIMEZONE)), 'Friday 17:59 is not a working moment');
+$check(!Support::isWorkingMoment(Carbon::parse('2026-11-27 18:00', Support::TIMEZONE)), 'Friday 18:00 is counted as working time');
+$check(!Support::isWorkingMoment(Carbon::parse('2026-11-28 12:00', Support::TIMEZONE)), 'Saturday is counted as working time');
+$check(Support::SLA_HOURS === 24, 'SLA is not 24 working hours');
+
+$suffix = bin2hex(random_bytes(4));
+$email = 'qa-ticket-' . $suffix . '@example.test';
+$otherEmail = 'qa-ticket-other-' . $suffix . '@example.test';
+
+$customer = Customer::create([
+    'email' => $email,
+    'name' => 'Мария Сергеевна',
+]);
+$other = Customer::create(['email' => $otherEmail]);
+
+$service = new TicketService();
+
+$ticket = $service->open($customer, [
+    'subject' => 'Не активируется ключ',
+    'body' => 'Ввожу ключ на странице активации, получаю ошибку 403.',
+]);
+
+$check($ticket instanceof Ticket, 'ticket is not created');
+$check((string) $ticket->number === 'TK-' . str_pad((string) $ticket->id, 6, '0', STR_PAD_LEFT), 'ticket number is not TK-000000');
+$check((string) $ticket->status === Ticket::STATUS_NEW, 'new ticket is not in «new» status');
+$check($ticket->sla_due_at !== null, 'new ticket has no SLA due date');
+$check($ticket->first_response_at === null, 'new ticket already has a first response');
+$check($ticket->messages()->count() === 1, 'new ticket does not keep the first message');
+$check($ticket->messages()->first()->author === Ticket::AUTHOR_CUSTOMER, 'first message is not from the customer');
+$check(str_contains((string) $ticket->url, '/tickets/?id=' . $ticket->id), 'ticket url is not canonical');
+$check($ticket->sla_label !== '', 'ticket has no SLA label');
+$check(str_contains($ticket->sla_label, 'Первый ответ до:'), 'open ticket SLA label does not show the deadline');
+
+$ticket->forceFill(['sla_due_at' => now()->subHour()])->save();
+$check(Support::isOverdue($ticket->fresh()), 'overdue ticket is not detected');
+$check($ticket->fresh()->sla_overdue === true, 'overdue flag is not exposed to templates');
+
+$service->customerReply($ticket->fresh(), 'Добавил скриншот ошибки.', $customer->display_name);
+$ticket = $ticket->fresh();
+$check((string) $ticket->status === Ticket::STATUS_OPEN, 'customer reply does not move the ticket to «open»');
+$check($ticket->messages()->count() === 2, 'customer reply is not saved');
+$check($ticket->messages()->get()->last()->author === Ticket::AUTHOR_CUSTOMER, 'customer reply has the wrong author');
+
+$service->supportReply($ticket, 'Проверьте, что домен указан без https://', 'Иван');
+$ticket = $ticket->fresh();
+$check((string) $ticket->status === Ticket::STATUS_WAITING, 'support reply does not move the ticket to «waiting»');
+$check($ticket->first_response_at !== null, 'support reply does not close the first response SLA');
+$check($ticket->sla_overdue === false, 'answered ticket is still marked overdue');
+$check(str_contains($ticket->sla_label, 'Первый ответ:'), 'answered ticket SLA label does not show the response time');
+$check($ticket->messages()->get()->last()->author === Ticket::AUTHOR_SUPPORT, 'support reply has the wrong author');
+
+$service->close($ticket);
+$ticket = $ticket->fresh();
+$check((string) $ticket->status === Ticket::STATUS_CLOSED, 'close does not set the «closed» status');
+$check($ticket->closed_at !== null, 'close does not save the date');
+$check($ticket->is_closed === true, 'closed ticket is not reported as closed');
+$check($ticket->messages()->get()->last()->author === Ticket::AUTHOR_SYSTEM, 'close does not add a system message');
+$check(Support::isOverdue($ticket) === false, 'closed ticket is marked overdue');
+
+$before = $ticket->messages()->count();
+$service->close($ticket);
+$check($ticket->fresh()->messages()->count() === $before, 'second close adds a duplicate system message');
+
+$service->customerReply($ticket->fresh(), 'Вопрос решился, но появился новый.', $customer->display_name);
+$ticket = $ticket->fresh();
+$check((string) $ticket->status === Ticket::STATUS_OPEN, 'reply to a closed ticket does not reopen it');
+$check($ticket->closed_at === null, 'reopened ticket keeps the close date');
+
+$account = new AccountService();
+$check($account->ticket($customer, (int) $ticket->id) !== null, 'owner cannot open the ticket');
+$check($account->ticket($other, (int) $ticket->id) === null, 'another customer opens the ticket');
+$check($account->tickets($customer)->count() === 1, 'cabinet does not list the customer ticket');
+$check($account->tickets($other)->count() === 0, 'another customer sees the ticket');
+$check($account->ticket($customer, 0) === null, 'zero id returns a ticket');
+
+$emailTicket = new Ticket();
+$emailTicket->fill([
+    'customer_id' => null,
+    'email' => $email,
+    'subject' => 'Письмо с другого адреса',
+    'status' => Ticket::STATUS_NEW,
+    'priority' => Ticket::PRIORITY_NORMAL,
+]);
+$emailTicket->save();
+$check($account->ticket($customer, (int) $emailTicket->id) !== null, 'ticket found by e-mail is not visible to the customer');
+$check($account->ticket($other, (int) $emailTicket->id) === null, 'ticket found by e-mail is visible to another customer');
+
+$check(View::exists('elv.kit::mail.ticket-admin'), 'ticket admin mail view is missing');
+$check(View::exists('elv.kit::mail.ticket-customer'), 'ticket customer mail view is missing');
+
+// Telegram выключен: пустой токен и chat_id не должны ничего отправлять.
+$originalToken = Settings::get('telegram_bot_token');
+$originalChat = Settings::get('telegram_chat_id');
+$originalSecret = Settings::get('telegram_webhook_secret');
+
+Settings::set('telegram_bot_token', '');
+Settings::set('telegram_chat_id', '');
+Settings::set('telegram_webhook_secret', '');
+
+$check(Telegram::enabled() === false, 'Telegram is enabled without a token');
+$check(Telegram::send('test') === false, 'Telegram sends with an empty token');
+$check(Telegram::webhookUrl() === '', 'webhook url exists without a secret');
+$check(Telegram::secretMatches('anything') === false, 'empty secret matches any value');
+$check(Telegram::chatMatches('123') === false, 'empty chat id matches any chat');
+
+$route = Route::getRoutes()->getByName('elv.kit.telegram.webhook');
+$check($route !== null, 'telegram webhook route is missing');
+$check($route && str_contains($route->uri(), '{secret}'), 'webhook route has no secret segment');
+$check($route && in_array('elv.kit.ticket.store', array_keys(Route::getRoutes()->getRoutesByName())), 'ticket store route is missing');
+
+$controller = new TelegramController();
+
+try {
+    $controller->webhook(Request::create('/telegram/webhook/' . str_repeat('a', 20), 'POST'), str_repeat('a', 20));
+    $check(false, 'webhook accepts requests without a configured secret');
+}
+catch (HttpException $e) {
+    $check($e->getStatusCode() === 404, 'webhook answers ' . $e->getStatusCode() . ' instead of 404');
+}
+
+// Настроенный секрет и чат: команда /reply отвечает покупателю без сети.
+$secret = 'qa' . $suffix . str_repeat('0', 10);
+$chatId = '900' . random_int(100000, 999999);
+Settings::set('telegram_webhook_secret', $secret);
+Settings::set('telegram_chat_id', $chatId);
+
+$check(Telegram::secretMatches($secret), 'configured webhook secret does not match');
+$check(!Telegram::secretMatches($secret . 'x'), 'wrong webhook secret matches');
+$check(Telegram::chatMatches($chatId), 'configured chat id does not match');
+$check(!Telegram::chatMatches('1'), 'foreign chat id matches');
+$check(Telegram::webhookUrl() === url('/telegram/webhook/' . $secret), 'webhook url is not built from the secret');
+
+$replyTicket = $service->open($customer, [
+    'subject' => 'Вопрос по установке',
+    'body' => 'Куда положить файлы темы?',
+]);
+
+$update = [
+    'message' => [
+        'chat' => ['id' => (int) $chatId],
+        'from' => ['first_name' => 'Оператор'],
+        'text' => '/reply ' . $replyTicket->number . ' Файлы темы — в themes/.',
+    ],
+];
+
+$controller->webhook(Request::create('/telegram/webhook/' . $secret, 'POST', [], [], [], [], json_encode($update)), $secret);
+$replyTicket = $replyTicket->fresh();
+$check((string) $replyTicket->status === Ticket::STATUS_WAITING, 'webhook /reply does not answer the ticket');
+$check($replyTicket->first_response_at !== null, 'webhook /reply does not close the SLA');
+$check($replyTicket->messages()->get()->last()->author_name === 'Оператор', 'webhook /reply loses the operator name');
+
+$foreign = $update;
+$foreign['message']['chat']['id'] = 1;
+$foreign['message']['text'] = '/close ' . $replyTicket->number;
+$controller->webhook(Request::create('/telegram/webhook/' . $secret, 'POST', [], [], [], [], json_encode($foreign)), $secret);
+$check((string) $replyTicket->fresh()->status === Ticket::STATUS_WAITING, 'webhook accepts commands from a foreign chat');
+
+// Заголовки: кабинет и поддержка закрыты от индексации и кэша.
+$headers = (new SecurityHeaders())->handle(Request::create('/tickets/'), function () {
+    return response('ok');
+});
+
+$check((string) $headers->headers->get('X-Robots-Tag') === 'noindex, nofollow', '/tickets/ is not closed from indexing');
+$check(str_contains((string) $headers->headers->get('Cache-Control'), 'no-store'), '/tickets/ is cacheable');
+
+$accountHeaders = (new SecurityHeaders())->handle(Request::create('/account/'), function () {
+    return response('ok');
+});
+
+$check((string) $accountHeaders->headers->get('X-Robots-Tag') === 'noindex, nofollow', '/account/ is not closed from indexing');
+
+$check((string) TicketMessage::query()->where('ticket_id', $ticket->id)->first()->author === Ticket::AUTHOR_CUSTOMER, 'message author is not saved');
+
+Settings::set('telegram_bot_token', (string) $originalToken);
+Settings::set('telegram_chat_id', (string) $originalChat);
+Settings::set('telegram_webhook_secret', (string) $originalSecret);
+
+$ticketIds = Ticket::query()->whereIn('email', [$email, $otherEmail])->pluck('id')->all();
+TicketMessage::query()->whereIn('ticket_id', $ticketIds)->delete();
+Ticket::query()->whereIn('id', $ticketIds)->delete();
+Customer::query()->whereIn('email', [$email, $otherEmail])->delete();
+
+if ($errors !== []) {
+    fwrite(STDERR, "tickets checks failed:\n- " . implode("\n- ", $errors) . "\n");
+    exit(1);
+}
+
+echo "OK: tickets checks passed\n";

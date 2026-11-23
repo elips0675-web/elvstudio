@@ -1,9 +1,9 @@
 # Структура репозитория Elv Landing
 
-Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
+Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
 
-Отслеживаемые файлы (`git ls-files`), всего 626.
-`demo-static` — 172 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 649.
+`demo-static` — 173 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -62,6 +62,8 @@
 - `plugins/elv/kit/classes/Http/QuoteController.php`
 - `plugins/elv/kit/classes/Http/SeoController.php`
 - `plugins/elv/kit/classes/Http/SubscribeController.php`
+- `plugins/elv/kit/classes/Http/TelegramController.php`
+- `plugins/elv/kit/classes/Http/TicketController.php`
 - `plugins/elv/kit/classes/Icons.php`
 - `plugins/elv/kit/classes/LicenseService.php`
 - `plugins/elv/kit/classes/Mail/AccountMagicLink.php`
@@ -73,6 +75,8 @@
 - `plugins/elv/kit/classes/Mail/OrderAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderCustomer.php`
 - `plugins/elv/kit/classes/Mail/SubscribeConfirm.php`
+- `plugins/elv/kit/classes/Mail/TicketAdmin.php`
+- `plugins/elv/kit/classes/Mail/TicketCustomer.php`
 - `plugins/elv/kit/classes/Menu.php`
 - `plugins/elv/kit/classes/Money.php`
 - `plugins/elv/kit/classes/OrderService.php`
@@ -89,7 +93,10 @@
 - `plugins/elv/kit/classes/Sitemap.php`
 - `plugins/elv/kit/classes/SlotUnavailableException.php`
 - `plugins/elv/kit/classes/Slots.php`
+- `plugins/elv/kit/classes/Support.php`
+- `plugins/elv/kit/classes/Telegram.php`
 - `plugins/elv/kit/classes/TextFilter.php`
+- `plugins/elv/kit/classes/TicketService.php`
 - `plugins/elv/kit/composer.json`
 - `plugins/elv/kit/config/blog.php`
 - `plugins/elv/kit/config/booking.php`
@@ -114,6 +121,7 @@
 - `plugins/elv/kit/controllers/Releases.php`
 - `plugins/elv/kit/controllers/Slots.php`
 - `plugins/elv/kit/controllers/Subscribers.php`
+- `plugins/elv/kit/controllers/Tickets.php`
 - `plugins/elv/kit/controllers/bookings/config_form.yaml`
 - `plugins/elv/kit/controllers/bookings/config_list.yaml`
 - `plugins/elv/kit/controllers/bookings/index.htm`
@@ -172,6 +180,11 @@
 - `plugins/elv/kit/controllers/slots/update.htm`
 - `plugins/elv/kit/controllers/subscribers/config_list.yaml`
 - `plugins/elv/kit/controllers/subscribers/index.htm`
+- `plugins/elv/kit/controllers/tickets/_thread.htm`
+- `plugins/elv/kit/controllers/tickets/config_form.yaml`
+- `plugins/elv/kit/controllers/tickets/config_list.yaml`
+- `plugins/elv/kit/controllers/tickets/index.htm`
+- `plugins/elv/kit/controllers/tickets/update.htm`
 - `plugins/elv/kit/demo/blog.json`
 - `plugins/elv/kit/demo/presets/agency.json`
 - `plugins/elv/kit/demo/presets/booking.json`
@@ -191,6 +204,8 @@
 - `plugins/elv/kit/models/Settings.php`
 - `plugins/elv/kit/models/Slot.php`
 - `plugins/elv/kit/models/Subscriber.php`
+- `plugins/elv/kit/models/Ticket.php`
+- `plugins/elv/kit/models/TicketMessage.php`
 - `plugins/elv/kit/models/booking/columns.yaml`
 - `plugins/elv/kit/models/booking/fields.yaml`
 - `plugins/elv/kit/models/category/columns.yaml`
@@ -213,12 +228,15 @@
 - `plugins/elv/kit/models/slot/columns.yaml`
 - `plugins/elv/kit/models/slot/fields.yaml`
 - `plugins/elv/kit/models/subscriber/columns.yaml`
+- `plugins/elv/kit/models/ticket/columns.yaml`
+- `plugins/elv/kit/models/ticket/fields.yaml`
 - `plugins/elv/kit/routes.php`
 - `plugins/elv/kit/updates/add_audience_to_posts.php`
 - `plugins/elv/kit/updates/add_booking_admin_reminder.php`
 - `plugins/elv/kit/updates/add_booking_reminder.php`
 - `plugins/elv/kit/updates/create_kit_customers.php`
 - `plugins/elv/kit/updates/create_kit_tables.php`
+- `plugins/elv/kit/updates/create_kit_tickets.php`
 - `plugins/elv/kit/updates/create_price_versions.php`
 - `plugins/elv/kit/updates/create_releases.php`
 - `plugins/elv/kit/updates/seed_kit_blog.php`
@@ -233,6 +251,8 @@
 - `plugins/elv/kit/views/mail/order-admin.htm`
 - `plugins/elv/kit/views/mail/order-customer.htm`
 - `plugins/elv/kit/views/mail/subscribe-confirm.htm`
+- `plugins/elv/kit/views/mail/ticket-admin.htm`
+- `plugins/elv/kit/views/mail/ticket-customer.htm`
 - `plugins/elv/kit/views/quote-pdf.htm`
 - `plugins/elv/kit/views/widget.htm`
 
@@ -284,6 +304,7 @@
 - `themes/elv-studio/pages/sitemap.htm`
 - `themes/elv-studio/pages/template.htm`
 - `themes/elv-studio/pages/terms.htm`
+- `themes/elv-studio/pages/tickets.htm`
 - `themes/elv-studio/partials/analytics.htm`
 - `themes/elv-studio/partials/blog-aside.htm`
 - `themes/elv-studio/partials/breadcrumbs.htm`
@@ -343,6 +364,7 @@
 - `tools/seo-check.php`
 - `tools/serve-static.php`
 - `tools/static-chat-data.php`
+- `tools/tickets-check.php`
 - `tools/warmup.ps1`
 
 ## docs

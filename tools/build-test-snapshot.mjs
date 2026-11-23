@@ -90,6 +90,8 @@ const groups = [
       'docs/content-policy.md',
       'docs/00-audit-documents.md',
       'tools/price-check.php',
+      'tools/account-check.php',
+      'tools/tickets-check.php',
       'docs/prices.md',
     ],
   },
@@ -99,6 +101,22 @@ const groups = [
     files: [
       'Что доделать.txt',
       'Что доделать коротко.txt',
+    ],
+  },
+  {
+    file: '10-support.txt',
+    title: 'Поддержка: обращения, SLA и Telegram ChatOps',
+    files: [
+      'plugins/elv/kit/classes/Support.php',
+      'plugins/elv/kit/classes/TicketService.php',
+      'plugins/elv/kit/classes/Telegram.php',
+      'plugins/elv/kit/classes/Http/TicketController.php',
+      'plugins/elv/kit/classes/Http/TelegramController.php',
+      'plugins/elv/kit/models/Ticket.php',
+      'plugins/elv/kit/models/TicketMessage.php',
+      'themes/elv-studio/pages/tickets.htm',
+      'themes/elv-studio/pages/account.htm',
+      'tools/tickets-check.php',
     ],
   },
 ];
