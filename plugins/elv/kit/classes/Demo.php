@@ -438,6 +438,7 @@ class Demo
             'pustye-sostoyaniya-v-cms',
             'kak-uskorit-october-cms',
             'migracii-v-october-cms',
+            'og-kartinki-na-php',
         ];
     }
 

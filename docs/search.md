@@ -4,7 +4,7 @@
 
 ## Что сделано
 
-- `/search/` — страница поиска по 27 страницам и 101 статье блога.
+- `/search/` — страница поиска по 27 страницам и 112 статьям блога.
 - В шапке каждой страницы — кнопка поиска; форма открывается в `<dialog>`.
 - Индекс: `GET /search-index.json`, собирается из `Classes\Search`; внутри
   одного HTTP-запроса индекс кэшируется статически, `Search::flush()` сбрасывает
@@ -23,7 +23,7 @@
   проходят, а `fuck`, `fucking`, `bitches`, `xyй` и `х у й` блокируются.
 - `/sitemap/` — человеческая карта сайта: три группы разделов, услуги,
   покупка и контакты, правовые документы; блог показан шестью свежими
-  статьями и рубриками, а не плоским списком 101 статьи. Над блоками есть
+  статьями и рубриками, а не плоским списком 112 статей. Над блоками есть
   якорная навигация `#sitemap-site`, `#sitemap-services`, `#sitemap-modules`,
   `#sitemap-buy`, `#sitemap-legal`, `#sitemap-blog`.
 - В JSON-LD `WebSite` `SearchAction` ведёт на `/search/?q=...`, а не на
@@ -68,8 +68,8 @@
 `description` (начало анонса), `text` (первые 800 символов тела без HTML),
 `keywords` (рубрика, теги, аудитория), `meta` (рубрика и дата). Полное тело
 статей в индекс не попадает: это держит страницу лёгкой и не раздувает
-`demo-static`. На 23.11.2026 индекс: 128 записей (27 страниц и 101 статья),
-212,8 КБ JSON.
+`demo-static`. На 23.11.2026 индекс: 139 записей (27 страниц и 112 статей),
+234,9 КБ JSON.
 
 ## Как ищет
 
@@ -146,7 +146,7 @@ php tools/chat-check.php       # ответы Консультанта, филь
 php tools/seo-check.php        # пустой FAQPage и Clean-param
 node tools/check-seo.mjs       # живой сайт: JSON-LD, Organization.logo, якоря
 node tools/gate.mjs            # URL, SEO, заголовки, бюджет, сироты, консоль
-node tools/check-console.mjs   # 157 страниц demo-static
+node tools/check-console.mjs   # 171 страница demo-static
 php tools/export-static.php --origin=https://elvstudio.vercel.app
 ```
 

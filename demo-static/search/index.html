@@ -115,7 +115,7 @@
     </div>
 </dialog>
 
-<main id="main" data-search-index="/search-index.json">
+<main id="main" data-search-index="/search-index.json" data-search-config="{&quot;stop&quot;:[&quot;и&quot;,&quot;в&quot;,&quot;во&quot;,&quot;на&quot;,&quot;для&quot;,&quot;с&quot;,&quot;со&quot;,&quot;по&quot;,&quot;как&quot;,&quot;что&quot;,&quot;это&quot;,&quot;или&quot;,&quot;не&quot;,&quot;из&quot;,&quot;у&quot;,&quot;о&quot;,&quot;об&quot;,&quot;от&quot;,&quot;до&quot;,&quot;за&quot;,&quot;под&quot;,&quot;над&quot;,&quot;при&quot;,&quot;про&quot;,&quot;без&quot;,&quot;же&quot;,&quot;бы&quot;,&quot;ли&quot;,&quot;то&quot;,&quot;все&quot;,&quot;мы&quot;,&quot;вы&quot;,&quot;он&quot;,&quot;она&quot;,&quot;они&quot;,&quot;мне&quot;,&quot;нам&quot;],&quot;synonyms&quot;:[[&quot;оплата&quot;,&quot;оплаты&quot;,&quot;оплате&quot;,&quot;оплату&quot;,&quot;оплатой&quot;,&quot;оплатить&quot;,&quot;платеж&quot;,&quot;платежи&quot;,&quot;платить&quot;],[&quot;запись&quot;,&quot;записи&quot;,&quot;записью&quot;,&quot;записаться&quot;,&quot;бронирование&quot;,&quot;бронирования&quot;,&quot;бронь&quot;,&quot;брони&quot;],[&quot;цена&quot;,&quot;цены&quot;,&quot;цене&quot;,&quot;цену&quot;,&quot;ценой&quot;,&quot;стоимость&quot;,&quot;стоимости&quot;,&quot;стоимостью&quot;,&quot;тариф&quot;,&quot;тарифы&quot;,&quot;тарифам&quot;,&quot;тарифами&quot;],[&quot;сайт&quot;,&quot;сайты&quot;,&quot;сайта&quot;,&quot;сайту&quot;,&quot;сайте&quot;,&quot;сайтом&quot;,&quot;лендинг&quot;,&quot;лендинга&quot;],[&quot;установка&quot;,&quot;установки&quot;,&quot;установить&quot;,&quot;настройка&quot;,&quot;настройки&quot;,&quot;настроить&quot;],[&quot;поддержка&quot;,&quot;поддержки&quot;,&quot;поддержать&quot;,&quot;сопровождение&quot;,&quot;сопровождения&quot;],[&quot;аудит&quot;,&quot;аудита&quot;,&quot;проверка&quot;,&quot;проверки&quot;,&quot;проверить&quot;],[&quot;блог&quot;,&quot;блога&quot;,&quot;блоге&quot;,&quot;статья&quot;,&quot;статьи&quot;,&quot;статью&quot;,&quot;статей&quot;],[&quot;ключ&quot;,&quot;ключа&quot;,&quot;ключи&quot;,&quot;ключей&quot;,&quot;лицензия&quot;,&quot;лицензии&quot;]],&quot;endings&quot;:[&quot;иями&quot;,&quot;ями&quot;,&quot;ами&quot;,&quot;ией&quot;,&quot;иям&quot;,&quot;ием&quot;,&quot;иях&quot;,&quot;ого&quot;,&quot;его&quot;,&quot;ому&quot;,&quot;ему&quot;,&quot;ыми&quot;,&quot;ими&quot;,&quot;овать&quot;,&quot;евать&quot;,&quot;ая&quot;,&quot;яя&quot;,&quot;ое&quot;,&quot;ее&quot;,&quot;ые&quot;,&quot;ие&quot;,&quot;ой&quot;,&quot;ей&quot;,&quot;ий&quot;,&quot;ый&quot;,&quot;ом&quot;,&quot;ем&quot;,&quot;ам&quot;,&quot;ям&quot;,&quot;ах&quot;,&quot;ях&quot;,&quot;ов&quot;,&quot;ев&quot;,&quot;ью&quot;,&quot;ия&quot;,&quot;ию&quot;,&quot;ии&quot;,&quot;ую&quot;,&quot;юю&quot;,&quot;ить&quot;,&quot;ать&quot;,&quot;ять&quot;,&quot;еть&quot;,&quot;а&quot;,&quot;я&quot;,&quot;о&quot;,&quot;е&quot;,&quot;ы&quot;,&quot;и&quot;,&quot;у&quot;,&quot;ю&quot;,&quot;ь&quot;]}">
     <section class="page-hero">
         <div class="container">
                 <nav class="breadcrumbs" aria-label="Хлебные крошки">
@@ -783,7 +783,7 @@ return { status: response.status, data: data };
 .then(function (result) {
 typing.row.remove();
 if (result.status === 200 && result.data && result.data.ok) {
-if (result.data.rejected) user.row.remove();
+if (result.data.hide_user) user.row.remove();
 bubble('bot', result.data.answer || '');
 if (result.data.sources) result.data.sources.forEach(addLink);
 addLink(result.data.link);

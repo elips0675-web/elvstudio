@@ -207,30 +207,30 @@
 
             <div class="card mt-32">
                 <h2 id="sitemap-blog">Блог</h2>
-                <p class="muted">В блоге 100 материалов: практика, технологии, SEO и контент. Ниже — свежие статьи и рубрики, без длинного списка всех публикаций.</p>
+                <p class="muted">В блоге 112 материалов: практика, технологии, SEO и контент. Ниже — свежие статьи и рубрики, без длинного списка всех публикаций.</p>
 
                 <div class="grid grid--2 mt-24">
                     <div>
                         <h3>Свежие статьи</h3>
                         <ul class="mt-24">
                                                             <li>
-                                    <a href="/blog/tilda-wordpress-october/">Tilda, WordPress и October CMS: сравнение по задачам</a>
-                                    <span class="muted small">— 21.11.2026</span>                                </li>
+                                    <a href="/blog/kejs-pod-nda/">Кейс под NDA: как показать работу без имени клиента</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                             <li>
-                                    <a href="/blog/kak-vybrat-modul/">Как выбрать модуль: запись, магазин, формы или блог</a>
-                                    <span class="muted small">— 21.11.2026</span>                                </li>
+                                    <a href="/blog/okupaemost-sajta-uslug/">Окупаемость сайта услуг: таблица без сквозной аналитики</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                             <li>
-                                    <a href="/blog/chto-vhodit-v-elv-kit/">Что входит в Elv Kit и чего в нём нет</a>
-                                    <span class="muted small">— 21.11.2026</span>                                </li>
+                                    <a href="/blog/svoj-sajt-ili-marketplejsy/">Свой сайт или маркетплейсы: как считать комиссию</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                             <li>
-                                    <a href="/blog/lid-magnit-dlya-b2b-sajta/">Лид-магнит для B2B-сайта: что предложить клиенту до продажи</a>
-                                    <span class="muted small">— 20.11.2026</span>                                </li>
+                                    <a href="/blog/sajt-dlya-lokalnoj-dostavki/">Сайт для локальной доставки: зоны, сроки и статусы</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                             <li>
-                                    <a href="/blog/review-aggregaterating-jsonld/">Review и AggregateRating в JSON-LD: разметка отзывов без ошибок</a>
-                                    <span class="muted small">— 20.11.2026</span>                                </li>
+                                    <a href="/blog/sajt-dlya-yurista-psihologa-buhgaltera/">Сайт для юриста, психолога или бухгалтера</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                             <li>
-                                    <a href="/blog/promokody-i-komplekty/">Промокоды и комплекты: как упаковать предложение без скидочной гонки</a>
-                                    <span class="muted small">— 19.11.2026</span>                                </li>
+                                    <a href="/blog/og-kartinki-na-php/">OG-картинки на PHP: превью для соцсетей</a>
+                                    <span class="muted small">— 23.11.2026</span>                                </li>
                                                     </ul>
                     </div>
 
@@ -243,15 +243,15 @@
                                 </li>
                                                             <li>
                                     <a href="/blog/category/practice/">Практика</a>
-                                    <span class="muted small">40</span>
+                                    <span class="muted small">46</span>
                                 </li>
                                                             <li>
                                     <a href="/blog/category/seo/">SEO и трафик</a>
-                                    <span class="muted small">17</span>
+                                    <span class="muted small">21</span>
                                 </li>
                                                             <li>
                                     <a href="/blog/category/content/">Контент</a>
-                                    <span class="muted small">14</span>
+                                    <span class="muted small">16</span>
                                 </li>
                                                     </ul>
                         <p class="mt-24"><a href="/blog/tech/">Технический раздел для разработчиков <svg class="elv-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></a></p>
@@ -854,7 +854,7 @@ return { status: response.status, data: data };
 .then(function (result) {
 typing.row.remove();
 if (result.status === 200 && result.data && result.data.ok) {
-if (result.data.rejected) user.row.remove();
+if (result.data.hide_user) user.row.remove();
 bubble('bot', result.data.answer || '');
 if (result.data.sources) result.data.sources.forEach(addLink);
 addLink(result.data.link);

@@ -168,11 +168,6 @@
                                 <span class="tiny muted">Дата</span>
                                 <div class="booking-days mt-24">
                                                                             <a class="day day--active"
-                                           href="/booking?service=demo-tour&date=2026-11-23">
-                                            <b>23.11</b>
-                                            <span>Пн</span>
-                                        </a>
-                                                                            <a class="day"
                                            href="/booking?service=demo-tour&date=2026-11-24">
                                             <b>24.11</b>
                                             <span>Вт</span>
@@ -242,6 +237,11 @@
                                             <b>11.12</b>
                                             <span>Пт</span>
                                         </a>
+                                                                            <a class="day"
+                                           href="/booking?service=demo-tour&date=2026-12-14">
+                                            <b>14.12</b>
+                                            <span>Пн</span>
+                                        </a>
                                                                     </div>
                             </div>
                         </div>
@@ -257,10 +257,10 @@
                         <input type="hidden" name="_token" value="static-demo" autocomplete="off">
                         <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
                         <input type="hidden" name="service_code" value="demo-tour">
-                        <input type="hidden" name="date" value="2026-11-23">
+                        <input type="hidden" name="date" value="2026-11-24">
 
                         <div class="field">
-                            <span class="label">Время на 23.11</span>
+                            <span class="label">Время на 24.11</span>
                             <div class="times">
                                                                     <div class="time-option">
                                         <input
@@ -957,7 +957,7 @@ return { status: response.status, data: data };
 .then(function (result) {
 typing.row.remove();
 if (result.status === 200 && result.data && result.data.ok) {
-if (result.data.rejected) user.row.remove();
+if (result.data.hide_user) user.row.remove();
 bubble('bot', result.data.answer || '');
 if (result.data.sources) result.data.sources.forEach(addLink);
 addLink(result.data.link);

@@ -5,6 +5,90 @@
     <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
     <language>ru</language>
     <item>
+      <title>Кейс под NDA: как показать работу без имени клиента</title>
+      <link>https://elvstudio.vercel.app/blog/kejs-pod-nda</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kejs-pod-nda</guid>
+      <description>Как опубликовать кейс под NDA: согласование, обезличивание, проверяемые результаты и формат без намёков на клиента.</description>
+      <pubDate>Mon, 23 Nov 2026 01:50:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Окупаемость сайта услуг: таблица без сквозной аналитики</title>
+      <link>https://elvstudio.vercel.app/blog/okupaemost-sajta-uslug</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/okupaemost-sajta-uslug</guid>
+      <description>Простая таблица окупаемости сайта услуг: расходы, заявки, конверсия, средний чек и маржа — со своими цифрами.</description>
+      <pubDate>Mon, 23 Nov 2026 01:40:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Свой сайт или маркетплейсы: как считать комиссию</title>
+      <link>https://elvstudio.vercel.app/blog/svoj-sajt-ili-marketplejsy</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/svoj-sajt-ili-marketplejsy</guid>
+      <description>Формула стоимости заказа: комиссия, эквайринг, доставка, возвраты, реклама и поддержка сайта — без цифр без источника.</description>
+      <pubDate>Mon, 23 Nov 2026 01:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Сайт для локальной доставки: зоны, сроки и статусы</title>
+      <link>https://elvstudio.vercel.app/blog/sajt-dlya-lokalnoj-dostavki</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-lokalnoj-dostavki</guid>
+      <description>Зоны, интервалы, минимальный заказ, статусы и оплата: что показать клиенту до оформления локальной доставки.</description>
+      <pubDate>Mon, 23 Nov 2026 01:20:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Сайт для юриста, психолога или бухгалтера</title>
+      <link>https://elvstudio.vercel.app/blog/sajt-dlya-yurista-psihologa-buhgaltera</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-yurista-psihologa-buhgaltera</guid>
+      <description>Доверие, конфиденциальность, запись и оплата консультации: что должно быть на сайте частного специалиста.</description>
+      <pubDate>Mon, 23 Nov 2026 01:10:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>OG-картинки на PHP: превью для соцсетей</title>
+      <link>https://elvstudio.vercel.app/blog/og-kartinki-na-php</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/og-kartinki-na-php</guid>
+      <description>Как генерировать OG-изображения 1200×630 на PHP: шрифт, перенос строк, кэш, заглушка и мета-теги.</description>
+      <pubDate>Mon, 23 Nov 2026 01:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Markdown или HTML в админке: чем платить за удобство</title>
+      <link>https://elvstudio.vercel.app/blog/markdown-ili-html-v-adminke</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/markdown-ili-html-v-adminke</guid>
+      <description>Сравнение Markdown и HTML для статей: скорость набора, таблицы, код, безопасность и переносимость.</description>
+      <pubDate>Mon, 23 Nov 2026 00:50:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Упал трафик после редизайна: что проверить первым</title>
+      <link>https://elvstudio.vercel.app/blog/upal-trafik-posle-redizajna</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/upal-trafik-posle-redizajna</guid>
+      <description>Пошаговая проверка после редизайна или переезда: индексация, 301, canonical, sitemap, скорость и аналитика.</description>
+      <pubDate>Mon, 23 Nov 2026 00:40:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Сайт онлайн-школы или репетитора: запись и материалы</title>
+      <link>https://elvstudio.vercel.app/blog/sajt-onlajn-shkoly-repetitora</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-onlajn-shkoly-repetitora</guid>
+      <description>Пробное занятие, оплата курса и защищённая выдача материалов: как собрать сайт онлайн-школы без лишнего кабинета.</description>
+      <pubDate>Mon, 23 Nov 2026 00:30:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Почасовая аренда: фотостудия, коворкинг, переговорная</title>
+      <link>https://elvstudio.vercel.app/blog/pochasovaya-arenda-fotostudiya-kovorking</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pochasovaya-arenda-fotostudiya-kovorking</guid>
+      <description>Сетка по часам, буфер между бронями, защита от накладок, отмена и депозит: что описать до запуска почасовой аренды.</description>
+      <pubDate>Mon, 23 Nov 2026 00:20:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Уведомления о заявках в Telegram: что отправлять</title>
+      <link>https://elvstudio.vercel.app/blog/telegram-uvedomleniya-o-zayavkah</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/telegram-uvedomleniya-o-zayavkah</guid>
+      <description>Как настроить быстрые уведомления о заказах и записях в Telegram, не перенося персональные данные в мессенджер.</description>
+      <pubDate>Mon, 23 Nov 2026 00:10:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Сайт взломали: что делать в первые часы</title>
+      <link>https://elvstudio.vercel.app/blog/pervye-chasy-posle-vzloma</link>
+      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pervye-chasy-posle-vzloma</guid>
+      <description>Пошаговый порядок действий, если сайт взломали: копия и логи до правок, закрытие доступов, хостинг, восстановление из чистой копии и разговор с клиентами.</description>
+      <pubDate>Sun, 22 Nov 2026 10:00:00 +0000</pubDate>
+    </item>
+    <item>
       <title>Tilda, WordPress и October CMS: сравнение по задачам</title>
       <link>https://elvstudio.vercel.app/blog/tilda-wordpress-october</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/tilda-wordpress-october</guid>
@@ -40,7 +124,7 @@
       <pubDate>Fri, 20 Nov 2026 09:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>Промокоды и комплекты: как упаковать предложение без скидочной гонки</title>
+      <title>Промокоды и комплекты: как упаковать без скидочной гонки</title>
       <link>https://elvstudio.vercel.app/blog/promokody-i-komplekty</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/promokody-i-komplekty</guid>
       <description>Как использовать промокоды, наборы и комплекты на сайте услуг или товаров, чтобы не обесценить продукт. Сценарии, ограничения и связка с оплатой на сайте.</description>
@@ -54,7 +138,7 @@
       <pubDate>Thu, 19 Nov 2026 09:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>Changelog и версии продукта: как показать, что решение живое и поддерживается</title>
+      <title>Changelog продукта: как показать, что решение живое</title>
       <link>https://elvstudio.vercel.app/blog/changelog-i-versii-produkta</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/changelog-i-versii-produkta</guid>
       <description>Зачем на странице цифрового продукта нужен блок истории версий, какие поля включать в changelog и как короткий список релизов повышает доверие покупателя.</description>
@@ -96,7 +180,7 @@
       <pubDate>Tue, 17 Nov 2026 06:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>Тепловые карты и записи сессий: что смотреть и как не нарушить приватность</title>
+      <title>Тепловые карты: что смотреть и как не нарушить приватность</title>
       <link>https://elvstudio.vercel.app/blog/teplovye-karty-i-privatnost</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/teplovye-karty-i-privatnost</guid>
       <description>Как читать тепловые карты, какие выводы не делать и что проверить, чтобы не собирать лишние персональные данные.</description>
@@ -236,7 +320,7 @@
       <pubDate>Sat, 14 Nov 2026 15:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>Готовый сайт, конструктор или разработка: что выбрать малому бизнесу</title>
+      <title>Готовый сайт, конструктор или разработка: что выбрать бизнесу</title>
       <link>https://elvstudio.vercel.app/blog/kak-vybrat-cms</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-cms</guid>
       <description>Конструктор, готовый сайт с записью и заказами или разработка с нуля. Сравниваем цену, срок, контроль и поддержку без технического справочника.</description>
@@ -269,89 +353,5 @@
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/bezopasnost-sajta</guid>
       <description>Взлом — это письма клиентам, утечка данных и пометка «опасный сайт» в поиске. Семь слоёв защиты, проверка доступов, обновлений и бэкапов, действия в первые часы.</description>
       <pubDate>Sat, 14 Nov 2026 10:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Миграции в October CMS: без потери данных</title>
-      <link>https://elvstudio.vercel.app/blog/migracii-v-october-cms</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/migracii-v-october-cms</guid>
-      <description>Как работают миграции в October CMS: создание, откат, данные в миграциях и продакшн-стратегия. Что делать, чтобы не потерять заказы клиентов при обновлении.</description>
-      <pubDate>Sat, 14 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Доступность сайта: зачем бизнесу и как проверить</title>
-      <link>https://elvstudio.vercel.app/blog/dostupnost-sajta-a11y</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/dostupnost-sajta-a11y</guid>
-      <description>Доступность — это удобство для всех клиентов и понятность для поиска. Семь проверок, которые можно сделать без специальных программ.</description>
-      <pubDate>Sat, 14 Nov 2026 10:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Какие сервисы подключить к сайту: CRM, оплата, доставка</title>
-      <link>https://elvstudio.vercel.app/blog/integracii-i-avtomatizaciya</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/integracii-i-avtomatizaciya</guid>
-      <description>Сайт может передавать заявки в CRM, принимать оплату и отправлять письма. Что подключать в первую очередь, а что может подождать.</description>
-      <pubDate>Sat, 14 Nov 2026 09:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Как вести заказы в админке: статусы, письма и возвраты</title>
-      <link>https://elvstudio.vercel.app/blog/admin-workflow-orders</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/admin-workflow-orders</guid>
-      <description>Четыре статуса вместо десяти, письма из очереди и возврат, который закрывает доступ. Как вести заказы, чтобы не звать разработчика.</description>
-      <pubDate>Sat, 14 Nov 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Блог, который продаёт: структура статьи и CTA</title>
-      <link>https://elvstudio.vercel.app/blog/blog-that-sells</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/blog-that-sells</guid>
-      <description>Статья приносит заявки, когда отвечает на вопрос и предлагает следующий шаг. Разбираем структуру, которая работает без давления.</description>
-      <pubDate>Sat, 14 Nov 2026 09:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Почему клиенты не приходят на запись и как это исправить</title>
-      <link>https://elvstudio.vercel.app/blog/pochemu-klienty-ne-prihodyat-na-zapis</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/pochemu-klienty-ne-prihodyat-na-zapis</guid>
-      <description>Неявка — не одна причина, а сумма мелочей: непонятное подтверждение, отсутствие напоминания, неудобный перенос. Что проверить и как считать потери.</description>
-      <pubDate>Sat, 14 Nov 2026 08:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Напоминания клиентам: за день, за час, после визита</title>
-      <link>https://elvstudio.vercel.app/blog/napominaniya-klientam</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/napominaniya-klientam</guid>
-      <description>Три коротких сообщения снижают неявки и звонки администратору. Когда отправлять, что писать, как получить согласие и не превратить помощь в спам.</description>
-      <pubDate>Sat, 14 Nov 2026 08:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Что подготовить к запуску сайта: чек-лист</title>
-      <link>https://elvstudio.vercel.app/blog/chto-podgotovit-k-zapusku-sajta</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/chto-podgotovit-k-zapusku-sajta</guid>
-      <description>Тексты, фото, цены, документы, доступы и аналитика — что собрать до старта, чтобы запуск не сдвигался, а первый экран не заполнялся заглушками.</description>
-      <pubDate>Sat, 14 Nov 2026 07:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Онлайн-запись или переписка в мессенджере: что выбрать</title>
-      <link>https://elvstudio.vercel.app/blog/onlajn-zapis-ili-messendzher</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/onlajn-zapis-ili-messendzher</guid>
-      <description>Мессенджер быстрее для вопроса, онлайн-запись — для конкретного времени. Сравниваем по скорости, потерям, напоминаниям, оплате и стоимости владения.</description>
-      <pubDate>Sat, 14 Nov 2026 07:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Сайт для салона красоты: с чего начать</title>
-      <link>https://elvstudio.vercel.app/blog/sajt-dlya-salona-krasoty</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-salona-krasoty</guid>
-      <description>Путь клиента, запись, услуги и цены, мастера, фото, отзывы, напоминания и ошибки. Что важно на сайте салона, кроме красивой главной.</description>
-      <pubDate>Sat, 14 Nov 2026 06:30:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Сайт для мастера или специалиста: с чего начать</title>
-      <link>https://elvstudio.vercel.app/blog/sajt-dlya-mastera</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-mastera</guid>
-      <description>Одна страница или несколько, запись, портфолио, цены, отзывы, оплата, SEO и ошибки. Как мастеру собрать сайт, который приносит клиентов.</description>
-      <pubDate>Sat, 14 Nov 2026 06:00:00 +0000</pubDate>
-    </item>
-    <item>
-      <title>Сайт для небольшого магазина: заказы и оплата</title>
-      <link>https://elvstudio.vercel.app/blog/sajt-dlya-magazina</link>
-      <guid isPermaLink="true">https://elvstudio.vercel.app/blog/sajt-dlya-magazina</guid>
-      <description>Каталог, корзина или форма заказа, доставка, оплата, остатки, возвраты и админка. Что важно магазину, чтобы заказы не терялись.</description>
-      <pubDate>Sat, 14 Nov 2026 05:30:00 +0000</pubDate>
     </item>
 </channel></rss>
