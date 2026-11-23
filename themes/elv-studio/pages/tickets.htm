@@ -1,0 +1,236 @@
+title = "Поддержка"
+url = "/tickets/"
+layout = "default"
+meta_title = "Поддержка"
+meta_description = "Обращения покупателя Elv Kit: переписка с поддержкой, срок первого ответа и история в личном кабинете."
+meta_robots = "noindex, nofollow"
+==
+{% set account = elv_account() %}
+{% set tickets = account ? elv_account_tickets() : [] %}
+{% set orders = account ? elv_account_orders() : [] %}
+{% set ticketId = elv_query('id') %}
+{% set ticket = account and ticketId ? elv_ticket(ticketId) : null %}
+{{ elv_404_if(account and ticketId and not ticket) }}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Поддержка</span>
+            {% if ticket %}
+                <h1>Обращение {{ ticket.number }}</h1>
+                <p class="lead">{{ ticket.subject }}</p>
+            {% elseif account %}
+                <h1>Поддержка</h1>
+                <p class="lead">
+                    Опишите вопрос — ответ придёт на {{ account.email }} и появится здесь.
+                    Первый ответ — в течение 24 рабочих часов, Пн–Пт 10:00–18:00 (Минск).
+                </p>
+            {% else %}
+                <h1>Поддержка</h1>
+                <p class="lead">
+                    Обращения доступны покупателям: войдите в кабинет по одноразовой ссылке,
+                    чтобы написать в поддержку и увидеть историю.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            {% if not account %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Вход</span>
+                        <h2>Сначала в кабинет</h2>
+                        <p class="muted">
+                            Поддержка видит ваши заказы и лицензии, поэтому обращение привязано
+                            к адресу, на который оформлена покупка.
+                        </p>
+                        <div class="stack-actions mt-24">
+                            <a class="btn btn--primary" href="{{ 'account'|page }}">Войти в кабинет</a>
+                            <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать без входа</a>
+                        </div>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Как это работает</span>
+                        <ol class="account-steps">
+                            <li>Входите в кабинет по ссылке из письма.</li>
+                            <li>Описываете вопрос и при желании выбираете заказ.</li>
+                            <li>Получаете ответ на e-mail и видите переписку здесь.</li>
+                        </ol>
+                        <div class="notice mt-24">
+                            {{ elv_icon('shield')|raw }}
+                            <p>Обращение видит только поддержка и владелец адреса. Публично оно не показывается.</p>
+                        </div>
+                    </aside>
+                </div>
+            {% elseif ticket %}
+                <div class="account-head">
+                    <div>
+                        <span class="tiny muted">Обращение</span>
+                        <b>{{ ticket.number }} · {{ ticket.status_label }}</b>
+                    </div>
+                    <a class="btn btn--ghost btn--sm" href="{{ 'tickets'|page }}">К списку</a>
+                </div>
+
+                <div class="card mt-24">
+                    <div class="split">
+                        <div>
+                            <h2 class="mb-0">{{ ticket.subject }}</h2>
+                            <p class="tiny muted mt-8 mb-0">
+                                Создано {{ ticket.created_at ? ticket.created_at|date('d.m.Y H:i') : '—' }}
+                                {% if ticket.order_id %} · заказ #{{ ticket.order_id }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="ticket-meta">
+                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span>
+                            <span class="tiny {{ ticket.sla_overdue ? 'ticket-overdue' : 'muted' }}">{{ ticket.sla_label }}</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-thread mt-24">
+                        {% for message in ticket.messages %}
+                            <article class="ticket-message {{ message.is_support ? 'ticket-message--support' : '' }}">
+                                <header>
+                                    <b>{{ message.author_label }}</b>
+                                    {% if message.author_name %}<span class="tiny muted">· {{ message.author_name }}</span>{% endif %}
+                                    <span class="tiny muted">· {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}</span>
+                                </header>
+                                <div class="ticket-message__body">{{ message.body|elv_text|raw }}</div>
+                            </article>
+                        {% endfor %}
+                    </div>
+
+                    {% if not ticket.is_closed %}
+                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="ticket-reply">Сообщение</label>
+                                <textarea class="input" id="ticket-reply" name="body" rows="5" required maxlength="5000" placeholder="Дополните вопрос или ответьте поддержке.">{{ elv_old('body') }}</textarea>
+                            </div>
+
+                            <div class="stack-actions">
+                                <button class="btn btn--primary" type="submit">Отправить</button>
+                            </div>
+                        </form>
+
+                        <form method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/close') }}" class="mt-16"
+                              onsubmit="return confirm('Закрыть обращение? Если понадобится, вы сможете написать снова.');">
+                            {{ elv_csrf()|raw }}
+                            <button class="btn btn--ghost btn--sm" type="submit">Закрыть обращение</button>
+                        </form>
+                    {% else %}
+                        <div class="notice mt-24">
+                            {{ elv_icon('check')|raw }}
+                            <p>Обращение закрыто. Новое сообщение откроет его снова.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Новое обращение</span>
+                        <h2>Написать в поддержку</h2>
+                        <p class="muted">
+                            Опишите вопрос подробнее: что делали, что ожидали и что получили.
+                            Так ответ будет точнее.
+                        </p>
+
+                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="ticket-subject">Тема</label>
+                                <input class="input" id="ticket-subject" type="text" name="subject" required minlength="5" maxlength="200" value="{{ elv_old('subject') }}" placeholder="Например: не активируется ключ лицензии">
+                            </div>
+
+                            {% if orders|length %}
+                                <div class="field">
+                                    <label for="ticket-order">Заказ (необязательно)</label>
+                                    <select class="input" id="ticket-order" name="order_id">
+                                        <option value="">Без привязки к заказу</option>
+                                        {% for order in orders %}
+                                            <option value="{{ order.id }}" {{ elv_old('order_id') == order.id ? 'selected' : '' }}>
+                                                {{ order.order_no }} — {{ order.product_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+
+                            <div class="field">
+                                <label for="ticket-body">Сообщение</label>
+                                <textarea class="input" id="ticket-body" name="body" rows="6" required minlength="10" maxlength="5000" placeholder="Что случилось и чем помочь?">{{ elv_old('body') }}</textarea>
+                            </div>
+
+                            <label class="check">
+                                <input type="checkbox" name="consent" value="1" required {{ elv_old('consent') ? 'checked' : '' }}>
+                                <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                            </label>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">Отправить обращение</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Срок ответа</span>
+                        <p class="account-limit mb-0">24 рабочих часа</p>
+                        <p class="tiny muted">Пн–Пт, 10:00–18:00 по Минску. Выходные и праздники не считаются.</p>
+                        <div class="notice mt-24">
+                            {{ elv_icon('mail')|raw }}
+                            <p>Ответ придёт на {{ account.email }}. Если письмо не пришло, проверьте папку «Спам» — история всё равно останется здесь.</p>
+                        </div>
+                    </aside>
+                </div>
+
+                <h2 class="mt-32" id="tickets">Мои обращения</h2>
+
+                {% if tickets|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                    <th>Обновлено</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in tickets %}
+                                    <tr>
+                                        <td><b>{{ item.number }}</b></td>
+                                        <td>{{ item.subject }}</td>
+                                        <td><span class="badge {{ item.is_closed ? 'badge--line' : 'badge--accent' }}">{{ item.status_label }}</span></td>
+                                        <td>{{ item.last_message_at ? item.last_message_at|date('d.m.Y H:i') : '—' }}</td>
+                                        <td><a class="btn btn--ghost btn--sm" href="{{ item.url }}">Открыть</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <h2>Обращений пока нет</h2>
+                        <p>Когда появится вопрос, напишите в форме выше — он появится в этом списке.</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</main>

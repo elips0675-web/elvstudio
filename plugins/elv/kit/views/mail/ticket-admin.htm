@@ -1,0 +1,11 @@
+<h1 style="font:600 18px/1.4 Arial, sans-serif; margin:0 0 12px">Обращение {{ ticket.number }}</h1>
+<table cellpadding="0" cellspacing="0" style="font:14px/1.6 Arial, sans-serif">
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Тема</td><td>{{ ticket.subject }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Покупатель</td><td>{{ ticket.email }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Статус</td><td>{{ ticket.status }}</td></tr>
+    <tr><td style="padding:2px 16px 2px 0; color:#5b6472">Срок</td><td>{{ ticket.sla }}</td></tr>
+</table>
+<p style="font:14px/1.55 Arial, sans-serif; margin:14px 0 0; white-space:pre-line">{{ ticket.body }}</p>
+<p style="font:14px/1.55 Arial, sans-serif; margin:18px 0 0">
+    <a href="{{ ticket.url }}">Открыть обращение в кабинете</a>
+</p>

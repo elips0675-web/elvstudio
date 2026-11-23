@@ -1,0 +1,4 @@
+name: Обращение
+modelClass: Elv\Kit\Models\Ticket
+form: $/elv/kit/models/ticket/fields.yaml
+defaultRedirect: elv/kit/tickets

@@ -1,0 +1,35 @@
+columns:
+    number:
+        label: 'Номер'
+        searchable: true
+    subject:
+        label: 'Тема'
+        searchable: true
+    email:
+        label: 'E-mail'
+        searchable: true
+    status:
+        label: 'Статус'
+        type: selectable
+        select: status
+        options:
+            new: 'Новое'
+            open: 'В работе'
+            waiting: 'Ждём ответа'
+            closed: 'Закрыто'
+    priority:
+        label: 'Приоритет'
+        type: selectable
+        select: priority
+        options:
+            low: 'Низкий'
+            normal: 'Обычный'
+            high: 'Высокий'
+    sla_label:
+        label: 'Первый ответ'
+        type: text
+        valueFrom: sla_label
+    created_at:
+        label: 'Создано'
+        type: datetime
+        sortable: true

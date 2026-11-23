@@ -1,0 +1,57 @@
+fields:
+    number:
+        label: 'Номер'
+        disabled: true
+        span: left
+    created_at:
+        label: 'Создано'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    email:
+        label: 'Покупатель'
+        disabled: true
+        span: left
+    order_id:
+        label: 'Заказ'
+        disabled: true
+        span: right
+    subject:
+        label: 'Тема'
+        disabled: true
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: left
+        options:
+            new: 'Новое'
+            open: 'В работе'
+            waiting: 'Ждём ответа'
+            closed: 'Закрыто'
+    priority:
+        label: 'Приоритет'
+        type: dropdown
+        span: right
+        options:
+            low: 'Низкий'
+            normal: 'Обычный'
+            high: 'Высокий'
+    sla_due_at:
+        label: 'Срок первого ответа'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: left
+    first_response_at:
+        label: 'Первый ответ'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    closed_at:
+        label: 'Закрыто'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: left

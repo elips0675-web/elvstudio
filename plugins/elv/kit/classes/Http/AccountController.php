@@ -46,7 +46,7 @@ class AccountController
                 ], 422);
             }
 
-            return redirect('/account/?error=1')
+            return redirect(url('/account') . '/?error=1')
                 ->withInput()
                 ->with('elv_error', $validator->errors()->first('email'));
         }
@@ -67,10 +67,10 @@ class AccountController
     public function auth(string $token)
     {
         if (!$this->account->verify($token)) {
-            return redirect('/account/?login=invalid');
+            return redirect(url('/account') . '/?login=invalid');
         }
 
-        return redirect('/account/');
+        return redirect(url('/account') . '/');
     }
 
     /**
@@ -84,7 +84,7 @@ class AccountController
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/account/');
+        return redirect(url('/account') . '/');
     }
 
     /**
@@ -108,7 +108,7 @@ class AccountController
 
         $result = $this->account->unbind($customer, $install);
 
-        return redirect('/account/?' . ($result['ok'] ? 'unbound=1' : 'unbind=blocked') . '#domains')
+        return redirect(url('/account') . '/?' . ($result['ok'] ? 'unbound=1' : 'unbind=blocked') . '#domains')
             ->with($result['ok'] ? 'elv_success' : 'elv_error', $result['message']);
     }
 
@@ -125,6 +125,6 @@ class AccountController
             return response()->json(['ok' => true, 'message' => $message], 201);
         }
 
-        return redirect('/account/?sent=1')->with('elv_success', $message);
+        return redirect(url('/account') . '/?sent=1')->with('elv_success', $message);
     }
 }

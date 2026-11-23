@@ -9,6 +9,7 @@ meta_robots = "noindex, nofollow"
 {% set orders = account ? elv_account_orders() : [] %}
 {% set licenses = account ? elv_account_licenses() : [] %}
 {% set domains = account ? elv_account_domains() : [] %}
+{% set tickets = account ? elv_account_tickets() : [] %}
 
 <main id="main">
     <section class="page-hero">
@@ -167,6 +168,47 @@ meta_robots = "noindex, nofollow"
                         <div class="stack-actions">
                             <a class="btn btn--primary" href="{{ 'pricing'|page }}">Тарифы</a>
                             <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать нам</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <h2 class="mt-32" id="tickets">Обращения в поддержку</h2>
+
+                {% if tickets|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                    <th>Обновлено</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets|slice(0, 5) %}
+                                    <tr>
+                                        <td><b>{{ ticket.number }}</b></td>
+                                        <td>{{ ticket.subject }}</td>
+                                        <td><span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span></td>
+                                        <td>{{ ticket.last_message_at ? ticket.last_message_at|date('d.m.Y H:i') : '—' }}</td>
+                                        <td><a class="btn btn--ghost btn--sm" href="{{ ticket.url }}">Открыть</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="stack-actions mt-16">
+                        <a class="btn btn--primary" href="{{ 'tickets'|page }}">Все обращения</a>
+                        <a class="btn btn--ghost" href="{{ 'tickets'|page }}#new-ticket">Новое обращение</a>
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <h2>Обращений пока нет</h2>
+                        <p>Если что-то не работает или нужен совет по установке — напишите в поддержку.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'tickets'|page }}#new-ticket">Написать в поддержку</a>
                         </div>
                     </div>
                 {% endif %}

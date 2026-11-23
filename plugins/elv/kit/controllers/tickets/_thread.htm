@@ -1,0 +1,59 @@
+<div id="ticketThread" style="margin-top:24px">
+    <h3 style="margin:0 0 8px">Переписка</h3>
+
+    <div class="callout {{ ticket.sla_overdue ? 'callout-danger' : 'callout-info' }}" style="margin-bottom:16px">
+        <div class="callout-content">
+            <p style="margin:0">
+                <strong>{{ ticket.status_label }}</strong>
+                · {{ ticket.sla_label }}
+                {% if ticket.sla_overdue %}· срок первого ответа прошёл{% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if ticket.messages|length %}
+        {% for message in ticket.messages %}
+            <div class="callout {{ message.is_support ? 'callout-success' : 'callout-default' }}" style="margin-bottom:10px">
+                <div class="callout-content">
+                    <p style="margin:0 0 6px">
+                        <strong>{{ message.author_label }}</strong>
+                        {% if message.author_name %}· {{ message.author_name }}{% endif %}
+                        · {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}
+                    </p>
+                    <div style="white-space:pre-line">{{ message.body }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">Сообщений пока нет.</p>
+    {% endif %}
+
+    {% if not ticket.is_closed %}
+        <?= Form::open(['data-request' => 'onReply', 'data-request-flash' => true]) ?>
+            <?= Form::token() ?>
+            <input type="hidden" name="id" value="{{ ticket.id }}">
+            <div class="form-group">
+                <label for="ticket-reply-body">Ответ покупателю</label>
+                <textarea
+                    id="ticket-reply-body"
+                    name="body"
+                    class="form-control"
+                    rows="5"
+                    maxlength="5000"
+                    required
+                    placeholder="Текст ответа. Покупатель получит его на e-mail и увидит в кабинете."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary oc-icon-reply">Отправить ответ</button>
+        <?= Form::close() ?>
+
+        <div style="margin-top:16px">
+            <?= Form::open(['data-request' => 'onClose', 'data-request-confirm' => 'Закрыть обращение?']) ?>
+                <?= Form::token() ?>
+                <input type="hidden" name="id" value="{{ ticket.id }}">
+                <button type="submit" class="btn btn-default oc-icon-check">Закрыть обращение</button>
+            <?= Form::close() ?>
+        </div>
+    {% else %}
+        <p class="text-muted">Обращение закрыто. Покупатель может открыть его новым сообщением из кабинета.</p>
+    {% endif %}
+</div>

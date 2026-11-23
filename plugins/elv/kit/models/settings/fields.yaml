@@ -73,6 +73,23 @@ tabs:
             tab: 'Контакты'
             span: left
             default: '/demo/'
+        telegram_bot_token:
+            label: 'Telegram: токен бота'
+            tab: 'Поддержка'
+            type: password
+            span: left
+            comment: 'Токен от @BotFather. Лучше хранить в .env (ELV_TELEGRAM_BOT_TOKEN). Пусто — Telegram выключен, обращения работают в кабинете и админке.'
+        telegram_chat_id:
+            label: 'Telegram: chat_id'
+            tab: 'Поддержка'
+            span: right
+            comment: 'Чат поддержки. Напишите боту, откройте getUpdates и возьмите chat.id. Можно задать в .env (ELV_TELEGRAM_CHAT_ID).'
+        telegram_webhook_secret:
+            label: 'Telegram: секрет вебхука'
+            tab: 'Поддержка'
+            type: password
+            comment: 'Строка 16–64 символа, латиница, цифры, дефис и подчёркивание. Вебхук: /telegram/webhook/<секрет>. Пусто — ChatOps выключен. Можно задать в .env (ELV_TELEGRAM_WEBHOOK_SECRET).'
+
         chat_enabled:
             label: 'Консультант в виджете'
             tab: 'Виджет'

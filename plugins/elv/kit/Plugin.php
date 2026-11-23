@@ -89,6 +89,10 @@ class Plugin extends PluginBase
                 'label' => 'Сообщения обратной связи',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.tickets' => [
+                'label' => 'Обращения в поддержку',
+                'tab' => 'Elv Kit',
+            ],
             'elv.kit.subscribers' => [
                 'label' => 'Подписчики',
                 'tab' => 'Elv Kit',
@@ -155,6 +159,12 @@ class Plugin extends PluginBase
                         'icon' => 'icon-envelope',
                         'url' => \Backend::url('elv/kit/messages'),
                         'permissions' => ['elv.kit.messages'],
+                    ],
+                    'tickets' => [
+                        'label' => 'Обращения',
+                        'icon' => 'icon-life-ring',
+                        'url' => \Backend::url('elv/kit/tickets'),
+                        'permissions' => ['elv.kit.tickets'],
                     ],
                     'subscribers' => [
                         'label' => 'Подписчики',
@@ -510,6 +520,16 @@ class Plugin extends PluginBase
                     $customer = $account->user();
 
                     return $customer ? $account->orders($customer) : collect();
+                },
+                'elv_account_tickets' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->tickets($customer) : collect();
+                },
+                'elv_ticket' => function ($id) use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->ticket($customer, (int) $id) : null;
                 },
                 'elv_account_licenses' => function () use ($account) {
                     $customer = $account->user();

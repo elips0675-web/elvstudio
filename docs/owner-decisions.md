@@ -45,7 +45,7 @@
   `/api/v1/install` пишем только для админки.
 
 ### 7. Песочница
-- Sandbox откладывается в конец очереди — после кабинета, тикетов и отзывов.
+- Sandbox откладывается в конец очереди — после Q&A и отзывов.
 
 ### 8. BYN-платежи
 - В `PaymentManager` закладываем архитектуру для белорусского шлюза
@@ -63,8 +63,12 @@
 
 - 23.11.2026: кабинет `/account/` закрыт — вход по Magic Link, заказы,
   лицензии, домены и отвязка раз в 30 дней (`plugins/elv/kit/classes/AccountService.php`,
-  `themes/elv-studio/pages/account.htm`, миграция 1.1.0). Следующий шаг —
-  тикеты и Telegram ChatOps.
+  `themes/elv-studio/pages/account.htm`, миграция 1.1.0).
+- 23.11.2026: тикеты и Telegram ChatOps закрыты — миграция 1.2.0, страница
+  `/tickets/`, админка «Обращения», SLA по рабочим часам
+  (`Support::dueAt()`), уведомления в Telegram (`Telegram`, вебхук
+  `/telegram/webhook/{secret}`). Проверки — `php tools/tickets-check.php`.
+  Следующий шаг — «Вопрос-ответ» и отзывы (Stage 3).
 
 ## Что не делаем
 

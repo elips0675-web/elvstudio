@@ -243,6 +243,7 @@ $paths['/'] = true;
 $paths['/404'] = true;
 $paths['/search'] = true;
 $paths['/account'] = true;
+$paths['/tickets'] = true;
 ksort($paths);
 
 $pages = 0;

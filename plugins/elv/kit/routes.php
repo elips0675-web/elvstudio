@@ -11,6 +11,8 @@ use Elv\Kit\Classes\Http\PaymentController;
 use Elv\Kit\Classes\Http\QuoteController;
 use Elv\Kit\Classes\Http\SeoController;
 use Elv\Kit\Classes\Http\SubscribeController;
+use Elv\Kit\Classes\Http\TelegramController;
+use Elv\Kit\Classes\Http\TicketController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -36,6 +38,20 @@ Route::middleware(['web', 'throttle:10,1'])->group(function () {
     Route::post('account/domain/{id}/unbind', [AccountController::class, 'unbind'])
         ->where('id', '[0-9]+')
         ->name('elv.kit.account.unbind');
+
+    Route::post('tickets', [TicketController::class, 'store'])->name('elv.kit.ticket.store');
+    Route::post('tickets/{id}/reply', [TicketController::class, 'reply'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.ticket.reply');
+    Route::post('tickets/{id}/close', [TicketController::class, 'close'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.ticket.close');
+});
+
+Route::middleware('throttle:60,1')->group(function () {
+    Route::post('telegram/webhook/{secret}', [TelegramController::class, 'webhook'])
+        ->where('secret', '[A-Za-z0-9_-]{16,64}')
+        ->name('elv.kit.telegram.webhook');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {

@@ -1,0 +1,14 @@
+title: Обращения
+list: $/elv/kit/models/ticket/columns.yaml
+modelClass: Elv\Kit\Models\Ticket
+recordUrl: elv/kit/tickets/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Обращений пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Номер, тема или e-mail'

@@ -5,6 +5,7 @@ use Elv\Kit\Models\Customer;
 use Elv\Kit\Models\Install;
 use Elv\Kit\Models\License;
 use Elv\Kit\Models\Order;
+use Elv\Kit\Models\Ticket;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -191,6 +192,37 @@ class AccountService
                 ->orderByDesc('id')
                 ->get();
         });
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Ticket>
+     */
+    public function tickets(Customer $customer)
+    {
+        return $this->remember('tickets', $customer, function () use ($customer) {
+            return Ticket::query()
+                ->forCustomer($customer)
+                ->withCount('messages')
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->get();
+        });
+    }
+
+    /**
+     * ticket — обращение только своего покупателя; чужое не отличается от
+     * несуществующего.
+     */
+    public function ticket(Customer $customer, int $id): ?Ticket
+    {
+        if ($id <= 0) {
+            return null;
+        }
+
+        return Ticket::query()
+            ->forCustomer($customer)
+            ->with('messages')
+            ->find($id);
     }
 
     public function ownsInstall(Customer $customer, Install $install): bool
