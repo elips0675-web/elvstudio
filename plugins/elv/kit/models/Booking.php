@@ -22,6 +22,7 @@ class Booking extends Model
 
     protected $casts = [
         'reminded_at' => 'datetime',
+        'admin_reminded_at' => 'datetime',
     ];
 
     public $rules = [

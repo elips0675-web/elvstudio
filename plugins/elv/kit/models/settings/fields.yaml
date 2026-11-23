@@ -285,3 +285,9 @@ tabs:
             type: number
             default: 24
             comment: 'От 1 до 72 часов. Пусто — 24.'
+        booking_reminder_admin:
+            label: 'Напоминать мастеру'
+            tab: 'Запись'
+            type: switch
+            default: false
+            comment: 'Письмо администратору на адрес уведомлений из вкладки «Продажи». Расписание — то же, что у клиента.'

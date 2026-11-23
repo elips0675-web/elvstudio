@@ -22,6 +22,14 @@ meta_description = "Пошаговый запуск сайта на вашем �
 
     <section class="section">
         <div class="container">
+            <div class="notice">
+                {{ elv_icon('info')|raw }}
+                <p><strong>Статическая копия — только показ.</strong> Демо-стенд и <code>demo-static</code>
+                повторяют интерфейс, но не принимают заявки. Формы, запись, заказы, оплата,
+                письма и админка работают на PHP 8.3+ с MySQL: у статики нет базы, чтобы
+                сохранить заявку, и почты, чтобы отправить письмо. Для продаж нужен обычный
+                хостинг с PHP и MySQL — шаги ниже.</p>
+            </div>
             <div class="split">
                 <div>
                     <div class="toc">

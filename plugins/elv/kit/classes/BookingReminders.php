@@ -2,18 +2,20 @@
 
 use Carbon\Carbon;
 use Elv\Kit\Classes\Mail\BookingReminder;
+use Elv\Kit\Classes\Mail\BookingReminderAdmin;
 use Elv\Kit\Models\Booking;
 use Elv\Kit\Models\Settings;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * BookingReminders — письма-напоминания клиенту перед визитом.
+ * BookingReminders — письма-напоминания перед визитом.
  *
- * Настройки: `booking_reminder_enabled` (вкладка «Запись») и
+ * Клиенту и мастеру (администратору) пишутся независимые письма, у каждого
+ * своя отметка: `reminded_at` и `admin_reminded_at`. Настройки на вкладке
+ * «Запись»: `booking_reminder_enabled`, `booking_reminder_admin` и
  * `booking_reminder_hours` — за сколько часов до визита писать (1–72, по
- * умолчанию 24). Отметка `reminded_at` в брони не даёт отправить письмо
- * дважды; отменённые брони и записи без e-mail пропускаются.
+ * умолчанию 24). Отменённые брони пропускаются, повторно письмо не уходит.
  */
 class BookingReminders
 {
@@ -24,6 +26,16 @@ class BookingReminders
     public static function enabled(): bool
     {
         return (bool) Settings::get('booking_reminder_enabled', false);
+    }
+
+    public static function adminEnabled(): bool
+    {
+        return (bool) Settings::get('booking_reminder_admin', false);
+    }
+
+    public static function adminEmail(): string
+    {
+        return (string) (Settings::get('order_notify_email') ?: Settings::get('email'));
     }
 
     public static function hours(): int
@@ -43,8 +55,8 @@ class BookingReminders
     }
 
     /**
-     * Брони, которым пора напомнить: не отменены, e-mail есть, отметки нет,
-     * визит в ближайшие $hours часов.
+     * Брони, которым пора напомнить клиенту: не отменены, e-mail есть,
+     * отметки нет, визит в ближайшие $hours часов.
      *
      * @return \Illuminate\Support\Collection<int, Booking>
      */
@@ -62,13 +74,41 @@ class BookingReminders
             ->orderBy('time')
             ->get()
             ->filter(function (Booking $booking) use ($now, $until) {
-                $at = self::moment($booking);
-
-                return $at !== null
-                    && $at->greaterThanOrEqualTo($now)
-                    && $at->lessThanOrEqualTo($until);
+                return self::within($booking, $now, $until);
             })
             ->values();
+    }
+
+    /**
+     * Брони, о которых пора напомнить мастеру. E-mail берётся из настроек,
+     * поэтому адрес самой брони здесь не важен.
+     *
+     * @return \Illuminate\Support\Collection<int, Booking>
+     */
+    public static function pendingAdmin(int $hours, ?Carbon $now = null)
+    {
+        $now = $now ?: Carbon::now();
+        $until = $now->copy()->addHours(self::normalizeHours($hours));
+
+        return Booking::query()
+            ->whereNull('admin_reminded_at')
+            ->where('status', '<>', Booking::STATUS_CANCELLED)
+            ->orderBy('date')
+            ->orderBy('time')
+            ->get()
+            ->filter(function (Booking $booking) use ($now, $until) {
+                return self::within($booking, $now, $until);
+            })
+            ->values();
+    }
+
+    protected static function within(Booking $booking, Carbon $now, Carbon $until): bool
+    {
+        $at = self::moment($booking);
+
+        return $at !== null
+            && $at->greaterThanOrEqualTo($now)
+            && $at->lessThanOrEqualTo($until);
     }
 
     public static function moment(Booking $booking): ?Carbon
@@ -89,7 +129,7 @@ class BookingReminders
     }
 
     /**
-     * Отправляет напоминания и ставит отметку. Возвращает число писем.
+     * Отправляет напоминания клиентам и ставит отметку. Возвращает число писем.
      */
     public static function send(int $hours, ?Carbon $now = null): int
     {
@@ -104,6 +144,37 @@ class BookingReminders
             }
             catch (\Throwable $e) {
                 Log::warning('Elv Kit: напоминание о записи не отправлено', [
+                    'booking' => $booking->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $sent;
+    }
+
+    /**
+     * Отправляет напоминания мастеру и ставит отметку. Возвращает число писем.
+     */
+    public static function sendAdmin(int $hours, ?Carbon $now = null): int
+    {
+        $email = self::adminEmail();
+
+        if ($email === '') {
+            return 0;
+        }
+
+        $sent = 0;
+
+        foreach (self::pendingAdmin($hours, $now) as $booking) {
+            try {
+                Mail::to($email)->queue(new BookingReminderAdmin($booking));
+                $booking->admin_reminded_at = Carbon::now();
+                $booking->save();
+                $sent++;
+            }
+            catch (\Throwable $e) {
+                Log::warning('Elv Kit: напоминание мастеру не отправлено', [
                     'booking' => $booking->id,
                     'error' => $e->getMessage(),
                 ]);

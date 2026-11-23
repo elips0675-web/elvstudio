@@ -21,3 +21,6 @@
 1.0.8:
     - 'Напоминания о записи: отметка reminded_at и письмо клиенту за сутки'
     - add_booking_reminder.php
+1.0.9:
+    - 'Напоминание мастеру о записи: отметка admin_reminded_at'
+    - add_booking_admin_reminder.php

@@ -224,6 +224,104 @@ class Slots
     }
 
     /**
+     * generateRange — сетка по диапазону дат, времени и шагу.
+     *
+     * Возвращает число созданных и пропущенных (уже существующих) слотов.
+     * Ограничение — 500 слотов за раз: случайный диапазон в сто лет не должен
+     * превращаться в миллион строк. Занятые слоты не перезаписываются.
+     *
+     * @return array{created: int, skipped: int, total: int}
+     */
+    public static function generateRange(
+        string $serviceCode,
+        string $dateFrom,
+        string $dateTo,
+        string $timeFrom,
+        string $timeTo,
+        int $step = 60,
+        int $capacity = 1,
+        bool $skipWeekends = false
+    ): array {
+        $serviceCode = preg_replace('/[^a-z0-9-]/', '', strtolower($serviceCode)) ?? '';
+
+        if ($serviceCode === '') {
+            throw new \InvalidArgumentException('Выберите услугу.');
+        }
+
+        if (static::service($serviceCode) === null) {
+            throw new \InvalidArgumentException('Услуга не найдена в настройках записи.');
+        }
+
+        $start = \Carbon\Carbon::parse($dateFrom)->startOfDay();
+        $end = \Carbon\Carbon::parse($dateTo)->startOfDay();
+
+        if ($end->lessThan($start)) {
+            throw new \InvalidArgumentException('Дата «по» раньше даты «с».');
+        }
+
+        if ($start->diffInDays($end) > 92) {
+            throw new \InvalidArgumentException('Диапазон больше 92 дней — выберите короче.');
+        }
+
+        $step = max(5, min(240, $step));
+        $capacity = max(1, min(50, $capacity));
+
+        $from = \Carbon\Carbon::parse($timeFrom);
+        $to = \Carbon\Carbon::parse($timeTo);
+
+        if ($to->lessThanOrEqualTo($from)) {
+            throw new \InvalidArgumentException('Время «до» должно быть позже времени «с».');
+        }
+
+        $times = [];
+
+        for ($cursor = $from->copy(); $cursor->lessThanOrEqualTo($to); $cursor->addMinutes($step)) {
+            $times[] = $cursor->format('H:i');
+        }
+
+        $days = [];
+
+        for ($date = $start->copy(); $date->lessThanOrEqualTo($end); $date->addDay()) {
+            if ($skipWeekends && $date->dayOfWeekIso >= 6) {
+                continue;
+            }
+
+            $days[] = $date->toDateString();
+        }
+
+        $total = count($days) * count($times);
+
+        if ($total === 0) {
+            throw new \InvalidArgumentException('В выбранном диапазоне нет рабочих дней.');
+        }
+
+        if ($total > 500) {
+            throw new \InvalidArgumentException('Слишком много слотов: ' . $total . ', максимум 500 за раз.');
+        }
+
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($days as $date) {
+            foreach ($times as $time) {
+                $slot = Slot::query()->firstOrCreate(
+                    ['service_code' => $serviceCode, 'date' => $date, 'time' => $time],
+                    ['capacity' => $capacity, 'taken' => 0]
+                );
+
+                if ($slot->wasRecentlyCreated) {
+                    $created++;
+                }
+                else {
+                    $skipped++;
+                }
+            }
+        }
+
+        return ['created' => $created, 'skipped' => $skipped, 'total' => $total];
+    }
+
+    /**
      * prune — убирает прошедшие слоты без броней.
      */
     public static function prune(): int

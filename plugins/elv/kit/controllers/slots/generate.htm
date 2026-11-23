@@ -1,0 +1,84 @@
+<?= Form::open(['class' => 'layout']) ?>
+    <div class="layout-row">
+        <div class="layout-cell">
+            <?php if ($services === []): ?>
+                <div class="callout callout-warning">
+                    <div class="callout-content">
+                        <p>Сначала задайте услуги записи: Настройки → Elv Kit → вкладка «Запись».</p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="control-group">
+                    <label class="control-label">Услуга</label>
+                    <div class="control-field">
+                        <select name="service_code" class="form-control">
+                            <?php foreach ($services as $service): ?>
+                                <option value="<?= e($service['code']) ?>" <?= $service['code'] === $serviceCode ? 'selected' : '' ?>>
+                                    <?= e($service['name']) ?>
+                                </option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Даты</label>
+                    <div class="control-field">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="date" name="date_from" class="form-control" value="<?= e($dateFrom) ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="date" name="date_to" class="form-control" value="<?= e($dateTo) ?>" required>
+                            </div>
+                        </div>
+                        <p class="help-block">Не больше 92 дней и 500 слотов за раз.</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Время и шаг</label>
+                    <div class="control-field">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="time" name="time_from" class="form-control" value="<?= e($timeFrom) ?>" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="time" name="time_to" class="form-control" value="<?= e($timeTo) ?>" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="step" class="form-control" min="5" max="240" step="5" value="<?= (int) $step ?>" required>
+                                <p class="help-block">Шаг, минут</p>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="capacity" class="form-control" min="1" max="50" value="<?= (int) $capacity ?>" required>
+                                <p class="help-block">Мест в слоте</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Дни</label>
+                    <div class="control-field">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="skip_weekends" value="1" checked>
+                            Пропустить субботу и воскресенье
+                        </label>
+                        <p class="help-block">Существующие слоты не перезаписываются — они попадут в «уже было».</p>
+                    </div>
+                </div>
+            <?php endif ?>
+        </div>
+    </div>
+    <div class="form-buttons">
+        <?php if ($services !== []): ?>
+            <button
+                type="submit"
+                class="btn btn-primary oc-icon-calendar"
+                data-request="onGenerate"
+                data-request-data="redirect:0">Сгенерировать</button>
+        <?php endif ?>
+        <a class="btn btn-default" href="<?= Backend::url('elv/kit/slots') ?>">Отмена</a>
+    </div>
+<?= Form::close() ?>

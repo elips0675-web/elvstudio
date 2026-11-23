@@ -7,6 +7,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\BookingReminders;
 use Elv\Kit\Classes\Mail\BookingReminder;
+use Elv\Kit\Classes\Mail\BookingReminderAdmin;
 use Elv\Kit\Classes\Slots;
 use Elv\Kit\Models\Booking;
 use Elv\Kit\Models\Settings;
@@ -27,6 +28,7 @@ $settings = Settings::instance();
 $backup = $settings->getAttribute('booking_services');
 $backupReminderEnabled = $settings->getAttribute('booking_reminder_enabled');
 $backupReminderHours = $settings->getAttribute('booking_reminder_hours');
+$backupReminderAdmin = $settings->getAttribute('booking_reminder_admin');
 
 $settings->forceFill(['booking_services' => '']);
 $check(Slots::services() === [], 'empty settings still return booking services');
@@ -158,6 +160,54 @@ try {
     $slot->delete();
     $check(Slot::query()->find($id) === null, 'free slot is not deleted');
 
+    $range = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($range['created'] === 4, 'slot range generation did not create four slots');
+    $check($range['total'] === 4, 'slot range generation reports the wrong total');
+
+    $repeat = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($repeat['created'] === 0, 'repeated slot generation creates duplicates');
+    $check($repeat['skipped'] === 4, 'repeated slot generation does not skip existing slots');
+
+    $generated = Slot::query()
+        ->where('service_code', 'ok')
+        ->whereBetween('date', ['2030-01-07', '2030-01-08'])
+        ->get();
+    $check($generated->count() === 4, 'generated slot count does not match');
+    $check((int) ($generated->first()->capacity ?? 0) === 2, 'generated slot capacity is not applied');
+
+    $reversed = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-08', '2030-01-07', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $reversed = true;
+    }
+
+    $check($reversed, 'reversed slot range is not rejected');
+
+    $overLimit = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-01', '2030-12-31', '10:00', '18:00', 5);
+    }
+    catch (\InvalidArgumentException $e) {
+        $overLimit = true;
+    }
+
+    $check($overLimit, 'slot range over 500 is not rejected');
+
+    $unknownService = false;
+
+    try {
+        Slots::generateRange('zz-no-such', '2030-01-07', '2030-01-08', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $unknownService = true;
+    }
+
+    $check($unknownService, 'slot range accepts a service missing from settings');
+
     $check(BookingReminders::normalizeHours(0) === BookingReminders::DEFAULT_HOURS, 'zero reminder hours are not defaulted');
     $check(BookingReminders::normalizeHours(500) === 72, 'reminder hours are not capped at 72');
     $check(BookingReminders::normalizeHours(1) === 1, 'one hour reminder is not allowed');
@@ -203,6 +253,14 @@ try {
     $check($due->fresh()->reminded_at !== null, 'reminder mark is not saved');
     Mail::assertQueued(BookingReminder::class);
     $check(BookingReminders::pending(24, $now)->count() === 0, 'reminded booking is selected twice');
+
+    $settings->forceFill(['booking_reminder_admin' => true]);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 3, 'admin reminder selection is wrong');
+    $adminSent = BookingReminders::sendAdmin(24, $now);
+    $check($adminSent === 3, 'admin reminder send does not report three letters');
+    $check($due->fresh()->admin_reminded_at !== null, 'admin reminder mark is not saved');
+    Mail::assertQueued(BookingReminderAdmin::class);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 0, 'admin reminder is sent twice');
 }
 finally {
     DB::rollBack();
@@ -212,6 +270,7 @@ $settings->forceFill(['booking_services' => $backup]);
 $settings->forceFill([
     'booking_reminder_enabled' => $backupReminderEnabled,
     'booking_reminder_hours' => $backupReminderHours,
+    'booking_reminder_admin' => $backupReminderAdmin,
 ]);
 
 if ($errors !== []) {
