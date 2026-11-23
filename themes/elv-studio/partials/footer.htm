@@ -6,7 +6,7 @@
                     <span class="logo__mark">{{ elv_icon('cubes')|raw }}</span>
                     <span class="logo__text">
                         {{ elv_setting('brand_name', 'Elv Kit') }}
-                        <small>Elv Studio</small>
+                        {% if elv_setting('brand_subtitle') %}<small>{{ elv_setting('brand_subtitle') }}</small>{% endif %}
                     </span>
                 </a>
                 <p class="mt-24">{{ elv_setting('brand_description', 'Готовый сайт для бизнеса: онлайн-запись, заказы, блог и понятная админка.') }}</p>
@@ -60,7 +60,7 @@
         </div>
 
         <div class="footer__bottom">
-            <span>© {{ elv_year() }} {{ elv_setting('brand_name', 'Elv Kit') }}. Сайт и данные остаются у вас.</span>
+            <span>© {{ elv_year() }} {{ elv_setting('legal_name', elv_setting('brand_name', 'Elv Kit')) }}. Сайт и данные остаются у вас.</span>
             <span>
                 <a href="{{ 'terms'|page }}">Оферта</a> ·
                 <a href="{{ 'privacy'|page }}">Политика конфиденциальности</a>

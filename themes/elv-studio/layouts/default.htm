@@ -27,7 +27,7 @@ description = "Основной макет: шапка, подвал, инлай
         <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     {% endif %}
     <link rel="canonical" href="{{ elv_canonical(seo_page_no) }}">
-    <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
+    <link rel="alternate" type="application/rss+xml" title="Блог {{ elv_setting('brand_name', 'Elv Kit') }}" href="{{ url('/rss.xml') }}">
 
     <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
     <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">

@@ -86,7 +86,7 @@ meta_description = "Связаться по вопросам сайта: e-mail,
                 <aside class="card summary">
                     <h3>Реквизиты и условия</h3>
                     <ul class="specs mt-24">
-                        <li><span>Продавец</span><span>Elv Studio</span></li>
+                        <li><span>Продавец</span><span>{{ elv_setting('legal_name', elv_setting('brand_name', 'Elv Kit')) }}</span></li>
                         <li><span>Формат работы</span><span>онлайн, Беларусь</span></li>
                         <li><span>Часовой пояс</span><span>Минск, UTC+3</span></li>
                         <li><span>Документы</span><span><a href="{{ 'terms'|page }}">оферта</a>, <a href="{{ 'privacy'|page }}">политика</a></span></li>

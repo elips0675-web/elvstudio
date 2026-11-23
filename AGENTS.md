@@ -90,9 +90,14 @@
 8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-studio`),
    нет нашего домена и контактов: `elv-studio.by`, `sales@elv-studio`,
    `t.me/elvstudio`. Контакты — только из Settings (`email`, `telegram`), валюта —
-   `Money::currency()`, дефолт почты — `sales@example.com`. Проверка:
-   `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`); `demo-static`
-   не сканируется — это наш собственный сайт.
+   `Money::currency()`, дефолт почты — `sales@example.com`. Название бренда в
+   шаблонах (`layouts/`, `pages/`, `partials/`, `views/`) не зашито: шапка,
+   подвал, оферта, политика, контакты, письма и смета берут `brand_name`,
+   `brand_subtitle` и `legal_name` через `elv_setting()`, дефолт — «Elv Kit».
+   Строка «Elv Studio» в шаблоне — дефект: у покупателя на сайте чужое имя.
+   Проверка: `node tools/check-brand.mjs` (входит в `node tools/gate.mjs`), она
+   же ищет зашитый бренд в 55 шаблонах; `demo-static` не сканируется — это наш
+   собственный сайт.
 9. Один адрес на страницу: каноническая форма — со слэшем. `/blog` уводится 301
    на `/blog/` (`Plugin.php`, `cms.page.beforeDisplay`), у страниц пагинации свой
    canonical `?page=N` и свой `<title>` «— страница N» (`Seo::canonical()`,
