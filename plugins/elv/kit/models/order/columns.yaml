@@ -16,11 +16,11 @@ columns:
     plan:
         label: 'Тариф'
         type: text
-        select: plan_label
+        valueFrom: plan_label
     amount_label:
         label: 'Сумма'
         type: text
-        select: amount_label
+        valueFrom: amount_label
     status:
         label: 'Статус'
         type: selectable

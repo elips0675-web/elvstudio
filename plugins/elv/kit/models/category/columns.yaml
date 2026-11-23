@@ -13,7 +13,7 @@ columns:
         label: 'Статей'
         type: number
         relation: posts
-        select: count
+        relationCount: true
     sort_order:
         label: 'Порядок'
         type: number

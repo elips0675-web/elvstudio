@@ -1,0 +1,4 @@
+name: Слот
+modelClass: Elv\Kit\Models\Slot
+form: $/elv/kit/models/slot/fields.yaml
+defaultRedirect: elv/kit/slots

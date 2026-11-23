@@ -7,6 +7,7 @@ const SCRIPTS = [
   'tools/chat-check.php',
   'tools/search-check.php',
   'tools/seo-check.php',
+  'tools/admin-check.php',
   'tools/booking-check.php',
   'tools/presets-check.php',
   'tools/download-check.php',

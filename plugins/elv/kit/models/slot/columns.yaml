@@ -1,0 +1,21 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    service_code:
+        label: 'Услуга'
+        searchable: true
+    date:
+        label: 'Дата'
+        type: date
+        sortable: true
+    time:
+        label: 'Время'
+        sortable: true
+    capacity:
+        label: 'Мест'
+        type: number
+    taken:
+        label: 'Занято'
+        type: number

@@ -1,0 +1,31 @@
+fields:
+    service_code:
+        label: 'Услуга'
+        type: dropdown
+        span: left
+        required: 1
+        options: getServiceCodeOptions
+        comment: 'Код из «Настройки → Запись → Услуги для записи».'
+    date:
+        label: 'Дата'
+        type: datepicker
+        mode: date
+        span: right
+        required: 1
+    time:
+        label: 'Время'
+        span: left
+        required: 1
+        comment: 'Формат ЧЧ:ММ, например 10:00.'
+    capacity:
+        label: 'Мест в слоте'
+        type: number
+        span: right
+        default: 1
+        comment: 'Сколько записей можно принять на это время.'
+    taken:
+        label: 'Уже занято'
+        type: number
+        span: left
+        default: 0
+        comment: 'Меняйте вручную, только чтобы закрыть или освободить место.'

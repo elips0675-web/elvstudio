@@ -7,6 +7,9 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Slots;
 use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Slot;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 $errors = [];
 
@@ -62,6 +65,96 @@ $check((Slots::parseServices($lines) === Slots::services()), 'settings lines do 
 $config = Slots::configServices();
 $check(count($config) > 0, 'demo booking dataset is missing');
 $check(Slots::servicesToLines($config) !== '', 'demo booking dataset is not convertible to settings lines');
+
+DB::beginTransaction();
+
+try {
+    $date = date('Y-m-d', strtotime('+2 days'));
+    $slot = Slot::create([
+        'service_code' => 'zz-check',
+        'date' => $date,
+        'time' => '9:05',
+        'capacity' => 2,
+        'taken' => 0,
+    ]);
+    $check($slot->time === '09:05', 'slot time is not normalized to HH:MM');
+    $check($slot->date === $date, 'slot date is not normalized to Y-m-d');
+
+    $duplicate = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '09:05',
+            'capacity' => 2,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $duplicate = true;
+    }
+
+    $check($duplicate, 'duplicate slot is not rejected');
+
+    $badTime = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '25:00',
+            'capacity' => 1,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $badTime = true;
+    }
+
+    $check($badTime, 'invalid slot time is not rejected');
+
+    $overbooked = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '10:00',
+            'capacity' => 1,
+            'taken' => 2,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $overbooked = true;
+    }
+
+    $check($overbooked, 'taken above capacity is not rejected');
+
+    $slot->taken = 1;
+    $slot->save();
+
+    $deleted = true;
+
+    try {
+        $slot->delete();
+        $deleted = false;
+    }
+    catch (ValidationException $e) {
+        // Занятый слот удалять нельзя — это и проверяем.
+    }
+
+    $check($deleted, 'taken slot is deleted');
+
+    $id = (int) $slot->id;
+    $slot->taken = 0;
+    $slot->save();
+    $slot->delete();
+    $check(Slot::query()->find($id) === null, 'free slot is not deleted');
+}
+finally {
+    DB::rollBack();
+}
 
 $settings->forceFill(['booking_services' => $backup]);
 

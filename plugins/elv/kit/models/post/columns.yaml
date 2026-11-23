@@ -12,7 +12,7 @@ columns:
         select: name
     audience:
         label: 'Аудитория'
-        type: select
+        type: selectable
         options:
             business: 'Для бизнеса'
             tech: 'Технический'

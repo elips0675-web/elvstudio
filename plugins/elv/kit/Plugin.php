@@ -142,6 +142,12 @@ class Plugin extends PluginBase
                         'url' => \Backend::url('elv/kit/bookings'),
                         'permissions' => ['elv.kit.bookings'],
                     ],
+                    'slots' => [
+                        'label' => 'Слоты записи',
+                        'icon' => 'icon-clock-o',
+                        'url' => \Backend::url('elv/kit/slots'),
+                        'permissions' => ['elv.kit.bookings'],
+                    ],
                     'messages' => [
                         'label' => 'Сообщения',
                         'icon' => 'icon-envelope',

@@ -12,14 +12,13 @@ columns:
     kind:
         label: 'Тип'
         type: selectable
-        select: kind
         options:
             kit: 'Kit'
             module: 'Модуль'
     price_label:
         label: 'Цена'
         type: text
-        select: price_label
+        valueFrom: price_label
     is_active:
         label: 'Активен'
         type: switch

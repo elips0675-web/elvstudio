@@ -1,0 +1,15 @@
+title: 'Слоты записи'
+list: $/elv/kit/models/slot/columns.yaml
+modelClass: Elv\Kit\Models\Slot
+recordUrl: elv/kit/slots/update/:id
+recordsPerPage: 30
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Слотов пока нет. Создайте первый — или заполните сетку из настроек записи.'
+defaultSort:
+    column: date
+    direction: asc
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'Код услуги'
