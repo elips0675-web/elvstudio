@@ -9,6 +9,7 @@ const gates = [
   { script: 'check-orphans.mjs' },
   { script: 'check-package.mjs' },
   { script: 'check-brand.mjs' },
+  { script: 'check-promises.mjs' },
   { script: 'check-encoding.mjs' },
   { script: 'check-plans.mjs' },
   { script: 'check-php.mjs' },
