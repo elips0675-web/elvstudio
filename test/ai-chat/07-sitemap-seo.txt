@@ -1,6 +1,6 @@
 # Карта сайта и SEO-разметка
 
-Срез: 21.11.2026. Stage 84. Коммит: `f6bcb87`.
+Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -13,7 +13,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
 {% set crumbs = elv_breadcrumbs() %}
 {% set categories = elv_categories('all') %}
 {% set latest = elv_posts(6, null, 'all') %}
-{% set totalPosts = elv_posts(500, null, 'all')|length %}
+{% set totalPosts = elv_blog_total('all') %}
 
 <main id="main">
     <section class="page-hero">
@@ -164,6 +164,7 @@ class Seo
 {
     public const SECTIONS = [
         'kit' => 'Возможности',
+        'template' => 'Шаблон',
         'modules' => 'Разделы',
         'services' => 'Услуги',
         'calculator' => 'Калькулятор',
@@ -178,6 +179,7 @@ class Seo
         'terms' => 'Оферта',
         'privacy' => 'Политика конфиденциальности',
         'sitemap' => 'Карта сайта',
+        'search' => 'Поиск',
     ];
 
     protected static $post = null;
@@ -473,7 +475,36 @@ class Seo
     protected static function softwareNode(): array
     {
         $kit = Product::kit();
-        $price = $kit ? $kit->price_cents / 100 : 79;
+
+        if (!$kit) {
+            return [];
+        }
+
+        // Цены — из версий прайса (Prices::resolve внутри Catalog::plans),
+        // а не из карточки товара: иначе микроразметка расходится с /pricing/.
+        $prices = [];
+
+        foreach (Catalog::plans($kit) as $plan) {
+            $price = (int) ($plan['price'] ?? 0);
+
+            if ($price > 0) {
+                $prices[] = $price;
+            }
+        }
+
+        $offers = null;
+
+        if ($prices !== []) {
+            $offers = [
+                '@type' => 'AggregateOffer',
+                'lowPrice' => (string) (min($prices) / 100),
+                'highPrice' => (string) (max($prices) / 100),
+                'offerCount' => (string) count($prices),
+                'priceCurrency' => Money::currency(),
+                'url' => static::base() . '/pricing/',
+                'availability' => 'https://schema.org/InStock',
+            ];
+        }
 
         return static::withoutEmpty([
             '@type' => 'SoftwareApplication',
@@ -483,13 +514,7 @@ class Seo
             'operatingSystem' => 'Web',
             'description' => (string) (Settings::get('brand_description') ?: static::tagline()),
             'url' => static::base() . '/kit/',
-            'offers' => [
-                '@type' => 'Offer',
-                'price' => (string) $price,
-                'priceCurrency' => Money::currency(),
-                'url' => static::base() . '/pricing/',
-                'availability' => 'https://schema.org/InStock',
-            ],
+            'offers' => $offers,
             'featureList' => $kit && is_array($kit->features) ? array_values($kit->features) : [],
         ]);
     }
@@ -536,7 +561,7 @@ class Seo
 
         $node['offers'] = [
             '@type' => 'Offer',
-            'price' => (string) (max(0, (int) $product->price_cents) / 100),
+            'price' => (string) (max(0, Prices::resolve($product, 'single')) / 100),
             'priceCurrency' => Money::currency(),
             'url' => static::canonical(),
             'availability' => 'https://schema.org/InStock',
@@ -609,6 +634,7 @@ class Seo
     public static function llms(): string
     {
         $kit = Product::kit();
+        $kitPrice = $kit ? Prices::resolve($kit, 'single') : 0;
 
         $lines = [
             '# ' . static::siteName(),
@@ -618,7 +644,7 @@ class Seo
             (string) (Settings::get('brand_description') ?: ''),
             '',
             '## Что это',
-            '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка; цена от ' . Money::format($kit ? $kit->price_cents : 7900) . '.',
+            '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка' . ($kitPrice > 0 ? '; цена от ' . Money::format($kitPrice) : '') . '.',
             '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
             '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
             '- [Калькулятор](' . static::base() . '/calculator/): лицензия и модули, три суммы и разбивка без скрытых платежей.',

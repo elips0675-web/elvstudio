@@ -1,6 +1,6 @@
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 21.11.2026. Stage 84. Коммит: `f6bcb87`.
+Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -23,19 +23,6 @@ class Search
 
     /** @var array<int, array<string, mixed>>|null */
     protected static ?array $cache = null;
-
-    /** @var array<int, array<int, string>> */
-    protected const SYNONYM_GROUPS = [
-        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
-        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
-        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
-        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
-        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
-        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
-        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
-        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
-        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии'],
-    ];
 
     /**
      * index — все записи, по которым ищет страница /search/ и Консультант.
@@ -256,11 +243,7 @@ class Search
      */
     protected static function words(string $text): array
     {
-        $stop = [
-            'и', 'в', 'во', 'на', 'для', 'с', 'со', 'по', 'как', 'что', 'это', 'или', 'не',
-            'из', 'у', 'о', 'об', 'от', 'до', 'за', 'под', 'над', 'при', 'про', 'без',
-            'же', 'бы', 'ли', 'то', 'все', 'мы', 'вы', 'он', 'она', 'они', 'мне', 'нам',
-        ];
+        $stop = SearchConfig::stopWords();
 
         $words = array_filter(
             explode(' ', $text),
@@ -284,7 +267,7 @@ class Search
             $forms[] = $stem;
         }
 
-        foreach (static::SYNONYM_GROUPS as $group) {
+        foreach (SearchConfig::synonymGroups() as $group) {
             if (!in_array($word, $group, true)) {
                 continue;
             }
@@ -308,13 +291,11 @@ class Search
 
     protected static function stem(string $word): string
     {
-        static $endings = [
-            'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
-            'овать', 'евать',
-            'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
-            'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
-            'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь',
-        ];
+        static $endings = null;
+
+        if ($endings === null) {
+            $endings = SearchConfig::endings();
+        }
 
         if (mb_strlen($word) <= 3) {
             return $word;
@@ -375,13 +356,13 @@ title = "Поиск по сайту"
 url = "/search/"
 layout = "default"
 meta_title = "Поиск по сайту — Elv Kit"
-meta_description = "Поиск по страницам сайта и статьям блога Elv Studio: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
+meta_description = "Поиск по страницам сайта и статьям блога: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
 meta_robots = "noindex, follow"
 ==
 {% set query = elv_query('q') %}
 {% set crumbs = elv_breadcrumbs() %}
 
-<main id="main" data-search-index="/search-index.json">
+<main id="main" data-search-index="/search-index.json" data-search-config="{{ elv_search_config() }}">
     <section class="page-hero">
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}
@@ -482,31 +463,24 @@ meta_robots = "noindex, follow"
     var loaded = false;
 
     var state = { type: 'all', limit: 30 };
-    var stop = {
-        'и': 1, 'в': 1, 'во': 1, 'на': 1, 'для': 1, 'с': 1, 'со': 1, 'по': 1,
-        'как': 1, 'что': 1, 'это': 1, 'или': 1, 'не': 1, 'из': 1, 'у': 1,
-        'о': 1, 'об': 1, 'от': 1, 'до': 1, 'за': 1, 'под': 1, 'над': 1,
-        'при': 1, 'про': 1, 'без': 1, 'же': 1, 'бы': 1, 'ли': 1, 'то': 1,
-        'все': 1, 'мы': 1, 'вы': 1, 'он': 1, 'она': 1, 'они': 1, 'мне': 1, 'нам': 1
-    };
-    var synonymGroups = [
-        ['оплата', 'оплаты', 'оплате', 'оплату', 'оплатой', 'оплатить', 'платеж', 'платежи', 'платить'],
-        ['запись', 'записи', 'записью', 'записаться', 'бронирование', 'бронирования', 'бронь', 'брони'],
-        ['цена', 'цены', 'цене', 'цену', 'ценой', 'стоимость', 'стоимости', 'стоимостью', 'тариф', 'тарифы', 'тарифам', 'тарифами'],
-        ['сайт', 'сайты', 'сайта', 'сайту', 'сайте', 'сайтом', 'лендинг', 'лендинга'],
-        ['установка', 'установки', 'установить', 'настройка', 'настройки', 'настроить'],
-        ['поддержка', 'поддержки', 'поддержать', 'сопровождение', 'сопровождения'],
-        ['аудит', 'аудита', 'проверка', 'проверки', 'проверить'],
-        ['блог', 'блога', 'блоге', 'статья', 'статьи', 'статью', 'статей'],
-        ['ключ', 'ключа', 'ключи', 'ключей', 'лицензия', 'лицензии']
-    ];
-    var endings = [
-        'иями', 'ями', 'ами', 'ией', 'иям', 'ием', 'иях', 'ого', 'его', 'ому', 'ему', 'ыми', 'ими',
-        'овать', 'евать',
-        'ая', 'яя', 'ое', 'ее', 'ые', 'ие', 'ой', 'ей', 'ий', 'ый', 'ом', 'ем', 'ам', 'ям', 'ах', 'ях',
-        'ов', 'ев', 'ью', 'ия', 'ию', 'ии', 'ую', 'юю', 'ить', 'ать', 'ять', 'еть',
-        'а', 'я', 'о', 'е', 'ы', 'и', 'у', 'ю', 'ь'
-    ];
+
+    // Словари — из SearchConfig через data-search-config (единый источник).
+    var config = {};
+
+    try {
+        config = JSON.parse(indexNode.getAttribute('data-search-config') || '{}') || {};
+    } catch (error) {
+        config = {};
+    }
+
+    var stop = {};
+
+    (config.stop || []).forEach(function (word) {
+        stop[word] = 1;
+    });
+
+    var synonymGroups = config.synonyms || [];
+    var endings = config.endings || [];
     var timer = null;
 
     function normalize(value) {
@@ -1007,7 +981,7 @@ description = "Основной макет: шапка, подвал, инлай
         <meta name="robots" content="{{ this.page.meta_robots ?: 'index, follow, max-image-preview:large, max-snippet:-1' }}">
     {% endif %}
     <link rel="canonical" href="{{ elv_canonical(seo_page_no) }}">
-    <link rel="alternate" type="application/rss+xml" title="Блог Elv Studio" href="{{ url('/rss.xml') }}">
+    <link rel="alternate" type="application/rss+xml" title="Блог {{ elv_setting('brand_name', 'Elv Kit') }}" href="{{ url('/rss.xml') }}">
 
     <meta property="og:type" content="{{ this.page.id == 'blog-post' ? 'article' : 'website' }}">
     <meta property="og:site_name" content="{{ elv_setting('brand_name', 'Elv Kit') }}">

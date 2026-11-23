@@ -1,9 +1,9 @@
 # Структура репозитория Elv Landing
 
-Срез: 21.11.2026. Stage 84. Коммит: `f6bcb87`.
+Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
 
-Отслеживаемые файлы (`git ls-files`), всего 523.
-`demo-static` — 125 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 572.
+`demo-static` — 171 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -77,6 +77,7 @@
 - `plugins/elv/kit/classes/Prices.php`
 - `plugins/elv/kit/classes/Rss.php`
 - `plugins/elv/kit/classes/Search.php`
+- `plugins/elv/kit/classes/SearchConfig.php`
 - `plugins/elv/kit/classes/SecurityHeaders.php`
 - `plugins/elv/kit/classes/Seo.php`
 - `plugins/elv/kit/classes/Sitemap.php`
@@ -278,6 +279,7 @@
 - `tools/check-php.mjs`
 - `tools/check-plans.mjs`
 - `tools/check-plans.php`
+- `tools/check-promises.mjs`
 - `tools/check-seo.mjs`
 - `tools/check-urls.mjs`
 - `tools/export-blog-articles.php`
@@ -341,6 +343,7 @@
 - `docs/html/профиль клиента и чат тикет системы.txt`
 - `docs/html/шаблонный конструктор или готовое решение на продажу аренду.html`
 - `docs/prices.md`
+- `docs/production-deploy.md`
 - `docs/qa/README.md`
 - `docs/qa/firefox-360-blog-article.png`
 - `docs/qa/firefox-360-blog-tech.png`

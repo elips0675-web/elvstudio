@@ -1,6 +1,6 @@
 # Проверки, доки и аудит приватности
 
-Срез: 21.11.2026. Stage 84. Коммит: `f6bcb87`.
+Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -43,13 +43,29 @@ $refusal = Chat::answer('хуй');
 $check($refusal['answer'] === TextFilter::REFUSAL, 'profanity refusal is not returned');
 $check($refusal['sources'] === [], 'profanity refusal must not expose search sources');
 $check($refusal['rejected'] === true, 'profanity message must be rejected');
+$check(($refusal['hide_user'] ?? false) === true, 'profanity must hide the user bubble');
 
 foreach (['абырвалг', 'фывап', 'абырвалг абырвалг', 'абырвалг оплата', 'фывап тарифы'] as $nonsense) {
     $reply = Chat::answer($nonsense);
     $check($reply['rejected'] === true, 'nonsense message is not rejected: ' . $nonsense);
     $check(str_contains($reply['answer'], 'Не понял'), 'nonsense answer is missing: ' . $nonsense);
     $check($reply['sources'] === [], 'nonsense answer must not expose sources: ' . $nonsense);
+    $check(($reply['hide_user'] ?? false) === false, 'nonsense must keep the user bubble: ' . $nonsense);
 }
+
+foreach (['nginx', 'webhook', 'stripe', 'телеграм', 'вебхук', 'как настроить nginx', 'stripe оплата'] as $term) {
+    $reply = Chat::answer($term);
+    $check($reply['rejected'] === false, 'technical term is rejected: ' . $term);
+    $check(($reply['hide_user'] ?? false) === false, 'technical term hides the user bubble: ' . $term);
+}
+
+$telegram = Chat::answer('телеграм');
+$check(
+    mb_stripos($telegram['answer'], 'e-mail') !== false
+    || mb_stripos($telegram['answer'], 'telegram') !== false
+    || mb_stripos($telegram['answer'], 'почт') !== false,
+    'telegram request does not return contacts'
+);
 
 $crowdfunding = Chat::answer('краудфандинг');
 $check($crowdfunding['rejected'] === false, 'known off-site term is rejected: краудфандинг');
@@ -902,15 +918,21 @@ class SecurityHeaders
 
 # Поиск по сайту и блогу
 
-Дата среза: 18.11.2026 (Stage 59).
+Дата среза: 18.11.2026 (Stage 59), обновлено 23.11.2026.
 
 ## Что сделано
 
-- `/search/` — страница поиска по 27 страницам и 67 статьям блога.
+- `/search/` — страница поиска по 27 страницам и 112 статьям блога.
 - В шапке каждой страницы — кнопка поиска; форма открывается в `<dialog>`.
 - Индекс: `GET /search-index.json`, собирается из `Classes\Search`; внутри
   одного HTTP-запроса индекс кэшируется статически, `Search::flush()` сбрасывает
   кэш в тестах.
+- Словари поиска живут в одном месте — `Classes\SearchConfig`: стоп-слова,
+  группы синонимов и окончания. Серверный `Search` и клиентский `search.js`
+  читают их оттуда; страница `/search/` отдаёт словари JSON-атрибутом
+  `data-search-config`, поэтому правка словаря не требует второй правки в JS.
+  Если атрибута нет (старая кэшированная страница), поиск работает по точным
+  словам без синонимов и основ.
 - Консультант ищет по тому же индексу: явный запрос («найди статью…») и
   запасной вариант, когда готового ответа нет, возвращают до трёх ссылок.
 - Фильтр грубых слов `TextFilter` стоит до поиска: сообщение с матом не
@@ -919,7 +941,7 @@ class SecurityHeaders
   проходят, а `fuck`, `fucking`, `bitches`, `xyй` и `х у й` блокируются.
 - `/sitemap/` — человеческая карта сайта: три группы разделов, услуги,
   покупка и контакты, правовые документы; блог показан шестью свежими
-  статьями и рубриками, а не плоским списком 67 статей. Над блоками есть
+  статьями и рубриками, а не плоским списком 112 статей. Над блоками есть
   якорная навигация `#sitemap-site`, `#sitemap-services`, `#sitemap-modules`,
   `#sitemap-buy`, `#sitemap-legal`, `#sitemap-blog`.
 - В JSON-LD `WebSite` `SearchAction` ведёт на `/search/?q=...`, а не на
@@ -944,6 +966,7 @@ class SecurityHeaders
 | Файл | Роль |
 |---|---|
 | `plugins/elv/kit/classes/Search.php` | индекс страниц и статей, кэш, нормализация, основы слов, ранжирование |
+| `plugins/elv/kit/classes/SearchConfig.php` | стоп-слова, группы синонимов и окончания — один источник для PHP и JS |
 | `plugins/elv/kit/classes/Chat.php` | ответы Консультанта, поиск и массив `sources` |
 | `plugins/elv/kit/classes/Http/ChatController.php` | HTTP-ответ Консультанта, общий контракт `sources` и лимит 15 сообщений в минуту на сессию |
 | `plugins/elv/kit/assets/widget.js` | рендер ответа и ссылок Консультанта |
@@ -953,7 +976,7 @@ class SecurityHeaders
 | `themes/elv-studio/pages/sitemap.htm` | сгруппированная карта сайта, якоря и ссылки на поиск |
 | `plugins/elv/kit/classes/Seo.php` | JSON-LD `WebSite`/`SearchAction`, `Organization.logo`, `FAQPage` |
 | `plugins/elv/kit/classes/Sitemap.php` | XML-sitemap без `hidden`-страниц |
-| `themes/elv-studio/assets/js/search.js` | загрузка индекса, поиск, основы, фильтр, пагинация, подсветка, `history.replaceState` |
+| `themes/elv-studio/assets/js/search.js` | загрузка индекса и словарей из `data-search-config`, поиск, основы, фильтр, пагинация, подсветка, `history.replaceState` |
 | `themes/elv-studio/assets/css/search.css` | стили страницы; подключается только на `/search/` |
 | `themes/elv-studio/partials/header.htm` | кнопка и `<dialog>` поиска |
 | `themes/elv-studio/assets/js/app.js` | открытие/закрытие диалога |
@@ -963,18 +986,20 @@ class SecurityHeaders
 `description` (начало анонса), `text` (первые 800 символов тела без HTML),
 `keywords` (рубрика, теги, аудитория), `meta` (рубрика и дата). Полное тело
 статей в индекс не попадает: это держит страницу лёгкой и не раздувает
-`demo-static`. На Stage 59 индекс: 94 записи, 143,5 КБ JSON, 35,6 КБ gzip.
+`demo-static`. На 23.11.2026 индекс: 139 записей (27 страниц и 112 статей),
+234,9 КБ JSON.
 
 ## Как ищет
 
 1. Запрос приводится к нижнему регистру, `ё` → `е`, пунктуация заменяется
    пробелами.
 2. Слова короче двух символов и служебные слова (`и`, `в`, `на`, `для`…)
-   отбрасываются.
+   отбрасываются; список служебных слов — из `SearchConfig::stopWords()`.
 3. Для слова строятся простые основы и синонимы: `оплата/оплаты/оплатить`,
    `тариф/тарифы/тарифами`, `статья/статьи/статью`,
    `бронирование/бронирования`, `цена/цены/стоимость`, `сайт/сайты/лендинг`.
-   Левенштейн и внешний морфологический сервис не используются.
+   Группы синонимов и окончания — из `SearchConfig`; те же данные получает
+   `search.js`. Левенштейн и внешний морфологический сервис не используются.
 4. Совпадение всей фразы в заголовке даёт +14; слово в заголовке +7,
    в ключевых словах +5, в описании +3, в начале текста +2, в метаданных +1.
 5. Результаты сортируются по сумме; показываются первые 30, остальные — по
@@ -997,13 +1022,20 @@ class SecurityHeaders
 `/services/`, «записаться на услугу» — в онлайн-запись, «аудит сайта» — в
 `/services/audit/`, «как настроить сайт» — в инструкцию.
 
-Грубость и бессмыслица не остаются в окне чата: ответ получает
-`rejected: true`, а виджет убирает пузырь пользователя и показывает
-вежливую подсказку. Бессмыслица определяется без словаря: слово, которого нет
-в индексе, проверяется на явные признаки набора букв (нет гласных, тройной
-повтор, неестественное окончание). Если в сообщении есть и знакомое слово, и
-такой набор («абырвалг оплата»), ответ тоже отклоняется. «Краудфандинг» —
-известный термин вне индекса и проходит.
+Грубость убирает пузырь пользователя: ответ получает `rejected: true` и
+`hide_user: true`, виджет удаляет сообщение и показывает вежливую подсказку.
+Бессмыслица получает только `rejected: true` — пузырь остаётся, чтобы человек
+видел, что именно не распознали. Бессмыслица определяется без словаря: слово,
+которого нет в индексе, проверяется на явные признаки набора букв (нет гласных,
+тройной повтор, неестественное окончание). Если в сообщении есть и знакомое
+слово, и такой набор («абырвалг оплата»), ответ тоже отклоняется.
+«Краудфандинг» — известный термин вне индекса и проходит.
+
+Латиница не считается опечаткой: `nginx`, `stripe`, `webhook`, `api`, `php`
+проходят как технические термины. Русские англицизмы и техтермины
+(`телеграм`, `вебхук`, `кэш`, `хостинг`, `домен`) перечислены в
+`Chat::TECH_WORDS` и тоже не отклоняются. «Телеграм» попадает в контакты,
+«stripe оплата» — в ветку оплаты.
 
 HTTP-лимит: 15 сообщений в минуту на сессию (16-й — `429`), плюс общий
 `throttle:40,1` по IP в `routes.php`.
@@ -1018,7 +1050,9 @@ HTTP-лимит: 15 сообщений в минуту на сессию (16-й 
 Страница собрана из карточек: «Сайт» (включая `/search/`), «Услуги»,
 «Модули Elv Kit», «Купить и связаться», «Правовое и служебное» и «Блог».
 В блоке блога — шесть последних статей и рубрики с количеством публикаций;
-полный список открывается на `/blog/`, технический — на `/blog/tech/`.
+число материалов считается через `elv_blog_total('all')`, без выборки
+500 записей ради длины. Полный список открывается на `/blog/`, технический —
+на `/blog/tech/`.
 Поисковая страница в XML-sitemap не попадает из-за `noindex`, но в
 человеческой карте ссылка на неё есть. `hidden`-страницы в XML-sitemap не
 попадают.
@@ -1026,12 +1060,11 @@ HTTP-лимит: 15 сообщений в минуту на сессию (16-й 
 ## Проверка
 
 ```bash
-php tools/chat-check.php       # ответы Консультанта, фильтр, бессмыслица
-php tools/search-check.php     # кэш, основы, лимит тела, /pricing/
+php tools/chat-check.php       # ответы Консультанта, фильтр, бессмыслица, техтермины
 php tools/seo-check.php        # пустой FAQPage и Clean-param
 node tools/check-seo.mjs       # живой сайт: JSON-LD, Organization.logo, якоря
 node tools/gate.mjs            # URL, SEO, заголовки, бюджет, сироты, консоль
-node tools/check-console.mjs   # 107 страниц demo-static
+node tools/check-console.mjs   # 171 страница demo-static
 php tools/export-static.php --origin=https://elvstudio.vercel.app
 ```
 
@@ -1450,9 +1483,11 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\OrderService;
 use Elv\Kit\Classes\Prices;
 use Elv\Kit\Models\Price;
 use Elv\Kit\Models\Product;
+use Illuminate\Validation\ValidationException;
 
 function priceFail(string $message): void
 {
@@ -1478,6 +1513,8 @@ function insertVersion(array $row): int
         'created_at' => $now,
         'updated_at' => $now,
     ], $row));
+
+    Prices::flush();
 }
 
 function dropVersion(array $ids): void
@@ -1645,6 +1682,120 @@ try {
         priceFail('Консультант отвечает старой ценой');
     }
 
+    \Illuminate\Support\Facades\Mail::fake();
+
+    $order = (new OrderService())->create([
+        'plan' => 'single',
+        'customer_name' => 'price-check',
+        'email' => 'price-check@example.com',
+        'ip' => '203.0.113.7',
+        'user_agent' => 'price-check-agent/1.0',
+    ], $kit);
+
+    if ((int) $order->amount_cents !== $freshPrice) {
+        priceFail('OrderService создаёт счёт по старой цене: ' . $order->amount_cents . ' вместо ' . $freshPrice);
+    }
+
+    $meta = (array) $order->meta;
+
+    if (($meta['consent_accepted'] ?? null) !== true) {
+        priceFail('в заказе нет отметки согласия с офертой');
+    }
+
+    if (!strtotime((string) ($meta['consent_at'] ?? ''))) {
+        priceFail('в заказе нет времени согласия');
+    }
+
+    if (($meta['consent_ip'] ?? '') !== '203.0.113.7') {
+        priceFail('в заказе не сохранён IP согласия');
+    }
+
+    if (($meta['consent_ua'] ?? '') !== 'price-check-agent/1.0') {
+        priceFail('в заказе не сохранён User-Agent согласия');
+    }
+
+    if (strlen((string) ($meta['terms_version'] ?? '')) !== 12 || $meta['terms_version'] === 'unknown') {
+        priceFail('в заказе нет версии оферты');
+    }
+
+    if (!str_ends_with((string) ($meta['terms_url'] ?? ''), '/terms/')) {
+        priceFail('в заказе нет ссылки на оферту');
+    }
+
+    $bumped = (new OrderService())->create([
+        'plan' => 'single',
+        'bump' => 1,
+        'customer_name' => 'price-check',
+        'email' => 'price-check@example.com',
+    ], $kit);
+
+    if ((int) $bumped->amount_cents !== $freshPrice + 1900) {
+        priceFail('доп. услуга считается не от действующей цены');
+    }
+
+    if ($kit->price_label !== Money::format($freshPrice)) {
+        priceFail('аксессор price_label показывает старую цену');
+    }
+
+    $modelVersion = new Price([
+        'product_slug' => $slug,
+        'plan' => 'single',
+        'price_cents' => $freshPrice + 100,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+        'note' => 'price-check sync',
+    ]);
+    $modelVersion->save();
+
+    if ((int) Product::kit()->fresh()->price_cents !== $freshPrice + 100) {
+        priceFail('сохранение версии не обновило базовую цену карточки');
+    }
+
+    $modelVersion->delete();
+    Prices::flush();
+
+    if ((int) Product::kit()->fresh()->price_cents !== $freshPrice) {
+        priceFail('удаление версии не вернуло базовую цену карточки');
+    }
+
+    $created[] = insertVersion([
+        'price_cents' => $base + 8000,
+        'currency' => 'BYN',
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+    ]);
+
+    if (Prices::current($slug, 'single') !== $freshPrice) {
+        priceFail('версия в чужой валюте применена к текущей');
+    }
+
+    dropVersion($created);
+    $created = [];
+
+    $immutable = new Price([
+        'product_slug' => $slug,
+        'plan' => 'single',
+        'price_cents' => $freshPrice,
+        'valid_from' => $today,
+        'note' => 'price-check immutable',
+    ]);
+    $immutable->save();
+
+    $immutable->note = 'price-check editable';
+    $immutable->is_active = true;
+    $immutable->valid_to = null;
+    $immutable->save();
+
+    $immutable->price_cents = $freshPrice + 1;
+
+    try {
+        $immutable->save();
+        priceFail('модель разрешила изменить цену сохранённой версии');
+    } catch (ValidationException $e) {
+        $immutable->price_cents = $freshPrice;
+    }
+
+    Db::table('elv_kit_price_versions')->where('id', $immutable->id)->delete();
+    Prices::flush();
+
     dropVersion($created);
     $created = [];
 } finally {
@@ -1767,7 +1918,7 @@ echo 'OK: versions=' . count(Prices::rows())
 
 # Версионность прайса Elv Kit
 
-Дата среза: 18.11.2026 (Stage 60).
+Дата среза: 18.11.2026 (Stage 60), обновлено 23.11.2026.
 
 ## Что сделано
 
@@ -1777,12 +1928,20 @@ echo 'OK: versions=' . count(Prices::rows())
   флаг `is_active`, заметка и автор. Старая версия не переписывается — новая
   цена добавляется новой строкой.
 - Действующую цену выбирает `Classes\Prices`: `/pricing/`, калькулятор,
-  смета-PDF и Консультант читают одно и то же значение.
+  смета-PDF, Консультант, карточки модулей и оформление заказа читают одно и
+  то же значение. Заказ (`OrderService`) считает сумму через
+  `Prices::resolve()`, поэтому счёт в шлюзе совпадает с витриной.
+- Версия в чужой валюте не применяется: `Prices::current()` и
+  `Prices::updatedAt()` сравнивают `currency` строки с `Money::currency()`.
+  После смены валюты старые цифры не выдаются за новые.
+- История защищена: `Price::beforeUpdate()` запрещает менять `price_cents`,
+  `plan`, `product_slug`, `currency` и `valid_from` у сохранённой версии.
+  Редактируются только `valid_to`, `is_active` и `note`.
 - В админке появился раздел «Прайс» (`/admin/elv/kit/prices`): список версий,
   создание, правка, удаление. Право — `elv.kit.prices`, иконка `icon-money`.
 - Дата «Цены обновлены» на `/pricing/` и `/calculator/` берётся из прайса:
-  это самый свежий `valid_from` активной версии (markup-функция
-  `elv_prices_updated_at()`). Поле «Дата актуальности цен» в
+  это самый свежий `valid_from` активной версии в текущей валюте
+  (markup-функция `elv_prices_updated_at()`). Поле «Дата актуальности цен» в
   `Elv Kit → Настройки` осталось запасным — на случай, когда версий ещё нет;
   последний запасной вариант в коде — литерал `17.11.2026`, чтобы в вёрстке
   никогда не появлялась пустая дата.
@@ -1795,15 +1954,17 @@ echo 'OK: versions=' . count(Prices::rows())
 
 1. Отбрасываются строки с `is_active = false`.
 2. Отбрасываются строки другого товара (`product_slug`) и другого тарифа.
-3. Отбрасывается строка, у которой `valid_from > D` (цена ещё не началась).
-4. Отбрасывается строка, у которой `valid_to` заполнен и `valid_to < D`.
+3. Отбрасывается строка в валюте, отличной от `Money::currency()`.
+4. Отбрасывается строка, у которой `valid_from > D` (цена ещё не началась).
+5. Отбрасывается строка, у которой `valid_to` заполнен и `valid_to < D`.
    `valid_to = D` — ещё действует: последний день включён.
-5. Из оставшихся побеждает строка с самым большим `valid_from`; при равных
+6. Из оставшихся побеждает строка с самым большим `valid_from`; при равных
    датах начала — запись с большим `id` (более поздняя).
 
 Если действующей версии нет, цена берётся из карточки товара
-(`Product::planPrice()`) — тем же полем, по которому исторически считается
-заказ. Поэтому витрина не ломается ни до миграции, ни при пустом прайсе.
+(`Product::planPrice()`) — запасной источник для пустого прайса и модулей.
+Витрина, заказ и карточки модулей вызывают `Prices::resolve()`, поэтому
+фолбэк виден везде одинаково.
 
 `Prices::rows()` читает таблицу один раз на запрос и кэширует результат;
 `Prices::flush()` сбрасывает кэш (нужен в проверках и после правки версий из
@@ -1812,29 +1973,34 @@ echo 'OK: versions=' . count(Prices::rows())
 
 ## Границы этапа
 
-- Версионируются только три тарифа Kit. Цены модулей (`price_cents` в
-  `elv_kit_products`) остаются в карточке товара: их читают и витрина, и
-  оформление заказа, а отдельного прайса модулей в этом этапе нет.
-- Заказ (`OrderService`) по-прежнему считает сумму по `Product.price_cents`.
-  Версия прайса меняет витрину, калькулятор и смету, но не переписывает уже
-  существующие заказы и не подменяет цену в момент оплаты.
+- Версионируются только три тарифа Kit: форма админки создаёт версии с
+  `product_slug = elv-kit`. `Prices::resolve()` умеет читать версии любого
+  товара, поэтому цены модулей можно версионировать позже, без правки
+  шаблонов: карточка модуля остаётся фолбэком.
+- Заказ (`OrderService`) считает сумму по `Prices::resolve()`, той же
+  функцией, что и витрина. Уже созданные заказы не переписываются: в них
+  хранится `amount_cents` на момент оформления.
 - Налоги, скидки и курсы валют не моделируются: валюта — одна на сайт
   (`Settings::get('currency')`, по умолчанию `USD`), налог не начисляется.
+  Версии в другой валюте остаются в истории, но не участвуют в выборе.
 - Лог изменений — это сами строки версий (кто и когда создал, заметка).
   Отдельной таблицы аудита правок нет: строка версии после создания не
-  редактируется по смыслу, новая цена — новая строка.
+  редактируется, новая цена — новая строка.
 
 ## Архитектура
 
 | Файл | Роль |
 |---|---|
 | `plugins/elv/kit/updates/create_price_versions.php` | таблица `elv_kit_price_versions`, индексы, сид трёх версий из каталога |
-| `plugins/elv/kit/models/Price.php` | модель версии: белый список тарифов, правила дат, `beforeValidate()`, аксессоры для админки |
-| `plugins/elv/kit/classes/Prices.php` | выбор действующей цены, дата обновления, кэш на запрос |
+| `plugins/elv/kit/models/Price.php` | модель версии: белый список тарифов, правила дат, `beforeValidate()`, `beforeUpdate()` — защита истории, аксессоры для админки |
+| `plugins/elv/kit/classes/Prices.php` | выбор действующей цены, фильтр валюты, дата обновления, кэш на запрос |
 | `plugins/elv/kit/classes/Catalog.php` | `plans()` — тарифы с ценами из `Prices::resolve()` |
-| `plugins/elv/kit/classes/Calculator.php` | `data()` — наборы, цены и `prices_updated_at` из прайса |
+| `plugins/elv/kit/classes/Calculator.php` | `data()` — наборы, цены тарифов и модулей, `prices_updated_at` из прайса |
+| `plugins/elv/kit/classes/OrderService.php` | сумма заказа через `Prices::resolve()` |
+| `plugins/elv/kit/classes/Seo.php` | `Product.offer` и `llms.txt` — цена через `Prices::resolve()` |
 | `plugins/elv/kit/classes/Chat.php` | ответ про тарифы берёт цены из `Catalog::plans()` |
-| `plugins/elv/kit/models/Product.php` | `planPrice()` — запасной источник, когда версий нет |
+| `plugins/elv/kit/models/Product.php` | `planPrice()` — запасной источник; аксессоры `price`/`price_label` — из `Prices::resolve()` |
+| `plugins/elv/kit/Plugin.php` | `elv_price()` для шаблонов, `elv_prices_updated_at()`, меню «Прайс» |
 | `plugins/elv/kit/controllers/Prices.php` | админка: `ListController` + `FormController`, право `elv.kit.prices` |
 | `plugins/elv/kit/controllers/prices/config_list.yaml` | сортировка по `created_at`, поиск по заметке |
 | `plugins/elv/kit/controllers/prices/config_form.yaml` | форма создания и правки версии |
@@ -1851,6 +2017,8 @@ echo 'OK: versions=' . count(Prices::rows())
    действия; дату окончания можно оставить пустой.
 3. Сохранить. Новая версия начинает действовать с указанной даты, старая
    остаётся в истории; если у старой задан `valid_to`, она закрывается сама.
+   После сохранения цена, тариф, валюта и дата начала не редактируются: форма
+   правки разрешает только `valid_to`, `is_active` и заметку.
 
 Если цену нужно откатить — не удаляйте историю: создайте новую версию с
 прежней ценой или выключите ошибочную (`is_active`). Удаление строки тоже
@@ -1873,6 +2041,11 @@ php tools/price-check.php
 - цена другого товара попадает в тариф El Kit;
 - действующая версия не доходит до `Catalog::plans()`, `Calculator::data()`,
   сметы (`Calculator::estimate()`/`quote()`) или ответа Консультанта;
+- `OrderService` создаёт счёт по старой цене, а не по действующей версии;
+- версия в чужой валюте применяется к текущей;
+- `Price::beforeUpdate()` разрешает изменить цену, тариф, валюту, товар или
+  дату начала сохранённой версии;
+- аксессор `price_label` показывает старое значение;
 - дата цен не следует за действующей версией;
 - новая версия не проходит валидацию без `product_slug` (значит,
   `beforeValidate()` не подставляет товар);
