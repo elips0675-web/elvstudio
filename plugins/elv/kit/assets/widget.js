@@ -214,7 +214,7 @@
                     typing.row.remove();
 
                     if (result.status === 200 && result.data && result.data.ok) {
-                        if (result.data.rejected) user.row.remove();
+                        if (result.data.hide_user) user.row.remove();
                         bubble('bot', result.data.answer || '');
 
                         if (result.data.sources) result.data.sources.forEach(addLink);

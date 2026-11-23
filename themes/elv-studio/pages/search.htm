@@ -8,7 +8,7 @@ meta_robots = "noindex, follow"
 {% set query = elv_query('q') %}
 {% set crumbs = elv_breadcrumbs() %}
 
-<main id="main" data-search-index="/search-index.json">
+<main id="main" data-search-index="/search-index.json" data-search-config="{{ elv_search_config() }}">
     <section class="page-hero">
         <div class="container">
             {% partial 'breadcrumbs' crumbs=crumbs %}

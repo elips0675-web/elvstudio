@@ -37,13 +37,29 @@ $refusal = Chat::answer('хуй');
 $check($refusal['answer'] === TextFilter::REFUSAL, 'profanity refusal is not returned');
 $check($refusal['sources'] === [], 'profanity refusal must not expose search sources');
 $check($refusal['rejected'] === true, 'profanity message must be rejected');
+$check(($refusal['hide_user'] ?? false) === true, 'profanity must hide the user bubble');
 
 foreach (['абырвалг', 'фывап', 'абырвалг абырвалг', 'абырвалг оплата', 'фывап тарифы'] as $nonsense) {
     $reply = Chat::answer($nonsense);
     $check($reply['rejected'] === true, 'nonsense message is not rejected: ' . $nonsense);
     $check(str_contains($reply['answer'], 'Не понял'), 'nonsense answer is missing: ' . $nonsense);
     $check($reply['sources'] === [], 'nonsense answer must not expose sources: ' . $nonsense);
+    $check(($reply['hide_user'] ?? false) === false, 'nonsense must keep the user bubble: ' . $nonsense);
 }
+
+foreach (['nginx', 'webhook', 'stripe', 'телеграм', 'вебхук', 'как настроить nginx', 'stripe оплата'] as $term) {
+    $reply = Chat::answer($term);
+    $check($reply['rejected'] === false, 'technical term is rejected: ' . $term);
+    $check(($reply['hide_user'] ?? false) === false, 'technical term hides the user bubble: ' . $term);
+}
+
+$telegram = Chat::answer('телеграм');
+$check(
+    mb_stripos($telegram['answer'], 'e-mail') !== false
+    || mb_stripos($telegram['answer'], 'telegram') !== false
+    || mb_stripos($telegram['answer'], 'почт') !== false,
+    'telegram request does not return contacts'
+);
 
 $crowdfunding = Chat::answer('краудфандинг');
 $check($crowdfunding['rejected'] === false, 'known off-site term is rejected: краудфандинг');

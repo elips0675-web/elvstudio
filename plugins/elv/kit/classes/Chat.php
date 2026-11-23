@@ -23,6 +23,27 @@ class Chat
     ];
 
     /**
+     * TECH_WORDS — техтермины и англицизмы, которые не опечатки.
+     *
+     * Латиница отсекается отдельно в `looksBroken()`, а этот список нужен,
+     * чтобы слово считалось знакомым и вопрос не уходил в «Не понял запрос».
+     *
+     * @var array<int, string>
+     */
+    protected const TECH_WORDS = [
+        'api', 'ajax', 'apache', 'backup', 'cache', 'cdn', 'cms', 'composer', 'cron',
+        'css', 'docker', 'dns', 'ftp', 'git', 'google', 'hosting', 'html', 'http',
+        'https', 'js', 'json', 'laravel', 'laragon', 'mysql', 'nginx', 'node', 'npm',
+        'october', 'php', 'postgres', 'redis', 'seo', 'smtp', 'sql', 'sqlite', 'ssh',
+        'ssl', 'stripe', 'telegram', 'tls', 'twig', 'url', 'vps', 'webhook', 'yandex',
+        'yaml', 'markdown', 'cloudflare',
+        'апи', 'бэкап', 'бэкенд', 'вебхук', 'вебхуки', 'вебхука', 'виджет', 'джсон',
+        'домен', 'домена', 'домены', 'интеграция', 'кеш', 'кэш', 'лендинг', 'маркетинг',
+        'модуль', 'плагин', 'редирект', 'сервер', 'скрипт', 'смтп', 'ссл', 'телеграм',
+        'телеграмм', 'телеграма', 'трафик', 'фронтенд', 'хостинг', 'шаблон',
+    ];
+
+    /**
      * answer — разбирает вопрос и возвращает ответ для виджета.
      */
     public static function answer(string $message): array
@@ -34,6 +55,7 @@ class Chat
                 null,
                 null,
                 [],
+                true,
                 true
             );
         }
@@ -258,7 +280,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телефон', 'whatsapp', 'написать', 'связ'])) {
+        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать', 'связ'])) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -280,7 +302,7 @@ class Chat
         );
     }
 
-    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null, array $sources = [], bool $rejected = false): array
+    protected static function reply(string $answer, array $chips = [], ?array $link = null, ?string $open = null, array $sources = [], bool $rejected = false, bool $hideUser = false): array
     {
         return [
             'answer' => $answer,
@@ -289,6 +311,7 @@ class Chat
             'open' => $open,
             'sources' => array_values($sources),
             'rejected' => $rejected,
+            'hide_user' => $hideUser,
         ];
     }
 
@@ -363,7 +386,7 @@ class Chat
 
     protected static function isKnownWord(string $word): bool
     {
-        if (in_array($word, static::KNOWN_WORDS, true)) {
+        if (in_array($word, static::KNOWN_WORDS, true) || in_array($word, static::TECH_WORDS, true)) {
             return true;
         }
 
@@ -373,6 +396,11 @@ class Chat
     protected static function looksBroken(string $word): bool
     {
         if (mb_strlen($word) < 4) {
+            return false;
+        }
+
+        // Латиница — технический термин или название, а не русская опечатка.
+        if (preg_match('/^[a-z0-9][a-z0-9._+-]*$/i', $word)) {
             return false;
         }
 

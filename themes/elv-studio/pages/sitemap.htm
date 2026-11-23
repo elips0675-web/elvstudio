@@ -7,7 +7,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
 {% set crumbs = elv_breadcrumbs() %}
 {% set categories = elv_categories('all') %}
 {% set latest = elv_posts(6, null, 'all') %}
-{% set totalPosts = elv_posts(500, null, 'all')|length %}
+{% set totalPosts = elv_blog_total('all') %}
 
 <main id="main">
     <section class="page-hero">

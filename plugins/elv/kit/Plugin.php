@@ -15,6 +15,7 @@ use Elv\Kit\Classes\CompressResponse;
 use Elv\Kit\Classes\Prices;
 use Elv\Kit\Classes\SecurityHeaders;
 use Elv\Kit\Classes\Search;
+use Elv\Kit\Classes\SearchConfig;
 use Elv\Kit\Classes\Seo;
 use Elv\Kit\Classes\Slots;
 use Elv\Kit\Models\Post;
@@ -465,6 +466,9 @@ class Plugin extends PluginBase
                 },
                 'elv_search_json' => function ($items = null) {
                     return Search::json(is_array($items) ? $items : null);
+                },
+                'elv_search_config' => function () {
+                    return SearchConfig::json();
                 },
                 'elv_search' => function ($query, $type = Search::TYPE_ALL, $limit = 20) {
                     return Search::query((string) $query, (string) $type, (int) $limit);
