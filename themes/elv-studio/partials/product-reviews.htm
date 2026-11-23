@@ -1,0 +1,70 @@
+{% if product and elv_reviews_enabled() %}
+    {% set reviews = elv_reviews(product, 20) %}
+    {% set summary = elv_review_summary(product) %}
+
+    <section class="section" id="reviews">
+        <div class="container">
+            {% if elv_query('review') == 'sent' %}
+                <div class="alert alert--ok mb-24" role="status">
+                    Спасибо! Отзыв отправлен на проверку — опубликуем после модерации.
+                </div>
+            {% endif %}
+
+            <div class="section-head">
+                <span class="eyebrow">Отзывы</span>
+                <h2>Что говорят покупатели</h2>
+                {% if summary.count %}
+                    <p class="review-summary">
+                        {% partial 'stars' rating=summary.average %}
+                        <b>{{ summary.average }}</b> из 5 · {{ summary.count }}
+                        {{ summary.count == 1 ? 'отзыв' : (summary.count < 5 ? 'отзыва' : 'отзывов') }}
+                    </p>
+                {% else %}
+                    <p>Отзывов пока нет. Ссылку на отзыв присылаем после оплаты заказа.</p>
+                {% endif %}
+            </div>
+
+            <div class="community__list">
+                {% for review in reviews %}
+                    <article class="review">
+                        <header class="review__head">
+                            {% partial 'stars' rating=review.rating %}
+                            <div>
+                                <b>{{ review.display_name }}</b>
+                                {% if review.is_verified %}
+                                    <span class="badge badge--accent">{{ elv_icon('check')|raw }} Покупка подтверждена</span>
+                                {% endif %}
+                            </div>
+                            <time class="muted">{{ review.published_at ? review.published_at|date('d.m.Y') : '' }}</time>
+                        </header>
+
+                        {% if review.title %}
+                            <h3 class="review__title">{{ review.title }}</h3>
+                        {% endif %}
+
+                        <div class="review__text">{{ review.text|elv_text|raw }}</div>
+
+                        {% if review.pros %}
+                            <p class="review__pros"><b>Плюсы:</b> {{ review.pros }}</p>
+                        {% endif %}
+
+                        {% if review.cons %}
+                            <p class="review__cons"><b>Минусы:</b> {{ review.cons }}</p>
+                        {% endif %}
+
+                        {% if review.reply %}
+                            <div class="review__reply">
+                                <b>Ответ магазина</b>
+                                <div>{{ review.reply|elv_text|raw }}</div>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% else %}
+                    <div class="empty">
+                        <p>Пока нет опубликованных отзывов.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}

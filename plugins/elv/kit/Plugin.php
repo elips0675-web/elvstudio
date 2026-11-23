@@ -48,6 +48,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('elv.kit.reset', \Elv\Kit\Console\ResetCommand::class);
         $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
         $this->registerConsoleCommand('elv.kit.remind', \Elv\Kit\Console\RemindCommand::class);
+        $this->registerConsoleCommand('elv.kit.review', \Elv\Kit\Console\ReviewCommand::class);
     }
 
     public function registerSettings()
@@ -91,6 +92,14 @@ class Plugin extends PluginBase
             ],
             'elv.kit.tickets' => [
                 'label' => 'Обращения в поддержку',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.questions' => [
+                'label' => 'Вопросы покупателей',
+                'tab' => 'Elv Kit',
+            ],
+            'elv.kit.reviews' => [
+                'label' => 'Отзывы покупателей',
                 'tab' => 'Elv Kit',
             ],
             'elv.kit.subscribers' => [
@@ -166,6 +175,18 @@ class Plugin extends PluginBase
                         'url' => \Backend::url('elv/kit/tickets'),
                         'permissions' => ['elv.kit.tickets'],
                     ],
+                    'questions' => [
+                        'label' => 'Вопросы',
+                        'icon' => 'icon-question-circle',
+                        'url' => \Backend::url('elv/kit/questions'),
+                        'permissions' => ['elv.kit.questions'],
+                    ],
+                    'reviews' => [
+                        'label' => 'Отзывы',
+                        'icon' => 'icon-star',
+                        'url' => \Backend::url('elv/kit/reviews'),
+                        'permissions' => ['elv.kit.reviews'],
+                    ],
                     'subscribers' => [
                         'label' => 'Подписчики',
                         'icon' => 'icon-users',
@@ -217,6 +238,7 @@ class Plugin extends PluginBase
     {
         $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
         $schedule->command('elv:kit:remind')->hourly()->withoutOverlapping();
+        $schedule->command('elv:kit:review')->dailyAt('10:10')->withoutOverlapping();
         $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
     }
 
@@ -554,6 +576,39 @@ class Plugin extends PluginBase
                     return $license instanceof \Elv\Kit\Models\License
                         ? $account->nextUnbindAt($license)
                         : null;
+                },
+                'elv_qa_enabled' => function () {
+                    return \Elv\Kit\Classes\Questions::enabled();
+                },
+                'elv_questions' => function ($product, $limit = 20) {
+                    return $product instanceof Product
+                        ? \Elv\Kit\Classes\Questions::published($product, (int) $limit)
+                        : collect();
+                },
+                'elv_question_count' => function ($product) {
+                    return $product instanceof Product
+                        ? \Elv\Kit\Classes\Questions::count($product)
+                        : 0;
+                },
+                'elv_reviews_enabled' => function () {
+                    return \Elv\Kit\Classes\Reviews::enabled();
+                },
+                'elv_reviews' => function ($product, $limit = 20) {
+                    return $product instanceof Product
+                        ? \Elv\Kit\Classes\Reviews::approved($product, (int) $limit)
+                        : collect();
+                },
+                'elv_review_summary' => function ($product) {
+                    return $product instanceof Product
+                        ? \Elv\Kit\Classes\Reviews::summary($product)
+                        : ['count' => 0, 'average' => 0.0];
+                },
+                'elv_review_order' => function ($token) {
+                    return (new \Elv\Kit\Classes\Reviews())->orderByToken((string) $token);
+                },
+                'elv_review_exists' => function ($order) {
+                    return $order instanceof \Elv\Kit\Models\Order
+                        && (new \Elv\Kit\Classes\Reviews())->existsFor($order);
                 },
             ],
             'filters' => [

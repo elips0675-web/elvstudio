@@ -1,0 +1,61 @@
+fields:
+    id:
+        label: '#'
+        disabled: true
+        span: left
+    created_at:
+        label: 'Получен'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    product:
+        label: 'Продукт'
+        type: relation
+        nameFrom: name
+        disabled: true
+        span: left
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: right
+        options:
+            new: 'Новый'
+            published: 'Опубликован'
+            rejected: 'Отклонён'
+    name:
+        label: 'Автор'
+        disabled: true
+        span: left
+    email:
+        label: 'E-mail'
+        disabled: true
+        span: right
+    question:
+        label: 'Вопрос'
+        type: textarea
+        size: large
+        disabled: true
+    answer:
+        label: 'Ответ'
+        type: textarea
+        size: large
+        comment: 'Ответ публикует вопрос: он появится на странице продукта после сохранения.'
+    answered_by:
+        label: 'Кто ответил'
+        span: left
+    answered_at:
+        label: 'Когда ответили'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    is_pinned:
+        label: 'Закрепить сверху'
+        type: switch
+        span: left
+    sort_order:
+        label: 'Порядок'
+        type: number
+        span: right
+        comment: 'Меньше — выше, если вопрос не закреплён.'

@@ -1,0 +1,23 @@
+<?= Form::open(['class' => 'layout']) ?>
+    <div class="layout-row">
+        <div class="layout-cell">
+            <?= $this->formRender() ?>
+        </div>
+    </div>
+    <input type="hidden" name="id" value="<?= (int) $formModel->id ?>">
+    <div class="form-buttons">
+        <button
+            type="submit"
+            class="btn btn-primary oc-icon-check"
+            data-request="onPublish"
+            data-request-data="id: <?= (int) $formModel->id ?>"
+            data-stripe-load-indicator>Опубликовать ответ</button>
+        <button
+            type="submit"
+            class="btn btn-default oc-icon-ban"
+            data-request="onReject"
+            data-request-data="id: <?= (int) $formModel->id ?>"
+            data-request-confirm="Снять вопрос с витрины?">Отклонить</button>
+        <a class="btn btn-link" href="<?= Backend::url('elv/kit/questions') ?>">К списку</a>
+    </div>
+<?= Form::close() ?>

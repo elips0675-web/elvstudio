@@ -1,0 +1,28 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    product:
+        label: 'Продукт'
+        relation: product
+        select: name
+        searchable: true
+    author_name:
+        label: 'Автор'
+        searchable: true
+    rating:
+        label: 'Оценка'
+        type: number
+    status:
+        label: 'Статус'
+        type: selectable
+        select: status
+        options:
+            pending: 'На модерации'
+            approved: 'Одобрен'
+            rejected: 'Отклонён'
+    created_at:
+        label: 'Получен'
+        type: datetime
+        sortable: true

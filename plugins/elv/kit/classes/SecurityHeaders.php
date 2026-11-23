@@ -82,7 +82,7 @@ class SecurityHeaders
         $response->headers->remove('X-Powered-By');
 
         // Живой предпросмотр и кабинет не индексируются и не кэшируются.
-        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*')) {
+        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*', 'review', 'review/*')) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
             $response->headers->set('Cache-Control', 'no-store, max-age=0, private');
         }

@@ -1,0 +1,4 @@
+name: 'Вопрос'
+modelClass: Elv\Kit\Models\Question
+form: $/elv/kit/models/question/fields.yaml
+defaultRedirect: elv/kit/questions

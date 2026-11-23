@@ -306,6 +306,12 @@ class Seo
 
         if (static::$product) {
             $graph[] = static::productNode(static::$product);
+
+            $qa = static::qaNode(static::$product);
+
+            if ($qa !== []) {
+                $graph[] = $qa;
+            }
         }
 
         $crumbs = static::breadcrumbs();
@@ -434,7 +440,51 @@ class Seo
             'availability' => 'https://schema.org/InStock',
         ];
 
+        // Рейтинг — только по одобренным отзывам: выдуманная оценка в
+        // микроразметке расходится с видимым блоком и является дефектом.
+        $aggregate = Reviews::aggregate($product);
+
+        if ($aggregate !== null) {
+            $node['aggregateRating'] = $aggregate;
+        }
+
         return $node;
+    }
+
+    /**
+     * qaNode — вопросы и ответы продукта.
+     *
+     * Один вопрос — `QAPage` (страница отвечает на один вопрос), несколько —
+     * `FAQPage`: так разметка соответствует тому, что видит посетитель.
+     */
+    protected static function qaNode(Product $product): array
+    {
+        $items = [];
+
+        foreach (Questions::published($product, 20) as $question) {
+            $items[] = [
+                '@type' => 'Question',
+                'name' => (string) $question->question,
+                'text' => (string) $question->question,
+                'answerCount' => 1,
+                'acceptedAnswer' => static::withoutEmpty([
+                    '@type' => 'Answer',
+                    'text' => (string) $question->answer,
+                    'dateCreated' => $question->answered_at ? $question->answered_at->format('c') : null,
+                ]),
+                'author' => ['@type' => 'Person', 'name' => (string) $question->display_name],
+            ];
+        }
+
+        if ($items === []) {
+            return [];
+        }
+
+        return [
+            '@type' => count($items) === 1 ? 'QAPage' : 'FAQPage',
+            '@id' => static::canonical() . '#qa',
+            'mainEntity' => count($items) === 1 ? $items[0] : $items,
+        ];
     }
 
     protected static function articleNode(Post $post): array
@@ -479,6 +529,7 @@ class Seo
             'Disallow: /api/',
             'Disallow: /account/',
             'Disallow: /tickets/',
+            'Disallow: /review/',
             'Disallow: /order/success/',
             'Disallow: /download/',
             'Disallow: /*?q=',

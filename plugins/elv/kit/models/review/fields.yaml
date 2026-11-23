@@ -1,0 +1,77 @@
+fields:
+    id:
+        label: '#'
+        disabled: true
+        span: left
+    created_at:
+        label: 'Получен'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right
+    product:
+        label: 'Продукт'
+        type: relation
+        nameFrom: name
+        disabled: true
+        span: left
+    order:
+        label: 'Заказ'
+        type: relation
+        nameFrom: order_no
+        disabled: true
+        span: right
+    author_name:
+        label: 'Автор'
+        span: left
+        comment: 'На витрине показывается как «Имя Ф.».'
+    rating:
+        label: 'Оценка'
+        type: dropdown
+        span: right
+        options:
+            5: '5 — отлично'
+            4: '4 — хорошо'
+            3: '3 — нормально'
+            2: '2 — плохо'
+            1: '1 — очень плохо'
+    title:
+        label: 'Заголовок'
+        span: left
+    is_verified:
+        label: 'Покупка подтверждена'
+        type: switch
+        span: right
+    text:
+        label: 'Отзыв'
+        type: textarea
+        size: large
+    pros:
+        label: 'Плюсы'
+        type: textarea
+        size: small
+        span: left
+    cons:
+        label: 'Минусы'
+        type: textarea
+        size: small
+        span: right
+    reply:
+        label: 'Ответ магазина'
+        type: textarea
+        size: small
+        comment: 'Необязательный ответ: показывается под отзывом.'
+    status:
+        label: 'Статус'
+        type: dropdown
+        span: left
+        options:
+            pending: 'На модерации'
+            approved: 'Одобрен'
+            rejected: 'Отклонён'
+    published_at:
+        label: 'Опубликован'
+        type: datepicker
+        mode: datetime
+        disabled: true
+        span: right

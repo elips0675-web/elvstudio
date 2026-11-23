@@ -1,0 +1,4 @@
+name: 'Отзыв'
+modelClass: Elv\Kit\Models\Review
+form: $/elv/kit/models/review/fields.yaml
+defaultRedirect: elv/kit/reviews

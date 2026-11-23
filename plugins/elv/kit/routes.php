@@ -9,6 +9,8 @@ use Elv\Kit\Classes\Http\LicenseController;
 use Elv\Kit\Classes\Http\OrderController;
 use Elv\Kit\Classes\Http\PaymentController;
 use Elv\Kit\Classes\Http\QuoteController;
+use Elv\Kit\Classes\Http\QuestionController;
+use Elv\Kit\Classes\Http\ReviewController;
 use Elv\Kit\Classes\Http\SeoController;
 use Elv\Kit\Classes\Http\SubscribeController;
 use Elv\Kit\Classes\Http\TelegramController;
@@ -46,6 +48,13 @@ Route::middleware(['web', 'throttle:10,1'])->group(function () {
     Route::post('tickets/{id}/close', [TicketController::class, 'close'])
         ->where('id', '[0-9]+')
         ->name('elv.kit.ticket.close');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('questions', [QuestionController::class, 'store'])->name('elv.kit.question.store');
+    Route::post('review/{token}', [ReviewController::class, 'store'])
+        ->where('token', '[a-f0-9]{48}')
+        ->name('elv.kit.review.store');
 });
 
 Route::middleware('throttle:60,1')->group(function () {

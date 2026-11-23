@@ -1,0 +1,14 @@
+title: 'Отзывы'
+list: $/elv/kit/models/review/columns.yaml
+modelClass: Elv\Kit\Models\Review
+recordUrl: elv/kit/reviews/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Отзывов пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Автор или текст отзыва'

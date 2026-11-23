@@ -308,3 +308,29 @@ tabs:
             type: switch
             default: false
             comment: 'Письмо администратору на адрес уведомлений из вкладки «Продажи». Расписание — то же, что у клиента.'
+
+        qa_enabled:
+            label: 'Блок «Вопрос-ответ»'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: true
+            comment: 'Форма вопроса на страницах продуктов. Вопрос публикуется только после ответа из админки.'
+        reviews_enabled:
+            label: 'Отзывы покупателей'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: true
+            comment: 'Одобренные отзывы на страницах продуктов и рейтинг в микроразметке.'
+        review_invite_enabled:
+            label: 'Приглашать к отзыву'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: false
+            comment: 'Письмо со ссылкой на отзыв после оплаты. Нужен cron: `php artisan schedule:run` раз в минуту.'
+        review_delay_days:
+            label: 'Через сколько дней'
+            tab: 'Вопросы и отзывы'
+            type: number
+            default: 7
+            comment: 'От 1 до 90 дней после оплаты. Пусто — 7.'
+

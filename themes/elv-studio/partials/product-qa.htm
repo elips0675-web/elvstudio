@@ -1,0 +1,95 @@
+{% if product and elv_qa_enabled() %}
+    {% set questions = elv_questions(product, 20) %}
+    {% set qaCount = elv_question_count(product) %}
+
+    <section class="section section--paper" id="qa">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопрос-ответ</span>
+                <h2>Вопросы о {{ product.name }}</h2>
+                <p>
+                    {% if qaCount %}
+                        {{ qaCount }} {{ qaCount == 1 ? 'вопрос' : (qaCount < 5 ? 'вопроса' : 'вопросов') }} с ответами.
+                    {% else %}
+                        Пока вопросов нет. Задайте первый — ответ появится здесь после проверки.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="community">
+                <div class="community__list">
+                    {% for question in questions %}
+                        <article class="qa">
+                            <h3 class="qa__title">{{ question.question }}</h3>
+                            <div class="qa__answer">{{ question.answer|elv_text|raw }}</div>
+                            <p class="qa__meta">
+                                {{ question.display_name }}
+                                {% if question.answered_at %}
+                                    · {{ question.answered_at|date('d.m.Y') }}
+                                {% endif %}
+                            </p>
+                        </article>
+                    {% else %}
+                        <div class="empty">
+                            <p>Вопросов пока нет. Ваш вопрос может стать первым.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <form
+                    class="form card community__form"
+                    id="qa-form"
+                    method="post"
+                    action="{{ url('/questions') }}"
+                    data-elv-form
+                    data-success="Вопрос отправлен. Ответ появится на этой странице после проверки.">
+                    {{ elv_csrf()|raw }}
+                    <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <input type="hidden" name="product" value="{{ product.slug }}">
+
+                    <h3>Задать вопрос</h3>
+
+                    {% if elv_flash('elv_success') %}
+                        <div class="alert alert--ok" role="status">{{ elv_flash('elv_success') }}</div>
+                    {% endif %}
+
+                    {% if elv_errors() %}
+                        <div class="alert alert--err" role="alert">
+                            {% for field, messages in elv_errors() %}
+                                {{ messages|first }}
+                                {% if not loop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form__row">
+                        <div class="field">
+                            <label for="qa-name">Имя</label>
+                            <input class="input" id="qa-name" type="text" name="name" required maxlength="160" autocomplete="name" value="{{ elv_old('name') }}">
+                        </div>
+                        <div class="field">
+                            <label for="qa-email">E-mail</label>
+                            <input class="input" id="qa-email" type="email" name="email" required maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
+                            <span class="hint">Не публикуется: нужен, чтобы ответить лично.</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="qa-question">Вопрос</label>
+                        <textarea class="textarea" id="qa-question" name="question" required minlength="10" maxlength="3000" placeholder="Что важно уточнить перед покупкой">{{ elv_old('question') }}</textarea>
+                    </div>
+
+                    <label class="check">
+                        <input type="checkbox" name="consent" value="1" required>
+                        <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                    </label>
+
+                    <div>
+                        <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить вопрос</button>
+                    </div>
+                    <p class="hint">Вопрос публикуется с ответом и без e-mail. Имя на сайте — «Имя Ф.».</p>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endif %}

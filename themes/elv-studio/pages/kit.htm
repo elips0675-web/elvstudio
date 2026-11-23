@@ -133,6 +133,9 @@ meta_description = "Готовый сайт для бизнеса: страни�
                 </div>
             </div>
         </section>
+
+        {% partial 'product-qa' product=kit %}
+        {% partial 'product-reviews' product=kit %}
     {% else %}
         <section class="section">
             <div class="container">

@@ -1,0 +1,31 @@
+columns:
+    id:
+        label: '#'
+        type: number
+        sortable: true
+    product:
+        label: 'Продукт'
+        relation: product
+        select: name
+        searchable: true
+    name:
+        label: 'Автор'
+        searchable: true
+    email:
+        label: 'E-mail'
+        searchable: true
+    question:
+        label: 'Вопрос'
+        type: text
+    status:
+        label: 'Статус'
+        type: selectable
+        select: status
+        options:
+            new: 'Новый'
+            published: 'Опубликован'
+            rejected: 'Отклонён'
+    created_at:
+        label: 'Получен'
+        type: datetime
+        sortable: true

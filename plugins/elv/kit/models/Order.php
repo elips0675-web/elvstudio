@@ -23,6 +23,7 @@ class Order extends Model
         'order_no', 'product_id', 'product_name', 'plan', 'qty', 'amount_cents',
         'currency', 'status', 'customer_name', 'email', 'phone', 'company',
         'comment', 'payment_provider', 'payment_id', 'download_token',
+        'review_token', 'review_token_expires_at', 'review_invited_at',
         'paid_at', 'delivered_at', 'ip', 'meta',
     ];
 
@@ -36,6 +37,8 @@ class Order extends Model
         'meta' => 'array',
         'paid_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'review_token_expires_at' => 'datetime',
+        'review_invited_at' => 'datetime',
     ];
 
     public $belongsTo = [

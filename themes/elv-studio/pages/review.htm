@@ -1,0 +1,145 @@
+title = "Отзыв о продукте"
+url = "/review/:token"
+layout = "default"
+meta_title = "Отзыв о продукте"
+meta_description = "Одноразовая ссылка на отзыв о продукте Elv Kit."
+meta_robots = "noindex, nofollow"
+==
+{% set token = this.param.token %}
+{% set order = elv_review_order(token) %}
+{% if not order %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set product = order.product %}
+{% if not product %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set already = elv_review_exists(order) %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Отзыв</span>
+            <h1>Как вам {{ product.name }}?</h1>
+            <p class="lead">
+                Заказ {{ order.order_no }} оплачен. Расскажите, как продукт работает у вас:
+                это помогает другим покупателям выбрать и не ошибиться.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            <div class="split">
+                <div>
+                    {% if already %}
+                        <div class="card">
+                            <h2>Отзыв уже отправлен</h2>
+                            <p class="muted">
+                                Спасибо! Отзыв по этому заказу получен и ждёт проверки.
+                                Ссылка одноразовая, повторно ей воспользоваться нельзя.
+                            </p>
+                            <p class="mt-24">
+                                <a class="btn btn--primary" href="{{ product.url }}">Вернуться к продукту</a>
+                            </p>
+                        </div>
+                    {% else %}
+                        <form
+                            class="form card"
+                            id="review-form"
+                            method="post"
+                            action="{{ url('/review/' ~ token) }}"
+                            data-elv-form
+                            data-success="Спасибо! Отзыв отправлен на проверку — опубликуем после модерации.">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <h2>Оставить отзыв</h2>
+
+                            {% if elv_errors() %}
+                                <div class="alert alert--err" role="alert">
+                                    {% for field, messages in elv_errors() %}
+                                        {{ messages|first }}
+                                        {% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="form__row">
+                                <div class="field">
+                                    <label for="review-name">Имя</label>
+                                    <input class="input" id="review-name" type="text" name="author_name" required maxlength="160" autocomplete="name" value="{{ elv_old('author_name', order.customer_name) }}">
+                                    <span class="hint">На сайте покажем как «Имя Ф.».</span>
+                                </div>
+                                <div class="field">
+                                    <label for="review-rating">Оценка</label>
+                                    <select class="select" id="review-rating" name="rating" required>
+                                        <option value="5">5 — отлично</option>
+                                        <option value="4">4 — хорошо</option>
+                                        <option value="3">3 — нормально</option>
+                                        <option value="2">2 — плохо</option>
+                                        <option value="1">1 — очень плохо</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="review-title">Заголовок <span class="muted">— необязательно</span></label>
+                                <input class="input" id="review-title" type="text" name="title" maxlength="160" value="{{ elv_old('title') }}">
+                            </div>
+
+                            <div class="field">
+                                <label for="review-text">Отзыв</label>
+                                <textarea class="textarea" id="review-text" name="text" required minlength="20" maxlength="4000" placeholder="Что получилось, что было сложно, что помогло">{{ elv_old('text') }}</textarea>
+                            </div>
+
+                            <div class="form__row">
+                                <div class="field">
+                                    <label for="review-pros">Плюсы <span class="muted">— необязательно</span></label>
+                                    <textarea class="textarea" id="review-pros" name="pros" maxlength="1000">{{ elv_old('pros') }}</textarea>
+                                </div>
+                                <div class="field">
+                                    <label for="review-cons">Минусы <span class="muted">— необязательно</span></label>
+                                    <textarea class="textarea" id="review-cons" name="cons" maxlength="1000">{{ elv_old('cons') }}</textarea>
+                                </div>
+                            </div>
+
+                            <label class="check">
+                                <input type="checkbox" name="consent" value="1" required>
+                                <span>Согласен на публикацию отзыва и обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                            </label>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить отзыв</button>
+                            </div>
+                            <p class="hint">Отзыв публикуется после проверки. Ссылка одноразовая и действует 30 дней.</p>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <aside class="card card--flat">
+                    <h3>Что публикуем</h3>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Оценку, заголовок и текст отзыва</li>
+                        <li>{{ elv_icon('check')|raw }} Имя в виде «Имя Ф.»</li>
+                        <li>{{ elv_icon('check')|raw }} Пометку «Покупка подтверждена»</li>
+                    </ul>
+                    <h3 class="mt-24">Что не публикуем</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} E-mail и номер заказа</li>
+                        <li>{{ elv_icon('close')|raw }} Фотографии и вложения</li>
+                        <li>{{ elv_icon('close')|raw }} Отзывы без проверки</li>
+                    </ul>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>

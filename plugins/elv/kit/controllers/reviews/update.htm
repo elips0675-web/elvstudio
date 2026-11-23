@@ -1,0 +1,22 @@
+<?= Form::open(['class' => 'layout']) ?>
+    <div class="layout-row">
+        <div class="layout-cell">
+            <?= $this->formRender() ?>
+        </div>
+    </div>
+    <div class="form-buttons">
+        <button
+            type="submit"
+            class="btn btn-primary oc-icon-check"
+            data-request="onApprove"
+            data-request-data="id: <?= (int) $formModel->id ?>"
+            data-stripe-load-indicator>Одобрить и опубликовать</button>
+        <button
+            type="submit"
+            class="btn btn-default oc-icon-ban"
+            data-request="onReject"
+            data-request-data="id: <?= (int) $formModel->id ?>"
+            data-request-confirm="Снять отзыв с витрины?">Отклонить</button>
+        <a class="btn btn-link" href="<?= Backend::url('elv/kit/reviews') ?>">К списку</a>
+    </div>
+<?= Form::close() ?>

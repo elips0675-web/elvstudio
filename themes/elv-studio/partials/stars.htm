@@ -1,0 +1,5 @@
+{% set value = rating|default(0) %}
+{% set filled = value|round %}
+<span class="stars" role="img" aria-label="Оценка {{ value }} из 5">
+    {% for i in 1..5 %}<span class="star{{ i <= filled ? ' star--on' : '' }}" aria-hidden="true">★</span>{% endfor %}
+</span>

@@ -1,0 +1,129 @@
+/* Вопрос-ответ и отзывы: компактный блок под карточкой продукта. */
+.community {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.community__list {
+    display: grid;
+    gap: 14px;
+}
+
+.community__form {
+    position: sticky;
+    top: 88px;
+}
+
+.qa {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.qa__title {
+    font-size: 16.5px;
+    margin: 0 0 10px;
+    color: var(--ink);
+}
+
+.qa__answer {
+    color: var(--body);
+    font-size: 15px;
+    padding-left: 14px;
+    border-left: 3px solid var(--brand-soft);
+}
+
+.qa__meta {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: var(--muted-2);
+}
+
+.review {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-sm);
+}
+
+.review__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin-bottom: 10px;
+}
+
+.review__head .badge {
+    margin-left: 6px;
+    font-size: 12px;
+}
+
+.review__head time {
+    margin-left: auto;
+    font-size: 13px;
+}
+
+.review__title {
+    font-size: 16.5px;
+    margin: 0 0 8px;
+    color: var(--ink);
+}
+
+.review__text {
+    font-size: 15px;
+}
+
+.review__pros,
+.review__cons {
+    font-size: 14.5px;
+    margin: 10px 0 0;
+}
+
+.review__pros b { color: #0a6b59; }
+.review__cons b { color: #8f2c21; }
+
+.review__reply {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--brand-soft);
+    font-size: 14.5px;
+}
+
+.review-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stars {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.star {
+    color: #d7dce6;
+}
+
+.star--on {
+    color: #f5a524;
+}
+
+@media (max-width: 900px) {
+    .community {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .community__form {
+        position: static;
+    }
+}

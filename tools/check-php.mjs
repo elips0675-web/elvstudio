@@ -13,6 +13,7 @@ const SCRIPTS = [
   'tools/download-check.php',
   'tools/account-check.php',
   'tools/tickets-check.php',
+  'tools/community-check.php',
 ];
 
 function commandWorks(command, args) {

@@ -1,0 +1,14 @@
+title: 'Вопросы'
+list: $/elv/kit/models/question/columns.yaml
+modelClass: Elv\Kit\Models\Question
+recordUrl: elv/kit/questions/update/:id
+recordsPerPage: 20
+showSetup: true
+showCheckboxes: false
+noRecordsMessage: 'Вопросов пока нет.'
+defaultSort:
+    column: id
+    direction: desc
+toolbar:
+    search:
+        prompt: 'Вопрос, имя или e-mail'
