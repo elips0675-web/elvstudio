@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 require __DIR__ . '/../bootstrap/autoload.php';
 
@@ -84,6 +85,57 @@ $add($mail === 'log' ? 'WARN' : 'OK', 'Почта', $mail . ($mail === 'log' ? '
 $paymentKeys = ['YOOKASSA_SHOP_ID', 'YOOKASSA_SECRET', 'STRIPE_SECRET', 'STRIPE_WEBHOOK_SECRET'];
 $missingPaymentKeys = array_values(array_filter($paymentKeys, static fn (string $key): bool => (string) env($key) === ''));
 $add($missingPaymentKeys === [] ? 'OK' : 'WARN', 'Платёжные ключи', $missingPaymentKeys === [] ? 'заданы' : 'не заданы: ' . implode(', ', $missingPaymentKeys));
+
+$scheme = (string) (parse_url($appUrl, PHP_URL_SCHEME) ?: '');
+
+$add(
+    $isLocal || $scheme === 'https' ? 'OK' : 'WARN',
+    'HTTPS',
+    $isLocal
+        ? 'локальный стенд'
+        : ($scheme === 'https' ? 'APP_URL по https' : 'APP_URL без https — сессия и оплата требуют защищённого канала')
+);
+
+$secureCookie = filter_var(env('SESSION_SECURE_COOKIE', false), FILTER_VALIDATE_BOOLEAN);
+
+$add(
+    $isLocal || $secureCookie ? 'OK' : 'WARN',
+    'SESSION_SECURE_COOKIE',
+    $isLocal ? 'локальный стенд' : ($secureCookie ? 'true' : 'false — cookie сессии уйдёт по http')
+);
+
+if ($mail === 'smtp') {
+    $mailHost = (string) env('MAIL_HOST');
+    $add($mailHost !== '' ? 'OK' : 'FAIL', 'SMTP хост', $mailHost !== '' ? $mailHost : 'MAIL_MAILER=smtp, но MAIL_HOST пуст');
+
+    $fromAddress = (string) env('MAIL_FROM_ADDRESS');
+    $fromIsPlaceholder = $fromAddress === ''
+        || str_contains($fromAddress, 'example.')
+        || str_contains($fromAddress, 'elv.local');
+
+    $add(
+        $fromIsPlaceholder ? 'WARN' : 'OK',
+        'Адрес отправителя',
+        $fromIsPlaceholder ? 'заглушка «' . ($fromAddress !== '' ? $fromAddress : 'пусто') . '» — нужен адрес на своём домене' : $fromAddress
+    );
+}
+
+if ($queue === 'database') {
+    $hasJobsTable = false;
+
+    try {
+        $hasJobsTable = Schema::hasTable('jobs');
+    }
+    catch (\Throwable $error) {
+        $hasJobsTable = false;
+    }
+
+    $add(
+        $hasJobsTable ? 'OK' : 'FAIL',
+        'Таблица jobs',
+        $hasJobsTable ? 'есть' : 'нет — выполните php artisan october:up'
+    );
+}
 
 $add('WARN', 'Cron', 'проверяется на хостинге: php artisan schedule:run каждую минуту');
 

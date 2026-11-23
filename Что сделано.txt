@@ -6,6 +6,46 @@
 
 ---
 
+(Правка - 23.11.2026) - **Блокер 6, локальная часть: прод-чек и чек-лист окружения.**
+
+Что было: `production-check.php` смотрел PHP, права, `.htaccess`, `APP_KEY`,
+БД, очередь и почту, но не замечал главного для боевого запуска: `APP_URL` без
+HTTPS, незащищённую cookie сессии, пустой `MAIL_HOST` при `smtp`, адрес
+отправителя-заглушку и очередь `database` без таблицы `jobs`. Чек-листа
+окружения не было вовсе — только пункт в бэклоге.
+
+Что сделано:
+- `tools/production-check.php` — новые проверки: `HTTPS` (`APP_URL` без https
+  на не-локальном стенде → WARN), `SESSION_SECURE_COOKIE`, `SMTP хост` (FAIL,
+  если `smtp` и `MAIL_HOST` пуст), `Адрес отправителя` (WARN на `example.*` и
+  `elv.local`), `Таблица jobs` (FAIL, если очередь `database`, а таблицы нет —
+  подсказка `php artisan october:up`). На локальном стенде эти проверки
+  помечаются «локальный стенд» и не добавляют шума: было 15 OK / 7 WARN,
+  стало 17 OK / 7 WARN.
+- `docs/production-deploy.md` — чек-лист: таблица переменных `.env`, воркер
+  очереди под supervisor, строка Cron, вебхуки `/payment/yookassa` и
+  `/payment/stripe`, SPF/DKIM/DMARC, права на `storage`, бэкапы, smoke-список
+  после деплоя и запрет `elv:kit:demo` на проде.
+- `.env.example` — закомментированный прод-блок (`APP_ENV=production`,
+  `APP_DEBUG=false`, `APP_URL` по HTTPS, `QUEUE_CONNECTION=database`,
+  `SESSION_SECURE_COOKIE=true`, SMTP, адрес отправителя, `LOG_CHANNEL=daily`).
+- `README.md` — раздел «Боевое окружение»; заодно исправлено устаревшее «125
+  страниц» на 171 в разделе команд и в описании демо-экспорта.
+
+Чем проверено: `php tools/production-check.php` на стенде — 17 OK, 7 WARN,
+0 ошибок; тот же скрипт с подставленными прод-переменными (`APP_ENV=production`,
+`APP_URL=http://example.com`, `MAIL_MAILER=smtp`, `MAIL_FROM_ADDRESS=sales@example.com`,
+`QUEUE_CONNECTION=database`) — 21 OK, 6 WARN и сработали ровно новые проверки:
+HTTPS, `SESSION_SECURE_COOKIE`, адрес отправителя; `Таблица jobs` — OK, таблица
+`jobs` в базе есть после миграций October.
+
+Что **не** проверено: реальные ключи ЮKassa/Stripe, SMTP-провайдер, воркер под
+supervisor, Cron и восстановление из бэкапа — для этого нужен хостинг.
+`--strict` на сервере должен дать 0 предупреждений; на стенде он падает
+намеренно.
+
+---
+
 (Правка - 23.11.2026) - **Блокер 5, локальная часть: 404 для модуля, которого нет в базе.**
 
 Что было: `pages/module.htm` при пустом `elv_product()` вызывает

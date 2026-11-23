@@ -254,7 +254,7 @@ php artisan serve --port=8090
 npm run check                        # весь гейт: ссылки, SEO, блог, заголовки,
                                      # бюджет, сироты, поставка, бренд, кодировка,
                                      # тарифы, PHP-проверки, консоль, TTFB
-npm run check:console                # 125 статических страниц: консоль, 5xx, 360 px
+npm run check:console                # 171 статическая страница: консоль, 5xx, 360 px
 npm run test:calculator              # Chrome E2E: выбор → результат → PDF
 node tools/check-empty-install.mjs --base=http://127.0.0.1:8090
                                      # витрина на пустой базе (в гейт не входит)
@@ -265,6 +265,18 @@ php tools/blog-content-audit.php     # срез блога: объём, ссыл
 php tools/chat-check.php             # Консультант: ответы, ссылки, фильтр слов
 php tools/calculator-check.php       # формула, рекомендации, шаблон PDF
 ```
+
+## Боевое окружение
+
+Стенд и прод отличаются окружением, а не кодом. Чек-лист —
+`docs/production-deploy.md`: `.env` (`APP_ENV=production`, `APP_DEBUG=false`,
+`APP_URL` по HTTPS, `QUEUE_CONNECTION=database`, SMTP и адрес отправителя на
+своём домене, ключи ЮKassa/Stripe), воркер очереди под supervisor, Cron
+`schedule:run`, вебхуки `/payment/yookassa` и `/payment/stripe`, бэкапы.
+
+Проверка: `php tools/production-check.php --strict` — на проде 0 предупреждений.
+На стенде строгий режим падает намеренно: там `APP_ENV=local`, `APP_DEBUG=true`,
+очередь `sync`, почта в лог и нет платёжных ключей.
 
 ## Сборка продукта
 
@@ -284,7 +296,7 @@ php artisan elv:kit:package --demo   # вариант с демо-данными
 php tools/export-static.php --origin=https://elvstudio.vercel.app
 ```
 
-Собирает `demo-static/` — 125 страниц со статическими адресами, картой сайта
+Собирает `demo-static/` — 171 страницу со статическими адресами, картой сайта
 и поисковым индексом. Именно эта папка деплоится на Vercel.
 
 ## Снимок для AI-аудита
