@@ -107,6 +107,10 @@ class Plugin extends PluginBase
                 'label' => 'Прайс: версии цен',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.releases' => [
+                'label' => 'Релизы архива',
+                'tab' => 'Elv Kit',
+            ],
         ];
     }
 
@@ -179,6 +183,12 @@ class Plugin extends PluginBase
                         'icon' => 'icon-money',
                         'url' => \Backend::url('elv/kit/prices'),
                         'permissions' => ['elv.kit.prices'],
+                    ],
+                    'releases' => [
+                        'label' => 'Релизы',
+                        'icon' => 'icon-archive',
+                        'url' => \Backend::url('elv/kit/releases'),
+                        'permissions' => ['elv.kit.releases'],
                     ],
                 ],
             ],

@@ -258,6 +258,20 @@ if (pluginVersions && themeVersions) {
       problems.push('в товарном архиве нет themes/elv-studio/screenshot.png');
     }
 
+    const presetFiles = Array.isArray(product.presets) ? product.presets : null;
+
+    if (presetFiles === null) {
+      problems.push('package-inspect не отдал список пресетов — проверка demo/presets не выполнена');
+    } else {
+      if (product.presets.length) {
+        problems.push('товарный архив содержит пресеты ниш: ' + product.presets.join(', '));
+      }
+
+      if (demo.presets.length !== 4) {
+        problems.push('демо-архив: пресетов ' + demo.presets.length + ', а должно быть 4 (booking, digital, agency, expert)');
+      }
+    }
+
     if (product.path === demo.path) {
       problems.push('товарный и демо-архив пишутся в один файл');
     }

@@ -1,0 +1,27 @@
+columns:
+    version:
+        label: 'Версия'
+        searchable: true
+        sortable: true
+    channel_label:
+        label: 'Канал'
+    is_demo:
+        label: 'Демо'
+        type: switch
+        sortable: true
+    size_label:
+        label: 'Размер'
+    checksum:
+        label: 'SHA-256'
+        type: text
+        cssClass: 'text-muted'
+    is_current:
+        label: 'Действующая'
+        type: switch
+        sortable: true
+    published_label:
+        label: 'Опубликован'
+        sortable: true
+    notes:
+        label: 'Заметка'
+        searchable: true

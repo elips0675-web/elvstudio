@@ -215,3 +215,24 @@
     и ключевые слова консультанта исключены: там «корзина» — про чужой
     магазин, а не про Elv Kit. Проверка: `node tools/check-promises.mjs`
     (входит в `node tools/gate.mjs`).
+21. Пресеты ниш — слой демо-стенда, а не товар: `plugins/elv/kit/demo/presets/*.json`,
+    команда `elv:kit:demo --preset=booking|digital|agency|expert` и
+    `--reset-preset`. Пресет меняет только настройки из закрытого списка
+    `Demo::PRESET_SETTINGS` (бренд, контакты, услуги, FAQ, меню, запись) и не
+    вправе трогать валюту, тарифы, платёжные ключи или аналитику. Каталог и
+    статьи остаются данными Elv Kit; цены — `{{currency}}`, подставляется
+    `Money::currency()`. Пресеты входят только в архив `--demo`, товарный ZIP
+    их не содержит. При смене пресета чужие свободные слоты удаляет
+    `Slots::pruneOrphans()`, занятые (`taken > 0`) не трогает. Зашитый нишевый
+    текст в шаблоне или классе — дефект. Проверка: `php tools/presets-check.php`
+    в `node tools/check-php.mjs`, состав архивов — `node tools/check-package.mjs`.
+22. Выдача архива покупателю — не «просто отдать файл»: `elv:kit:package`
+    записывает сборку в `elv_kit_releases` (версия, канал, файл, размер,
+    SHA-256, заметка), действующая сборка одна на вариант (`Release::beforeSave`),
+    её выбирает `DownloadService::archiveForDelivery()`; файла нет — архив
+    собирается заново. По `/download/{token}` отдаётся копия с
+    `LICENSE_OWNER.txt` (номер заказа, e-mail, тариф, ключ лицензии, дата),
+    базовый ZIP этого файла не содержит. Суточный лимит —
+    `download_daily_limit` (по умолчанию 5, `0` — без ограничения), счётчик
+    в `meta.downloads` заказа; сверх лимита — 429, а не 403/404. Проверка:
+    `php tools/download-check.php` в `node tools/check-php.mjs`.

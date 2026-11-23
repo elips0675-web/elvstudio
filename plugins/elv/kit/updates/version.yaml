@@ -15,3 +15,6 @@
 1.0.6:
     - 'Прайс с версиями цен: valid_from, valid_to, is_active и лог изменений'
     - create_price_versions.php
+1.0.7:
+    - 'Релизы архива: версия, канал, контрольная сумма и действующая сборка'
+    - create_releases.php

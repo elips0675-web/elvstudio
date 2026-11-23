@@ -234,6 +234,25 @@ class Slots
             ->delete();
     }
 
+    /**
+     * pruneOrphans — убирает свободные слоты услуг, которых больше нет в настройках.
+     *
+     * При смене пресета меняются коды услуг: старые слоты остаются в базе и
+     * никем не показываются. Брони (`taken > 0`) не трогаем — на них ссылаются
+     * заявки, и удалять чужие записи из-за демо-команды нельзя.
+     */
+    public static function pruneOrphans(): int
+    {
+        $codes = array_values(array_filter(array_column(static::services(), 'code')));
+        $query = Slot::query()->where('taken', 0);
+
+        if ($codes !== []) {
+            $query->whereNotIn('service_code', $codes);
+        }
+
+        return $query->delete();
+    }
+
     protected static function weekday(int $iso): string
     {
         return [

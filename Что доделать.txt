@@ -70,12 +70,19 @@
 
 ### Этапы 1–4 (все открыты)
 
-- [ ] **Этап 1. Инфраструктура продаж:** пресеты `demo/presets/*.json` и
-      `--preset` (папки нет), релизы `elv_kit_releases`, суточный лимит
-      скачиваний и водяной знак `LICENSE_OWNER.txt` (`DownloadController`
-      проверяет только токен и `paid`). Iframe-часть закрыта 23.11.2026:
-      `ELV_FRAME_ANCESTORS` в `SecurityHeaders`, `tools/check-iframe-demo.mjs`,
-      раздел в `docs/production-deploy.md`.
+- [x] **Этап 1. Инфраструктура продаж** — закрыто 23.11.2026. Пресеты
+      `demo/presets/*.json` и `--preset` (booking, digital, agency, expert) +
+      `--reset-preset`: закрытый список `Demo::PRESET_SETTINGS`, цены через
+      `{{currency}}`, чужие слоты убирает `Slots::pruneOrphans()`.
+      Релизы `elv_kit_releases` (версия, канал, файл, размер, SHA-256, заметка,
+      действующая сборка) пишет `elv:kit:package --notes`, админка «Elv Kit →
+      Релизы»; суточный лимит скачиваний (`download_daily_limit`, по умолчанию
+      5, 0 — без ограничения) и водяной знак `LICENSE_OWNER.txt` в копии архива
+      заказа. Iframe-часть закрыта ранее: `ELV_FRAME_ANCESTORS` в
+      `SecurityHeaders`, `tools/check-iframe-demo.mjs`, раздел в
+      `docs/production-deploy.md`. Проверки: `php tools/presets-check.php`,
+      `php tools/download-check.php` (оба в `node tools/check-php.mjs`),
+      `node tools/check-package.mjs`.
 - [ ] **Этап 2. Кабинет и поддержка:** `elv_kit_customers`, Magic Link,
       отвязка домена раз в 30 дней, тикеты, Telegram ChatOps, Q&A, форум.
       Ни таблиц, ни маршрутов `/account/`, `/tickets/` нет.
@@ -179,10 +186,10 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       цены конкурентов, «экономия в 3–5 раз» и «окупаемость за 2 года» —
       утверждения о чужих продуктах. Делать только на проверяемых ценах с
       датой среза; без «упущенной прибыли» из воздуха.
-- [ ] Пресеты ниш и DemoSandbox (`ELV_DEMO_SANDBOX`, сессия 24 часа, без
-      записи в БД): архитектура годная, но это слой демо-стенда, а не товар.
-      В товарный ZIP не включать; пресеты — только вместе с `elv:kit:demo`
-      (`demo/presets/*.json`), иначе `check-package` не отличит демо от товара.
+- [x] Пресеты ниш (23.11.2026): четыре файла в `demo/presets/` и
+      `elv:kit:demo --preset=…`, только в демо-архиве; товарный ZIP их не
+      содержит. DemoSandbox (`ELV_DEMO_SANDBOX`, сессия 24 часа, без записи в
+      БД) остаётся решением владельца: это слой демо-стенда, а не товар.
 - [ ] Мигратор `Elv\Importer` (WordPress WXR, Битрикс, Tilda, CSV/JSON, 7 CMS):
       отдельный продукт, не модуль Elv Kit. Драйверы через прямой доступ к
       MySQL чужой базы — риск и поддержка; начинать с WXR и CSV, 301-редиректы

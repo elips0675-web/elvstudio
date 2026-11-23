@@ -1,0 +1,45 @@
+fields:
+    version:
+        label: 'Версия'
+        span: left
+        disabled: true
+    channel:
+        label: 'Канал'
+        type: dropdown
+        span: right
+        options:
+            stable: 'Стабильный'
+            beta: 'Бета'
+    file:
+        label: 'Файл'
+        span: left
+        disabled: true
+        comment: 'Путь относительно storage/app.'
+    size_label:
+        label: 'Размер'
+        span: right
+        disabled: true
+    checksum:
+        label: 'SHA-256'
+        disabled: true
+        comment: 'Сверяйте с файлом при публикации: sed/Get-FileHash или sha256sum.'
+    is_demo:
+        label: 'Вариант с демо-данными'
+        type: switch
+        span: left
+        disabled: true
+    is_current:
+        label: 'Действующая сборка'
+        type: switch
+        span: right
+        comment: 'Её получит покупатель. Действующая сборка у продукта и варианта одна: при включении прежняя снимается автоматически.'
+    published_at:
+        label: 'Опубликован'
+        type: datepicker
+        mode: datetime
+        span: left
+    notes:
+        label: 'Заметка'
+        type: textarea
+        size: small
+        comment: 'Что изменилось в этой версии. Показывается только в админке.'

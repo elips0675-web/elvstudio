@@ -66,6 +66,10 @@ foreach (['product' => false, 'demo' => true] as $key => $demo) {
             && in_array('elv-kit/theme/composer.json', $files, true),
         'hasScreenshot' => in_array('elv-kit/theme/screenshot.png', $files, true),
         'hasDemoDataset' => in_array('elv-kit/plugin/demo/blog.json', $files, true),
+        'presets' => array_values(array_filter(
+            $files,
+            fn ($file) => (bool) preg_match('~^elv-kit/plugin/demo/presets/[a-z0-9-]+\.json$~', $file)
+        )),
     ];
 }
 

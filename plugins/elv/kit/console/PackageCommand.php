@@ -10,7 +10,8 @@ class PackageCommand extends Command
 {
     protected $signature = 'elv:kit:package
         {--rebuild : пересобрать архив, даже если он уже есть}
-        {--demo : собрать вариант с демо-данными (для лендинга)}';
+        {--demo : собрать вариант с демо-данными (для лендинга)}
+        {--notes= : заметка к релизу: что изменилось}';
 
     protected $description = 'Собирает ZIP Elv Kit (тема + плагин) в storage/app/kit.';
 
@@ -36,6 +37,16 @@ class PackageCommand extends Command
         $this->info('Архив готов: ' . $path);
         $this->line('Вариант: ' . ($demo ? 'с демо-данными' : 'без демо-данных'));
         $this->line('Размер: ' . number_format(filesize($path) / 1024, 1, ',', ' ') . ' КБ');
+
+        try {
+            $release = $service->registerRelease($path, $demo, (string) $this->option('notes'));
+            $this->line('Релиз: ' . $release->version . ' · ' . $release->size_label . ' · действующая сборка');
+        }
+        catch (\Throwable $e) {
+            $this->warn('Релиз не записан (миграция не применена?): ' . $e->getMessage());
+
+            return self::FAILURE;
+        }
 
         return self::SUCCESS;
     }

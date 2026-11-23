@@ -28,8 +28,9 @@
 - [ ] Прод: ключи, SMTP, хостинг. Локально 23.11.2026: чек-лист
       `docs/production-deploy.md`, проверки HTTPS/очереди/почты в
       `production-check.php`; `--strict` — на сервере.
-- [ ] Этап 1: пресеты, релизы, лимит скачиваний, водяной знак. Iframe-заголовки
-      закрыты 23.11.2026: `ELV_FRAME_ANCESTORS`, `check-iframe-demo.mjs`.
+- [x] Этап 1: пресеты ниш, релизы, лимит скачиваний и водяной знак — закрыто
+      23.11.2026 (`presets-check.php`, `download-check.php`, админка «Релизы»).
+      Iframe-заголовки: `ELV_FRAME_ANCESTORS`, `check-iframe-demo.mjs`.
 - [ ] Этап 2: кабинет, тикеты, Telegram ChatOps, Q&A, форум.
 - [ ] Этап 3: отзывы, промокоды, апгрейд тарифа, B2B-счёт, Team Seats.
 - [ ] Этап 4: update-сервер, конструктор страниц, EN/валюты, рефералка,

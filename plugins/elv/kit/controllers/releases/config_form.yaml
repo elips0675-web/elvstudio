@@ -1,0 +1,8 @@
+name: 'Релиз'
+modelClass: Elv\Kit\Models\Release
+form: $/elv/kit/models/release/fields.yaml
+defaultRedirect: elv/kit/releases
+update:
+    title: 'Релиз'
+    redirect: elv/kit/releases
+    redirectClose: elv/kit/releases

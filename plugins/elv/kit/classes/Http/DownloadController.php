@@ -25,6 +25,15 @@ class DownloadController
             abort(404);
         }
 
+        if (!$this->archive->canDownload($order)) {
+            Log::warning('Elv Kit: превышен суточный лимит скачиваний', [
+                'order' => $order->order_no,
+                'limit' => $this->archive->dailyLimit(),
+            ]);
+
+            abort(429, 'Лимит скачиваний на сегодня исчерпан. Напишите в поддержку — вышлем архив заново.');
+        }
+
         try {
             $path = $this->archive->forOrder($order);
         }
@@ -34,15 +43,13 @@ class DownloadController
             abort(503, 'Архив временно недоступен. Мы уже разбираемся — напишите в поддержку.');
         }
 
-        if (!$order->delivered_at) {
-            $order->delivered_at = now();
-            $order->save();
-        }
+        $this->archive->registerDownload($order);
 
         $filename = 'elv-kit-' . DownloadService::version() . '-' . $order->order_no . '.zip';
 
         return response()->download($path, $filename, [
             'Content-Type' => 'application/zip',
+            'Cache-Control' => 'private, no-store',
             'X-Robots-Tag' => 'noindex, nofollow',
         ]);
     }

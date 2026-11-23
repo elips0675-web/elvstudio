@@ -162,7 +162,8 @@ class Demo
 
     /**
      * slots — генерирует сетку для всех услуг демо-бронирования.
-     */    public static function slots(int $days = 21): int
+     */
+    public static function slots(int $days = 21): int
     {
         $created = 0;
 
@@ -450,6 +451,143 @@ class Demo
     public static function hasPostsDataset(): bool
     {
         return is_file(dirname(__DIR__) . '/demo/blog.json');
+    }
+
+    /**
+     * Пресеты ниш — демонстрационный контент для отдельных демо-стендов.
+     *
+     * Пресет меняет только настройки (бренд, услуги, FAQ, меню, запись):
+     * каталог и статьи остаются данными Elv Kit, а цены продукта живут
+     * в `Prices`, чтобы демо-стенд не подменял прайс витрины.
+     */
+    public const PRESETS = ['booking', 'digital', 'agency', 'expert'];
+
+    /**
+     * PRESET_SETTINGS — настройки, которые пресет вправе заменить.
+     *
+     * Список закрытый: пресет из файла не может переписать валюту, тарифы,
+     * платёжные ключи или аналитику. `tools/presets-check.php` сверяет
+     * набор ключей в JSON с этим списком.
+     */
+    public const PRESET_SETTINGS = [
+        'brand_name',
+        'brand_tagline',
+        'brand_description',
+        'brand_subtitle',
+        'legal_name',
+        'email',
+        'phone',
+        'chat_services',
+        'chat_services_url',
+        'menu_products_label',
+        'menu_products',
+        'faq_items',
+        'faq_calculator_items',
+        'faq_services_items',
+        'faq_seo_items',
+        'booking_services',
+    ];
+
+    public static function availablePresets(): array
+    {
+        return static::PRESETS;
+    }
+
+    public static function presetExists(string $preset): bool
+    {
+        return in_array($preset, static::PRESETS, true) && is_file(static::presetPath($preset));
+    }
+
+    public static function presetPath(string $preset): string
+    {
+        return dirname(__DIR__) . '/demo/presets/' . $preset . '.json';
+    }
+
+    /**
+     * presetData — настройки пресета с подставленной валютой.
+     *
+     * Цены в JSON написаны как «90 {{currency}}»: пресет не знает, в какой
+     * валюте продаёт владелец, и подставляет `Money::currency()` при чтении.
+     */
+    public static function presetData(string $preset): array
+    {
+        if (!static::presetExists($preset)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents(static::presetPath($preset)), true);
+
+        return is_array($decoded) ? static::withCurrency($decoded, Money::currency()) : [];
+    }
+
+    /**
+     * presetValues — пары «настройка → значение» для пресета.
+     *
+     * Отсутствующий ключ берётся из демо-значений по умолчанию, поэтому
+     * переключение пресетов не оставляет хвостов от предыдущего.
+     */
+    public static function presetValues(string $preset): array
+    {
+        $settings = (array) (static::presetData($preset)['settings'] ?? []);
+        $defaults = static::defaultPresetValues();
+        $values = [];
+
+        foreach (static::PRESET_SETTINGS as $key) {
+            $value = array_key_exists($key, $settings) ? $settings[$key] : ($defaults[$key] ?? '');
+            $values[$key] = trim((string) $value);
+        }
+
+        return $values;
+    }
+
+    /**
+     * applyPreset — записывает настройки пресета в базу.
+     *
+     * @return array<string, string> применённые значения
+     */
+    public static function applyPreset(string $preset): array
+    {
+        if (!static::presetExists($preset)) {
+            throw new \InvalidArgumentException('Неизвестный пресет «' . $preset . '».');
+        }
+
+        $values = static::presetValues($preset);
+
+        \Elv\Kit\Models\Settings::set($values);
+
+        return $values;
+    }
+
+    /**
+     * resetPresetSettings — возвращает демо-значения бренда и чистит нишевые
+     * настройки. Демо-контент (`contacts`, `menu`, `faq`, `bookingServices`)
+     * после этого снова заполняет пустые поля значениями Elv Kit.
+     */
+    public static function resetPresetSettings(): void
+    {
+        \Elv\Kit\Models\Settings::set(static::defaultPresetValues());
+    }
+
+    protected static function defaultPresetValues(): array
+    {
+        return [
+            'brand_name' => 'Elv Kit',
+            'brand_tagline' => 'Модульный конструктор сайтов на October CMS',
+            'brand_description' => 'Elv Kit — тема, модули и демо-данные для October CMS 4.x.',
+            'brand_subtitle' => '',
+            'legal_name' => '',
+            'email' => '',
+            'phone' => '',
+            'chat_services' => '',
+            'chat_services_url' => '',
+            'menu_products_label' => '',
+            'menu_products' => '',
+            'faq_items' => '',
+            'faq_calculator_items' => '',
+            'faq_services_items' => '',
+            'faq_seo_items' => '',
+            'booking_services' => '',
+        ];
     }
 
     protected static function json(array $value): string

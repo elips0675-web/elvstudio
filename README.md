@@ -182,7 +182,7 @@
 |---|---|
 | `themes/elv-studio/` | тема: `layouts/`, `pages/`, `partials/`, `assets/css`, `assets/js` |
 | `plugins/elv/kit/` | плагин: `classes/`, `models/`, `controllers/`, `console/`, `updates/`, `routes.php` |
-| `plugins/elv/kit/demo/` | демо-статьи блога (`blog.json`), в товарный архив не входят |
+| `plugins/elv/kit/demo/` | демо-статьи блога (`blog.json`) и пресеты ниш (`presets/`), в товарный архив не входят |
 | `tools/` | гейты `check-*.mjs`, `production-check.php`, экспорт статики, аудит блога, снимок для AI |
 | `docs/` | аудит источников, 42 исходных документа в `docs/html/`, политика контента, поиск, прайс, QA |
 | `demo-static/` | статический экспорт для Vercel |
@@ -237,6 +237,26 @@ php artisan serve --port=8090
 `elv:kit:demo` наполняет каталог, статьи и слоты бронирования идемпотентно;
 `elv:kit:reset` удаляет демо-данные, `elv:kit:package` собирает ZIP поставки.
 
+### Пресеты ниш для демо-стенда
+
+Пресет меняет только настройки (бренд, услуги, FAQ, меню, услуги записи),
+каталог и статьи остаются данными Elv Kit:
+
+```bash
+php artisan elv:kit:demo --preset=booking          # автосервис: запись и услуги
+php artisan elv:kit:demo --preset=digital          # цифровые товары
+php artisan elv:kit:demo --preset=agency           # студия и её услуги
+php artisan elv:kit:demo --preset=expert           # частный специалист
+php artisan elv:kit:demo --reset-preset            # вернуть демо-значения Elv Kit
+```
+
+Пресеты лежат в `plugins/elv/kit/demo/presets/*.json`, список закрытый
+(`Demo::PRESET_SETTINGS`): файл не может переписать валюту, тарифы или
+платёжные ключи. Цены в пресете пишутся как `90 {{currency}}` и подставляются
+из `Money::currency()`. Пресеты входят только в архив `--demo`; товарный ZIP
+их не содержит. Проверка — `php tools/presets-check.php` (входит в
+`npm run check`).
+
 ## Быстрый запуск на Windows
 
 1. Запустить MySQL (Laragon, порт 3306).
@@ -266,6 +286,8 @@ php tools/production-check.php --strict
 php tools/blog-content-audit.php     # срез блога: объём, ссылки, CTA, FAQ, meta
 php tools/chat-check.php             # Консультант: ответы, ссылки, фильтр слов
 php tools/calculator-check.php       # формула, рекомендации, шаблон PDF
+php tools/presets-check.php          # пресеты ниш: ключи, запись, сброс
+php tools/download-check.php         # выдача ZIP: лимит, водяной знак, релиз
 ```
 
 ## Боевое окружение
@@ -285,12 +307,24 @@ php tools/calculator-check.php       # формула, рекомендации,
 ```bash
 php artisan elv:kit:package          # товарный ZIP: тема, плагин, README, LICENSE
 php artisan elv:kit:package --demo   # вариант с демо-данными для лендинга
+php artisan elv:kit:package --rebuild --notes="Что изменилось"
 ```
 
 Архив собирается в `storage/app/kit/elv-kit-<версия>.zip`. Версия берётся из
 `updates/version.yaml` — это единственный источник. Демо-статьи блога
-(`demo/blog.json`) в товарный архив не попадают: у покупателя блог пуст до его
-собственных статей.
+(`demo/blog.json`) и пресеты ниш (`demo/presets/*.json`) в товарный архив не
+попадают: у покупателя блог пуст до его собственных статей, а пресеты — слой
+нашего демо-стенда, а не товар.
+
+Каждая сборка записывается в «Elv Kit → Релизы» (`elv_kit_releases`): версия,
+канал, размер, SHA-256 и заметка. Действующая сборка одна на вариант; именно её
+получает покупатель по ссылке из письма. Если файл релиза удалён, архив
+собирается заново из текущих файлов.
+
+По ссылке `/download/{token}` покупатель получает копию архива с
+`LICENSE_OWNER.txt` внутри: номер заказа, e-mail, тариф, ключ лицензии и дата
+скачивания. Суточный лимит — настройка «Скачиваний архива в сутки» (по
+умолчанию 5, `0` — без ограничения); сверх лимита ответ 429.
 
 ## Демо-экспорт для Vercel
 
