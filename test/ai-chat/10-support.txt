@@ -1,6 +1,6 @@
 # Поддержка: обращения, SLA и Telegram ChatOps
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 
 ===== FILE: plugins/elv/kit/classes/Support.php =====
 

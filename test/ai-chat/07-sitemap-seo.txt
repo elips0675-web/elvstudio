@@ -1,6 +1,6 @@
 # Карта сайта и SEO-разметка
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -454,6 +454,12 @@ class Seo
 
         if (static::$product) {
             $graph[] = static::productNode(static::$product);
+
+            $qa = static::qaNode(static::$product);
+
+            if ($qa !== []) {
+                $graph[] = $qa;
+            }
         }
 
         $crumbs = static::breadcrumbs();
@@ -582,7 +588,51 @@ class Seo
             'availability' => 'https://schema.org/InStock',
         ];
 
+        // Рейтинг — только по одобренным отзывам: выдуманная оценка в
+        // микроразметке расходится с видимым блоком и является дефектом.
+        $aggregate = Reviews::aggregate($product);
+
+        if ($aggregate !== null) {
+            $node['aggregateRating'] = $aggregate;
+        }
+
         return $node;
+    }
+
+    /**
+     * qaNode — вопросы и ответы продукта.
+     *
+     * Один вопрос — `QAPage` (страница отвечает на один вопрос), несколько —
+     * `FAQPage`: так разметка соответствует тому, что видит посетитель.
+     */
+    protected static function qaNode(Product $product): array
+    {
+        $items = [];
+
+        foreach (Questions::published($product, 20) as $question) {
+            $items[] = [
+                '@type' => 'Question',
+                'name' => (string) $question->question,
+                'text' => (string) $question->question,
+                'answerCount' => 1,
+                'acceptedAnswer' => static::withoutEmpty([
+                    '@type' => 'Answer',
+                    'text' => (string) $question->answer,
+                    'dateCreated' => $question->answered_at ? $question->answered_at->format('c') : null,
+                ]),
+                'author' => ['@type' => 'Person', 'name' => (string) $question->display_name],
+            ];
+        }
+
+        if ($items === []) {
+            return [];
+        }
+
+        return [
+            '@type' => count($items) === 1 ? 'QAPage' : 'FAQPage',
+            '@id' => static::canonical() . '#qa',
+            'mainEntity' => count($items) === 1 ? $items[0] : $items,
+        ];
     }
 
     protected static function articleNode(Post $post): array
@@ -627,6 +677,7 @@ class Seo
             'Disallow: /api/',
             'Disallow: /account/',
             'Disallow: /tickets/',
+            'Disallow: /review/',
             'Disallow: /order/success/',
             'Disallow: /download/',
             'Disallow: /*?q=',
@@ -860,6 +911,8 @@ use Elv\Kit\Classes\Http\LicenseController;
 use Elv\Kit\Classes\Http\OrderController;
 use Elv\Kit\Classes\Http\PaymentController;
 use Elv\Kit\Classes\Http\QuoteController;
+use Elv\Kit\Classes\Http\QuestionController;
+use Elv\Kit\Classes\Http\ReviewController;
 use Elv\Kit\Classes\Http\SeoController;
 use Elv\Kit\Classes\Http\SubscribeController;
 use Elv\Kit\Classes\Http\TelegramController;
@@ -897,6 +950,13 @@ Route::middleware(['web', 'throttle:10,1'])->group(function () {
     Route::post('tickets/{id}/close', [TicketController::class, 'close'])
         ->where('id', '[0-9]+')
         ->name('elv.kit.ticket.close');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('questions', [QuestionController::class, 'store'])->name('elv.kit.question.store');
+    Route::post('review/{token}', [ReviewController::class, 'store'])
+        ->where('token', '[a-f0-9]{48}')
+        ->name('elv.kit.review.store');
 });
 
 Route::middleware('throttle:60,1')->group(function () {

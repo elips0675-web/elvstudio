@@ -1,8 +1,8 @@
 # Структура репозитория Elv Landing
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 
-Отслеживаемые файлы (`git ls-files`), всего 649.
+Отслеживаемые файлы (`git ls-files`), всего 686.
 `demo-static` — 173 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
@@ -45,6 +45,7 @@
 - `plugins/elv/kit/classes/Calculator.php`
 - `plugins/elv/kit/classes/Catalog.php`
 - `plugins/elv/kit/classes/Chat.php`
+- `plugins/elv/kit/classes/Community.php`
 - `plugins/elv/kit/classes/CompressResponse.php`
 - `plugins/elv/kit/classes/Demo.php`
 - `plugins/elv/kit/classes/DemoLinks.php`
@@ -59,7 +60,9 @@
 - `plugins/elv/kit/classes/Http/LicenseController.php`
 - `plugins/elv/kit/classes/Http/OrderController.php`
 - `plugins/elv/kit/classes/Http/PaymentController.php`
+- `plugins/elv/kit/classes/Http/QuestionController.php`
 - `plugins/elv/kit/classes/Http/QuoteController.php`
+- `plugins/elv/kit/classes/Http/ReviewController.php`
 - `plugins/elv/kit/classes/Http/SeoController.php`
 - `plugins/elv/kit/classes/Http/SubscribeController.php`
 - `plugins/elv/kit/classes/Http/TelegramController.php`
@@ -74,6 +77,9 @@
 - `plugins/elv/kit/classes/Mail/MessageAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderCustomer.php`
+- `plugins/elv/kit/classes/Mail/QuestionAdmin.php`
+- `plugins/elv/kit/classes/Mail/ReviewAdmin.php`
+- `plugins/elv/kit/classes/Mail/ReviewInvite.php`
 - `plugins/elv/kit/classes/Mail/SubscribeConfirm.php`
 - `plugins/elv/kit/classes/Mail/TicketAdmin.php`
 - `plugins/elv/kit/classes/Mail/TicketCustomer.php`
@@ -85,6 +91,8 @@
 - `plugins/elv/kit/classes/Payment/YooKassa.php`
 - `plugins/elv/kit/classes/PaymentUnavailableException.php`
 - `plugins/elv/kit/classes/Prices.php`
+- `plugins/elv/kit/classes/Questions.php`
+- `plugins/elv/kit/classes/Reviews.php`
 - `plugins/elv/kit/classes/Rss.php`
 - `plugins/elv/kit/classes/Search.php`
 - `plugins/elv/kit/classes/SearchConfig.php`
@@ -109,6 +117,7 @@
 - `plugins/elv/kit/console/PackageCommand.php`
 - `plugins/elv/kit/console/RemindCommand.php`
 - `plugins/elv/kit/console/ResetCommand.php`
+- `plugins/elv/kit/console/ReviewCommand.php`
 - `plugins/elv/kit/controllers/Bookings.php`
 - `plugins/elv/kit/controllers/Categories.php`
 - `plugins/elv/kit/controllers/Install.php`
@@ -118,7 +127,9 @@
 - `plugins/elv/kit/controllers/Posts.php`
 - `plugins/elv/kit/controllers/Prices.php`
 - `plugins/elv/kit/controllers/Products.php`
+- `plugins/elv/kit/controllers/Questions.php`
 - `plugins/elv/kit/controllers/Releases.php`
+- `plugins/elv/kit/controllers/Reviews.php`
 - `plugins/elv/kit/controllers/Slots.php`
 - `plugins/elv/kit/controllers/Subscribers.php`
 - `plugins/elv/kit/controllers/Tickets.php`
@@ -166,11 +177,19 @@
 - `plugins/elv/kit/controllers/products/create.htm`
 - `plugins/elv/kit/controllers/products/index.htm`
 - `plugins/elv/kit/controllers/products/update.htm`
+- `plugins/elv/kit/controllers/questions/config_form.yaml`
+- `plugins/elv/kit/controllers/questions/config_list.yaml`
+- `plugins/elv/kit/controllers/questions/index.htm`
+- `plugins/elv/kit/controllers/questions/update.htm`
 - `plugins/elv/kit/controllers/releases/_list_toolbar.htm`
 - `plugins/elv/kit/controllers/releases/config_form.yaml`
 - `plugins/elv/kit/controllers/releases/config_list.yaml`
 - `plugins/elv/kit/controllers/releases/index.htm`
 - `plugins/elv/kit/controllers/releases/update.htm`
+- `plugins/elv/kit/controllers/reviews/config_form.yaml`
+- `plugins/elv/kit/controllers/reviews/config_list.yaml`
+- `plugins/elv/kit/controllers/reviews/index.htm`
+- `plugins/elv/kit/controllers/reviews/update.htm`
 - `plugins/elv/kit/controllers/slots/_list_toolbar.htm`
 - `plugins/elv/kit/controllers/slots/config_form.yaml`
 - `plugins/elv/kit/controllers/slots/config_list.yaml`
@@ -200,7 +219,9 @@
 - `plugins/elv/kit/models/Post.php`
 - `plugins/elv/kit/models/Price.php`
 - `plugins/elv/kit/models/Product.php`
+- `plugins/elv/kit/models/Question.php`
 - `plugins/elv/kit/models/Release.php`
+- `plugins/elv/kit/models/Review.php`
 - `plugins/elv/kit/models/Settings.php`
 - `plugins/elv/kit/models/Slot.php`
 - `plugins/elv/kit/models/Subscriber.php`
@@ -222,8 +243,12 @@
 - `plugins/elv/kit/models/price/fields.yaml`
 - `plugins/elv/kit/models/product/columns.yaml`
 - `plugins/elv/kit/models/product/fields.yaml`
+- `plugins/elv/kit/models/question/columns.yaml`
+- `plugins/elv/kit/models/question/fields.yaml`
 - `plugins/elv/kit/models/release/columns.yaml`
 - `plugins/elv/kit/models/release/fields.yaml`
+- `plugins/elv/kit/models/review/columns.yaml`
+- `plugins/elv/kit/models/review/fields.yaml`
 - `plugins/elv/kit/models/settings/fields.yaml`
 - `plugins/elv/kit/models/slot/columns.yaml`
 - `plugins/elv/kit/models/slot/fields.yaml`
@@ -235,6 +260,7 @@
 - `plugins/elv/kit/updates/add_booking_admin_reminder.php`
 - `plugins/elv/kit/updates/add_booking_reminder.php`
 - `plugins/elv/kit/updates/create_kit_customers.php`
+- `plugins/elv/kit/updates/create_kit_questions_reviews.php`
 - `plugins/elv/kit/updates/create_kit_tables.php`
 - `plugins/elv/kit/updates/create_kit_tickets.php`
 - `plugins/elv/kit/updates/create_price_versions.php`
@@ -250,6 +276,9 @@
 - `plugins/elv/kit/views/mail/message-admin.htm`
 - `plugins/elv/kit/views/mail/order-admin.htm`
 - `plugins/elv/kit/views/mail/order-customer.htm`
+- `plugins/elv/kit/views/mail/question-admin.htm`
+- `plugins/elv/kit/views/mail/review-admin.htm`
+- `plugins/elv/kit/views/mail/review-invite.htm`
 - `plugins/elv/kit/views/mail/subscribe-confirm.htm`
 - `plugins/elv/kit/views/mail/ticket-admin.htm`
 - `plugins/elv/kit/views/mail/ticket-customer.htm`
@@ -261,6 +290,7 @@
 - `themes/elv-studio/assets/css/account.css`
 - `themes/elv-studio/assets/css/blog.css`
 - `themes/elv-studio/assets/css/calculator.css`
+- `themes/elv-studio/assets/css/community.css`
 - `themes/elv-studio/assets/css/preview.css`
 - `themes/elv-studio/assets/css/search.css`
 - `themes/elv-studio/assets/css/styles.css`
@@ -293,6 +323,7 @@
 - `themes/elv-studio/pages/preview.htm`
 - `themes/elv-studio/pages/pricing.htm`
 - `themes/elv-studio/pages/privacy.htm`
+- `themes/elv-studio/pages/review.htm`
 - `themes/elv-studio/pages/search.htm`
 - `themes/elv-studio/pages/services-audit.htm`
 - `themes/elv-studio/pages/services-booking.htm`
@@ -317,8 +348,11 @@
 - `themes/elv-studio/partials/module-cards.htm`
 - `themes/elv-studio/partials/preview.htm`
 - `themes/elv-studio/partials/price-cards.htm`
+- `themes/elv-studio/partials/product-qa.htm`
+- `themes/elv-studio/partials/product-reviews.htm`
 - `themes/elv-studio/partials/product-switch.htm`
 - `themes/elv-studio/partials/service-cards.htm`
+- `themes/elv-studio/partials/stars.htm`
 - `themes/elv-studio/partials/subscribe.htm`
 - `themes/elv-studio/screenshot.png`
 - `themes/elv-studio/theme.yaml`
@@ -352,6 +386,7 @@
 - `tools/check-promises.mjs`
 - `tools/check-seo.mjs`
 - `tools/check-urls.mjs`
+- `tools/community-check.php`
 - `tools/download-check.php`
 - `tools/export-blog-articles.php`
 - `tools/export-static.php`

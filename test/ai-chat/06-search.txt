@@ -1,6 +1,6 @@
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -953,7 +953,7 @@ description = "Основной макет: шапка, подвал, инлай
 {% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
 {% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
 {% set seo_filtered = this.page.id in ['blog', 'blog-tech'] and (elv_query('category') or elv_query('tag') or elv_query('q')) %}
-{% set seo_noindex = this.page.id in ['404', 'order-success', 'account', 'tickets'] or seo_filtered %}
+{% set seo_noindex = this.page.id in ['404', 'order-success', 'account', 'tickets', 'review'] or seo_filtered %}
 {% set seo_page_no = this.page.paginated and not seo_filtered ? elv_page_no() : 1 %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
@@ -1009,6 +1009,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% endif %}
     {% if this.page.id in ['account', 'tickets'] %}
         <link rel="stylesheet" href="{{ 'assets/css/account.css'|theme }}?v=20261123-2">
+    {% endif %}
+    {% if this.page.id in ['kit', 'module', 'review'] %}
+        <link rel="stylesheet" href="{{ 'assets/css/community.css'|theme }}?v=20261124-1">
     {% endif %}
 </head>
 <body>

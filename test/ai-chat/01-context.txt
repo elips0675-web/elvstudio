@@ -1,6 +1,6 @@
-# Elv Landing — срез для AI-анализа: Консультант, поиск и карта сайта
+# Elv Landing — срез для AI-анализа: Консультант, поиск, поддержка и сообщество
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 ## Что это за проект
@@ -29,7 +29,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 1. Консультант: `Chat::answer()`, `TextFilter`, `ChatController`, `widget.js`.
 2. Поиск: `Search.php`, страница `/search/`, `search.js`, `/search-index.json`.
 3. Карта сайта: `sitemap.htm`, `Seo.php`, `Sitemap.php`.
-4. Проверки: `tools/check-php.mjs` (chat/seo/booking/account/tickets),
+4. Проверки: `tools/check-php.mjs` (chat/seo/booking/account/tickets/community),
    `tools/search-check.php`, `tools/price-check.php`, `node tools/gate.mjs`.
 5. Приватность: `SecurityHeaders.php` — CSP и заголовки HTTP.
 6. Прайс: `classes/Prices.php`, `models/Price.php`, админка
@@ -40,7 +40,11 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 8. Поддержка: `Support`, `TicketService`, `TicketController`, `Ticket`,
    `themes/elv-studio/pages/tickets.htm`, админка `controllers/Tickets.php`,
    `Telegram` и `TelegramController` — обращения, SLA и ChatOps.
-9. Исходники и аудит: `docs/html/`, `docs/00-audit-documents.md`
+9. Вопросы и отзывы: `Community`, `Questions`, `Reviews`, `Question`,
+   `Review`, `QuestionController`, `ReviewController`,
+   `partials/product-qa.htm`, `partials/product-reviews.htm`,
+   `pages/review.htm` — премодерация вопросов и отзывы по одноразовой ссылке.
+10. Исходники и аудит: `docs/html/`, `docs/00-audit-documents.md`
    (разделы 1–7) — что уже реализовано и что осталось решением владельца.
 
 ## Текущее поведение (факты)
@@ -138,6 +142,21 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   `/reply TK-000001 текст`, `/close`, `/status`, `/start` только из
   настроенного чата; пустой токен выключает канал, обращения продолжают
   работать в кабинете. Вебхук — `/telegram/webhook/{secret}`.
+- Вопросы к продукту — форма на `/kit/` и `/modules/:slug/`: имя, e-mail,
+  текст и обязательное согласие, honeypot и `throttle:10,1`. Вопрос создаётся
+  в статусе `new` и на витрине не виден: публикует его ответ из админки
+  (`Questions::answer()` ставит `published` и `published_at`). На витрине имя
+  сокращено до «Имя Ф.», e-mail и IP хранятся хэшем (`Community`).
+- Отзывы собираются только по одноразовой ссылке `review_token` из письма
+  после оплаты: срок 30 дней, приглашение отправляет `elv:kit:review`
+  (расписание 10:10) не раньше `review_delay_days` после заказа. После
+  отправки токен гасится, поэтому возврат идёт на страницу продукта с
+  `?review=sent#reviews`, а повторный переход по ссылке — 404. Отзыв ждёт
+  одобрения в админке; фото в отзывах не поддерживаются.
+- Микроразметка сообщества: `QAPage` для одного опубликованного вопроса,
+  `FAQPage` для списка, `AggregateRating` в `Product` — только при одобренных
+  отзывах. `/review/` закрыт `noindex`, `no-store` и `Disallow: /review/`
+  в `robots.txt`.
 - Карта `/sitemap/` сгруппирована по разделам: «Сайт», «Услуги», «Модули
   Elv Kit», «Купить и связаться», «Правовое и служебное», «Блог». В блоге —
   шесть свежих статей и четыре рубрики, а не плоский список 112 статей.
@@ -158,8 +177,9 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `node tools/gate.mjs` — all gates passed: 152 внутренних URL, 140 URL
   sitemap, 173 страницы статики без ошибок консоли, блог (301 на `/blog/`,
   9 страниц пагинации с canonical, 404 за последней), бюджет, состав ZIP,
-  бренд, кодировка, тарифы, PHP-проверки (chat/seo/booking/account/tickets)
-  и TTFB p90 в пределах 300 мс (медиана около 109 мс).
+  бренд, кодировка, тарифы, PHP-проверки
+  (chat/seo/booking/account/tickets/community) и TTFB p90 в пределах 300 мс
+  (медиана около 100 мс, p90 118 мс).
 - `node tools/check-budget.mjs` — `/` HTML 133,9 КБ / CSS 35,9 КБ / JS 18,9 КБ,
   gzip 25,0 КБ (лимиты 150/36/20/30).
 - `php tools/chat-check.php` — OK: тарифы, явный и запасной поиск, пустой
@@ -181,8 +201,13 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   выходные и границы рабочего окна, номер и статусы, первый ответ, повторное
   закрытие, права чужого покупателя, поиск по e-mail, письма, выключенный
   Telegram, секрет и чужой чат вебхука, заголовки `noindex`.
-- `node tools/check-package.mjs` — плагин 1.2.0, тема 1.0.0; товарный архив
-  329 файлов / 469 КБ без `demo/blog.json`, демо-архив 338 файлов / 671 КБ
+- `php tools/community-check.php` — OK: имя «Имя Ф.», хэши e-mail и IP,
+  статусы вопроса и отзыва, публикация ответом, одноразовый и просроченный
+  `review_token`, повторный отзыв, средняя оценка, `AggregateRating` и
+  `QAPage`, маршруты, письма, `noindex`, `robots.txt`, шаблоны темы,
+  выключатели настроек.
+- `node tools/check-package.mjs` — плагин 1.3.0, тема 1.0.0; товарный архив
+  367 файлов / 501 КБ без `demo/blog.json`, демо-архив 376 файлов / 702 КБ
   с ним и четырьмя пресетами ниш; `Demo::posts()` отдаёт 112 статей и
   совпадает с числом уникальных `slug` в датасете.
 - `node tools/check-headers.mjs` — CSP без `upgrade-insecure-requests` на

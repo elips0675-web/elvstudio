@@ -1,0 +1,1536 @@
+# Сообщество: вопросы с премодерацией и отзывы после оплаты
+
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
+
+===== FILE: plugins/elv/kit/updates/create_kit_questions_reviews.php =====
+
+<?php
+
+use October\Rain\Database\Schema\Blueprint;
+use October\Rain\Database\Updates\Migration;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * «Вопрос-ответ» и отзывы покупателей.
+ *
+ * `elv_kit_questions` — вопрос к продукту. Публикуется только после ответа
+ * и модерации: `status = published` ставит админка, а не отправитель.
+ * `elv_kit_reviews` — отзыв с оценкой 1–5. Собирается по одноразовой ссылке
+ * из письма, поэтому в заказе хранится `review_token`.
+ *
+ * Внешних ключей нет: продукт, заказ и покупатель могли быть удалены раньше
+ * записи, а история вопроса или отзыва должна остаться.
+ */
+return new class extends Migration
+{
+    public function up()
+    {
+        if (!Schema::hasTable('elv_kit_questions')) {
+            Schema::create('elv_kit_questions', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('customer_id')->nullable();
+                $table->string('name', 160);
+                $table->string('email', 191);
+                $table->text('question');
+                $table->text('answer')->nullable();
+                $table->string('answered_by', 160)->nullable();
+                $table->string('status', 20)->default('new');
+                $table->boolean('is_pinned')->default(false);
+                $table->integer('sort_order')->default(0);
+                $table->dateTime('answered_at')->nullable();
+                $table->dateTime('published_at')->nullable();
+                $table->string('ip_hash', 64)->nullable();
+                $table->timestamps();
+
+                $table->index('product_id');
+                $table->index('customer_id');
+                $table->index(['status', 'published_at']);
+                $table->index('created_at');
+            });
+        }
+
+        if (!Schema::hasTable('elv_kit_reviews')) {
+            Schema::create('elv_kit_reviews', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('order_id')->nullable();
+                $table->unsignedBigInteger('customer_id')->nullable();
+                $table->string('author_name', 160);
+                $table->string('email_hash', 64)->nullable();
+                $table->unsignedTinyInteger('rating')->default(5);
+                $table->string('title', 160)->nullable();
+                $table->text('text');
+                $table->text('pros')->nullable();
+                $table->text('cons')->nullable();
+                $table->string('status', 20)->default('pending');
+                $table->boolean('is_verified')->default(false);
+                $table->text('reply')->nullable();
+                $table->dateTime('replied_at')->nullable();
+                $table->dateTime('published_at')->nullable();
+                $table->string('ip_hash', 64)->nullable();
+                $table->timestamps();
+
+                $table->unique(['order_id', 'product_id']);
+                $table->index('product_id');
+                $table->index(['status', 'published_at']);
+                $table->index('created_at');
+            });
+        }
+
+        if (!Schema::hasColumn('elv_kit_orders', 'review_token')) {
+            Schema::table('elv_kit_orders', function (Blueprint $table) {
+                $table->string('review_token', 48)->nullable()->unique();
+                $table->dateTime('review_token_expires_at')->nullable();
+                $table->dateTime('review_invited_at')->nullable();
+            });
+        }
+    }
+
+    public function down()
+    {
+        if (Schema::hasColumn('elv_kit_orders', 'review_token')) {
+            Schema::table('elv_kit_orders', function (Blueprint $table) {
+                $table->dropUnique(['review_token']);
+                $table->dropColumn(['review_token', 'review_token_expires_at', 'review_invited_at']);
+            });
+        }
+
+        Schema::dropIfExists('elv_kit_reviews');
+        Schema::dropIfExists('elv_kit_questions');
+    }
+};
+
+===== FILE: plugins/elv/kit/classes/Community.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+/**
+ * Community — общие правила публичных вопросов и отзывов.
+ *
+ * Имя покупателя не публикуется целиком: на витрине остаётся имя и первая
+ * буква фамилии («Алексей К.»). E-mail и IP хранятся только хэшем.
+ */
+class Community
+{
+    public static function displayName(string $name): string
+    {
+        $name = trim(preg_replace('/\s+/u', ' ', strip_tags($name)) ?? '');
+
+        if ($name === '') {
+            return 'Покупатель';
+        }
+
+        $parts = preg_split('/\s+/u', $name) ?: [];
+        $first = (string) ($parts[0] ?? '');
+
+        if ($first === '') {
+            return 'Покупатель';
+        }
+
+        $last = count($parts) > 1 ? (string) end($parts) : '';
+        $first = mb_substr($first, 0, 60);
+
+        if ($last === '') {
+            return $first;
+        }
+
+        return $first . ' ' . mb_strtoupper(mb_substr($last, 0, 1)) . '.';
+    }
+
+    public static function emailHash(string $email): string
+    {
+        return hash('sha256', mb_strtolower(trim($email)));
+    }
+
+    public static function ipHash(string $ip): string
+    {
+        return hash('sha256', trim($ip) . '|' . (string) config('app.key'));
+    }
+
+    public static function average(iterable $ratings): float
+    {
+        $sum = 0;
+        $count = 0;
+
+        foreach ($ratings as $rating) {
+            $sum += (int) $rating;
+            $count++;
+        }
+
+        return $count > 0 ? round($sum / $count, 1) : 0.0;
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Questions.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Elv\Kit\Classes\Mail\QuestionAdmin;
+use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Question;
+use Elv\Kit\Models\Settings;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+/**
+ * Questions — публичные вопросы к продукту и их модерация.
+ *
+ * Вопрос сохраняется сразу, письмо администратору ставится после записи.
+ * На витрину вопрос попадает только после ответа: `answer()` сам ставит
+ * `published`, потому что ответ и есть модерация.
+ */
+class Questions
+{
+    public static function enabled(): bool
+    {
+        return filter_var(Settings::get('qa_enabled', true), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * published — вопросы продукта, которые можно показывать.
+     *
+     * @return \October\Rain\Database\Collection<int, Question>
+     */
+    public static function published(Product $product, int $limit = 0)
+    {
+        $query = Question::query()
+            ->published()
+            ->where('product_id', (int) $product->id);
+
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
+    }
+
+    public static function count(Product $product): int
+    {
+        return Question::query()
+            ->where('product_id', (int) $product->id)
+            ->where('status', Question::STATUS_PUBLISHED)
+            ->whereNotNull('answer')
+            ->where('answer', '<>', '')
+            ->count();
+    }
+
+    /**
+     * ask — новый вопрос. Статус `new`, на витрине его ещё нет.
+     *
+     * @param  array{name: string, email: string, question: string}  $data
+     */
+    public function ask(Product $product, array $data, string $ip = ''): Question
+    {
+        $question = new Question();
+        $question->fill([
+            'product_id' => (int) $product->id,
+            'name' => (string) $data['name'],
+            'email' => mb_strtolower((string) $data['email']),
+            'question' => (string) $data['question'],
+            'status' => Question::STATUS_NEW,
+            'ip_hash' => Community::ipHash($ip),
+        ]);
+        $question->save();
+
+        $this->notifyAdmin($question);
+
+        return $question;
+    }
+
+    /**
+     * answer — ответ поддержки. Публикует вопрос.
+     */
+    public function answer(Question $question, string $answer, string $author = 'Поддержка'): Question
+    {
+        $answer = trim($answer);
+
+        if ($answer === '') {
+            return $question;
+        }
+
+        $question->answer = $answer;
+        $question->answered_by = mb_substr($author, 0, 160);
+        $question->answered_at = now();
+        $question->status = Question::STATUS_PUBLISHED;
+        $question->published_at = now();
+        $question->save();
+
+        return $question->fresh();
+    }
+
+    public function reject(Question $question): Question
+    {
+        $question->status = Question::STATUS_REJECTED;
+        $question->published_at = null;
+        $question->save();
+
+        return $question->fresh();
+    }
+
+    protected function notifyAdmin(Question $question): void
+    {
+        $admin = (string) (Settings::get('order_notify_email') ?: Settings::get('email'));
+
+        if ($admin === '') {
+            Log::warning('Elv Kit: некуда отправить письмо о новом вопросе', ['question' => $question->id]);
+
+            return;
+        }
+
+        try {
+            Mail::to($admin)->queue(new QuestionAdmin($question));
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: письмо о новом вопросе не отправлено', [
+                'question' => $question->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Reviews.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Elv\Kit\Classes\Mail\ReviewAdmin;
+use Elv\Kit\Classes\Mail\ReviewInvite;
+use Elv\Kit\Models\Order;
+use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Review;
+use Elv\Kit\Models\Settings;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+/**
+ * Reviews — отзывы покупателей, приглашения и модерация.
+ *
+ * Отзыв нельзя оставить с улицы: ссылка `review_token` выдаётся оплаченному
+ * заказу и гасится после отправки. На витрину и в `AggregateRating` попадают
+ * только одобренные отзывы.
+ */
+class Reviews
+{
+    public const INVITE_DAYS = 7;
+
+    public static function enabled(): bool
+    {
+        return filter_var(Settings::get('reviews_enabled', true), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public static function inviteEnabled(): bool
+    {
+        return filter_var(Settings::get('review_invite_enabled', false), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public static function delayDays(): int
+    {
+        $days = (int) Settings::get('review_delay_days', self::INVITE_DAYS);
+
+        return max(1, min(90, $days ?: self::INVITE_DAYS));
+    }
+
+    /**
+     * approved — опубликованные отзывы продукта.
+     *
+     * @return \October\Rain\Database\Collection<int, Review>
+     */
+    public static function approved(Product $product, int $limit = 0)
+    {
+        $query = Review::query()
+            ->approved()
+            ->where('product_id', (int) $product->id);
+
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * summary — количество и средняя оценка только по одобренным отзывам.
+     *
+     * @return array{count: int, average: float}
+     */
+    public static function summary(Product $product): array
+    {
+        $ratings = Review::query()
+            ->where('product_id', (int) $product->id)
+            ->where('status', Review::STATUS_APPROVED)
+            ->pluck('rating')
+            ->all();
+
+        return [
+            'count' => count($ratings),
+            'average' => Community::average($ratings),
+        ];
+    }
+
+    /**
+     * aggregate — узел `AggregateRating` или null, если отзывов нет.
+     *
+     * @return array<string, mixed>|null
+     */
+    public static function aggregate(Product $product): ?array
+    {
+        $summary = static::summary($product);
+
+        if ($summary['count'] < 1) {
+            return null;
+        }
+
+        return [
+            '@type' => 'AggregateRating',
+            'ratingValue' => (string) $summary['average'],
+            'reviewCount' => (string) $summary['count'],
+            'bestRating' => '5',
+            'worstRating' => '1',
+        ];
+    }
+
+    /**
+     * createInvitation — одноразовая ссылка для оплаченного заказа.
+     */
+    public function createInvitation(Order $order): string
+    {
+        $token = bin2hex(random_bytes(24));
+
+        $order->forceFill([
+            'review_token' => $token,
+            'review_token_expires_at' => now()->addDays(30),
+            'review_invited_at' => now(),
+        ])->save();
+
+        return $token;
+    }
+
+    public function invitationUrl(Order $order): string
+    {
+        return $order->review_token
+            ? url('/review/' . $order->review_token) . '/'
+            : '';
+    }
+
+    public function sendInvitation(Order $order): bool
+    {
+        $product = $order->product;
+
+        if (!$product || trim((string) $order->email) === '') {
+            return false;
+        }
+
+        $token = $this->createInvitation($order);
+
+        try {
+            Mail::to($order->email)->queue(new ReviewInvite($order, $product, $token));
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: приглашение к отзыву не отправлено', [
+                'order' => $order->order_no,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * orderByToken — оплаченный заказ по действующей ссылке.
+     */
+    public function orderByToken(string $token): ?Order
+    {
+        $token = trim($token);
+
+        if (preg_match('~^[a-f0-9]{48}$~', $token) !== 1) {
+            return null;
+        }
+
+        $order = Order::query()
+            ->where('review_token', $token)
+            ->where('status', Order::STATUS_PAID)
+            ->first();
+
+        if (!$order || !$order->review_token_expires_at || $order->review_token_expires_at->isPast()) {
+            return null;
+        }
+
+        return $order;
+    }
+
+    public function existsFor(Order $order): bool
+    {
+        if (!$order->product_id) {
+            return false;
+        }
+
+        return Review::query()
+            ->where('order_id', (int) $order->id)
+            ->where('product_id', (int) $order->product_id)
+            ->exists();
+    }
+
+    /**
+     * submit — отзыв по ссылке из письма. Ждёт модерации.
+     *
+     * @param  array{author_name: string, rating: int, title?: string, text: string, pros?: string, cons?: string}  $data
+     */
+    public function submit(Order $order, array $data, string $ip = ''): ?Review
+    {
+        if (!$order->product_id || $this->existsFor($order)) {
+            return null;
+        }
+
+        $review = new Review();
+        $review->fill([
+            'product_id' => (int) $order->product_id,
+            'order_id' => (int) $order->id,
+            'author_name' => (string) $data['author_name'],
+            'email_hash' => Community::emailHash((string) $order->email),
+            'rating' => max(1, min(5, (int) $data['rating'])),
+            'title' => (string) ($data['title'] ?? ''),
+            'text' => (string) $data['text'],
+            'pros' => (string) ($data['pros'] ?? ''),
+            'cons' => (string) ($data['cons'] ?? ''),
+            'status' => Review::STATUS_PENDING,
+            'is_verified' => true,
+            'ip_hash' => Community::ipHash($ip),
+        ]);
+        $review->save();
+
+        $order->forceFill([
+            'review_token' => null,
+            'review_token_expires_at' => null,
+        ])->save();
+
+        $this->notifyAdmin($review);
+
+        return $review;
+    }
+
+    public function approve(Review $review): Review
+    {
+        $review->status = Review::STATUS_APPROVED;
+        $review->published_at = $review->published_at ?: now();
+        $review->save();
+
+        return $review->fresh();
+    }
+
+    public function reject(Review $review): Review
+    {
+        $review->status = Review::STATUS_REJECTED;
+        $review->published_at = null;
+        $review->save();
+
+        return $review->fresh();
+    }
+
+    protected function notifyAdmin(Review $review): void
+    {
+        $admin = (string) (Settings::get('order_notify_email') ?: Settings::get('email'));
+
+        if ($admin === '') {
+            Log::warning('Elv Kit: некуда отправить письмо о новом отзыве', ['review' => $review->id]);
+
+            return;
+        }
+
+        try {
+            Mail::to($admin)->queue(new ReviewAdmin($review));
+        }
+        catch (\Throwable $e) {
+            Log::warning('Elv Kit: письмо о новом отзыве не отправлено', [
+                'review' => $review->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Http/QuestionController.php =====
+
+<?php namespace Elv\Kit\Classes\Http;
+
+use Elv\Kit\Classes\AntiSpam;
+use Elv\Kit\Classes\Catalog;
+use Elv\Kit\Classes\Questions;
+use Elv\Kit\Models\Product;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+
+/**
+ * QuestionController — вопрос к продукту со страницы витрины.
+ *
+ * Форма открыта без входа в кабинет: вопрос покупателя не требует заказа.
+ * Запись создаётся в статусе `new` и на витрине не появляется, пока её не
+ * опубликуют ответом. Возврат — на ту же страницу продукта к блоку «Вопрос-ответ».
+ */
+class QuestionController extends FormController
+{
+    protected ?Product $product = null;
+
+    public function __construct(protected Questions $questions = new Questions())
+    {
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'product' => 'required|string|max:160',
+            'name' => 'required|string|max:160',
+            'email' => 'required|email|max:191',
+            'question' => 'required|string|min:10|max:3000',
+            'consent' => 'accepted',
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'product.required' => 'Не выбран продукт для вопроса.',
+            'name.required' => 'Укажите имя.',
+            'email.required' => 'Укажите e-mail — на него ответим.',
+            'email.email' => 'Проверьте адрес e-mail.',
+            'question.required' => 'Напишите вопрос.',
+            'question.min' => 'Опишите вопрос подробнее — минимум 10 символов.',
+            'consent.accepted' => 'Нужно согласие на обработку персональных данных.',
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return JsonResponse|RedirectResponse|null
+     */
+    protected function handle(array $data, Request $request)
+    {
+        if (!Questions::enabled()) {
+            return $this->invalid($request, ['question' => ['Приём вопросов временно закрыт.']]);
+        }
+
+        $this->product = Catalog::find((string) ($data['product'] ?? ''));
+
+        if (!$this->product) {
+            return $this->invalid($request, ['product' => ['Такой продукт не найден.']]);
+        }
+
+        $this->questions->ask($this->product, [
+            'name' => (string) $data['name'],
+            'email' => (string) $data['email'],
+            'question' => (string) $data['question'],
+        ], AntiSpam::ip($request));
+
+        return null;
+    }
+
+    protected function fallbackPath(): string
+    {
+        if ($this->product) {
+            return $this->product->kind === 'kit'
+                ? '/kit/'
+                : '/modules/' . $this->product->slug . '/';
+        }
+
+        return '/kit/';
+    }
+
+    protected function anchor(): string
+    {
+        return 'qa';
+    }
+
+    protected function done(Request $request, array $extra = [])
+    {
+        if ($request->expectsJson()) {
+            return response()->json(array_merge(['ok' => true], $extra), 201);
+        }
+
+        return $this->back($request, ['sent' => '1'])
+            ->with('elv_success', 'Вопрос отправлен. Ответ появится на этой странице после проверки.');
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Http/ReviewController.php =====
+
+<?php namespace Elv\Kit\Classes\Http;
+
+use Elv\Kit\Classes\AntiSpam;
+use Elv\Kit\Classes\Reviews;
+use Elv\Kit\Models\Order;
+use Elv\Kit\Models\Product;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+
+/**
+ * ReviewController — отзыв по одноразовой ссылке из письма.
+ *
+ * Ссылка выдаётся оплаченному заказу (`review_token`) и гасится после отправки.
+ * Отзыв ждёт модерации: на витрину и в `AggregateRating` попадают только
+ * одобренные. Просроченная или использованная ссылка отвечает 404.
+ */
+class ReviewController extends FormController
+{
+    protected ?Order $order = null;
+
+    protected ?Product $product = null;
+
+    protected string $token = '';
+
+    public function __construct(protected Reviews $reviews = new Reviews())
+    {
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'author_name' => 'required|string|max:160',
+            'rating' => 'required|integer|min:1|max:5',
+            'title' => 'nullable|string|max:160',
+            'text' => 'required|string|min:20|max:4000',
+            'pros' => 'nullable|string|max:1000',
+            'cons' => 'nullable|string|max:1000',
+            'consent' => 'accepted',
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'author_name.required' => 'Укажите имя.',
+            'rating.required' => 'Поставьте оценку от 1 до 5.',
+            'rating.min' => 'Оценка — от 1 до 5.',
+            'rating.max' => 'Оценка — от 1 до 5.',
+            'text.required' => 'Напишите отзыв.',
+            'text.min' => 'Расскажите подробнее — минимум 20 символов.',
+            'consent.accepted' => 'Нужно согласие на публикацию отзыва.',
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return JsonResponse|RedirectResponse|null
+     */
+    protected function handle(array $data, Request $request)
+    {
+        if (!Reviews::enabled()) {
+            abort(404);
+        }
+
+        $this->token = (string) $request->route('token');
+        $this->order = $this->reviews->orderByToken($this->token);
+
+        if (!$this->order) {
+            abort(404);
+        }
+
+        $this->product = $this->order->product;
+
+        if ($this->reviews->existsFor($this->order)) {
+            return $this->invalid($request, ['text' => ['Отзыв по этому заказу уже отправлен.']]);
+        }
+
+        $this->reviews->submit($this->order, [
+            'author_name' => (string) $data['author_name'],
+            'rating' => (int) $data['rating'],
+            'title' => (string) ($data['title'] ?? ''),
+            'text' => (string) $data['text'],
+            'pros' => (string) ($data['pros'] ?? ''),
+            'cons' => (string) ($data['cons'] ?? ''),
+        ], AntiSpam::ip($request));
+
+        return null;
+    }
+
+    protected function fallbackPath(): string
+    {
+        return '/review/' . $this->token . '/';
+    }
+
+    protected function anchor(): string
+    {
+        return 'review-form';
+    }
+
+    protected function done(Request $request, array $extra = [])
+    {
+        if ($request->expectsJson()) {
+            return response()->json(array_merge(['ok' => true], $extra), 201);
+        }
+
+        // Токен гасится после отправки, поэтому возврат — на страницу продукта:
+        // ссылка на отзыв к этому моменту уже недействительна.
+        $url = $this->product ? (string) $this->product->url : rtrim(url('/'), '/') . '/';
+
+        return redirect($url . '?review=sent#reviews')
+            ->with('elv_success', 'Спасибо! Отзыв отправлен на проверку — опубликуем после модерации.');
+    }
+}
+
+===== FILE: plugins/elv/kit/models/Question.php =====
+
+<?php namespace Elv\Kit\Models;
+
+use Elv\Kit\Classes\Community;
+use Model;
+
+/**
+ * Question — вопрос к продукту.
+ *
+ * Отправитель создаёт строку в статусе `new`. На витрину она попадает только
+ * после ответа и модерации: `published` ставит админка, а `answer` не пустой.
+ */
+class Question extends Model
+{
+    public const STATUS_NEW = 'new';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_REJECTED = 'rejected';
+
+    public $table = 'elv_kit_questions';
+
+    public $fillable = [
+        'product_id', 'customer_id', 'name', 'email', 'question', 'answer',
+        'answered_by', 'status', 'is_pinned', 'sort_order', 'answered_at',
+        'published_at', 'ip_hash',
+    ];
+
+    public $rules = [
+        'product_id' => 'required|integer|min:1',
+        'name' => 'required|max:160',
+        'email' => 'required|email|max:191',
+        'question' => 'required|max:3000',
+        'status' => 'required|in:new,published,rejected',
+    ];
+
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'answered_at' => 'datetime',
+        'published_at' => 'datetime',
+    ];
+
+    public $belongsTo = [
+        'product' => Product::class,
+        'customer' => Customer::class,
+    ];
+
+    public function scopePublished($query)
+    {
+        return $query
+            ->where('status', self::STATUS_PUBLISHED)
+            ->whereNotNull('answer')
+            ->where('answer', '<>', '')
+            ->orderByDesc('is_pinned')
+            ->orderBy('sort_order')
+            ->orderByDesc('published_at');
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return Community::displayName((string) $this->name);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ((string) $this->status) {
+            self::STATUS_PUBLISHED => 'Опубликован',
+            self::STATUS_REJECTED => 'Отклонён',
+            default => 'Новый',
+        };
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return (string) $this->status === self::STATUS_PUBLISHED && trim((string) $this->answer) !== '';
+    }
+}
+
+===== FILE: plugins/elv/kit/models/Review.php =====
+
+<?php namespace Elv\Kit\Models;
+
+use Elv\Kit\Classes\Community;
+use Model;
+
+/**
+ * Review — отзыв покупателя с оценкой 1–5.
+ *
+ * Отзыв приходит по одноразовой ссылке из письма и ждёт модерации. На витрину
+ * и в `AggregateRating` попадают только `approved`.
+ */
+class Review extends Model
+{
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+
+    public $table = 'elv_kit_reviews';
+
+    public $fillable = [
+        'product_id', 'order_id', 'customer_id', 'author_name', 'email_hash',
+        'rating', 'title', 'text', 'pros', 'cons', 'status', 'is_verified',
+        'reply', 'replied_at', 'published_at', 'ip_hash',
+    ];
+
+    public $rules = [
+        'product_id' => 'required|integer|min:1',
+        'author_name' => 'required|max:160',
+        'rating' => 'required|integer|min:1|max:5',
+        'text' => 'required|max:4000',
+        'status' => 'required|in:pending,approved,rejected',
+    ];
+
+    protected $casts = [
+        'is_verified' => 'boolean',
+        'replied_at' => 'datetime',
+        'published_at' => 'datetime',
+    ];
+
+    public $belongsTo = [
+        'product' => Product::class,
+        'order' => Order::class,
+        'customer' => Customer::class,
+    ];
+
+    public function scopeApproved($query)
+    {
+        return $query
+            ->where('status', self::STATUS_APPROVED)
+            ->orderByDesc('published_at')
+            ->orderByDesc('id');
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return Community::displayName((string) $this->author_name);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ((string) $this->status) {
+            self::STATUS_APPROVED => 'Одобрен',
+            self::STATUS_REJECTED => 'Отклонён',
+            default => 'На модерации',
+        };
+    }
+
+    public function getIsApprovedAttribute(): bool
+    {
+        return (string) $this->status === self::STATUS_APPROVED;
+    }
+
+    /**
+     * stars — пять флагов для шаблона: `true` для заполненной звезды.
+     *
+     * @return array<int, bool>
+     */
+    public function getStarsAttribute(): array
+    {
+        $rating = max(0, min(5, (int) $this->rating));
+
+        return array_map(fn (int $star) => $star <= $rating, range(1, 5));
+    }
+}
+
+===== FILE: themes/elv-studio/partials/product-qa.htm =====
+
+{% if product and elv_qa_enabled() %}
+    {% set questions = elv_questions(product, 20) %}
+    {% set qaCount = elv_question_count(product) %}
+
+    <section class="section section--paper" id="qa">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Вопрос-ответ</span>
+                <h2>Вопросы о {{ product.name }}</h2>
+                <p>
+                    {% if qaCount %}
+                        {{ qaCount }} {{ qaCount == 1 ? 'вопрос' : (qaCount < 5 ? 'вопроса' : 'вопросов') }} с ответами.
+                    {% else %}
+                        Пока вопросов нет. Задайте первый — ответ появится здесь после проверки.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="community">
+                <div class="community__list">
+                    {% for question in questions %}
+                        <article class="qa">
+                            <h3 class="qa__title">{{ question.question }}</h3>
+                            <div class="qa__answer">{{ question.answer|elv_text|raw }}</div>
+                            <p class="qa__meta">
+                                {{ question.display_name }}
+                                {% if question.answered_at %}
+                                    · {{ question.answered_at|date('d.m.Y') }}
+                                {% endif %}
+                            </p>
+                        </article>
+                    {% else %}
+                        <div class="empty">
+                            <p>Вопросов пока нет. Ваш вопрос может стать первым.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <form
+                    class="form card community__form"
+                    id="qa-form"
+                    method="post"
+                    action="{{ url('/questions') }}"
+                    data-elv-form
+                    data-success="Вопрос отправлен. Ответ появится на этой странице после проверки.">
+                    {{ elv_csrf()|raw }}
+                    <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <input type="hidden" name="product" value="{{ product.slug }}">
+
+                    <h3>Задать вопрос</h3>
+
+                    {% if elv_flash('elv_success') %}
+                        <div class="alert alert--ok" role="status">{{ elv_flash('elv_success') }}</div>
+                    {% endif %}
+
+                    {% if elv_errors() %}
+                        <div class="alert alert--err" role="alert">
+                            {% for field, messages in elv_errors() %}
+                                {{ messages|first }}
+                                {% if not loop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form__row">
+                        <div class="field">
+                            <label for="qa-name">Имя</label>
+                            <input class="input" id="qa-name" type="text" name="name" required maxlength="160" autocomplete="name" value="{{ elv_old('name') }}">
+                        </div>
+                        <div class="field">
+                            <label for="qa-email">E-mail</label>
+                            <input class="input" id="qa-email" type="email" name="email" required maxlength="191" autocomplete="email" value="{{ elv_old('email') }}">
+                            <span class="hint">Не публикуется: нужен, чтобы ответить лично.</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="qa-question">Вопрос</label>
+                        <textarea class="textarea" id="qa-question" name="question" required minlength="10" maxlength="3000" placeholder="Что важно уточнить перед покупкой">{{ elv_old('question') }}</textarea>
+                    </div>
+
+                    <label class="check">
+                        <input type="checkbox" name="consent" value="1" required>
+                        <span>Согласен на обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                    </label>
+
+                    <div>
+                        <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить вопрос</button>
+                    </div>
+                    <p class="hint">Вопрос публикуется с ответом и без e-mail. Имя на сайте — «Имя Ф.».</p>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+===== FILE: themes/elv-studio/partials/product-reviews.htm =====
+
+{% if product and elv_reviews_enabled() %}
+    {% set reviews = elv_reviews(product, 20) %}
+    {% set summary = elv_review_summary(product) %}
+
+    <section class="section" id="reviews">
+        <div class="container">
+            {% if elv_query('review') == 'sent' %}
+                <div class="alert alert--ok mb-24" role="status">
+                    Спасибо! Отзыв отправлен на проверку — опубликуем после модерации.
+                </div>
+            {% endif %}
+
+            <div class="section-head">
+                <span class="eyebrow">Отзывы</span>
+                <h2>Что говорят покупатели</h2>
+                {% if summary.count %}
+                    <p class="review-summary">
+                        {% partial 'stars' rating=summary.average %}
+                        <b>{{ summary.average }}</b> из 5 · {{ summary.count }}
+                        {{ summary.count == 1 ? 'отзыв' : (summary.count < 5 ? 'отзыва' : 'отзывов') }}
+                    </p>
+                {% else %}
+                    <p>Отзывов пока нет. Ссылку на отзыв присылаем после оплаты заказа.</p>
+                {% endif %}
+            </div>
+
+            <div class="community__list">
+                {% for review in reviews %}
+                    <article class="review">
+                        <header class="review__head">
+                            {% partial 'stars' rating=review.rating %}
+                            <div>
+                                <b>{{ review.display_name }}</b>
+                                {% if review.is_verified %}
+                                    <span class="badge badge--accent">{{ elv_icon('check')|raw }} Покупка подтверждена</span>
+                                {% endif %}
+                            </div>
+                            <time class="muted">{{ review.published_at ? review.published_at|date('d.m.Y') : '' }}</time>
+                        </header>
+
+                        {% if review.title %}
+                            <h3 class="review__title">{{ review.title }}</h3>
+                        {% endif %}
+
+                        <div class="review__text">{{ review.text|elv_text|raw }}</div>
+
+                        {% if review.pros %}
+                            <p class="review__pros"><b>Плюсы:</b> {{ review.pros }}</p>
+                        {% endif %}
+
+                        {% if review.cons %}
+                            <p class="review__cons"><b>Минусы:</b> {{ review.cons }}</p>
+                        {% endif %}
+
+                        {% if review.reply %}
+                            <div class="review__reply">
+                                <b>Ответ магазина</b>
+                                <div>{{ review.reply|elv_text|raw }}</div>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% else %}
+                    <div class="empty">
+                        <p>Пока нет опубликованных отзывов.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+===== FILE: themes/elv-studio/partials/stars.htm =====
+
+{% set value = rating|default(0) %}
+{% set filled = value|round %}
+<span class="stars" role="img" aria-label="Оценка {{ value }} из 5">
+    {% for i in 1..5 %}<span class="star{{ i <= filled ? ' star--on' : '' }}" aria-hidden="true">★</span>{% endfor %}
+</span>
+
+===== FILE: themes/elv-studio/pages/review.htm =====
+
+title = "Отзыв о продукте"
+url = "/review/:token"
+layout = "default"
+meta_title = "Отзыв о продукте"
+meta_description = "Одноразовая ссылка на отзыв о продукте Elv Kit."
+meta_robots = "noindex, nofollow"
+==
+{% set token = this.param.token %}
+{% set order = elv_review_order(token) %}
+{% if not order %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set product = order.product %}
+{% if not product %}
+    {{ elv_not_found() }}
+{% endif %}
+{% set already = elv_review_exists(order) %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Отзыв</span>
+            <h1>Как вам {{ product.name }}?</h1>
+            <p class="lead">
+                Заказ {{ order.order_no }} оплачен. Расскажите, как продукт работает у вас:
+                это помогает другим покупателям выбрать и не ошибиться.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            <div class="split">
+                <div>
+                    {% if already %}
+                        <div class="card">
+                            <h2>Отзыв уже отправлен</h2>
+                            <p class="muted">
+                                Спасибо! Отзыв по этому заказу получен и ждёт проверки.
+                                Ссылка одноразовая, повторно ей воспользоваться нельзя.
+                            </p>
+                            <p class="mt-24">
+                                <a class="btn btn--primary" href="{{ product.url }}">Вернуться к продукту</a>
+                            </p>
+                        </div>
+                    {% else %}
+                        <form
+                            class="form card"
+                            id="review-form"
+                            method="post"
+                            action="{{ url('/review/' ~ token) }}"
+                            data-elv-form
+                            data-success="Спасибо! Отзыв отправлен на проверку — опубликуем после модерации.">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <h2>Оставить отзыв</h2>
+
+                            {% if elv_errors() %}
+                                <div class="alert alert--err" role="alert">
+                                    {% for field, messages in elv_errors() %}
+                                        {{ messages|first }}
+                                        {% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="form__row">
+                                <div class="field">
+                                    <label for="review-name">Имя</label>
+                                    <input class="input" id="review-name" type="text" name="author_name" required maxlength="160" autocomplete="name" value="{{ elv_old('author_name', order.customer_name) }}">
+                                    <span class="hint">На сайте покажем как «Имя Ф.».</span>
+                                </div>
+                                <div class="field">
+                                    <label for="review-rating">Оценка</label>
+                                    <select class="select" id="review-rating" name="rating" required>
+                                        <option value="5">5 — отлично</option>
+                                        <option value="4">4 — хорошо</option>
+                                        <option value="3">3 — нормально</option>
+                                        <option value="2">2 — плохо</option>
+                                        <option value="1">1 — очень плохо</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="review-title">Заголовок <span class="muted">— необязательно</span></label>
+                                <input class="input" id="review-title" type="text" name="title" maxlength="160" value="{{ elv_old('title') }}">
+                            </div>
+
+                            <div class="field">
+                                <label for="review-text">Отзыв</label>
+                                <textarea class="textarea" id="review-text" name="text" required minlength="20" maxlength="4000" placeholder="Что получилось, что было сложно, что помогло">{{ elv_old('text') }}</textarea>
+                            </div>
+
+                            <div class="form__row">
+                                <div class="field">
+                                    <label for="review-pros">Плюсы <span class="muted">— необязательно</span></label>
+                                    <textarea class="textarea" id="review-pros" name="pros" maxlength="1000">{{ elv_old('pros') }}</textarea>
+                                </div>
+                                <div class="field">
+                                    <label for="review-cons">Минусы <span class="muted">— необязательно</span></label>
+                                    <textarea class="textarea" id="review-cons" name="cons" maxlength="1000">{{ elv_old('cons') }}</textarea>
+                                </div>
+                            </div>
+
+                            <label class="check">
+                                <input type="checkbox" name="consent" value="1" required>
+                                <span>Согласен на публикацию отзыва и обработку персональных данных по <a href="{{ 'privacy'|page }}">политике конфиденциальности</a>.</span>
+                            </label>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">{{ elv_icon('send')|raw }} Отправить отзыв</button>
+                            </div>
+                            <p class="hint">Отзыв публикуется после проверки. Ссылка одноразовая и действует 30 дней.</p>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <aside class="card card--flat">
+                    <h3>Что публикуем</h3>
+                    <ul class="list-check mt-24">
+                        <li>{{ elv_icon('check')|raw }} Оценку, заголовок и текст отзыва</li>
+                        <li>{{ elv_icon('check')|raw }} Имя в виде «Имя Ф.»</li>
+                        <li>{{ elv_icon('check')|raw }} Пометку «Покупка подтверждена»</li>
+                    </ul>
+                    <h3 class="mt-24">Что не публикуем</h3>
+                    <ul class="list-check list-check--no mt-24">
+                        <li>{{ elv_icon('close')|raw }} E-mail и номер заказа</li>
+                        <li>{{ elv_icon('close')|raw }} Фотографии и вложения</li>
+                        <li>{{ elv_icon('close')|raw }} Отзывы без проверки</li>
+                    </ul>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>
+
+===== FILE: tools/community-check.php =====
+
+<?php
+
+require __DIR__ . '/../bootstrap/autoload.php';
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+use Elv\Kit\Classes\Community;
+use Elv\Kit\Classes\Questions;
+use Elv\Kit\Classes\Reviews;
+use Elv\Kit\Classes\Seo;
+use Elv\Kit\Classes\SecurityHeaders;
+use Elv\Kit\Models\Order;
+use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Question;
+use Elv\Kit\Models\Review;
+use Elv\Kit\Models\Settings;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+
+/*
+ * community-check — вопросы, отзывы, премодерация и микроразметка.
+ *
+ * Проверка не ходит в сеть: почта уходит в array-транспорт, Telegram выключен.
+ * Всё, что создаётся, удаляется в конце.
+ */
+
+$errors = [];
+
+$check = function (bool $condition, string $message) use (&$errors) {
+    if (!$condition) {
+        $errors[] = $message;
+    }
+};
+
+config(['mail.default' => 'array']);
+
+// Имя на витрине — «Имя Ф.», e-mail не публикуется.
+$check(Community::displayName('Алексей Кузнецов') === 'Алексей К.', 'display name is not «Имя Ф.»');
+$check(Community::displayName('  мария   сергеевна  иванова ') === 'мария И.', 'display name does not collapse spaces');
+$check(Community::displayName('Пётр') === 'Пётр', 'single name is not kept');
+$check(Community::displayName('') === 'Покупатель', 'empty name is not replaced');
+$check(Community::average([5, 4]) === 4.5, 'average is not 4.5');
+$check(Community::average([]) === 0.0, 'empty average is not zero');
+
+$suffix = bin2hex(random_bytes(4));
+$email = 'qa-community-' . $suffix . '@example.test';
+$slug = 'qa-product-' . $suffix;
+
+$product = new Product();
+$product->name = 'Тестовый продукт ' . $suffix;
+$product->slug = $slug;
+$product->kind = 'module';
+$product->tagline = 'Продукт для проверки вопросов и отзывов';
+$product->description = 'Создаётся проверкой community-check и удаляется после неё.';
+$product->price_cents = 1000;
+$product->is_active = true;
+$product->save();
+
+$questions = new Questions();
+
+$first = $questions->ask($product, [
+    'name' => 'Алексей Кузнецов',
+    'email' => $email,
+    'question' => 'Можно ли поставить раздел на два сайта?',
+], '127.0.0.1');
+
+$check($first instanceof Question, 'question is not created');
+$check((string) $first->status === Question::STATUS_NEW, 'new question is not in «new» status');
+$check($first->published_at === null, 'new question already has a publish date');
+$check($first->display_name === 'Алексей К.', 'question display name is not «Имя Ф.»');
+$check($first->ip_hash !== null && !str_contains((string) $first->ip_hash, '127.0.0.1'), 'question stores a raw IP');
+$check(Questions::count($product) === 0, 'unanswered question is already counted');
+$check(Questions::published($product)->count() === 0, 'unanswered question is already published');
+
+$second = $questions->ask($product, [
+    'name' => 'Мария Иванова',
+    'email' => $email,
+    'question' => 'Как перенести данные из старой базы?',
+], '127.0.0.1');
+
+$questions->answer($first, 'Да, на два сайта нужен тариф «До 5 сайтов».', 'Поддержка');
+$first = $first->fresh();
+
+$check((string) $first->status === Question::STATUS_PUBLISHED, 'answer does not publish the question');
+$check($first->published_at !== null, 'published question has no publish date');
+$check($first->answered_at !== null, 'published question has no answer date');
+$check($first->is_published === true, 'published question is not reported as published');
+$check(Questions::count($product) === 1, 'published question is not counted');
+$check(Questions::published($product)->count() === 1, 'published question is not listed');
+$check(Questions::published($product, 1)->count() === 1, 'question limit does not work');
+
+$questions->answer($second, '', 'Поддержка');
+$check((string) $second->fresh()->status === Question::STATUS_NEW, 'empty answer publishes the question');
+
+$questions->reject($second);
+$check((string) $second->fresh()->status === Question::STATUS_REJECTED, 'reject does not change the status');
+$check(Questions::count($product) === 1, 'rejected question is counted');
+
+// Отзывы: приглашение по оплаченному заказу и одноразовая ссылка.
+$reviews = new Reviews();
+
+$check(Reviews::delayDays() >= 1 && Reviews::delayDays() <= 90, 'review delay is out of bounds');
+
+$order = Order::create([
+    'order_no' => Order::nextNumber(),
+    'product_id' => (int) $product->id,
+    'product_name' => (string) $product->name,
+    'plan' => 'single',
+    'qty' => 1,
+    'amount_cents' => 1000,
+    'currency' => 'BYN',
+    'status' => Order::STATUS_PAID,
+    'customer_name' => 'Алексей Кузнецов',
+    'email' => $email,
+    'paid_at' => now()->subDays(10),
+]);
+
+$token = $reviews->createInvitation($order);
+$order = $order->fresh();
+
+$check(preg_match('~^[a-f0-9]{48}$~', $token) === 1, 'review token is not 48 hex chars');
+$check($order->review_invited_at !== null, 'invitation date is not saved');
+$check($order->review_token_expires_at !== null && $order->review_token_expires_at->isFuture(), 'review token does not expire in the future');
+$check($reviews->orderByToken($token) !== null, 'paid order is not found by token');
+$check($reviews->orderByToken(str_repeat('0', 48)) === null, 'unknown token finds an order');
+$check($reviews->orderByToken('short') === null, 'malformed token finds an order');
+$check(str_contains($reviews->invitationUrl($order), '/review/' . $token . '/'), 'invitation url is not canonical');
+
+$order->forceFill(['review_token_expires_at' => now()->subDay()])->save();
+$check($reviews->orderByToken($token) === null, 'expired token still finds the order');
+$order->forceFill(['review_token_expires_at' => now()->addDays(30)])->save();
+
+$unpaid = Order::create([
+    'order_no' => Order::nextNumber(),
+    'product_id' => (int) $product->id,
+    'product_name' => (string) $product->name,
+    'plan' => 'single',
+    'qty' => 1,
+    'amount_cents' => 1000,
+    'currency' => 'BYN',
+    'status' => Order::STATUS_PENDING,
+    'customer_name' => 'Мария Иванова',
+    'email' => $email,
+]);
+
+$unpaidToken = $reviews->createInvitation($unpaid);
+$check($reviews->orderByToken($unpaidToken) === null, 'unpaid order is found by token');
+
+$review = $reviews->submit($order->fresh(), [
+    'author_name' => 'Алексей Кузнецов',
+    'rating' => 5,
+    'title' => 'Запустили за вечер',
+    'text' => 'Установили на свой домен, запись и оплата работают. Поддержка ответила в тот же день.',
+    'pros' => 'Готовые страницы',
+    'cons' => 'Пришлось разобраться с почтой',
+], '127.0.0.1');
+
+$check($review instanceof Review, 'review is not created');
+$check((string) $review->status === Review::STATUS_PENDING, 'new review is not on moderation');
+$check($review->is_verified === true, 'review from a paid order is not verified');
+$check($review->display_name === 'Алексей К.', 'review display name is not «Имя Ф.»');
+$check($review->stars === [true, true, true, true, true], 'five-star review has the wrong stars');
+$check($order->fresh()->review_token === null, 'review token is not cleared after submit');
+$check($reviews->existsFor($order->fresh()) === true, 'submitted review is not found for the order');
+$check($reviews->submit($order->fresh(), [
+    'author_name' => 'Алексей Кузнецов',
+    'rating' => 5,
+    'text' => 'Повторный отзыв по тому же заказу.',
+]) === null, 'second review for the same order is accepted');
+
+$check(Reviews::summary($product)['count'] === 0, 'pending review is already counted');
+$check(Reviews::approved($product)->count() === 0, 'pending review is already published');
+$check(Reviews::aggregate($product) === null, 'aggregate rating exists without approved reviews');
+
+$reviews->approve($review);
+$review = $review->fresh();
+
+$check((string) $review->status === Review::STATUS_APPROVED, 'approve does not change the status');
+$check($review->published_at !== null, 'approved review has no publish date');
+$check(Reviews::summary($product)['count'] === 1, 'approved review is not counted');
+$check(Reviews::summary($product)['average'] === 5.0, 'approved review average is not 5.0');
+$check(Reviews::approved($product)->count() === 1, 'approved review is not listed');
+
+$aggregate = Reviews::aggregate($product);
+$check($aggregate !== null, 'aggregate rating is missing with an approved review');
+$check(($aggregate['ratingValue'] ?? '') === '5', 'aggregate rating value is not 5');
+$check(($aggregate['reviewCount'] ?? '') === '1', 'aggregate rating count is not 1');
+
+// Микроразметка: Product + AggregateRating + QAPage.
+$page = new class {
+    public $id = 'module';
+};
+
+Seo::setProduct($product);
+$json = Seo::jsonld($page);
+
+$check(str_contains($json, '"@type":"Product"'), 'product node is missing');
+$check(str_contains($json, '"@type":"AggregateRating"'), 'aggregate rating node is missing');
+$check(str_contains($json, '"reviewCount":"1"'), 'aggregate rating count is not in the markup');
+$check(str_contains($json, '"@type":"QAPage"'), 'single question is not marked as QAPage');
+$check(str_contains($json, 'Можно ли поставить раздел на два сайта?'), 'published question is missing from the markup');
+$check(!str_contains($json, 'Как перенести данные из старой базы?'), 'rejected question leaked into the markup');
+
+$reviews->reject($review);
+$json = Seo::jsonld($page);
+$check(!str_contains($json, '"@type":"AggregateRating"'), 'rejected review keeps the aggregate rating');
+$check(Reviews::aggregate($product) === null, 'rejected review keeps the aggregate');
+
+// Маршруты и письма.
+$routes = array_keys(Route::getRoutes()->getRoutesByName());
+$check(in_array('elv.kit.question.store', $routes, true), 'question store route is missing');
+$check(in_array('elv.kit.review.store', $routes, true), 'review store route is missing');
+$check(View::exists('elv.kit::mail.question-admin'), 'question admin mail view is missing');
+$check(View::exists('elv.kit::mail.review-invite'), 'review invite mail view is missing');
+$check(View::exists('elv.kit::mail.review-admin'), 'review admin mail view is missing');
+$check(isset(Artisan::all()['elv:kit:review']), 'review command is not registered');
+
+// Заголовки и robots: страница отзыва закрыта от индексации и кэша.
+$headers = (new SecurityHeaders())->handle(Request::create('/review/' . str_repeat('a', 48) . '/'), function () {
+    return response('ok');
+});
+
+$check((string) $headers->headers->get('X-Robots-Tag') === 'noindex, nofollow', '/review/ is not closed from indexing');
+$check(str_contains((string) $headers->headers->get('Cache-Control'), 'no-store'), '/review/ is cacheable');
+$check(str_contains(Seo::robots(), 'Disallow: /review/'), 'robots.txt does not disallow /review/');
+
+$check(str_contains(Seo::robots(), 'Disallow: /tickets/'), 'robots.txt lost the tickets rule');
+
+// Шаблоны темы.
+$themePath = themes_path('elv-studio');
+$check(is_file($themePath . '/partials/product-qa.htm'), 'product-qa partial is missing');
+$check(is_file($themePath . '/partials/product-reviews.htm'), 'product-reviews partial is missing');
+$check(is_file($themePath . '/pages/review.htm'), 'review page is missing');
+$check(is_file($themePath . '/assets/css/community.css'), 'community.css is missing');
+
+$reviewPage = is_file($themePath . '/pages/review.htm')
+    ? (string) file_get_contents($themePath . '/pages/review.htm')
+    : '';
+$check(str_contains($reviewPage, 'noindex, nofollow'), 'review page is not noindex');
+$check(str_contains($reviewPage, 'url = "/review/:token"'), 'review page has the wrong url');
+
+// Настройки выключают блоки.
+$originalQa = Settings::get('qa_enabled');
+$originalReviews = Settings::get('reviews_enabled');
+
+Settings::set('qa_enabled', false);
+Settings::set('reviews_enabled', false);
+
+$check(Questions::enabled() === false, 'qa switch does not turn questions off');
+$check(Reviews::enabled() === false, 'reviews switch does not turn reviews off');
+
+Settings::set('qa_enabled', $originalQa);
+Settings::set('reviews_enabled', $originalReviews);
+
+// Уборка: удаляем только созданное проверкой.
+$orderIds = Order::query()->whereIn('email', [$email])->pluck('id')->all();
+Review::query()->whereIn('order_id', $orderIds)->delete();
+Order::query()->whereIn('id', $orderIds)->delete();
+Question::query()->where('product_id', (int) $product->id)->delete();
+Product::query()->where('id', (int) $product->id)->delete();
+
+if ($errors !== []) {
+    fwrite(STDERR, "community checks failed:\n- " . implode("\n- ", $errors) . "\n");
+    exit(1);
+}
+
+echo "OK: community checks passed\n";

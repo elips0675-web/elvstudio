@@ -119,6 +119,25 @@ const groups = [
       'tools/tickets-check.php',
     ],
   },
+  {
+    file: '11-community.txt',
+    title: 'Сообщество: вопросы с премодерацией и отзывы после оплаты',
+    files: [
+      'plugins/elv/kit/updates/create_kit_questions_reviews.php',
+      'plugins/elv/kit/classes/Community.php',
+      'plugins/elv/kit/classes/Questions.php',
+      'plugins/elv/kit/classes/Reviews.php',
+      'plugins/elv/kit/classes/Http/QuestionController.php',
+      'plugins/elv/kit/classes/Http/ReviewController.php',
+      'plugins/elv/kit/models/Question.php',
+      'plugins/elv/kit/models/Review.php',
+      'themes/elv-studio/partials/product-qa.htm',
+      'themes/elv-studio/partials/product-reviews.htm',
+      'themes/elv-studio/partials/stars.htm',
+      'themes/elv-studio/pages/review.htm',
+      'tools/community-check.php',
+    ],
+  },
 ];
 
 const missing = groups
@@ -202,7 +221,8 @@ const header = [
   stamp,
   '',
   'Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,',
-  'проверки, доки, аудит приватности и планы. Файлы разделены, чтобы каждый был понятен.',
+  'проверки, доки, аудит приватности, планы, поддержка, вопросы и отзывы.',
+  'Файлы разделены, чтобы каждый был понятен.',
   '',
   'Состав:',
   ...names.map((name) => '- ' + name),

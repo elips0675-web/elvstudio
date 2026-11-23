@@ -1,6 +1,6 @@
 # Проверки, доки и аудит приватности
 
-Срез: 23.11.2026. Stage 84. Коммит: `7fb829b`.
+Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -649,6 +649,7 @@ const SCRIPTS = [
   'tools/download-check.php',
   'tools/account-check.php',
   'tools/tickets-check.php',
+  'tools/community-check.php',
 ];
 
 function commandWorks(command, args) {
@@ -1150,7 +1151,7 @@ class SecurityHeaders
         $response->headers->remove('X-Powered-By');
 
         // Живой предпросмотр и кабинет не индексируются и не кэшируются.
-        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*')) {
+        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*', 'review', 'review/*')) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
             $response->headers->set('Cache-Control', 'no-store, max-age=0, private');
         }
