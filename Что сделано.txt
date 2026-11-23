@@ -6,6 +6,45 @@
 
 ---
 
+(Правка - 23.11.2026) - **Stage 1.1, часть про iframe: `ELV_FRAME_ANCESTORS` и проверка встраивания.**
+
+Что было: `SecurityHeaders` всегда отдавал `frame-ancestors 'self'` и
+`X-Frame-Options: SAMEORIGIN`. Нишевый демо-стенд на поддомене нельзя было
+показать в `/preview/` на домене витрины: браузер блокировал iframe, а
+проверить это до запуска было нечем.
+
+Что сделано:
+- `SecurityHeaders::frameAncestors()` читает `ELV_FRAME_ANCESTORS` (origin'ы
+  через пробел, только `http(s)://host[:port]`; `*` и мусор игнорируются).
+  При пустом значении поведение прежнее: `frame-ancestors 'self'` и
+  `X-Frame-Options: SAMEORIGIN`; при заполненном — источники перечисляются,
+  а `X-Frame-Options` не отдаётся, потому что списка он не умеет.
+- `frame-src` в не-production получает `http:` — иначе локальные демо в iframe
+  не грузятся.
+- `tools/check-iframe-demo.mjs` — проверка стенда: CSP разрешает родителя,
+  `X-Frame-Options` пуст, cookie сессии с `SameSite=None` (и `Secure` на https),
+  `POST /chat` из iframe отвечает 200, а не 419. Адреса задаются флагами
+  `--base` и `--parent`, без домена в коде.
+- `.env.example` — переменная с комментарием и подсказка про
+  `SESSION_SAME_SITE=none`; `docs/production-deploy.md` — раздел «Демо-стенды
+  ниш и iframe»; `AGENTS.md` правило 16; `README.md` — команда проверки.
+
+Чем проверено: на стенде без переменной CSP `frame-ancestors 'self'`,
+`X-Frame-Options: SAMEORIGIN` — `node tools/check-headers.mjs` OK. Значения
+функции: пусто → `'self'`; `https://elvstudio.vercel.app` → `'self' …`;
+два адреса → оба; `*` → `'self'`; `javascript:alert(1) https://ok.example` →
+`'self' https://ok.example`. Второй сервер на 8091 с
+`ELV_FRAME_ANCESTORS=http://127.0.0.1:8090`, `SESSION_SAME_SITE=none` —
+`check-iframe-demo.mjs` вернул OK, то есть CSP, cookie и POST из iframe
+работают. Без переменной тот же скрипт честно падает на трёх пунктах.
+`npm.cmd run check` — все гейты, TTFB медиана 125 мс.
+
+Что **не** проверено: реальные поддомены и https-кука (`Secure`) — нужен
+хостинг; Safari и Firefox ведут себя с `SameSite=None` строже, вручную не
+смотрел.
+
+---
+
 (Правка - 23.11.2026) - **Блокер 6, локальная часть: прод-чек и чек-лист окружения.**
 
 Что было: `production-check.php` смотрел PHP, права, `.htaccess`, `APP_KEY`,

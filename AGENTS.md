@@ -170,9 +170,16 @@
     разработок в `header.htm` — дефект.
 16. Живой предпросмотр — `/preview/:slug?` (`layouts/preview.htm`,
     `partials/preview.htm`): без шапки и подвала, `noindex, nofollow`,
-    `no-store`, вне sitemap и `llms.txt`. Фрейм разрешён только своему
-    источнику: `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN`,
-    `frame-src 'self' https:`. Список демо на `/demo/` — продукты с
+    `no-store`, вне sitemap и `llms.txt`. Фрейм по умолчанию разрешён только
+    своему источнику: `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN`,
+    `frame-src 'self' https:`. Нишевые демо-стенды на отдельных поддоменах
+    встраиваются в витрину через `ELV_FRAME_ANCESTORS` (origin'ы через пробел,
+    только `http(s)://`): тогда `frame-ancestors` перечисляет их, а
+    `X-Frame-Options` не отдаётся вовсе — он не умеет список источников
+    (`SecurityHeaders::frameAncestors()`). Cookie сессии в этом режиме —
+    `SameSite=None; Secure`. Ссылка на произвольный `*` или мусор в переменной
+    игнорируется. Проверка встраивания: `node tools/check-iframe-demo.mjs
+    --base=… --parent=…`. Список демо на `/demo/` — продукты с
     `demo_url` плюс `demo_links` из настроек (вкладка «Продажи», формат
     «Название | адрес демо | адрес страницы | подпись»); зашитый список
     демо в шаблоне — дефект. Проверка: `node tools/check-headers.mjs`

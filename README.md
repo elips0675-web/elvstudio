@@ -258,6 +258,8 @@ npm run check:console                # 171 статическая страниц
 npm run test:calculator              # Chrome E2E: выбор → результат → PDF
 node tools/check-empty-install.mjs --base=http://127.0.0.1:8090
                                      # витрина на пустой базе (в гейт не входит)
+node tools/check-iframe-demo.mjs --base=… --parent=…
+                                     # демо-стенд встраивается в iframe (вручную)
 node tools/check-perf.mjs --runs=5   # Lighthouse mobile, медиана и худший прогон
 php tools/production-check.php       # прод-чек: права, БД, .htaccess, ключи, очередь
 php tools/production-check.php --strict

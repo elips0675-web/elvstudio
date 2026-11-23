@@ -42,13 +42,14 @@ class SecurityHeaders
 
         $nonce = static::nonce();
         $analytics = $this->analyticsSources();
+        $ancestors = static::frameAncestors();
 
         $cspParts = [
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'self'",
-            "frame-src 'self' https:",
+            "frame-ancestors " . $ancestors,
+            "frame-src 'self' https:" . (app()->environment('production') ? '' : ' http:'),
             "img-src 'self' data:",
             "font-src 'self'",
             "style-src 'self' 'nonce-" . $nonce . "'",
@@ -65,7 +66,15 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+
+        // X-Frame-Options не умеет список источников: при встраивании на чужой
+        // домене он бы всё заблокировал, поэтому остаётся только для 'self'.
+        if ($ancestors === "'self'") {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        }
+        else {
+            $response->headers->remove('X-Frame-Options');
+        }
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -85,8 +94,40 @@ class SecurityHeaders
         return $response;
     }
 
-    protected function analyticsSources(): string
+    /**
+     * frameAncestors — источники, которым разрешено встраивать сайт в iframe.
+     *
+     * По умолчанию только свой домен (`'self'`). Нишевые демо-стенды живут на
+     * отдельных поддоменах и показываются внутри `/preview/` на домене витрины,
+     * поэтому родительские источники перечисляются в `ELV_FRAME_ANCESTORS`
+     * через пробел: `ELV_FRAME_ANCESTORS="https://example.com"`.
+     *
+     * Принимаются только origin'ы вида `http(s)://host[:port]`: строка вида
+     * `*` или мусор не должна открывать сайт для встраивания куда угодно.
+     */
+    public static function frameAncestors(): string
     {
+        $raw = trim((string) (env('ELV_FRAME_ANCESTORS') ?: ''));
+        $sources = [];
+
+        foreach (preg_split('~\s+~', $raw) ?: [] as $source) {
+            $source = rtrim(trim($source), '/');
+
+            if ($source === '' || !preg_match('~^https?://[a-z0-9.\-:\[\]]+$~i', $source)) {
+                continue;
+            }
+
+            $sources[] = strtolower($source);
+        }
+
+        if ($sources === []) {
+            return "'self'";
+        }
+
+        return implode(' ', array_merge(["'self'"], array_unique($sources)));
+    }
+
+    protected function analyticsSources(): string    {
         $sources = '';
 
         if (Settings::get('analytics_google')) {

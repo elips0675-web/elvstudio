@@ -71,10 +71,11 @@
 ### Этапы 1–4 (все открыты)
 
 - [ ] **Этап 1. Инфраструктура продаж:** пресеты `demo/presets/*.json` и
-      `--preset` (папки нет), `ELV_FRAME_ANCESTORS` в `SecurityHeaders`
-      (сейчас `frame-ancestors 'self'` жёстко), релизы `elv_kit_releases`,
-      суточный лимит скачиваний и водяной знак `LICENSE_OWNER.txt`
-      (`DownloadController` проверяет только токен и `paid`).
+      `--preset` (папки нет), релизы `elv_kit_releases`, суточный лимит
+      скачиваний и водяной знак `LICENSE_OWNER.txt` (`DownloadController`
+      проверяет только токен и `paid`). Iframe-часть закрыта 23.11.2026:
+      `ELV_FRAME_ANCESTORS` в `SecurityHeaders`, `tools/check-iframe-demo.mjs`,
+      раздел в `docs/production-deploy.md`.
 - [ ] **Этап 2. Кабинет и поддержка:** `elv_kit_customers`, Magic Link,
       отвязка домена раз в 30 дней, тикеты, Telegram ChatOps, Q&A, форум.
       Ни таблиц, ни маршрутов `/account/`, `/tickets/` нет.

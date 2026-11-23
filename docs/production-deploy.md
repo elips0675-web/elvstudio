@@ -35,6 +35,7 @@ php tools/production-check.php --strict
 | `LOG_CHANNEL` | `daily` | логи не растут одним файлом |
 | `LOG_LEVEL` | `warning` | на проде не нужен `debug` |
 | `ELV_CHROME_BIN` | путь к Chrome/Chromium | PDF сметы; пусто — поиск в стандартных местах |
+| `ELV_FRAME_ANCESTORS` | `https://<домен витрины>` | встраивание демо-стенда в `/preview/`; пусто — только свой домен |
 
 Ключи ЮKassa и Stripe можно задать и в админке (Настройки → Продажи), `.env`
 имеет приоритет. После правки `.env` — `php artisan config:clear`: на стенде
@@ -130,3 +131,19 @@ Smoke-список: `/`, `/pricing/`, `/order/?product=<товар>`, `/blog/`, 
 `/robots.txt`, `/llms.txt`, `/admin`.
 
 Демо-данные на проде не запускать: `php artisan elv:kit:demo` — команда стенда.
+
+## 9. Демо-стенды ниш и iframe
+
+Нишевый стенд (`booking.<домен>`) показывается на витрине внутри `<iframe>`.
+Чтобы браузер не заблокировал встраивание:
+
+1. На стенде: `ELV_FRAME_ANCESTORS="https://<домен витрины>"` — CSP
+   `frame-ancestors` перечислит родителя, `X-Frame-Options` не отдаётся.
+2. На стенде: `SESSION_SAME_SITE=none` и `SESSION_SECURE_COOKIE=true` — иначе
+   POST из iframe (заказ, запись, чат) получит 419.
+3. Проверка: `node tools/check-iframe-demo.mjs --base=https://booking.<домен>
+   --parent=https://<домен витрины>`.
+
+Пустая переменная или мусор в ней (`*`, адрес без схемы) оставляют
+`frame-ancestors 'self'`: случайная строка не должна открывать сайт для
+встраивания куда угодно.
