@@ -96,6 +96,23 @@ if (bogus.status !== 404) {
   problems.push('/order/?product=<несуществующий> — статус ' + bogus.status + ', ожидался 404');
 }
 
+/*
+ * Страница модуля без товара в базе: на чистой установке модулей нет, и
+ * выдумывать карточку нельзя. Ответ — честный 404 с noindex, а не пустая
+ * страница с «Подключить раздел».
+ */
+const bogusModule = await get('/modules/net-takogo-modulya/');
+
+if (bogusModule.status !== 404) {
+  problems.push('/modules/<несуществующий>/ — статус ' + bogusModule.status + ', ожидался 404');
+} else if (!/noindex/i.test(bogusModule.html)) {
+  problems.push('/modules/<несуществующий>/ — 404 без noindex: страница попадёт в индекс');
+} else if (/\{\{[^}]*\}\}/.test(bogusModule.html)) {
+  problems.push('/modules/<несуществующий>/ — в 404 остался сырой Twig');
+} else {
+  notes.push('/modules/<несуществующий>/: 404 с noindex');
+}
+
 const blog = bodies['/blog/'] || '';
 
 if ((blog.match(/post-card/g) || []).length === 0 && !/Ничего не нашлось|Пока нет статей|Записей нет/i.test(blog)) {
