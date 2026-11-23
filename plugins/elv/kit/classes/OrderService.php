@@ -50,11 +50,11 @@ class OrderService
             'company' => AntiSpam::clean($data['company'] ?? '', 191),
             'comment' => AntiSpam::clean($data['comment'] ?? '', 2000),
             'ip' => (string) ($data['ip'] ?? ''),
-            'meta' => [
+            'meta' => array_merge((array) ($data['meta'] ?? []), [
                 'bump' => !empty($data['bump']),
                 'plan_label' => $product->planLabel($plan),
                 'product_slug' => $product->slug,
-            ],
+            ], static::consentTrace($data)),
         ]);
 
         $order->save();
@@ -62,6 +62,34 @@ class OrderService
         $this->notifyAdmin($order);
 
         return $order;
+    }
+
+    /**
+     * consentTrace — юридический след согласия с офертой.
+     *
+     * Галочку требует `OrderController::rules()` (`consent` => `accepted`), а
+     * здесь фиксируется, когда она поставлена, с какого адреса и браузера и
+     * какая редакция текста оферты действовала. Редакция — хэш файла
+     * `themes/elv-studio/pages/terms.htm`: покупатель правит оферту под себя,
+     * и после правки хэш меняется, поэтому видно, с какой версией он соглашался.
+     */
+    public static function consentTrace(array $data = [], ?string $acceptedAt = null): array
+    {
+        return [
+            'consent_accepted' => true,
+            'consent_at' => $acceptedAt ?: now()->toIso8601String(),
+            'consent_ip' => (string) ($data['ip'] ?? ''),
+            'consent_ua' => mb_substr(trim((string) ($data['user_agent'] ?? '')), 0, 500),
+            'terms_version' => static::termsVersion(),
+            'terms_url' => rtrim(url('/terms'), '/') . '/',
+        ];
+    }
+
+    public static function termsVersion(): string
+    {
+        $file = themes_path('elv-studio/pages/terms.htm');
+
+        return is_file($file) ? substr(hash_file('sha256', $file), 0, 12) : 'unknown';
     }
 
     public function setPending(Order $order, string $provider, ?string $paymentId = null): Order

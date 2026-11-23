@@ -220,10 +220,38 @@ try {
         'plan' => 'single',
         'customer_name' => 'price-check',
         'email' => 'price-check@example.com',
+        'ip' => '203.0.113.7',
+        'user_agent' => 'price-check-agent/1.0',
     ], $kit);
 
     if ((int) $order->amount_cents !== $freshPrice) {
         priceFail('OrderService создаёт счёт по старой цене: ' . $order->amount_cents . ' вместо ' . $freshPrice);
+    }
+
+    $meta = (array) $order->meta;
+
+    if (($meta['consent_accepted'] ?? null) !== true) {
+        priceFail('в заказе нет отметки согласия с офертой');
+    }
+
+    if (!strtotime((string) ($meta['consent_at'] ?? ''))) {
+        priceFail('в заказе нет времени согласия');
+    }
+
+    if (($meta['consent_ip'] ?? '') !== '203.0.113.7') {
+        priceFail('в заказе не сохранён IP согласия');
+    }
+
+    if (($meta['consent_ua'] ?? '') !== 'price-check-agent/1.0') {
+        priceFail('в заказе не сохранён User-Agent согласия');
+    }
+
+    if (strlen((string) ($meta['terms_version'] ?? '')) !== 12 || $meta['terms_version'] === 'unknown') {
+        priceFail('в заказе нет версии оферты');
+    }
+
+    if (!str_ends_with((string) ($meta['terms_url'] ?? ''), '/terms/')) {
+        priceFail('в заказе нет ссылки на оферту');
     }
 
     $bumped = (new OrderService())->create([

@@ -75,6 +75,33 @@ class Order extends Model
         return $this->status === self::STATUS_PAID;
     }
 
+    /**
+     * consentLabel — юридический след согласия для карточки заказа.
+     *
+     * Показывает, когда покупатель принял оферту, с какого адреса и какая
+     * редакция текста действовала: это ответ на чарджбэк «я ничего не принимал».
+     */
+    public function getConsentLabelAttribute(): string
+    {
+        $meta = (array) $this->meta;
+
+        if (empty($meta['consent_accepted'])) {
+            return 'Согласие не зафиксировано.';
+        }
+
+        $at = (string) ($meta['consent_at'] ?? '');
+        $stamp = $at !== '' ? (string) \Carbon\Carbon::parse($at)->format('d.m.Y H:i') : 'время не сохранено';
+        $ip = (string) ($meta['consent_ip'] ?? '') ?: 'IP не сохранён';
+        $ua = (string) ($meta['consent_ua'] ?? '');
+        $ua = $ua !== '' ? mb_substr($ua, 0, 120) : 'браузер не сохранён';
+        $version = (string) ($meta['terms_version'] ?? '') ?: 'версия не сохранена';
+        $url = (string) ($meta['terms_url'] ?? '');
+
+        $line = $stamp . ' · ' . $ip . ' · оферта ' . $version . ' · ' . $ua;
+
+        return $url !== '' ? $line . ' · ' . $url : $line;
+    }
+
     public function getDownloadUrlAttribute(): string
     {
         if (!$this->download_token) {

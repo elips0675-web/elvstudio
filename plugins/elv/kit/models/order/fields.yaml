@@ -75,3 +75,8 @@ fields:
         mode: datetime
         disabled: true
         span: right
+    consent_label:
+        label: 'Согласие с офертой'
+        type: text
+        disabled: true
+        comment: 'Время, адрес, браузер и редакция оферты, с которой согласился покупатель. Заполняется автоматически при заказе.'

@@ -63,6 +63,7 @@ class OrderController extends FormController
         }
 
         $data['ip'] = AntiSpam::ip($request);
+        $data['user_agent'] = (string) $request->userAgent();
 
         $order = $this->orders->create($data, $product);
 
