@@ -1,5 +1,6 @@
 <?php
 
+use Elv\Kit\Classes\Http\AccountController;
 use Elv\Kit\Classes\Http\BookingController;
 use Elv\Kit\Classes\Http\ChatController;
 use Elv\Kit\Classes\Http\DownloadController;
@@ -25,6 +26,16 @@ Route::middleware(['web', 'throttle:20,1'])->group(function () {
 
 Route::middleware(['web', 'throttle:40,1'])->group(function () {
     Route::post('chat', [ChatController::class, 'store'])->name('elv.kit.chat');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('account/login', [AccountController::class, 'login'])->name('elv.kit.account.login');
+    Route::get('account/auth/{token}', [AccountController::class, 'auth'])
+        ->where('token', '[a-f0-9]{48}');
+    Route::post('account/logout', [AccountController::class, 'logout'])->name('elv.kit.account.logout');
+    Route::post('account/domain/{id}/unbind', [AccountController::class, 'unbind'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.account.unbind');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {

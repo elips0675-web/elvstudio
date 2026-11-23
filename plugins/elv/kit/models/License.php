@@ -15,6 +15,7 @@ class License extends Model
     protected $casts = [
         'activated_at' => 'datetime',
         'last_seen_at' => 'datetime',
+        'domain_changed_at' => 'datetime',
     ];
 
     public $hasMany = [

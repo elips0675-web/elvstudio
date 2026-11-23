@@ -56,9 +56,16 @@ class LicenseService
                 'license_id' => $license->id,
                 'product_slug' => $license->product_slug,
                 'domain_hash' => $hash,
+                'domain' => mb_substr($domain, 0, 191),
                 'app_version' => $version,
             ]);
             $count++;
+        }
+        elseif (!$existing->domain) {
+            // Активация до 1.1.0 хранила только хэш: при повторном запросе
+            // домен дописывается, чтобы владелец видел его в кабинете.
+            $existing->domain = mb_substr($domain, 0, 191);
+            $existing->save();
         }
 
         $license->activated_at = $license->activated_at ?: now();

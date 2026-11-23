@@ -11,6 +11,7 @@ const SCRIPTS = [
   'tools/booking-check.php',
   'tools/presets-check.php',
   'tools/download-check.php',
+  'tools/account-check.php',
 ];
 
 function commandWorks(command, args) {

@@ -1,0 +1,251 @@
+title = "Личный кабинет"
+url = "/account/"
+layout = "default"
+meta_title = "Личный кабинет"
+meta_description = "Заказы, лицензии и домены покупателя Elv Kit. Вход по одноразовой ссылке на e-mail, без пароля."
+meta_robots = "noindex, nofollow"
+==
+{% set account = elv_account() %}
+{% set orders = account ? elv_account_orders() : [] %}
+{% set licenses = account ? elv_account_licenses() : [] %}
+{% set domains = account ? elv_account_domains() : [] %}
+
+<main id="main">
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow">Кабинет</span>
+            {% if account %}
+                <h1>Здравствуйте, {{ account.short_name }}</h1>
+                <p class="lead">
+                    Здесь заказы, лицензии и домены, привязанные к адресу {{ account.email }}.
+                    Файлы сайта доступны после оплаты.
+                </p>
+            {% else %}
+                <h1>Вход в кабинет</h1>
+                <p class="lead">
+                    Пароля нет: пришлём одноразовую ссылку на e-mail. Она действует 30 минут
+                    и работает один раз.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% if elv_flash('elv_success') %}
+                <div class="alert alert--ok mb-24" role="status">{{ elv_flash('elv_success') }}</div>
+            {% endif %}
+
+            {% if elv_flash('elv_error') %}
+                <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
+            {% endif %}
+
+            {% if elv_query('login') == 'invalid' %}
+                <div class="alert alert--err mb-24" role="alert">
+                    Ссылка не подошла: она уже использована или срок действия истёк. Запросите новую.
+                </div>
+            {% endif %}
+
+            {% if not account %}
+                <div class="split">
+                    <div class="card">
+                        <span class="eyebrow">Вход</span>
+                        <h2>Ссылка на e-mail</h2>
+                        <p class="muted">
+                            Укажите адрес, на который оформляли заказ. Если адрес есть в базе,
+                            письмо придёт в течение минуты.
+                        </p>
+
+                        <form
+                            class="form mt-24"
+                            id="account-login"
+                            method="post"
+                            action="{{ url('/account/login') }}"
+                            data-elv-form
+                            data-success="Если адрес есть в заказах, письмо отправлено. Проверьте почту и папку «Спам».">
+                            {{ elv_csrf()|raw }}
+                            <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                            <div class="field">
+                                <label for="account-email">E-mail</label>
+                                <input
+                                    class="input"
+                                    id="account-email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    maxlength="191"
+                                    autocomplete="email"
+                                    value="{{ elv_old('email') }}">
+                            </div>
+
+                            <div>
+                                <button class="btn btn--primary" type="submit">
+                                    {{ elv_icon('mail')|raw }} Получить ссылку
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="card summary">
+                        <span class="price-card__label">Как это работает</span>
+                        <ol class="account-steps">
+                            <li>Указываете e-mail, на который оформлен заказ.</li>
+                            <li>Получаете письмо с кнопкой входа.</li>
+                            <li>Открываете кабинет: заказы, ключ, домены и файлы.</li>
+                        </ol>
+                        <div class="notice mt-24">
+                            {{ elv_icon('shield')|raw }}
+                            <p>Пароля нет, поэтому украсть его нельзя. Ссылка одноразовая: после входа её нельзя использовать снова.</p>
+                        </div>
+                        <p class="tiny muted mt-24 mb-0">
+                            Нет заказа? <a href="{{ 'pricing'|page }}">Посмотрите тарифы</a> или
+                            <a href="{{ 'contacts'|page }}">напишите нам</a>.
+                        </p>
+                    </aside>
+                </div>
+            {% else %}
+                <div class="account-head">
+                    <div>
+                        <span class="tiny muted">Вы вошли как</span>
+                        <b>{{ account.email }}</b>
+                    </div>
+                    <form method="post" action="{{ url('/account/logout') }}">
+                        {{ elv_csrf()|raw }}
+                        <button class="btn btn--ghost btn--sm" type="submit">Выйти</button>
+                    </form>
+                </div>
+
+                <h2 class="mt-32">Заказы</h2>
+
+                {% if orders|length %}
+                    <div class="table-wrap">
+                        <table class="compare account-table">
+                            <thead>
+                                <tr>
+                                    <th>Заказ</th>
+                                    <th>Дата</th>
+                                    <th>Состав</th>
+                                    <th>Сумма</th>
+                                    <th>Статус</th>
+                                    <th>Файлы</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td><b>{{ order.order_no }}</b></td>
+                                        <td>{{ order.created_at ? order.created_at|date('d.m.Y') : '—' }}</td>
+                                        <td>
+                                            {{ order.product_name }}
+                                            <span class="tiny muted account-table__sub">{{ order.plan_label }}</span>
+                                        </td>
+                                        <td>{{ order.amount_label }}</td>
+                                        <td>{{ order.status_label }}</td>
+                                        <td>
+                                            {% if order.status == 'paid' and order.download_token %}
+                                                <a class="btn btn--ghost btn--sm" href="{{ order.download_url }}">Скачать</a>
+                                            {% elseif order.status == 'paid' %}
+                                                <span class="tiny muted">файл выдаётся поддержкой</span>
+                                            {% else %}
+                                                <span class="tiny muted">после оплаты</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="tiny muted mt-24">
+                        Ссылка на скачивание персональная. Если файл не открывается, напишите на
+                        <a href="mailto:{{ elv_setting('email', 'sales@example.com') }}">{{ elv_setting('email', 'sales@example.com') }}</a>.
+                    </p>
+                {% else %}
+                    <div class="empty">
+                        <h2>Заказов пока нет</h2>
+                        <p>На этот адрес ещё ничего не оформляли. Если заказ был с другим e-mail, войдите с него.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'pricing'|page }}">Тарифы</a>
+                            <a class="btn btn--ghost" href="{{ 'contacts'|page }}">Написать нам</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <h2 class="mt-32" id="domains">Лицензии и домены</h2>
+
+                {% if licenses|length %}
+                    {% for license in licenses %}
+                        <div class="card mb-24">
+                            <div class="split">
+                                <div>
+                                    <span class="eyebrow">Ключ лицензии</span>
+                                    <h3 class="account-key">{{ license.license_key }}</h3>
+                                    <p class="tiny muted mb-0">
+                                        {{ license.status_label }}
+                                        {% if license.activated_at %} · активирована {{ license.activated_at|date('d.m.Y') }}{% endif %}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="tiny muted">Лимит доменов</span>
+                                    <b class="account-limit">{{ license.domain_limit }}</b>
+                                </div>
+                            </div>
+
+                            {% set licenseDomains = domains|filter(item => item.license_id == license.id) %}
+
+                            <h3 class="mt-24">Домены</h3>
+
+                            {% if licenseDomains|length %}
+                                <ul class="account-domains">
+                                    {% for install in licenseDomains %}
+                                        <li>
+                                            <span>
+                                                <b>{{ install.domain_label }}</b>
+                                                <span class="tiny muted">
+                                                    активирован {{ install.created_at ? install.created_at|date('d.m.Y') : '—' }}
+                                                    {% if install.app_version %} · версия {{ install.app_version }}{% endif %}
+                                                </span>
+                                            </span>
+                                            {% set unbind = elv_account_can_unbind(install) %}
+                                            {% if unbind.ok %}
+                                                <form
+                                                    method="post"
+                                                    action="{{ url('/account/domain/' ~ install.id ~ '/unbind') }}"
+                                                    onsubmit="return confirm('Отвязать домен? Он освободит место в лимите, повторная отвязка — через 30 дней.');">
+                                                    {{ elv_csrf()|raw }}
+                                                    <button class="btn btn--ghost btn--sm" type="submit">Отвязать</button>
+                                                </form>
+                                            {% else %}
+                                                <span class="tiny muted account-unbind-note">{{ unbind.message }}</span>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="muted">
+                                    Доменов пока нет. Активируйте ключ на сайте — он появится здесь.
+                                </p>
+                            {% endif %}
+
+                            {% set nextUnbind = elv_account_next_unbind(license) %}
+                            {% if nextUnbind %}
+                                <p class="tiny muted mt-24 mb-0">
+                                    Следующая отвязка по этой лицензии — {{ nextUnbind|date('d.m.Y') }}.
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty">
+                        <h2>Лицензий пока нет</h2>
+                        <p>Ключ выдаётся после оплаты и приходит на e-mail вместе с файлами сайта.</p>
+                        <div class="stack-actions">
+                            <a class="btn btn--primary" href="{{ 'pricing'|page }}">Тарифы</a>
+                            <a class="btn btn--ghost" href="{{ 'docs'|page }}">Инструкция по установке</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</main>

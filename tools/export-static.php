@@ -242,6 +242,7 @@ foreach ($matches[1] ?? [] as $loc) {
 $paths['/'] = true;
 $paths['/404'] = true;
 $paths['/search'] = true;
+$paths['/account'] = true;
 ksort($paths);
 
 $pages = 0;

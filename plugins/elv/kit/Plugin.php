@@ -2,6 +2,7 @@
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\AccountService;
 use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
@@ -235,6 +236,8 @@ class Plugin extends PluginBase
 
     public function registerMarkupTags()
     {
+        $account = new AccountService();
+
         return [
             'functions' => [
                 'elv_setting' => function ($key, $default = null) {
@@ -499,6 +502,38 @@ class Plugin extends PluginBase
                 },
                 'elv_related' => function ($post, $limit = 3) {
                     return $post instanceof Post ? Blog::related($post, (int) $limit) : collect();
+                },
+                'elv_account' => function () use ($account) {
+                    return $account->user();
+                },
+                'elv_account_orders' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->orders($customer) : collect();
+                },
+                'elv_account_licenses' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->licenses($customer) : collect();
+                },
+                'elv_account_domains' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->installs($customer) : collect();
+                },
+                'elv_account_can_unbind' => function ($install) use ($account) {
+                    $customer = $account->user();
+
+                    if (!$customer || !$install instanceof \Elv\Kit\Models\Install) {
+                        return ['ok' => false, 'message' => ''];
+                    }
+
+                    return $account->canUnbind($customer, $install);
+                },
+                'elv_account_next_unbind' => function ($license) use ($account) {
+                    return $license instanceof \Elv\Kit\Models\License
+                        ? $account->nextUnbindAt($license)
+                        : null;
                 },
             ],
             'filters' => [
