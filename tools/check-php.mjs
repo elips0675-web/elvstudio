@@ -5,6 +5,7 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const SCRIPTS = [
   'tools/chat-check.php',
+  'tools/search-check.php',
   'tools/seo-check.php',
   'tools/booking-check.php',
   'tools/presets-check.php',

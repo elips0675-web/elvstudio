@@ -234,15 +234,15 @@ meta_description = "Соберите смету за две минуты: тар
                         <span class="eyebrow">Смета</span>
                         <h2>Предварительно</h2>
                         <div class="calc-summary__rows">
-                            <div class="calc-summary__row"><span>Запуск, разово</span><b data-total-launch>$79</b></div>
-                            <div class="calc-summary__row"><span>Хостинг и лицензии, в год</span><b data-total-annual>$0</b></div>
+                            <div class="calc-summary__row"><span>Запуск, разово</span><b data-total-launch>{{ firstPlan.price_label }}</b></div>
+                            <div class="calc-summary__row"><span>Хостинг и лицензии, в год</span><b data-total-annual>{{ calc.zero }}</b></div>
                             <p class="calc-summary__hint">у студии; хостинг и домен — провайдеру</p>
-                            <div class="calc-summary__row"><span>Поддержка, в месяц</span><b data-total-monthly>$0</b></div>
+                            <div class="calc-summary__row"><span>Поддержка, в месяц</span><b data-total-monthly>{{ calc.zero }}</b></div>
                             <p class="calc-summary__hint">включена в тариф на <span data-total-support>30 дней</span></p>
-                            <div class="calc-summary__row"><span>Дальше в год</span><b data-total-next>$0</b></div>
+                            <div class="calc-summary__row"><span>Дальше в год</span><b data-total-next>{{ calc.zero }}</b></div>
                             <p class="calc-summary__hint">без хостинга провайдера</p>
                         </div>
-                        <div class="calc-summary__total"><span>Первый год, студии</span><b data-total-year>$79</b></div>
+                        <div class="calc-summary__total"><span>Первый год, студии</span><b data-total-year>{{ firstPlan.price_label }}</b></div>
                         <button type="button" class="btn btn--primary btn--block" data-calc-show-result>Показать смету</button>
                         <a class="btn btn--ghost btn--block" href="{{ 'booking'|page }}">Записаться на 30 минут</a>
                         <p class="calc-date">Цены обновлены {{ calc.prices_updated_at }}. Не оферта.</p>
@@ -262,22 +262,22 @@ meta_description = "Соберите смету за две минуты: тар
                 <div class="calc-result">
                     <article class="card calc-result__card">
                         <span class="calc-result__label">Запуск</span>
-                        <b data-result-launch>$79</b>
+                        <b data-result-launch>{{ firstPlan.price_label }}</b>
                         <small>разово</small>
                     </article>
                     <article class="card calc-result__card">
                         <span class="calc-result__label">Хостинг и лицензии</span>
-                        <b data-result-annual>$0</b>
+                        <b data-result-annual>{{ calc.zero }}</b>
                         <small>в год у студии</small>
                     </article>
                     <article class="card calc-result__card">
                         <span class="calc-result__label">Поддержка</span>
-                        <b data-result-monthly>$0</b>
+                        <b data-result-monthly>{{ calc.zero }}</b>
                         <small>в месяц, включена</small>
                     </article>
                     <article class="card calc-result__card calc-result__card--total">
                         <span class="calc-result__label">Первый год</span>
-                        <b data-result-year>$79</b>
+                        <b data-result-year>{{ firstPlan.price_label }}</b>
                         <small>итого студии</small>
                     </article>
                 </div>

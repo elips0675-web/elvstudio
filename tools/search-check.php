@@ -40,6 +40,16 @@ foreach (['оплата', 'оплатить', 'тарифами', 'цены', '�
     $check(Search::query($query, Search::TYPE_ALL, 10) !== [], 'search returns nothing for: ' . $query);
 }
 
+$boundaryUrls = array_column(Search::query('став', Search::TYPE_ALL, 20), 'url');
+$check(
+    !in_array('/blog/sajt-dlya-lokalnoj-dostavki/', $boundaryUrls, true),
+    'search matches «став» inside «доставка», not at a word start'
+);
+$check(
+    array_intersect(['/blog/og-kartinki-na-php/', '/blog/kak-vybrat-hosting/'], $boundaryUrls) !== [],
+    'search lost word-start matches for «став»'
+);
+
 $pricing = Search::query('тарифами', Search::TYPE_ALL, 10);
 $pricingUrls = array_column($pricing, 'url');
 $check(in_array('/pricing/', $pricingUrls, true), 'morphology does not find /pricing/ for «тарифами»');

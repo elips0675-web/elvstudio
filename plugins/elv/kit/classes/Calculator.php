@@ -57,6 +57,7 @@ class Calculator
             'enabled' => (bool) Settings::get('calculator_enabled', true),
             'currency' => Money::currency(),
             'symbol' => Money::symbol(),
+            'zero' => Money::format(0),
             'prices_updated_at' => Prices::label(),
             'hosting_note' => (string) (Settings::get('calculator_hosting_note') ?: 'Хостинг и домен оплачиваются провайдеру напрямую. Мы не добавляем наценку и не выдаём чужой хостинг за свой.'),
             'support_note' => (string) (Settings::get('calculator_support_note') ?: 'Поддержка уже входит в тариф на указанный срок. Продление после него считается отдельно по объёму работ.'),

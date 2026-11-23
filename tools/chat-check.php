@@ -17,11 +17,11 @@ $check = function (bool $condition, string $message) use (&$errors) {
     }
 };
 
-foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck'] as $word) {
+foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck', 'п1зд', '3бал', 'д0лбоеб', 'дро4', 'хуйня'] as $word) {
     $check(TextFilter::has($word), 'filter misses: ' . $word);
 }
 
-foreach (['хутор', 'нормальный вопрос', 'установка'] as $word) {
+foreach (['хутор', 'нормальный вопрос', 'установка', 'х0р', 'п1тон', 'эпидраздел'] as $word) {
     $check(!TextFilter::has($word), 'filter false positive: ' . $word);
 }
 
@@ -120,6 +120,16 @@ $check(str_contains($search['answer'], 'Нашёл материалы'), 'explic
 $check(count($search['sources']) >= 1, 'explicit search returns no sources');
 $check(count($search['sources']) <= 3, 'explicit search returns more than three sources');
 $check($search['rejected'] === false, 'valid search must not be rejected');
+
+$keep = Chat::answer('как перестать получать письма');
+$check(!str_contains($keep['answer'], 'Нашёл материалы'), 'word «перестать» is mistaken for a request about articles');
+$check(!str_contains($keep['answer'], 'Блог входит'), 'word «перестать» is mistaken for a request about the blog');
+
+$bundle = Chat::answer('покажи связку модулей');
+$check(
+    str_contains($bundle['answer'], 'Раздел') || str_contains($bundle['answer'], 'Модул'),
+    'word «связка» is mistaken for a request to get in touch'
+);
 
 $urls = [];
 

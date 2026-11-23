@@ -132,7 +132,20 @@ class Seo
 
     public static function image($page = null): string
     {
-        return static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $fallback = static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $cover = static::$post ? trim((string) static::$post->cover) : '';
+
+        // Обложка статьи — имя иконки (graph, calendar, spark), а не картинка.
+        // Ссылку берём, только если в поле действительно путь к изображению.
+        if ($cover === '' || preg_match('~\.(png|jpe?g|webp|gif|svg)$~i', $cover) !== 1) {
+            return $fallback;
+        }
+
+        if (preg_match('~^https?://~i', $cover) === 1) {
+            return $cover;
+        }
+
+        return static::base() . '/' . ltrim($cover, '/');
     }
 
     /**

@@ -7,6 +7,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Seo;
+use Elv\Kit\Models\Post;
 use Elv\Kit\Models\Settings;
 
 $errors = [];
@@ -32,6 +33,22 @@ $check(count($filled['mainEntity'] ?? []) === 1, 'FAQPage mainEntity is empty fo
 $robots = Seo::robots();
 $check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
 $check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
+
+$defaultImage = Seo::base() . '/themes/elv-studio/assets/img/og-default.png';
+Seo::setPost(null);
+$check(Seo::image() === $defaultImage, 'og:image is not the default without an article');
+
+$post = new Post();
+$post->cover = 'graph';
+Seo::setPost($post);
+$check(Seo::image() === $defaultImage, 'icon cover is used as an og:image');
+
+$post->cover = 'assets/img/cover.png';
+$check(Seo::image() === Seo::base() . '/assets/img/cover.png', 'relative cover path is not used as an og:image');
+
+$post->cover = 'https://cdn.example.com/cover.webp';
+$check(Seo::image() === 'https://cdn.example.com/cover.webp', 'absolute cover url is not used as an og:image');
+Seo::setPost(null);
 
 $settings = Settings::instance();
 $faqKeys = ['faq_items', 'faq_calculator_items', 'faq_services_items', 'faq_seo_items', 'faq_post_items'];

@@ -231,6 +231,10 @@ tabs:
             tab: 'SEO и аналитика'
             type: switch
             default: false
+        sitemap_lastmod:
+            label: 'Дата обновления контента'
+            tab: 'SEO и аналитика'
+            comment: 'Необязательная дата для lastmod статических страниц в sitemap.xml: 2026-11-23 или 23.11.2026. Пусто — lastmod у страниц не выводится, а у статей и товаров дата берётся из updated_at.'
 
         faq_items:
             label: 'Общий блок FAQ'

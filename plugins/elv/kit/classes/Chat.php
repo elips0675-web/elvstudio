@@ -73,7 +73,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать'])) {
+        if (
+            static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'почитать'])
+            || static::hasWord($text, ['стать'])
+        ) {
             $results = static::search($message);
 
             if ($results !== []) {
@@ -185,7 +188,10 @@ class Chat
         }
 
         if (static::has($text, ['цена', 'стоим', 'сколько', 'тариф', 'прайс', 'бюджет', 'дорого', 'price'])) {
-            if (static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'связ', 'магазин'])) {
+            if (
+                static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'магазин'])
+                || static::hasConnection($text)
+            ) {
                 return static::reply(static::modulePriceText($text), ['Что входит в Kit?', 'Какие разделы есть?', 'Как оплатить?'], static::link('Разделы', '/modules/'));
             }
 
@@ -226,7 +232,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['блог', 'стат', 'новост', 'rss'])) {
+        if (static::has($text, ['блог', 'новост', 'rss']) || static::hasWord($text, ['стат'])) {
             return static::reply(
                 'Блог входит в Elv Kit: статьи, категории, подписка на новости и карта сайта. Тексты правятся в админке, у каждой статьи есть заголовок и описание для поиска.',
                 ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам'],
@@ -280,7 +286,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать', 'связ'])) {
+        if (
+            static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать'])
+            || static::hasConnection($text)
+        ) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -497,6 +506,48 @@ class Chat
         return false;
     }
 
+    /**
+     * hasWord — совпадение с начала слова, а не внутри другого.
+     *
+     * `has()` ищет подстроку: «стать» в «перестать» — не запрос про статьи.
+     * Стем проверяется от начала слова, поэтому «статьи» и «статью» находятся,
+     * а «остаться» и «перестать» — нет.
+     *
+     * @param array<int, string> $words
+     * @param array<int, string> $except продолжения слова, которые не считаются совпадением
+     */
+    protected static function hasWord(string $text, array $words, array $except = []): bool
+    {
+        $tail = '';
+
+        if ($except !== []) {
+            $tail = '(?!' . implode('|', array_map(
+                fn (string $part): string => preg_quote($part, '/'),
+                $except
+            )) . ')';
+        }
+
+        foreach ($words as $word) {
+            if ($word === '') {
+                continue;
+            }
+
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($word, '/') . $tail . '/u', $text) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * hasConnection — вопрос про связь, а не про «связку» терминов.
+     */
+    protected static function hasConnection(string $text): bool
+    {
+        return static::hasWord($text, ['связ'], ['к']);
+    }
+
     protected static function plansText(): string
     {
         $plans = Catalog::plans();
@@ -547,11 +598,15 @@ class Chat
     {
         $slug = null;
 
-        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback', 'связ' => 'feedback'] as $word => $key) {
+        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback'] as $word => $key) {
             if (static::has($text, [$word])) {
                 $slug = $key;
                 break;
             }
+        }
+
+        if ($slug === null && static::hasConnection($text)) {
+            $slug = 'feedback';
         }
 
         if ($slug === null) {

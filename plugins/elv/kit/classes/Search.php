@@ -174,7 +174,7 @@ class Search
         $keywords = static::normalize((string) ($item['keywords'] ?? ''));
         $meta = static::normalize((string) ($item['meta'] ?? ''));
 
-        $score = $query !== '' && str_contains($title, $query) ? 14 : 0;
+        $score = $query !== '' && preg_match('/(?<![\p{L}\p{N}])' . preg_quote($query, '/') . '/u', $title) === 1 ? 14 : 0;
         $hits = 0;
 
         foreach ($words as $word) {
@@ -313,15 +313,11 @@ class Search
     protected static function containsAny(string $text, array $forms): bool
     {
         foreach ($forms as $form) {
-            if (mb_strlen($form) < 4) {
-                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
-                    return true;
-                }
+            // Короткая форма — только целым словом, длинная — только с начала слова:
+            // «став» не должен находить «доставку», а «оплата» — «недоплату».
+            $suffix = mb_strlen($form) < 4 ? '(?![\p{L}\p{N}])' : '';
 
-                continue;
-            }
-
-            if (str_contains($text, $form)) {
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . $suffix . '/u', $text) === 1) {
                 return true;
             }
         }

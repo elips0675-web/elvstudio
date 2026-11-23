@@ -4,9 +4,11 @@
  * TextFilter — фильтр грубых слов в сообщениях консультанта.
  *
  * Ловит основы слов, а не конкретные формы: между буквами допускаются пробелы
- * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`)
- * и замена буквы знаком (`х*й`). Слово, где букву просто выбросили (`хй`),
- * фильтр не разгадывает — иначе подстановка любых символов ловит обычные слова.
+ * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`),
+ * цифры вместо букв (`п1зд`, `3бал`) и замена буквы знаком (`х*й`). Слово, где
+ * букву просто выбросили (`хй`), фильтр не разгадывает — иначе подстановка
+ * любых символов ловит обычные слова. Основа ищется с начала слова, поэтому
+ * «пидр» не находится в «эпидраздел».
  * Ответ на грубость вежливый, без повтора самого слова.
  */
 class TextFilter
@@ -17,6 +19,7 @@ class TextFilter
     protected const LOOKALIKE = [
         'a' => 'а', 'b' => 'в', 'c' => 'с', 'e' => 'е', 'h' => 'н', 'k' => 'к',
         'm' => 'м', 'o' => 'о', 'p' => 'р', 't' => 'т', 'x' => 'х', 'y' => 'у',
+        '0' => 'о', '1' => 'и', '3' => 'е', '4' => 'ч',
     ];
 
     /** @var array<string, string> */
@@ -45,7 +48,7 @@ class TextFilter
         $latin = strtr($text, static::REVERSE);
 
         foreach (static::latinWords() as $stem) {
-            if (preg_match(static::pattern($stem, true), $latin)) {
+            if (preg_match(static::pattern($stem, true, true), $latin)) {
                 return $stem;
             }
         }
@@ -53,7 +56,7 @@ class TextFilter
         $cyrillic = strtr($text, static::LOOKALIKE);
 
         foreach (static::cyrillicWords() as $stem) {
-            if (preg_match(static::pattern($stem), $cyrillic)) {
+            if (preg_match(static::pattern($stem, true, false), $cyrillic)) {
                 return $stem;
             }
         }
@@ -105,10 +108,13 @@ class TextFilter
 
     /**
      * pattern — буквы основы через любые пробелы и знаки, повторы букв разрешены.
+     *
+     * $start — совпадение только с начала слова: «пидр» не находится в «эпидраздел».
+     * $end — совпадение только целым словом (для латиницы): «dick» не в «dickens».
      */
-    protected static function pattern(string $stem, bool $bounded = false): string
+    protected static function pattern(string $stem, bool $start = false, bool $end = false): string
     {
-        $key = $stem . ($bounded ? ':bounded' : '');
+        $key = $stem . ($start ? ':s' : '') . ($end ? ':e' : '');
 
         if (isset(static::$compiled[$key])) {
             return static::$compiled[$key];
@@ -129,8 +135,8 @@ class TextFilter
             $parts[] = '(?:' . $quoted . '+|[\p{P}\p{S}]+)';
         }
 
-        $prefix = $bounded ? '(?<![\p{L}\p{N}])' : '';
-        $suffix = $bounded ? '(?![\p{L}\p{N}])' : '';
+        $prefix = $start ? '(?<![\p{L}\p{N}])' : '';
+        $suffix = $end ? '(?![\p{L}\p{N}])' : '';
 
         return static::$compiled[$key] = '/' . $prefix . implode('[\s\p{P}\p{S}]*', $parts) . $suffix . '/u';
     }

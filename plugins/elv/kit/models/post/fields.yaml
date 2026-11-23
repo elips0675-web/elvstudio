@@ -30,7 +30,7 @@ fields:
     cover:
         label: 'Иконка обложки'
         span: left
-        comment: 'Имя из Classes\Icons: graph, calendar, spark.'
+        comment: 'Имя из Classes\Icons: graph, calendar, spark. Если указать путь к картинке (.png, .jpg, .webp, .svg), она станет обложкой статьи в og:image.'
     reading_time:
         label: 'Время чтения, мин'
         type: number
