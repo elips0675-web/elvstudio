@@ -3,6 +3,7 @@
 use BackendAuth;
 use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\Money;
+use Elv\Kit\Classes\Prices;
 use Illuminate\Validation\ValidationException;
 use Model;
 
@@ -66,6 +67,55 @@ class Price extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * afterSave / afterDelete — базовая цена карточки товара следует за прайсом.
+     *
+     * Карточка хранит цену как резерв, когда версий нет; если версия есть,
+     * поле должно совпадать с действующей, иначе админка и JSON-LD показывают
+     * одно, а заказ считает другое. Историю это не трогает: меняется только
+     * карточка товара.
+     */
+    public function afterSave()
+    {
+        $this->syncProductBase();
+    }
+
+    public function afterDelete()
+    {
+        $this->syncProductBase();
+    }
+
+    protected function syncProductBase(): void
+    {
+        Prices::flush();
+
+        if (!$this->product_slug) {
+            return;
+        }
+
+        $product = Product::query()->where('slug', (string) $this->product_slug)->first();
+
+        if (!$product) {
+            return;
+        }
+
+        $actual = Prices::current((string) $this->product_slug, (string) $this->plan);
+
+        if ($actual === null) {
+            return;
+        }
+
+        $column = match ((string) $this->plan) {
+            'multi' => 'price_multi_cents',
+            'extended' => 'price_extended_cents',
+            default => 'price_cents',
+        };
+
+        if ((int) $product->getAttribute($column) !== $actual) {
+            Product::query()->whereKey($product->getKey())->update([$column => $actual]);
+        }
     }
 
     /**

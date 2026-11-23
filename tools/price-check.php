@@ -241,6 +241,26 @@ try {
         priceFail('аксессор price_label показывает старую цену');
     }
 
+    $modelVersion = new Price([
+        'product_slug' => $slug,
+        'plan' => 'single',
+        'price_cents' => $freshPrice + 100,
+        'valid_from' => date('Y-m-d', strtotime('-1 day')),
+        'note' => 'price-check sync',
+    ]);
+    $modelVersion->save();
+
+    if ((int) Product::kit()->fresh()->price_cents !== $freshPrice + 100) {
+        priceFail('сохранение версии не обновило базовую цену карточки');
+    }
+
+    $modelVersion->delete();
+    Prices::flush();
+
+    if ((int) Product::kit()->fresh()->price_cents !== $freshPrice) {
+        priceFail('удаление версии не вернуло базовую цену карточки');
+    }
+
     $created[] = insertVersion([
         'price_cents' => $base + 8000,
         'currency' => 'BYN',

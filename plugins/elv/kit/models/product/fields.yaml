@@ -28,14 +28,17 @@ fields:
         label: 'Цена Single, центы'
         type: number
         span: left
+        comment: 'Резерв: нужен, только если версии в «Прайсе» нет. Действующую цену задаёт версия прайса.'
     price_multi_cents:
         label: 'Цена Multi, центы'
         type: number
         span: right
+        comment: 'Резерв: нужен, только если версии в «Прайсе» нет.'
     price_extended_cents:
         label: 'Цена Extended, центы'
         type: number
         span: left
+        comment: 'Резерв: нужен, только если версии в «Прайсе» нет.'
     icon:
         label: 'Иконка'
         span: right
