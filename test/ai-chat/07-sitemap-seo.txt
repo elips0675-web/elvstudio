@@ -1,13 +1,13 @@
 # Карта сайта и SEO-разметка
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
 title = "Карта сайта"
 url = "/sitemap/"
 layout = "default"
-meta_title = "Карта сайта — Elv Kit"
+meta_title = "Карта сайта"
 meta_description = "Все разделы сайта Elv Kit: возможности, цены, демо, инструкция, услуги, блог, контакты и правовые документы. Быстрый переход в нужный раздел."
 ==
 {% set crumbs = elv_breadcrumbs() %}
@@ -174,6 +174,7 @@ class Seo
         'docs' => 'Инструкция',
         'order' => 'Заказать',
         'booking' => 'Запись на показ',
+        'account' => 'Личный кабинет',
         'feedback' => 'Обратная связь',
         'contacts' => 'Контакты',
         'terms' => 'Оферта',
@@ -280,7 +281,20 @@ class Seo
 
     public static function image($page = null): string
     {
-        return static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $fallback = static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $cover = static::$post ? trim((string) static::$post->cover) : '';
+
+        // Обложка статьи — имя иконки (graph, calendar, spark), а не картинка.
+        // Ссылку берём, только если в поле действительно путь к изображению.
+        if ($cover === '' || preg_match('~\.(png|jpe?g|webp|gif|svg)$~i', $cover) !== 1) {
+            return $fallback;
+        }
+
+        if (preg_match('~^https?://~i', $cover) === 1) {
+            return $cover;
+        }
+
+        return static::base() . '/' . ltrim($cover, '/');
     }
 
     /**
@@ -707,6 +721,7 @@ use Cms\Classes\Page;
 use Cms\Classes\Theme;
 use Elv\Kit\Models\Post;
 use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Settings;
 
 /**
  * Sitemap — карта сайта из живых страниц темы и записей БД.
@@ -719,15 +734,15 @@ class Sitemap
         $base = Seo::base();
 
         foreach (static::pages() as $page) {
-            $urls[rtrim((string) $page['loc'], '/')] = $page['lastmod'];
+            $urls[static::key((string) $page['loc'])] = $page['lastmod'];
         }
 
         foreach (Product::query()->active()->get() as $product) {
-            $urls[rtrim((string) $product->url, '/')] = optional($product->updated_at)->format('c') ?: now()->format('c');
+            $urls[static::key((string) $product->url)] = optional($product->updated_at)->format('c') ?: now()->format('c');
         }
 
         foreach (Post::query()->published()->get() as $post) {
-            $urls[rtrim((string) $post->url, '/')] = optional($post->updated_at)->format('c') ?: now()->format('c');
+            $urls[static::key((string) $post->url)] = optional($post->updated_at)->format('c') ?: now()->format('c');
         }
 
         ksort($urls);
@@ -744,13 +759,27 @@ class Sitemap
 
             $lines[] = '  <url>';
             $lines[] = '    <loc>' . htmlspecialchars((string) $loc, ENT_XML1) . '</loc>';
-            $lines[] = '    <lastmod>' . htmlspecialchars((string) $lastmod, ENT_XML1) . '</lastmod>';
+
+            if ((string) $lastmod !== '') {
+                $lines[] = '    <lastmod>' . htmlspecialchars((string) $lastmod, ENT_XML1) . '</lastmod>';
+            }
+
             $lines[] = '  </url>';
         }
 
         $lines[] = '</urlset>';
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * key — каноническая форма адреса: со слэшем, как canonical и ссылки сайта.
+     * Лишние слэши срезаются, один ставится обратно, поэтому /blog и /blog/
+     * не попадают в карту дважды.
+     */
+    protected static function key(string $loc): string
+    {
+        return rtrim($loc, '/') . '/';
     }
 
     /**
@@ -784,16 +813,34 @@ class Sitemap
                 continue;
             }
 
-            $file = method_exists($page, 'getFilePath') ? $page->getFilePath() : null;
-            $mtime = $file && is_file($file) ? filemtime($file) : time();
-
             $result[] = [
                 'loc' => Seo::base() . '/' . ltrim($url, '/'),
-                'lastmod' => date('c', $mtime),
+                'lastmod' => static::pageLastmod(),
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * pageLastmod — дата контента, а не filemtime: у файла на новом сервере
+     * дата равна распаковке архива, и sitemap врал бы об обновлении страницы.
+     * Владелец задаёт дату в настройках; пусто — lastmod не выводится.
+     */
+    protected static function pageLastmod(): string
+    {
+        $value = trim((string) Settings::get('sitemap_lastmod'));
+
+        if ($value === '') {
+            return '';
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->startOfDay()->format('c');
+        }
+        catch (\Throwable $e) {
+            return '';
+        }
     }
 }
 
@@ -801,6 +848,7 @@ class Sitemap
 
 <?php
 
+use Elv\Kit\Classes\Http\AccountController;
 use Elv\Kit\Classes\Http\BookingController;
 use Elv\Kit\Classes\Http\ChatController;
 use Elv\Kit\Classes\Http\DownloadController;
@@ -826,6 +874,16 @@ Route::middleware(['web', 'throttle:20,1'])->group(function () {
 
 Route::middleware(['web', 'throttle:40,1'])->group(function () {
     Route::post('chat', [ChatController::class, 'store'])->name('elv.kit.chat');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('account/login', [AccountController::class, 'login'])->name('elv.kit.account.login');
+    Route::get('account/auth/{token}', [AccountController::class, 'auth'])
+        ->where('token', '[a-f0-9]{48}');
+    Route::post('account/logout', [AccountController::class, 'logout'])->name('elv.kit.account.logout');
+    Route::post('account/domain/{id}/unbind', [AccountController::class, 'unbind'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.account.unbind');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {

@@ -1,6 +1,6 @@
 # Проверки, доки и аудит приватности
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -23,11 +23,11 @@ $check = function (bool $condition, string $message) use (&$errors) {
     }
 };
 
-foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck'] as $word) {
+foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck', 'п1зд', '3бал', 'д0лбоеб', 'дро4', 'хуйня'] as $word) {
     $check(TextFilter::has($word), 'filter misses: ' . $word);
 }
 
-foreach (['хутор', 'нормальный вопрос', 'установка'] as $word) {
+foreach (['хутор', 'нормальный вопрос', 'установка', 'х0р', 'п1тон', 'эпидраздел'] as $word) {
     $check(!TextFilter::has($word), 'filter false positive: ' . $word);
 }
 
@@ -127,6 +127,16 @@ $check(count($search['sources']) >= 1, 'explicit search returns no sources');
 $check(count($search['sources']) <= 3, 'explicit search returns more than three sources');
 $check($search['rejected'] === false, 'valid search must not be rejected');
 
+$keep = Chat::answer('как перестать получать письма');
+$check(!str_contains($keep['answer'], 'Нашёл материалы'), 'word «перестать» is mistaken for a request about articles');
+$check(!str_contains($keep['answer'], 'Блог входит'), 'word «перестать» is mistaken for a request about the blog');
+
+$bundle = Chat::answer('покажи связку модулей');
+$check(
+    str_contains($bundle['answer'], 'Раздел') || str_contains($bundle['answer'], 'Модул'),
+    'word «связка» is mistaken for a request to get in touch'
+);
+
 $urls = [];
 
 foreach ($search['sources'] as $source) {
@@ -201,6 +211,16 @@ foreach (['оплата', 'оплатить', 'тарифами', 'цены', '�
     $check(Search::query($query, Search::TYPE_ALL, 10) !== [], 'search returns nothing for: ' . $query);
 }
 
+$boundaryUrls = array_column(Search::query('став', Search::TYPE_ALL, 20), 'url');
+$check(
+    !in_array('/blog/sajt-dlya-lokalnoj-dostavki/', $boundaryUrls, true),
+    'search matches «став» inside «доставка», not at a word start'
+);
+$check(
+    array_intersect(['/blog/og-kartinki-na-php/', '/blog/kak-vybrat-hosting/'], $boundaryUrls) !== [],
+    'search lost word-start matches for «став»'
+);
+
 $pricing = Search::query('тарифами', Search::TYPE_ALL, 10);
 $pricingUrls = array_column($pricing, 'url');
 $check(in_array('/pricing/', $pricingUrls, true), 'morphology does not find /pricing/ for «тарифами»');
@@ -233,6 +253,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Seo;
+use Elv\Kit\Models\Post;
 use Elv\Kit\Models\Settings;
 
 $errors = [];
@@ -258,6 +279,22 @@ $check(count($filled['mainEntity'] ?? []) === 1, 'FAQPage mainEntity is empty fo
 $robots = Seo::robots();
 $check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
 $check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
+
+$defaultImage = Seo::base() . '/themes/elv-studio/assets/img/og-default.png';
+Seo::setPost(null);
+$check(Seo::image() === $defaultImage, 'og:image is not the default without an article');
+
+$post = new Post();
+$post->cover = 'graph';
+Seo::setPost($post);
+$check(Seo::image() === $defaultImage, 'icon cover is used as an og:image');
+
+$post->cover = 'assets/img/cover.png';
+$check(Seo::image() === Seo::base() . '/assets/img/cover.png', 'relative cover path is not used as an og:image');
+
+$post->cover = 'https://cdn.example.com/cover.webp';
+$check(Seo::image() === 'https://cdn.example.com/cover.webp', 'absolute cover url is not used as an og:image');
+Seo::setPost(null);
 
 $settings = Settings::instance();
 $faqKeys = ['faq_items', 'faq_calculator_items', 'faq_services_items', 'faq_seo_items', 'faq_post_items'];
@@ -317,8 +354,16 @@ require __DIR__ . '/../bootstrap/autoload.php';
 $app = require __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+use Elv\Kit\Classes\BookingReminders;
+use Elv\Kit\Classes\Mail\BookingReminder;
+use Elv\Kit\Classes\Mail\BookingReminderAdmin;
 use Elv\Kit\Classes\Slots;
+use Elv\Kit\Models\Booking;
 use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Slot;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 $errors = [];
 
@@ -330,6 +375,9 @@ $check = function (bool $condition, string $message) use (&$errors) {
 
 $settings = Settings::instance();
 $backup = $settings->getAttribute('booking_services');
+$backupReminderEnabled = $settings->getAttribute('booking_reminder_enabled');
+$backupReminderHours = $settings->getAttribute('booking_reminder_hours');
+$backupReminderAdmin = $settings->getAttribute('booking_reminder_admin');
 
 $settings->forceFill(['booking_services' => '']);
 $check(Slots::services() === [], 'empty settings still return booking services');
@@ -375,7 +423,204 @@ $config = Slots::configServices();
 $check(count($config) > 0, 'demo booking dataset is missing');
 $check(Slots::servicesToLines($config) !== '', 'demo booking dataset is not convertible to settings lines');
 
+DB::beginTransaction();
+
+try {
+    $date = date('Y-m-d', strtotime('+2 days'));
+    $slot = Slot::create([
+        'service_code' => 'zz-check',
+        'date' => $date,
+        'time' => '9:05',
+        'capacity' => 2,
+        'taken' => 0,
+    ]);
+    $check($slot->time === '09:05', 'slot time is not normalized to HH:MM');
+    $check($slot->date === $date, 'slot date is not normalized to Y-m-d');
+
+    $duplicate = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '09:05',
+            'capacity' => 2,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $duplicate = true;
+    }
+
+    $check($duplicate, 'duplicate slot is not rejected');
+
+    $badTime = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '25:00',
+            'capacity' => 1,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $badTime = true;
+    }
+
+    $check($badTime, 'invalid slot time is not rejected');
+
+    $overbooked = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '10:00',
+            'capacity' => 1,
+            'taken' => 2,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $overbooked = true;
+    }
+
+    $check($overbooked, 'taken above capacity is not rejected');
+
+    $slot->taken = 1;
+    $slot->save();
+
+    $deleted = true;
+
+    try {
+        $slot->delete();
+        $deleted = false;
+    }
+    catch (ValidationException $e) {
+        // Занятый слот удалять нельзя — это и проверяем.
+    }
+
+    $check($deleted, 'taken slot is deleted');
+
+    $id = (int) $slot->id;
+    $slot->taken = 0;
+    $slot->save();
+    $slot->delete();
+    $check(Slot::query()->find($id) === null, 'free slot is not deleted');
+
+    $range = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($range['created'] === 4, 'slot range generation did not create four slots');
+    $check($range['total'] === 4, 'slot range generation reports the wrong total');
+
+    $repeat = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($repeat['created'] === 0, 'repeated slot generation creates duplicates');
+    $check($repeat['skipped'] === 4, 'repeated slot generation does not skip existing slots');
+
+    $generated = Slot::query()
+        ->where('service_code', 'ok')
+        ->whereBetween('date', ['2030-01-07', '2030-01-08'])
+        ->get();
+    $check($generated->count() === 4, 'generated slot count does not match');
+    $check((int) ($generated->first()->capacity ?? 0) === 2, 'generated slot capacity is not applied');
+
+    $reversed = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-08', '2030-01-07', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $reversed = true;
+    }
+
+    $check($reversed, 'reversed slot range is not rejected');
+
+    $overLimit = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-01', '2030-12-31', '10:00', '18:00', 5);
+    }
+    catch (\InvalidArgumentException $e) {
+        $overLimit = true;
+    }
+
+    $check($overLimit, 'slot range over 500 is not rejected');
+
+    $unknownService = false;
+
+    try {
+        Slots::generateRange('zz-no-such', '2030-01-07', '2030-01-08', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $unknownService = true;
+    }
+
+    $check($unknownService, 'slot range accepts a service missing from settings');
+
+    $check(BookingReminders::normalizeHours(0) === BookingReminders::DEFAULT_HOURS, 'zero reminder hours are not defaulted');
+    $check(BookingReminders::normalizeHours(500) === 72, 'reminder hours are not capped at 72');
+    $check(BookingReminders::normalizeHours(1) === 1, 'one hour reminder is not allowed');
+
+    $settings->forceFill(['booking_reminder_enabled' => true, 'booking_reminder_hours' => 12]);
+    $check(BookingReminders::enabled() === true, 'reminder switch is not read from settings');
+    $check(BookingReminders::hours() === 12, 'reminder hours are not read from settings');
+
+    $settings->forceFill(['booking_reminder_hours' => 500]);
+    $check(BookingReminders::hours() === 72, 'reminder hours from settings are not capped');
+
+    $now = \Carbon\Carbon::parse('2026-12-01 10:00:00');
+    $makeBooking = function (array $attributes = []) {
+        return Booking::create(array_merge([
+            'service_code' => 'zz-check',
+            'service' => 'Проверка',
+            'price' => '0 BYN',
+            'date' => '2026-12-01',
+            'time' => '18:00',
+            'person' => 'Тест',
+            'email' => 'zz-check@example.com',
+            'status' => Booking::STATUS_NEW,
+        ], $attributes));
+    };
+
+    $due = $makeBooking();
+    $makeBooking(['date' => '2026-12-03']);
+    $makeBooking(['time' => '12:00', 'status' => Booking::STATUS_CANCELLED]);
+    $makeBooking(['time' => '12:30', 'email' => '']);
+    $alreadyReminded = $makeBooking(['time' => '13:00']);
+    $alreadyReminded->reminded_at = $now->copy()->subHour();
+    $alreadyReminded->save();
+
+    $pending = BookingReminders::pending(24, $now);
+    $check($pending->count() === 1, 'reminder selection does not return exactly the due booking');
+    $check((int) ($pending->first()->id ?? 0) === (int) $due->id, 'reminder selection picked the wrong booking');
+    $check(BookingReminders::moment($due) !== null, 'reminder moment is not parsed from date and time');
+    $check(BookingReminders::moment($makeBooking(['time' => 'nonsense'])) === null, 'broken booking time still produces a moment');
+
+    Mail::fake();
+    $sent = BookingReminders::send(24, $now);
+    $check($sent === 1, 'reminder send does not report one letter');
+    $check($due->fresh()->reminded_at !== null, 'reminder mark is not saved');
+    Mail::assertQueued(BookingReminder::class);
+    $check(BookingReminders::pending(24, $now)->count() === 0, 'reminded booking is selected twice');
+
+    $settings->forceFill(['booking_reminder_admin' => true]);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 3, 'admin reminder selection is wrong');
+    $adminSent = BookingReminders::sendAdmin(24, $now);
+    $check($adminSent === 3, 'admin reminder send does not report three letters');
+    $check($due->fresh()->admin_reminded_at !== null, 'admin reminder mark is not saved');
+    Mail::assertQueued(BookingReminderAdmin::class);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 0, 'admin reminder is sent twice');
+}
+finally {
+    DB::rollBack();
+}
+
 $settings->forceFill(['booking_services' => $backup]);
+$settings->forceFill([
+    'booking_reminder_enabled' => $backupReminderEnabled,
+    'booking_reminder_hours' => $backupReminderHours,
+    'booking_reminder_admin' => $backupReminderAdmin,
+]);
 
 if ($errors !== []) {
     foreach ($errors as $error) {
@@ -394,7 +639,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const SCRIPTS = ['tools/chat-check.php', 'tools/seo-check.php', 'tools/booking-check.php'];
+const SCRIPTS = [
+  'tools/chat-check.php',
+  'tools/search-check.php',
+  'tools/seo-check.php',
+  'tools/admin-check.php',
+  'tools/booking-check.php',
+  'tools/presets-check.php',
+  'tools/download-check.php',
+  'tools/account-check.php',
+];
 
 function commandWorks(command, args) {
   const result = spawnSync(command, args, { stdio: 'ignore' });
@@ -855,13 +1109,14 @@ class SecurityHeaders
 
         $nonce = static::nonce();
         $analytics = $this->analyticsSources();
+        $ancestors = static::frameAncestors();
 
         $cspParts = [
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'self'",
-            "frame-src 'self' https:",
+            "frame-ancestors " . $ancestors,
+            "frame-src 'self' https:" . (app()->environment('production') ? '' : ' http:'),
             "img-src 'self' data:",
             "font-src 'self'",
             "style-src 'self' 'nonce-" . $nonce . "'",
@@ -878,17 +1133,25 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+
+        // X-Frame-Options не умеет список источников: при встраивании на чужой
+        // домене он бы всё заблокировал, поэтому остаётся только для 'self'.
+        if ($ancestors === "'self'") {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        }
+        else {
+            $response->headers->remove('X-Frame-Options');
+        }
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         header_remove('X-Powered-By');
         $response->headers->remove('X-Powered-By');
 
-        // Живой предпросмотр не индексируется и не кэшируется.
-        if ($request->is('preview', 'preview/*')) {
+        // Живой предпросмотр и кабинет не индексируются и не кэшируются.
+        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*')) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
-            $response->headers->set('Cache-Control', 'no-store, max-age=0');
+            $response->headers->set('Cache-Control', 'no-store, max-age=0, private');
         }
 
         if ($request->isSecure()) {
@@ -898,8 +1161,40 @@ class SecurityHeaders
         return $response;
     }
 
-    protected function analyticsSources(): string
+    /**
+     * frameAncestors — источники, которым разрешено встраивать сайт в iframe.
+     *
+     * По умолчанию только свой домен (`'self'`). Нишевые демо-стенды живут на
+     * отдельных поддоменах и показываются внутри `/preview/` на домене витрины,
+     * поэтому родительские источники перечисляются в `ELV_FRAME_ANCESTORS`
+     * через пробел: `ELV_FRAME_ANCESTORS="https://example.com"`.
+     *
+     * Принимаются только origin'ы вида `http(s)://host[:port]`: строка вида
+     * `*` или мусор не должна открывать сайт для встраивания куда угодно.
+     */
+    public static function frameAncestors(): string
     {
+        $raw = trim((string) (env('ELV_FRAME_ANCESTORS') ?: ''));
+        $sources = [];
+
+        foreach (preg_split('~\s+~', $raw) ?: [] as $source) {
+            $source = rtrim(trim($source), '/');
+
+            if ($source === '' || !preg_match('~^https?://[a-z0-9.\-:\[\]]+$~i', $source)) {
+                continue;
+            }
+
+            $sources[] = strtolower($source);
+        }
+
+        if ($sources === []) {
+            return "'self'";
+        }
+
+        return implode(' ', array_merge(["'self'"], array_unique($sources)));
+    }
+
+    protected function analyticsSources(): string    {
         $sources = '';
 
         if (Settings::get('analytics_google')) {

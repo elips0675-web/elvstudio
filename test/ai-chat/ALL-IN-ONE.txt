@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки, аудит приватности и планы. Файлы разделены, чтобы каждый был понятен.
@@ -22,7 +22,7 @@
 
 # Elv Landing — срез для AI-анализа: Консультант, поиск и карта сайта
 
-Срез: 21.11.2026. Stage 84. Коммит: `122a5c9`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 Репозиторий: https://github.com/elips0675-web/elvstudio
 
 ## Что это за проект
@@ -31,7 +31,7 @@
 тема `elv-studio` и плагин `Elv.Kit` (Booking, Shop, Feedback, Blog).
 Это не код продукта `D:\October CMS`: общих файлов нет, каждая инсталляция
 October своя. Витрина продаёт Elv Kit, модули, консультации и услуги;
-блог из 73 статей продаёт через контент. В шапке пять пунктов: «Продукты»
+блог из 112 статей продаёт через контент. В шапке пять пунктов: «Продукты»
 (Elv Kit, Шаблон, Модули), Услуги, Цены, Демо, Блог + CTA «Заказать сайт»;
 «Контакты» — в подвале, чтобы не перегружать шапку. Пункты «Продуктов» —
 из настроек, вкладка «Меню».
@@ -56,7 +56,10 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 5. Приватность: `SecurityHeaders.php` — CSP и заголовки HTTP.
 6. Прайс: `classes/Prices.php`, `models/Price.php`, админка
    `controllers/Prices.php` — версии цен и дата актуальности.
-7. Исходники и аудит: `docs/html/` (42 файла), `docs/00-audit-documents.md`
+7. Личный кабинет: `AccountService`, `AccountController`, `Customer`,
+   `themes/elv-studio/pages/account.htm` — вход по одноразовой ссылке,
+   заказы, лицензии, домены и отвязка раз в 30 дней.
+8. Исходники и аудит: `docs/html/` (42 файла), `docs/00-audit-documents.md`
    (разделы 1–7) — что уже реализовано и что осталось решением владельца.
 
 ## Текущее поведение (факты)
@@ -67,8 +70,8 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   Страница поиска закрыта `noindex, follow` и не попадает в XML-sitemap.
 - Индекс собирается из проверенного списка страниц и опубликованных статей;
   в записи статьи попадают заголовок, анонс, ключевые слова и первые
-  800 символов тела. Сейчас индекс — 94 записи, 143 529 байт JSON,
-  35 814 байт gzip.
+  800 символов тела. Сейчас индекс — 139 записей, 234 874 байта JSON,
+  59 191 байт gzip.
 - Поиск строит простые основы и синонимы (`оплата/оплаты/оплатить`,
   `тариф/тарифы/тарифами`, `статья/статьи`, `бронирование/бронирования`,
   `цена/цены/стоимость`), без Левенштейна и внешних сервисов. Первые
@@ -134,9 +137,15 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   `APP_ENV=production`. На локальном HTTP (`localhost` и LAN-IP) директива не
   отправляется, иначе браузер поднимает `fetch('/chat')` до `https://` и
   Консультант зависает на «Печатает…». Это проверено по LAN-IP.
+- Личный кабинет `/account/` — только по одноразовой ссылке: `Customer`
+  выдаёт 48 hex-символов на 30 минут, токен гасится при первом переходе,
+  паролей и регистрации нет. Покупатель видит заказы со статусом и
+  скачиванием, ключи лицензий и домены; домен отвязывается не чаще раза
+  в 30 дней на лицензию. Клиенты создаются миграцией 1.1.0 из заказов.
+  Страница закрыта `noindex` и `no-store`, в sitemap не входит.
 - Карта `/sitemap/` сгруппирована по разделам: «Сайт», «Услуги», «Модули
   Elv Kit», «Купить и связаться», «Правовое и служебное», «Блог». В блоге —
-  шесть свежих статей и четыре рубрики, а не плоский список 73 статей.
+  шесть свежих статей и четыре рубрики, а не плоский список 112 статей.
   Над блоками — якоря `#sitemap-site`, `#sitemap-services`, `#sitemap-modules`,
   `#sitemap-buy`, `#sitemap-legal`, `#sitemap-blog`.
 - `SearchAction` в `Seo.php` ведёт на `/search/?q={search_term_string}`.
@@ -146,16 +155,16 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - FAQ выводится у 22 статей; в подвале нет технической ссылки «Для ИИ-поиска»
   (`/llms.txt` остаётся доступен), а на `/kit/` инструкция по установке стоит
   в блоке «Запуск», не под кнопкой заказа.
-- Блог: 73 статьи (53 business / 20 tech), 37 тегов; все статьи длиннее
-  1 500 знаков, у каждой внутренние ссылки и CTA.
+- Блог: 112 статей (81 business / 31 tech), 126 тегов; у каждой внутренние
+  ссылки и CTA, тексты лежат в `plugins/elv/kit/demo/blog.json`.
 
 ## Чем проверено
 
-- `node tools/gate.mjs` — all gates passed: 107 внутренних URL, 101 URL
-  sitemap, 119 страниц без ошибок консоли, блог (301 на `/blog/`, 6 страниц
-  пагинации с canonical, 404 за последней), бюджет, состав ZIP, бренд,
-  кодировка, тарифы, PHP-проверки (chat/seo/booking) и TTFB p90 162 мс
-  (медиана 146 мс).
+- `node tools/gate.mjs` — all gates passed: 152 внутренних URL, 140 URL
+  sitemap, 172 страницы статики без ошибок консоли, блог (301 на `/blog/`,
+  9 страниц пагинации с canonical, 404 за последней), бюджет, состав ZIP,
+  бренд, кодировка, тарифы, PHP-проверки (chat/seo/booking/account) и TTFB
+  p90 в пределах 300 мс (медиана около 105 мс).
 - `node tools/check-budget.mjs` — `/` HTML 132,0 КБ / CSS 36,0 КБ / JS 18,3 КБ,
   gzip 24,6 КБ (лимиты 150/36/20/30).
 - `php tools/chat-check.php` — OK: тарифы, явный и запасной поиск, пустой
@@ -173,10 +182,10 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   будущую/истёкшую/выключенную версию, границу `valid_to = сегодня`, чужой
   товар, расхождение с `/pricing/`, калькулятором, сметой и Консультантом,
   а также битый конфиг колонок админки.
-- `node tools/check-package.mjs` — плагин 1.0.6, тема 1.0.0; товарный архив
-  213 файлов / 389 КБ без `demo/blog.json`, демо-архив 216 файлов / 520 КБ
-  с ним; `Demo::posts()` отдаёт 73 статьи и совпадает с числом уникальных
-  `slug` в датасете.
+- `node tools/check-package.mjs` — плагин 1.1.0, тема 1.0.0; товарный архив
+  306 файлов / 445 КБ без `demo/blog.json`, демо-архив 315 файлов / 647 КБ
+  с ним и четырьмя пресетами ниш; `Demo::posts()` отдаёт 112 статей и
+  совпадает с числом уникальных `slug` в датасете.
 - `node tools/check-headers.mjs` — CSP без `upgrade-insecure-requests` на
   локальном HTTP; `check-seo` требует `Organization.logo` и якоря карты.
 - Live-`/chat` с CSRF: 15 ответов `200`, 16-й — `429`. На LAN-IP
@@ -185,7 +194,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - Обратные подстановки Stage 74: без пропуска `demo/` в `DownloadService`
   гейт красный («товарный архив содержит демо-датасет блога»); сломанный
   `Demo::dataset()` — красный («`Demo::posts()` отдаёт 0 статей, а в датасете
-  73 уникальных slug»).
+  112 уникальных slug»).
 
 ## Ограничения и что не проверено
 
@@ -229,10 +238,10 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
-Отслеживаемые файлы (`git ls-files`), всего 572.
-`demo-static` — 171 HTML-страниц, показан не развёрнуто.
+Отслеживаемые файлы (`git ls-files`), всего 626.
+`demo-static` — 172 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
 ## Корень
@@ -264,10 +273,12 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/Plugin.php`
 - `plugins/elv/kit/assets/widget.css`
 - `plugins/elv/kit/assets/widget.js`
+- `plugins/elv/kit/classes/AccountService.php`
 - `plugins/elv/kit/classes/AntiSpam.php`
 - `plugins/elv/kit/classes/Assets.php`
 - `plugins/elv/kit/classes/Badges.php`
 - `plugins/elv/kit/classes/Blog.php`
+- `plugins/elv/kit/classes/BookingReminders.php`
 - `plugins/elv/kit/classes/BookingService.php`
 - `plugins/elv/kit/classes/Calculator.php`
 - `plugins/elv/kit/classes/Catalog.php`
@@ -277,6 +288,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/classes/DemoLinks.php`
 - `plugins/elv/kit/classes/DownloadService.php`
 - `plugins/elv/kit/classes/Faq.php`
+- `plugins/elv/kit/classes/Http/AccountController.php`
 - `plugins/elv/kit/classes/Http/BookingController.php`
 - `plugins/elv/kit/classes/Http/ChatController.php`
 - `plugins/elv/kit/classes/Http/DownloadController.php`
@@ -290,8 +302,11 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/classes/Http/SubscribeController.php`
 - `plugins/elv/kit/classes/Icons.php`
 - `plugins/elv/kit/classes/LicenseService.php`
+- `plugins/elv/kit/classes/Mail/AccountMagicLink.php`
 - `plugins/elv/kit/classes/Mail/BookingAdmin.php`
 - `plugins/elv/kit/classes/Mail/BookingCustomer.php`
+- `plugins/elv/kit/classes/Mail/BookingReminder.php`
+- `plugins/elv/kit/classes/Mail/BookingReminderAdmin.php`
 - `plugins/elv/kit/classes/Mail/MessageAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderAdmin.php`
 - `plugins/elv/kit/classes/Mail/OrderCustomer.php`
@@ -323,6 +338,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/config/services.php`
 - `plugins/elv/kit/console/DemoCommand.php`
 - `plugins/elv/kit/console/PackageCommand.php`
+- `plugins/elv/kit/console/RemindCommand.php`
 - `plugins/elv/kit/console/ResetCommand.php`
 - `plugins/elv/kit/controllers/Bookings.php`
 - `plugins/elv/kit/controllers/Categories.php`
@@ -333,13 +349,17 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/controllers/Posts.php`
 - `plugins/elv/kit/controllers/Prices.php`
 - `plugins/elv/kit/controllers/Products.php`
+- `plugins/elv/kit/controllers/Releases.php`
+- `plugins/elv/kit/controllers/Slots.php`
 - `plugins/elv/kit/controllers/Subscribers.php`
 - `plugins/elv/kit/controllers/bookings/config_form.yaml`
 - `plugins/elv/kit/controllers/bookings/config_list.yaml`
 - `plugins/elv/kit/controllers/bookings/index.htm`
 - `plugins/elv/kit/controllers/bookings/update.htm`
+- `plugins/elv/kit/controllers/categories/_list_toolbar.htm`
 - `plugins/elv/kit/controllers/categories/config_form.yaml`
 - `plugins/elv/kit/controllers/categories/config_list.yaml`
+- `plugins/elv/kit/controllers/categories/create.htm`
 - `plugins/elv/kit/controllers/categories/index.htm`
 - `plugins/elv/kit/controllers/categories/update.htm`
 - `plugins/elv/kit/controllers/install/_checks.htm`
@@ -358,8 +378,10 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/controllers/orders/config_list.yaml`
 - `plugins/elv/kit/controllers/orders/index.htm`
 - `plugins/elv/kit/controllers/orders/update.htm`
+- `plugins/elv/kit/controllers/posts/_list_toolbar.htm`
 - `plugins/elv/kit/controllers/posts/config_form.yaml`
 - `plugins/elv/kit/controllers/posts/config_list.yaml`
+- `plugins/elv/kit/controllers/posts/create.htm`
 - `plugins/elv/kit/controllers/posts/index.htm`
 - `plugins/elv/kit/controllers/posts/update.htm`
 - `plugins/elv/kit/controllers/prices/_list_toolbar.htm`
@@ -368,15 +390,34 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/controllers/prices/create.htm`
 - `plugins/elv/kit/controllers/prices/index.htm`
 - `plugins/elv/kit/controllers/prices/update.htm`
+- `plugins/elv/kit/controllers/products/_list_toolbar.htm`
 - `plugins/elv/kit/controllers/products/config_form.yaml`
 - `plugins/elv/kit/controllers/products/config_list.yaml`
+- `plugins/elv/kit/controllers/products/create.htm`
 - `plugins/elv/kit/controllers/products/index.htm`
 - `plugins/elv/kit/controllers/products/update.htm`
+- `plugins/elv/kit/controllers/releases/_list_toolbar.htm`
+- `plugins/elv/kit/controllers/releases/config_form.yaml`
+- `plugins/elv/kit/controllers/releases/config_list.yaml`
+- `plugins/elv/kit/controllers/releases/index.htm`
+- `plugins/elv/kit/controllers/releases/update.htm`
+- `plugins/elv/kit/controllers/slots/_list_toolbar.htm`
+- `plugins/elv/kit/controllers/slots/config_form.yaml`
+- `plugins/elv/kit/controllers/slots/config_list.yaml`
+- `plugins/elv/kit/controllers/slots/create.htm`
+- `plugins/elv/kit/controllers/slots/generate.htm`
+- `plugins/elv/kit/controllers/slots/index.htm`
+- `plugins/elv/kit/controllers/slots/update.htm`
 - `plugins/elv/kit/controllers/subscribers/config_list.yaml`
 - `plugins/elv/kit/controllers/subscribers/index.htm`
 - `plugins/elv/kit/demo/blog.json`
+- `plugins/elv/kit/demo/presets/agency.json`
+- `plugins/elv/kit/demo/presets/booking.json`
+- `plugins/elv/kit/demo/presets/digital.json`
+- `plugins/elv/kit/demo/presets/expert.json`
 - `plugins/elv/kit/models/Booking.php`
 - `plugins/elv/kit/models/Category.php`
+- `plugins/elv/kit/models/Customer.php`
 - `plugins/elv/kit/models/Install.php`
 - `plugins/elv/kit/models/License.php`
 - `plugins/elv/kit/models/Message.php`
@@ -384,6 +425,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/models/Post.php`
 - `plugins/elv/kit/models/Price.php`
 - `plugins/elv/kit/models/Product.php`
+- `plugins/elv/kit/models/Release.php`
 - `plugins/elv/kit/models/Settings.php`
 - `plugins/elv/kit/models/Slot.php`
 - `plugins/elv/kit/models/Subscriber.php`
@@ -403,17 +445,28 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `plugins/elv/kit/models/price/fields.yaml`
 - `plugins/elv/kit/models/product/columns.yaml`
 - `plugins/elv/kit/models/product/fields.yaml`
+- `plugins/elv/kit/models/release/columns.yaml`
+- `plugins/elv/kit/models/release/fields.yaml`
 - `plugins/elv/kit/models/settings/fields.yaml`
+- `plugins/elv/kit/models/slot/columns.yaml`
+- `plugins/elv/kit/models/slot/fields.yaml`
 - `plugins/elv/kit/models/subscriber/columns.yaml`
 - `plugins/elv/kit/routes.php`
 - `plugins/elv/kit/updates/add_audience_to_posts.php`
+- `plugins/elv/kit/updates/add_booking_admin_reminder.php`
+- `plugins/elv/kit/updates/add_booking_reminder.php`
+- `plugins/elv/kit/updates/create_kit_customers.php`
 - `plugins/elv/kit/updates/create_kit_tables.php`
 - `plugins/elv/kit/updates/create_price_versions.php`
+- `plugins/elv/kit/updates/create_releases.php`
 - `plugins/elv/kit/updates/seed_kit_blog.php`
 - `plugins/elv/kit/updates/seed_kit_demo.php`
 - `plugins/elv/kit/updates/version.yaml`
+- `plugins/elv/kit/views/mail/account-magic-link.htm`
 - `plugins/elv/kit/views/mail/booking-admin.htm`
 - `plugins/elv/kit/views/mail/booking-customer.htm`
+- `plugins/elv/kit/views/mail/booking-reminder-admin.htm`
+- `plugins/elv/kit/views/mail/booking-reminder.htm`
 - `plugins/elv/kit/views/mail/message-admin.htm`
 - `plugins/elv/kit/views/mail/order-admin.htm`
 - `plugins/elv/kit/views/mail/order-customer.htm`
@@ -423,6 +476,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 ## themes/elv-studio
 
+- `themes/elv-studio/assets/css/account.css`
 - `themes/elv-studio/assets/css/blog.css`
 - `themes/elv-studio/assets/css/calculator.css`
 - `themes/elv-studio/assets/css/preview.css`
@@ -438,6 +492,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `themes/elv-studio/layouts/default.htm`
 - `themes/elv-studio/layouts/preview.htm`
 - `themes/elv-studio/pages/404.htm`
+- `themes/elv-studio/pages/account.htm`
 - `themes/elv-studio/pages/blog-post.htm`
 - `themes/elv-studio/pages/blog-tech.htm`
 - `themes/elv-studio/pages/blog.htm`
@@ -488,6 +543,8 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 ## tools
 
+- `tools/account-check.php`
+- `tools/admin-check.php`
 - `tools/blog-content-audit.php`
 - `tools/booking-check.php`
 - `tools/build-test-snapshot.mjs`
@@ -502,6 +559,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `tools/check-empty-install.mjs`
 - `tools/check-encoding.mjs`
 - `tools/check-headers.mjs`
+- `tools/check-iframe-demo.mjs`
 - `tools/check-orphans.mjs`
 - `tools/check-package.mjs`
 - `tools/check-perf.mjs`
@@ -511,10 +569,12 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `tools/check-promises.mjs`
 - `tools/check-seo.mjs`
 - `tools/check-urls.mjs`
+- `tools/download-check.php`
 - `tools/export-blog-articles.php`
 - `tools/export-static.php`
 - `tools/gate.mjs`
 - `tools/package-inspect.php`
+- `tools/presets-check.php`
 - `tools/price-check.php`
 - `tools/production-check.php`
 - `tools/search-check.php`
@@ -571,6 +631,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 - `docs/html/проект идеально подходит для продаж софта.txt`
 - `docs/html/профиль клиента и чат тикет системы.txt`
 - `docs/html/шаблонный конструктор или готовое решение на продажу аренду.html`
+- `docs/owner-decisions.md`
 - `docs/prices.md`
 - `docs/production-deploy.md`
 - `docs/qa/README.md`
@@ -602,7 +663,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: composer.json =====
 
@@ -729,6 +790,18 @@ form:
 1.0.6:
     - 'Прайс с версиями цен: valid_from, valid_to, is_active и лог изменений'
     - create_price_versions.php
+1.0.7:
+    - 'Релизы архива: версия, канал, контрольная сумма и действующая сборка'
+    - create_releases.php
+1.0.8:
+    - 'Напоминания о записи: отметка reminded_at и письмо клиенту за сутки'
+    - add_booking_reminder.php
+1.0.9:
+    - 'Напоминание мастеру о записи: отметка admin_reminded_at'
+    - add_booking_admin_reminder.php
+1.1.0:
+    - 'Личный кабинет: клиенты, вход по одноразовой ссылке, домены и отвязка раз в 30 дней'
+    - create_kit_customers.php
 
 ===== FILE: README.md =====
 
@@ -805,9 +878,18 @@ form:
   описание, иконка. Пустое поле — раздел честно пишет «Запись временно
   недоступна», а не показывает выдуманные услуги.
 - Слоты строятся на 14 дней вперёд (по умолчанию), занятый слот не продаётся
-  дважды: проверка и запись идут в одной транзакции.
+  дважды: проверка и запись идут в одной транзакции. Сетку можно править в
+  админке («Elv Kit → Слоты записи»): дата, время, число мест; занятый слот
+  удалить нельзя. Кнопка «Сгенерировать слоты» создаёт диапазон дат и времени
+  с шагом, существующие слоты не перезаписывает (до 500 за раз).
 - Клиент получает подтверждение, администратор — уведомление; отмена
   освобождает слот. На демо-стенде письма пишутся в лог (`MAIL_MAILER=log`).
+- Напоминание за сутки: вкладка «Запись» → «Напоминания о записи» (клиенту)
+  и «Напоминать мастеру» (администратору на адрес уведомлений). Команда
+  `php artisan elv:kit:remind` идёт по расписанию раз в час, письмо уходит
+  один раз (`reminded_at` / `admin_reminded_at`), отменённые брони
+  пропускаются. Нужен cron `schedule:run`; `--hours` и `--force` — для ручной
+  проверки.
 
 ### Заказы и оплата
 - Тариф выбирается на `/pricing/`, кнопки ведут на `/order/?product=…&plan=…`.
@@ -826,6 +908,16 @@ form:
 - `POST /api/v1/license/activate` — активация по домену (хранится хэшем).
 - `GET /api/v1/license/stats` — статистика, если включена в настройках.
 - Лимит доменов считается по тарифу в одном месте — `Catalog::planDomainLimit()`.
+
+### Личный кабинет
+- `/account/` — вход только по одноразовой ссылке на e-mail: токен 48 символов,
+  живёт 30 минут, гасится при первом переходе. Паролей нет.
+- Покупатель видит свои заказы, ссылку на скачивание, ключи лицензий и домены.
+  Кабинет закрыт `noindex` и `no-store`; в sitemap его нет.
+- Домен отвязывается не чаще раза в 30 дней на лицензию — иначе лимит доменов
+  терял бы смысл. У активаций до 1.1.0 домен не сохранён: виден только хэш.
+- Клиенты создаются миграцией из заказов: существующим покупателям не нужно
+  регистрироваться заново.
 
 ### Обратная связь и подписка
 - Формы под CSRF, `throttle` и honeypot; сообщения попадают в админку.
@@ -873,7 +965,8 @@ form:
 |---|---|
 | Установка | Миграции, демо-данные, очередь, кэш — без терминала |
 | Заказы | Статусы, оплата, лицензия, ссылка на скачивание |
-| Брони | Записи клиентов, отмена, слоты |
+| Брони | Записи клиентов, отмена, освобождение слота |
+| Слоты записи | Сетка свободного времени: дата, время, места, услуга |
 | Сообщения | Обратная связь |
 | Подписчики | Список и статусы подписки |
 | Товары | Продукты, цены, тарифы |
@@ -894,9 +987,9 @@ form:
 | Продажи | Валюта, режим оплаты, тарифы и их видимость, почта уведомлений, демо-ссылки, ключи ЮKassa/Stripe |
 | Калькулятор | Включение, дата цен, примечания по хостингу и поддержке |
 | Лицензии | API-токен, публичная статистика |
-| SEO и аналитика | Google Analytics, Яндекс.Метрика, вебвизор |
+| SEO и аналитика | Google Analytics, Яндекс.Метрика, вебвизор, дата `lastmod` для статических страниц sitemap |
 | FAQ | Общий блок, калькулятор, услуги, SEO, статьи |
-| Запись | Услуги записи |
+| Запись | Услуги записи, напоминания клиенту и мастеру (за сколько часов) |
 
 Пустые настройки — не ошибка: шапка, футер, FAQ и разделы просто не показывают
 блок, а не печатают наш текст-заглушку. Демо-значения ставит только
@@ -916,7 +1009,7 @@ form:
 |---|---|
 | `themes/elv-studio/` | тема: `layouts/`, `pages/`, `partials/`, `assets/css`, `assets/js` |
 | `plugins/elv/kit/` | плагин: `classes/`, `models/`, `controllers/`, `console/`, `updates/`, `routes.php` |
-| `plugins/elv/kit/demo/` | демо-статьи блога (`blog.json`), в товарный архив не входят |
+| `plugins/elv/kit/demo/` | демо-статьи блога (`blog.json`) и пресеты ниш (`presets/`), в товарный архив не входят |
 | `tools/` | гейты `check-*.mjs`, `production-check.php`, экспорт статики, аудит блога, снимок для AI |
 | `docs/` | аудит источников, 42 исходных документа в `docs/html/`, политика контента, поиск, прайс, QA |
 | `demo-static/` | статический экспорт для Vercel |
@@ -971,6 +1064,26 @@ php artisan serve --port=8090
 `elv:kit:demo` наполняет каталог, статьи и слоты бронирования идемпотентно;
 `elv:kit:reset` удаляет демо-данные, `elv:kit:package` собирает ZIP поставки.
 
+### Пресеты ниш для демо-стенда
+
+Пресет меняет только настройки (бренд, услуги, FAQ, меню, услуги записи),
+каталог и статьи остаются данными Elv Kit:
+
+```bash
+php artisan elv:kit:demo --preset=booking          # автосервис: запись и услуги
+php artisan elv:kit:demo --preset=digital          # цифровые товары
+php artisan elv:kit:demo --preset=agency           # студия и её услуги
+php artisan elv:kit:demo --preset=expert           # частный специалист
+php artisan elv:kit:demo --reset-preset            # вернуть демо-значения Elv Kit
+```
+
+Пресеты лежат в `plugins/elv/kit/demo/presets/*.json`, список закрытый
+(`Demo::PRESET_SETTINGS`): файл не может переписать валюту, тарифы или
+платёжные ключи. Цены в пресете пишутся как `90 {{currency}}` и подставляются
+из `Money::currency()`. Пресеты входят только в архив `--demo`; товарный ZIP
+их не содержит. Проверка — `php tools/presets-check.php` (входит в
+`npm run check`).
+
 ## Быстрый запуск на Windows
 
 1. Запустить MySQL (Laragon, порт 3306).
@@ -992,12 +1105,16 @@ npm run check:console                # 171 статическая страниц
 npm run test:calculator              # Chrome E2E: выбор → результат → PDF
 node tools/check-empty-install.mjs --base=http://127.0.0.1:8090
                                      # витрина на пустой базе (в гейт не входит)
+node tools/check-iframe-demo.mjs --base=… --parent=…
+                                     # демо-стенд встраивается в iframe (вручную)
 node tools/check-perf.mjs --runs=5   # Lighthouse mobile, медиана и худший прогон
 php tools/production-check.php       # прод-чек: права, БД, .htaccess, ключи, очередь
 php tools/production-check.php --strict
 php tools/blog-content-audit.php     # срез блога: объём, ссылки, CTA, FAQ, meta
 php tools/chat-check.php             # Консультант: ответы, ссылки, фильтр слов
 php tools/calculator-check.php       # формула, рекомендации, шаблон PDF
+php tools/presets-check.php          # пресеты ниш: ключи, запись, сброс
+php tools/download-check.php         # выдача ZIP: лимит, водяной знак, релиз
 ```
 
 ## Боевое окружение
@@ -1017,12 +1134,24 @@ php tools/calculator-check.php       # формула, рекомендации,
 ```bash
 php artisan elv:kit:package          # товарный ZIP: тема, плагин, README, LICENSE
 php artisan elv:kit:package --demo   # вариант с демо-данными для лендинга
+php artisan elv:kit:package --rebuild --notes="Что изменилось"
 ```
 
 Архив собирается в `storage/app/kit/elv-kit-<версия>.zip`. Версия берётся из
 `updates/version.yaml` — это единственный источник. Демо-статьи блога
-(`demo/blog.json`) в товарный архив не попадают: у покупателя блог пуст до его
-собственных статей.
+(`demo/blog.json`) и пресеты ниш (`demo/presets/*.json`) в товарный архив не
+попадают: у покупателя блог пуст до его собственных статей, а пресеты — слой
+нашего демо-стенда, а не товар.
+
+Каждая сборка записывается в «Elv Kit → Релизы» (`elv_kit_releases`): версия,
+канал, размер, SHA-256 и заметка. Действующая сборка одна на вариант; именно её
+получает покупатель по ссылке из письма. Если файл релиза удалён, архив
+собирается заново из текущих файлов.
+
+По ссылке `/download/{token}` покупатель получает копию архива с
+`LICENSE_OWNER.txt` внутри: номер заказа, e-mail, тариф, ключ лицензии и дата
+скачивания. Суточный лимит — настройка «Скачиваний архива в сутки» (по
+умолчанию 5, `0` — без ограничения); сверх лимита ответ 429.
 
 ## Демо-экспорт для Vercel
 
@@ -1084,7 +1213,7 @@ node tools/build-test-snapshot.mjs
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -1092,6 +1221,7 @@ node tools/build-test-snapshot.mjs
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\AccountService;
 use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
@@ -1136,6 +1266,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('elv.kit.demo', \Elv\Kit\Console\DemoCommand::class);
         $this->registerConsoleCommand('elv.kit.reset', \Elv\Kit\Console\ResetCommand::class);
         $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
+        $this->registerConsoleCommand('elv.kit.remind', \Elv\Kit\Console\RemindCommand::class);
     }
 
     public function registerSettings()
@@ -1197,6 +1328,10 @@ class Plugin extends PluginBase
                 'label' => 'Прайс: версии цен',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.releases' => [
+                'label' => 'Релизы архива',
+                'tab' => 'Elv Kit',
+            ],
         ];
     }
 
@@ -1226,6 +1361,12 @@ class Plugin extends PluginBase
                         'label' => 'Брони',
                         'icon' => 'icon-calendar-check-o',
                         'url' => \Backend::url('elv/kit/bookings'),
+                        'permissions' => ['elv.kit.bookings'],
+                    ],
+                    'slots' => [
+                        'label' => 'Слоты записи',
+                        'icon' => 'icon-clock-o',
+                        'url' => \Backend::url('elv/kit/slots'),
                         'permissions' => ['elv.kit.bookings'],
                     ],
                     'messages' => [
@@ -1270,6 +1411,12 @@ class Plugin extends PluginBase
                         'url' => \Backend::url('elv/kit/prices'),
                         'permissions' => ['elv.kit.prices'],
                     ],
+                    'releases' => [
+                        'label' => 'Релизы',
+                        'icon' => 'icon-archive',
+                        'url' => \Backend::url('elv/kit/releases'),
+                        'permissions' => ['elv.kit.releases'],
+                    ],
                 ],
             ],
         ];
@@ -1278,6 +1425,7 @@ class Plugin extends PluginBase
     public function registerSchedule($schedule)
     {
         $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
+        $schedule->command('elv:kit:remind')->hourly()->withoutOverlapping();
         $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
     }
 
@@ -1307,6 +1455,8 @@ class Plugin extends PluginBase
 
     public function registerMarkupTags()
     {
+        $account = new AccountService();
+
         return [
             'functions' => [
                 'elv_setting' => function ($key, $default = null) {
@@ -1572,6 +1722,38 @@ class Plugin extends PluginBase
                 'elv_related' => function ($post, $limit = 3) {
                     return $post instanceof Post ? Blog::related($post, (int) $limit) : collect();
                 },
+                'elv_account' => function () use ($account) {
+                    return $account->user();
+                },
+                'elv_account_orders' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->orders($customer) : collect();
+                },
+                'elv_account_licenses' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->licenses($customer) : collect();
+                },
+                'elv_account_domains' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->installs($customer) : collect();
+                },
+                'elv_account_can_unbind' => function ($install) use ($account) {
+                    $customer = $account->user();
+
+                    if (!$customer || !$install instanceof \Elv\Kit\Models\Install) {
+                        return ['ok' => false, 'message' => ''];
+                    }
+
+                    return $account->canUnbind($customer, $install);
+                },
+                'elv_account_next_unbind' => function ($license) use ($account) {
+                    return $license instanceof \Elv\Kit\Models\License
+                        ? $account->nextUnbindAt($license)
+                        : null;
+                },
             ],
             'filters' => [
                 'elv_money' => function ($cents, $currency = null) {
@@ -1598,7 +1780,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -1677,7 +1859,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать'])) {
+        if (
+            static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'почитать'])
+            || static::hasWord($text, ['стать'])
+        ) {
             $results = static::search($message);
 
             if ($results !== []) {
@@ -1789,7 +1974,10 @@ class Chat
         }
 
         if (static::has($text, ['цена', 'стоим', 'сколько', 'тариф', 'прайс', 'бюджет', 'дорого', 'price'])) {
-            if (static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'связ', 'магазин'])) {
+            if (
+                static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'магазин'])
+                || static::hasConnection($text)
+            ) {
                 return static::reply(static::modulePriceText($text), ['Что входит в Kit?', 'Какие разделы есть?', 'Как оплатить?'], static::link('Разделы', '/modules/'));
             }
 
@@ -1830,7 +2018,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['блог', 'стат', 'новост', 'rss'])) {
+        if (static::has($text, ['блог', 'новост', 'rss']) || static::hasWord($text, ['стат'])) {
             return static::reply(
                 'Блог входит в Elv Kit: статьи, категории, подписка на новости и карта сайта. Тексты правятся в админке, у каждой статьи есть заголовок и описание для поиска.',
                 ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам'],
@@ -1884,7 +2072,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать', 'связ'])) {
+        if (
+            static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать'])
+            || static::hasConnection($text)
+        ) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -2101,6 +2292,48 @@ class Chat
         return false;
     }
 
+    /**
+     * hasWord — совпадение с начала слова, а не внутри другого.
+     *
+     * `has()` ищет подстроку: «стать» в «перестать» — не запрос про статьи.
+     * Стем проверяется от начала слова, поэтому «статьи» и «статью» находятся,
+     * а «остаться» и «перестать» — нет.
+     *
+     * @param array<int, string> $words
+     * @param array<int, string> $except продолжения слова, которые не считаются совпадением
+     */
+    protected static function hasWord(string $text, array $words, array $except = []): bool
+    {
+        $tail = '';
+
+        if ($except !== []) {
+            $tail = '(?!' . implode('|', array_map(
+                fn (string $part): string => preg_quote($part, '/'),
+                $except
+            )) . ')';
+        }
+
+        foreach ($words as $word) {
+            if ($word === '') {
+                continue;
+            }
+
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($word, '/') . $tail . '/u', $text) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * hasConnection — вопрос про связь, а не про «связку» терминов.
+     */
+    protected static function hasConnection(string $text): bool
+    {
+        return static::hasWord($text, ['связ'], ['к']);
+    }
+
     protected static function plansText(): string
     {
         $plans = Catalog::plans();
@@ -2151,11 +2384,15 @@ class Chat
     {
         $slug = null;
 
-        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback', 'связ' => 'feedback'] as $word => $key) {
+        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback'] as $word => $key) {
             if (static::has($text, [$word])) {
                 $slug = $key;
                 break;
             }
+        }
+
+        if ($slug === null && static::hasConnection($text)) {
+            $slug = 'feedback';
         }
 
         if ($slug === null) {
@@ -2269,9 +2506,11 @@ class Chat
  * TextFilter — фильтр грубых слов в сообщениях консультанта.
  *
  * Ловит основы слов, а не конкретные формы: между буквами допускаются пробелы
- * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`)
- * и замена буквы знаком (`х*й`). Слово, где букву просто выбросили (`хй`),
- * фильтр не разгадывает — иначе подстановка любых символов ловит обычные слова.
+ * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`),
+ * цифры вместо букв (`п1зд`, `3бал`) и замена буквы знаком (`х*й`). Слово, где
+ * букву просто выбросили (`хй`), фильтр не разгадывает — иначе подстановка
+ * любых символов ловит обычные слова. Основа ищется с начала слова, поэтому
+ * «пидр» не находится в «эпидраздел».
  * Ответ на грубость вежливый, без повтора самого слова.
  */
 class TextFilter
@@ -2282,6 +2521,7 @@ class TextFilter
     protected const LOOKALIKE = [
         'a' => 'а', 'b' => 'в', 'c' => 'с', 'e' => 'е', 'h' => 'н', 'k' => 'к',
         'm' => 'м', 'o' => 'о', 'p' => 'р', 't' => 'т', 'x' => 'х', 'y' => 'у',
+        '0' => 'о', '1' => 'и', '3' => 'е', '4' => 'ч',
     ];
 
     /** @var array<string, string> */
@@ -2310,7 +2550,7 @@ class TextFilter
         $latin = strtr($text, static::REVERSE);
 
         foreach (static::latinWords() as $stem) {
-            if (preg_match(static::pattern($stem, true), $latin)) {
+            if (preg_match(static::pattern($stem, true, true), $latin)) {
                 return $stem;
             }
         }
@@ -2318,7 +2558,7 @@ class TextFilter
         $cyrillic = strtr($text, static::LOOKALIKE);
 
         foreach (static::cyrillicWords() as $stem) {
-            if (preg_match(static::pattern($stem), $cyrillic)) {
+            if (preg_match(static::pattern($stem, true, false), $cyrillic)) {
                 return $stem;
             }
         }
@@ -2370,10 +2610,13 @@ class TextFilter
 
     /**
      * pattern — буквы основы через любые пробелы и знаки, повторы букв разрешены.
+     *
+     * $start — совпадение только с начала слова: «пидр» не находится в «эпидраздел».
+     * $end — совпадение только целым словом (для латиницы): «dick» не в «dickens».
      */
-    protected static function pattern(string $stem, bool $bounded = false): string
+    protected static function pattern(string $stem, bool $start = false, bool $end = false): string
     {
-        $key = $stem . ($bounded ? ':bounded' : '');
+        $key = $stem . ($start ? ':s' : '') . ($end ? ':e' : '');
 
         if (isset(static::$compiled[$key])) {
             return static::$compiled[$key];
@@ -2394,8 +2637,8 @@ class TextFilter
             $parts[] = '(?:' . $quoted . '+|[\p{P}\p{S}]+)';
         }
 
-        $prefix = $bounded ? '(?<![\p{L}\p{N}])' : '';
-        $suffix = $bounded ? '(?![\p{L}\p{N}])' : '';
+        $prefix = $start ? '(?<![\p{L}\p{N}])' : '';
+        $suffix = $end ? '(?![\p{L}\p{N}])' : '';
 
         return static::$compiled[$key] = '/' . $prefix . implode('[\s\p{P}\p{S}]*', $parts) . $suffix . '/u';
     }
@@ -2913,7 +3156,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -3093,7 +3336,7 @@ class Search
         $keywords = static::normalize((string) ($item['keywords'] ?? ''));
         $meta = static::normalize((string) ($item['meta'] ?? ''));
 
-        $score = $query !== '' && str_contains($title, $query) ? 14 : 0;
+        $score = $query !== '' && preg_match('/(?<![\p{L}\p{N}])' . preg_quote($query, '/') . '/u', $title) === 1 ? 14 : 0;
         $hits = 0;
 
         foreach ($words as $word) {
@@ -3232,15 +3475,11 @@ class Search
     protected static function containsAny(string $text, array $forms): bool
     {
         foreach ($forms as $form) {
-            if (mb_strlen($form) < 4) {
-                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
-                    return true;
-                }
+            // Короткая форма — только целым словом, длинная — только с начала слова:
+            // «став» не должен находить «доставку», а «оплата» — «недоплату».
+            $suffix = mb_strlen($form) < 4 ? '(?![\p{L}\p{N}])' : '';
 
-                continue;
-            }
-
-            if (str_contains($text, $form)) {
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . $suffix . '/u', $text) === 1) {
                 return true;
             }
         }
@@ -3268,7 +3507,7 @@ class Search
 title = "Поиск по сайту"
 url = "/search/"
 layout = "default"
-meta_title = "Поиск по сайту — Elv Kit"
+meta_title = "Поиск по сайту"
 meta_description = "Поиск по страницам сайта и статьям блога: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
 meta_robots = "noindex, follow"
 ==
@@ -3870,7 +4109,7 @@ description = "Основной макет: шапка, подвал, инлай
 {% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
 {% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
 {% set seo_filtered = this.page.id in ['blog', 'blog-tech'] and (elv_query('category') or elv_query('tag') or elv_query('q')) %}
-{% set seo_noindex = this.page.id in ['404', 'order-success'] or seo_filtered %}
+{% set seo_noindex = this.page.id in ['404', 'order-success', 'account'] or seo_filtered %}
 {% set seo_page_no = this.page.paginated and not seo_filtered ? elv_page_no() : 1 %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
@@ -3924,6 +4163,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% if this.page.id in ['blog', 'blog-tech', 'blog-post'] %}
         <link rel="stylesheet" href="{{ 'assets/css/blog.css'|theme }}?v=20261118-11">
     {% endif %}
+    {% if this.page.id == 'account' %}
+        <link rel="stylesheet" href="{{ 'assets/css/account.css'|theme }}?v=20261123-1">
+    {% endif %}
 </head>
 <body>
 <a class="skip-link" href="#main">К содержимому</a>
@@ -3956,14 +4198,14 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
 title = "Карта сайта"
 url = "/sitemap/"
 layout = "default"
-meta_title = "Карта сайта — Elv Kit"
+meta_title = "Карта сайта"
 meta_description = "Все разделы сайта Elv Kit: возможности, цены, демо, инструкция, услуги, блог, контакты и правовые документы. Быстрый переход в нужный раздел."
 ==
 {% set crumbs = elv_breadcrumbs() %}
@@ -4130,6 +4372,7 @@ class Seo
         'docs' => 'Инструкция',
         'order' => 'Заказать',
         'booking' => 'Запись на показ',
+        'account' => 'Личный кабинет',
         'feedback' => 'Обратная связь',
         'contacts' => 'Контакты',
         'terms' => 'Оферта',
@@ -4236,7 +4479,20 @@ class Seo
 
     public static function image($page = null): string
     {
-        return static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $fallback = static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $cover = static::$post ? trim((string) static::$post->cover) : '';
+
+        // Обложка статьи — имя иконки (graph, calendar, spark), а не картинка.
+        // Ссылку берём, только если в поле действительно путь к изображению.
+        if ($cover === '' || preg_match('~\.(png|jpe?g|webp|gif|svg)$~i', $cover) !== 1) {
+            return $fallback;
+        }
+
+        if (preg_match('~^https?://~i', $cover) === 1) {
+            return $cover;
+        }
+
+        return static::base() . '/' . ltrim($cover, '/');
     }
 
     /**
@@ -4663,6 +4919,7 @@ use Cms\Classes\Page;
 use Cms\Classes\Theme;
 use Elv\Kit\Models\Post;
 use Elv\Kit\Models\Product;
+use Elv\Kit\Models\Settings;
 
 /**
  * Sitemap — карта сайта из живых страниц темы и записей БД.
@@ -4675,15 +4932,15 @@ class Sitemap
         $base = Seo::base();
 
         foreach (static::pages() as $page) {
-            $urls[rtrim((string) $page['loc'], '/')] = $page['lastmod'];
+            $urls[static::key((string) $page['loc'])] = $page['lastmod'];
         }
 
         foreach (Product::query()->active()->get() as $product) {
-            $urls[rtrim((string) $product->url, '/')] = optional($product->updated_at)->format('c') ?: now()->format('c');
+            $urls[static::key((string) $product->url)] = optional($product->updated_at)->format('c') ?: now()->format('c');
         }
 
         foreach (Post::query()->published()->get() as $post) {
-            $urls[rtrim((string) $post->url, '/')] = optional($post->updated_at)->format('c') ?: now()->format('c');
+            $urls[static::key((string) $post->url)] = optional($post->updated_at)->format('c') ?: now()->format('c');
         }
 
         ksort($urls);
@@ -4700,13 +4957,27 @@ class Sitemap
 
             $lines[] = '  <url>';
             $lines[] = '    <loc>' . htmlspecialchars((string) $loc, ENT_XML1) . '</loc>';
-            $lines[] = '    <lastmod>' . htmlspecialchars((string) $lastmod, ENT_XML1) . '</lastmod>';
+
+            if ((string) $lastmod !== '') {
+                $lines[] = '    <lastmod>' . htmlspecialchars((string) $lastmod, ENT_XML1) . '</lastmod>';
+            }
+
             $lines[] = '  </url>';
         }
 
         $lines[] = '</urlset>';
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * key — каноническая форма адреса: со слэшем, как canonical и ссылки сайта.
+     * Лишние слэши срезаются, один ставится обратно, поэтому /blog и /blog/
+     * не попадают в карту дважды.
+     */
+    protected static function key(string $loc): string
+    {
+        return rtrim($loc, '/') . '/';
     }
 
     /**
@@ -4740,16 +5011,34 @@ class Sitemap
                 continue;
             }
 
-            $file = method_exists($page, 'getFilePath') ? $page->getFilePath() : null;
-            $mtime = $file && is_file($file) ? filemtime($file) : time();
-
             $result[] = [
                 'loc' => Seo::base() . '/' . ltrim($url, '/'),
-                'lastmod' => date('c', $mtime),
+                'lastmod' => static::pageLastmod(),
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * pageLastmod — дата контента, а не filemtime: у файла на новом сервере
+     * дата равна распаковке архива, и sitemap врал бы об обновлении страницы.
+     * Владелец задаёт дату в настройках; пусто — lastmod не выводится.
+     */
+    protected static function pageLastmod(): string
+    {
+        $value = trim((string) Settings::get('sitemap_lastmod'));
+
+        if ($value === '') {
+            return '';
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->startOfDay()->format('c');
+        }
+        catch (\Throwable $e) {
+            return '';
+        }
     }
 }
 
@@ -4757,6 +5046,7 @@ class Sitemap
 
 <?php
 
+use Elv\Kit\Classes\Http\AccountController;
 use Elv\Kit\Classes\Http\BookingController;
 use Elv\Kit\Classes\Http\ChatController;
 use Elv\Kit\Classes\Http\DownloadController;
@@ -4782,6 +5072,16 @@ Route::middleware(['web', 'throttle:20,1'])->group(function () {
 
 Route::middleware(['web', 'throttle:40,1'])->group(function () {
     Route::post('chat', [ChatController::class, 'store'])->name('elv.kit.chat');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('account/login', [AccountController::class, 'login'])->name('elv.kit.account.login');
+    Route::get('account/auth/{token}', [AccountController::class, 'auth'])
+        ->where('token', '[a-f0-9]{48}');
+    Route::post('account/logout', [AccountController::class, 'logout'])->name('elv.kit.account.logout');
+    Route::post('account/domain/{id}/unbind', [AccountController::class, 'unbind'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.account.unbind');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {
@@ -4821,7 +5121,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -4844,11 +5144,11 @@ $check = function (bool $condition, string $message) use (&$errors) {
     }
 };
 
-foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck'] as $word) {
+foreach (['хуй', 'х у й', 'xyй', 'пиззда', 'fuck', 'п1зд', '3бал', 'д0лбоеб', 'дро4', 'хуйня'] as $word) {
     $check(TextFilter::has($word), 'filter misses: ' . $word);
 }
 
-foreach (['хутор', 'нормальный вопрос', 'установка'] as $word) {
+foreach (['хутор', 'нормальный вопрос', 'установка', 'х0р', 'п1тон', 'эпидраздел'] as $word) {
     $check(!TextFilter::has($word), 'filter false positive: ' . $word);
 }
 
@@ -4948,6 +5248,16 @@ $check(count($search['sources']) >= 1, 'explicit search returns no sources');
 $check(count($search['sources']) <= 3, 'explicit search returns more than three sources');
 $check($search['rejected'] === false, 'valid search must not be rejected');
 
+$keep = Chat::answer('как перестать получать письма');
+$check(!str_contains($keep['answer'], 'Нашёл материалы'), 'word «перестать» is mistaken for a request about articles');
+$check(!str_contains($keep['answer'], 'Блог входит'), 'word «перестать» is mistaken for a request about the blog');
+
+$bundle = Chat::answer('покажи связку модулей');
+$check(
+    str_contains($bundle['answer'], 'Раздел') || str_contains($bundle['answer'], 'Модул'),
+    'word «связка» is mistaken for a request to get in touch'
+);
+
 $urls = [];
 
 foreach ($search['sources'] as $source) {
@@ -5022,6 +5332,16 @@ foreach (['оплата', 'оплатить', 'тарифами', 'цены', '�
     $check(Search::query($query, Search::TYPE_ALL, 10) !== [], 'search returns nothing for: ' . $query);
 }
 
+$boundaryUrls = array_column(Search::query('став', Search::TYPE_ALL, 20), 'url');
+$check(
+    !in_array('/blog/sajt-dlya-lokalnoj-dostavki/', $boundaryUrls, true),
+    'search matches «став» inside «доставка», not at a word start'
+);
+$check(
+    array_intersect(['/blog/og-kartinki-na-php/', '/blog/kak-vybrat-hosting/'], $boundaryUrls) !== [],
+    'search lost word-start matches for «став»'
+);
+
 $pricing = Search::query('тарифами', Search::TYPE_ALL, 10);
 $pricingUrls = array_column($pricing, 'url');
 $check(in_array('/pricing/', $pricingUrls, true), 'morphology does not find /pricing/ for «тарифами»');
@@ -5054,6 +5374,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Elv\Kit\Classes\Faq;
 use Elv\Kit\Classes\Seo;
+use Elv\Kit\Models\Post;
 use Elv\Kit\Models\Settings;
 
 $errors = [];
@@ -5079,6 +5400,22 @@ $check(count($filled['mainEntity'] ?? []) === 1, 'FAQPage mainEntity is empty fo
 $robots = Seo::robots();
 $check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
 $check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
+
+$defaultImage = Seo::base() . '/themes/elv-studio/assets/img/og-default.png';
+Seo::setPost(null);
+$check(Seo::image() === $defaultImage, 'og:image is not the default without an article');
+
+$post = new Post();
+$post->cover = 'graph';
+Seo::setPost($post);
+$check(Seo::image() === $defaultImage, 'icon cover is used as an og:image');
+
+$post->cover = 'assets/img/cover.png';
+$check(Seo::image() === Seo::base() . '/assets/img/cover.png', 'relative cover path is not used as an og:image');
+
+$post->cover = 'https://cdn.example.com/cover.webp';
+$check(Seo::image() === 'https://cdn.example.com/cover.webp', 'absolute cover url is not used as an og:image');
+Seo::setPost(null);
 
 $settings = Settings::instance();
 $faqKeys = ['faq_items', 'faq_calculator_items', 'faq_services_items', 'faq_seo_items', 'faq_post_items'];
@@ -5138,8 +5475,16 @@ require __DIR__ . '/../bootstrap/autoload.php';
 $app = require __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+use Elv\Kit\Classes\BookingReminders;
+use Elv\Kit\Classes\Mail\BookingReminder;
+use Elv\Kit\Classes\Mail\BookingReminderAdmin;
 use Elv\Kit\Classes\Slots;
+use Elv\Kit\Models\Booking;
 use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Slot;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 $errors = [];
 
@@ -5151,6 +5496,9 @@ $check = function (bool $condition, string $message) use (&$errors) {
 
 $settings = Settings::instance();
 $backup = $settings->getAttribute('booking_services');
+$backupReminderEnabled = $settings->getAttribute('booking_reminder_enabled');
+$backupReminderHours = $settings->getAttribute('booking_reminder_hours');
+$backupReminderAdmin = $settings->getAttribute('booking_reminder_admin');
 
 $settings->forceFill(['booking_services' => '']);
 $check(Slots::services() === [], 'empty settings still return booking services');
@@ -5196,7 +5544,204 @@ $config = Slots::configServices();
 $check(count($config) > 0, 'demo booking dataset is missing');
 $check(Slots::servicesToLines($config) !== '', 'demo booking dataset is not convertible to settings lines');
 
+DB::beginTransaction();
+
+try {
+    $date = date('Y-m-d', strtotime('+2 days'));
+    $slot = Slot::create([
+        'service_code' => 'zz-check',
+        'date' => $date,
+        'time' => '9:05',
+        'capacity' => 2,
+        'taken' => 0,
+    ]);
+    $check($slot->time === '09:05', 'slot time is not normalized to HH:MM');
+    $check($slot->date === $date, 'slot date is not normalized to Y-m-d');
+
+    $duplicate = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '09:05',
+            'capacity' => 2,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $duplicate = true;
+    }
+
+    $check($duplicate, 'duplicate slot is not rejected');
+
+    $badTime = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '25:00',
+            'capacity' => 1,
+            'taken' => 0,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $badTime = true;
+    }
+
+    $check($badTime, 'invalid slot time is not rejected');
+
+    $overbooked = false;
+
+    try {
+        Slot::create([
+            'service_code' => 'zz-check',
+            'date' => $date,
+            'time' => '10:00',
+            'capacity' => 1,
+            'taken' => 2,
+        ]);
+    }
+    catch (ValidationException $e) {
+        $overbooked = true;
+    }
+
+    $check($overbooked, 'taken above capacity is not rejected');
+
+    $slot->taken = 1;
+    $slot->save();
+
+    $deleted = true;
+
+    try {
+        $slot->delete();
+        $deleted = false;
+    }
+    catch (ValidationException $e) {
+        // Занятый слот удалять нельзя — это и проверяем.
+    }
+
+    $check($deleted, 'taken slot is deleted');
+
+    $id = (int) $slot->id;
+    $slot->taken = 0;
+    $slot->save();
+    $slot->delete();
+    $check(Slot::query()->find($id) === null, 'free slot is not deleted');
+
+    $range = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($range['created'] === 4, 'slot range generation did not create four slots');
+    $check($range['total'] === 4, 'slot range generation reports the wrong total');
+
+    $repeat = Slots::generateRange('ok', '2030-01-07', '2030-01-08', '10:00', '11:00', 60, 2, false);
+    $check($repeat['created'] === 0, 'repeated slot generation creates duplicates');
+    $check($repeat['skipped'] === 4, 'repeated slot generation does not skip existing slots');
+
+    $generated = Slot::query()
+        ->where('service_code', 'ok')
+        ->whereBetween('date', ['2030-01-07', '2030-01-08'])
+        ->get();
+    $check($generated->count() === 4, 'generated slot count does not match');
+    $check((int) ($generated->first()->capacity ?? 0) === 2, 'generated slot capacity is not applied');
+
+    $reversed = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-08', '2030-01-07', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $reversed = true;
+    }
+
+    $check($reversed, 'reversed slot range is not rejected');
+
+    $overLimit = false;
+
+    try {
+        Slots::generateRange('ok', '2030-01-01', '2030-12-31', '10:00', '18:00', 5);
+    }
+    catch (\InvalidArgumentException $e) {
+        $overLimit = true;
+    }
+
+    $check($overLimit, 'slot range over 500 is not rejected');
+
+    $unknownService = false;
+
+    try {
+        Slots::generateRange('zz-no-such', '2030-01-07', '2030-01-08', '10:00', '11:00');
+    }
+    catch (\InvalidArgumentException $e) {
+        $unknownService = true;
+    }
+
+    $check($unknownService, 'slot range accepts a service missing from settings');
+
+    $check(BookingReminders::normalizeHours(0) === BookingReminders::DEFAULT_HOURS, 'zero reminder hours are not defaulted');
+    $check(BookingReminders::normalizeHours(500) === 72, 'reminder hours are not capped at 72');
+    $check(BookingReminders::normalizeHours(1) === 1, 'one hour reminder is not allowed');
+
+    $settings->forceFill(['booking_reminder_enabled' => true, 'booking_reminder_hours' => 12]);
+    $check(BookingReminders::enabled() === true, 'reminder switch is not read from settings');
+    $check(BookingReminders::hours() === 12, 'reminder hours are not read from settings');
+
+    $settings->forceFill(['booking_reminder_hours' => 500]);
+    $check(BookingReminders::hours() === 72, 'reminder hours from settings are not capped');
+
+    $now = \Carbon\Carbon::parse('2026-12-01 10:00:00');
+    $makeBooking = function (array $attributes = []) {
+        return Booking::create(array_merge([
+            'service_code' => 'zz-check',
+            'service' => 'Проверка',
+            'price' => '0 BYN',
+            'date' => '2026-12-01',
+            'time' => '18:00',
+            'person' => 'Тест',
+            'email' => 'zz-check@example.com',
+            'status' => Booking::STATUS_NEW,
+        ], $attributes));
+    };
+
+    $due = $makeBooking();
+    $makeBooking(['date' => '2026-12-03']);
+    $makeBooking(['time' => '12:00', 'status' => Booking::STATUS_CANCELLED]);
+    $makeBooking(['time' => '12:30', 'email' => '']);
+    $alreadyReminded = $makeBooking(['time' => '13:00']);
+    $alreadyReminded->reminded_at = $now->copy()->subHour();
+    $alreadyReminded->save();
+
+    $pending = BookingReminders::pending(24, $now);
+    $check($pending->count() === 1, 'reminder selection does not return exactly the due booking');
+    $check((int) ($pending->first()->id ?? 0) === (int) $due->id, 'reminder selection picked the wrong booking');
+    $check(BookingReminders::moment($due) !== null, 'reminder moment is not parsed from date and time');
+    $check(BookingReminders::moment($makeBooking(['time' => 'nonsense'])) === null, 'broken booking time still produces a moment');
+
+    Mail::fake();
+    $sent = BookingReminders::send(24, $now);
+    $check($sent === 1, 'reminder send does not report one letter');
+    $check($due->fresh()->reminded_at !== null, 'reminder mark is not saved');
+    Mail::assertQueued(BookingReminder::class);
+    $check(BookingReminders::pending(24, $now)->count() === 0, 'reminded booking is selected twice');
+
+    $settings->forceFill(['booking_reminder_admin' => true]);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 3, 'admin reminder selection is wrong');
+    $adminSent = BookingReminders::sendAdmin(24, $now);
+    $check($adminSent === 3, 'admin reminder send does not report three letters');
+    $check($due->fresh()->admin_reminded_at !== null, 'admin reminder mark is not saved');
+    Mail::assertQueued(BookingReminderAdmin::class);
+    $check(BookingReminders::pendingAdmin(24, $now)->count() === 0, 'admin reminder is sent twice');
+}
+finally {
+    DB::rollBack();
+}
+
 $settings->forceFill(['booking_services' => $backup]);
+$settings->forceFill([
+    'booking_reminder_enabled' => $backupReminderEnabled,
+    'booking_reminder_hours' => $backupReminderHours,
+    'booking_reminder_admin' => $backupReminderAdmin,
+]);
 
 if ($errors !== []) {
     foreach ($errors as $error) {
@@ -5215,7 +5760,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const SCRIPTS = ['tools/chat-check.php', 'tools/seo-check.php', 'tools/booking-check.php'];
+const SCRIPTS = [
+  'tools/chat-check.php',
+  'tools/search-check.php',
+  'tools/seo-check.php',
+  'tools/admin-check.php',
+  'tools/booking-check.php',
+  'tools/presets-check.php',
+  'tools/download-check.php',
+  'tools/account-check.php',
+];
 
 function commandWorks(command, args) {
   const result = spawnSync(command, args, { stdio: 'ignore' });
@@ -5676,13 +6230,14 @@ class SecurityHeaders
 
         $nonce = static::nonce();
         $analytics = $this->analyticsSources();
+        $ancestors = static::frameAncestors();
 
         $cspParts = [
             "default-src 'self'",
             "base-uri 'self'",
             "form-action 'self'",
-            "frame-ancestors 'self'",
-            "frame-src 'self' https:",
+            "frame-ancestors " . $ancestors,
+            "frame-src 'self' https:" . (app()->environment('production') ? '' : ' http:'),
             "img-src 'self' data:",
             "font-src 'self'",
             "style-src 'self' 'nonce-" . $nonce . "'",
@@ -5699,17 +6254,25 @@ class SecurityHeaders
 
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+
+        // X-Frame-Options не умеет список источников: при встраивании на чужой
+        // домене он бы всё заблокировал, поэтому остаётся только для 'self'.
+        if ($ancestors === "'self'") {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        }
+        else {
+            $response->headers->remove('X-Frame-Options');
+        }
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         header_remove('X-Powered-By');
         $response->headers->remove('X-Powered-By');
 
-        // Живой предпросмотр не индексируется и не кэшируется.
-        if ($request->is('preview', 'preview/*')) {
+        // Живой предпросмотр и кабинет не индексируются и не кэшируются.
+        if ($request->is('preview', 'preview/*', 'account', 'account/*', 'tickets', 'tickets/*')) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
-            $response->headers->set('Cache-Control', 'no-store, max-age=0');
+            $response->headers->set('Cache-Control', 'no-store, max-age=0, private');
         }
 
         if ($request->isSecure()) {
@@ -5719,8 +6282,40 @@ class SecurityHeaders
         return $response;
     }
 
-    protected function analyticsSources(): string
+    /**
+     * frameAncestors — источники, которым разрешено встраивать сайт в iframe.
+     *
+     * По умолчанию только свой домен (`'self'`). Нишевые демо-стенды живут на
+     * отдельных поддоменах и показываются внутри `/preview/` на домене витрины,
+     * поэтому родительские источники перечисляются в `ELV_FRAME_ANCESTORS`
+     * через пробел: `ELV_FRAME_ANCESTORS="https://example.com"`.
+     *
+     * Принимаются только origin'ы вида `http(s)://host[:port]`: строка вида
+     * `*` или мусор не должна открывать сайт для встраивания куда угодно.
+     */
+    public static function frameAncestors(): string
     {
+        $raw = trim((string) (env('ELV_FRAME_ANCESTORS') ?: ''));
+        $sources = [];
+
+        foreach (preg_split('~\s+~', $raw) ?: [] as $source) {
+            $source = rtrim(trim($source), '/');
+
+            if ($source === '' || !preg_match('~^https?://[a-z0-9.\-:\[\]]+$~i', $source)) {
+                continue;
+            }
+
+            $sources[] = strtolower($source);
+        }
+
+        if ($sources === []) {
+            return "'self'";
+        }
+
+        return implode(' ', array_merge(["'self'"], array_unique($sources)));
+    }
+
+    protected function analyticsSources(): string    {
         $sources = '';
 
         if (Settings::get('analytics_google')) {
@@ -6904,7 +7499,7 @@ php tools/price-check.php
 
 # Планы: что доделать
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: Что доделать.txt =====
 
@@ -6980,20 +7575,30 @@ php tools/price-check.php
 
 ### Этапы 1–4 (все открыты)
 
-- [ ] **Этап 1. Инфраструктура продаж:** пресеты `demo/presets/*.json` и
-      `--preset` (папки нет), `ELV_FRAME_ANCESTORS` в `SecurityHeaders`
-      (сейчас `frame-ancestors 'self'` жёстко), релизы `elv_kit_releases`,
-      суточный лимит скачиваний и водяной знак `LICENSE_OWNER.txt`
-      (`DownloadController` проверяет только токен и `paid`).
-- [ ] **Этап 2. Кабинет и поддержка:** `elv_kit_customers`, Magic Link,
-      отвязка домена раз в 30 дней, тикеты, Telegram ChatOps, Q&A, форум.
+- [x] **Этап 1. Инфраструктура продаж** — закрыто 23.11.2026. Пресеты
+      `demo/presets/*.json` и `--preset` (booking, digital, agency, expert) +
+      `--reset-preset`: закрытый список `Demo::PRESET_SETTINGS`, цены через
+      `{{currency}}`, чужие слоты убирает `Slots::pruneOrphans()`.
+      Релизы `elv_kit_releases` (версия, канал, файл, размер, SHA-256, заметка,
+      действующая сборка) пишет `elv:kit:package --notes`, админка «Elv Kit →
+      Релизы»; суточный лимит скачиваний (`download_daily_limit`, по умолчанию
+      5, 0 — без ограничения) и водяной знак `LICENSE_OWNER.txt` в копии архива
+      заказа. Iframe-часть закрыта ранее: `ELV_FRAME_ANCESTORS` в
+      `SecurityHeaders`, `tools/check-iframe-demo.mjs`, раздел в
+      `docs/production-deploy.md`. Проверки: `php tools/presets-check.php`,
+      `php tools/download-check.php` (оба в `node tools/check-php.mjs`),
+      `node tools/check-package.mjs`.
+- [ ] **Этап 2. Кабинет и поддержка:** `elv_kit_customers`, Magic Link
+      (токен 48 символов, TTL 30 минут), отвязка домена раз в 30 дней, тикеты
+      + Telegram ChatOps, Q&A. Форум не делаем — решение 23.11.2026.
       Ни таблиц, ни маршрутов `/account/`, `/tickets/` нет.
-- [ ] **Этап 3. Отзывы и монетизация:** `elv_kit_reviews`, `AggregateRating`
-      только по `approved`, промокоды, комплект, апгрейд тарифа, B2B-счёт,
-      Team Seats. Нет ни одной таблицы.
-- [ ] **Этап 4. Масштаб:** update-сервер и телеметрия, конструктор страниц,
-      `/en/` и мультивалютность, рефералка и лид-магниты, песочница.
-      Не начато; часть ждёт решения владельца.
+- [ ] **Этап 3. Отзывы и монетизация:** `elv_kit_reviews` (без фото,
+      премодерация, «Имя Ф.»), `AggregateRating` только по `approved`,
+      промокоды, апгрейд тарифа. B2B-счёт и Team Seats — по отдельному
+      решению. Нет ни одной таблицы.
+- [ ] **Этап 4. Масштаб:** update-сервер и телеметрия (только админка),
+      рефералка. Конструктор страниц, `/en/`, мультивалютность и публичный
+      счётчик установок не делаем; песочница — в конце очереди.
 
 ### Stage 84, блок 2: что уже сделано и что нет
 
@@ -7065,22 +7670,29 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
 
 ### Берём в работу (код, без решений владельца)
 
-- [ ] Поиск: `Search.php` сравнивает через `str_contains` без границ слова —
-      короткий запрос находится внутри длинного. Менять на границы с
-      проверкой выдачи и `tools/seo-check.php`.
-- [ ] Консультант: `Chat.php` — `'стать'` (строка 54) ловит «статью/статьи» и
-      уводит в поиск; `'связ'` (строка 166) срабатывает на «связь», «связано».
-      Сузить до словоформ, проверить `tools/chat-check.php`.
-- [ ] `TextFilter`: кириллические основы без границ слова — «пидр» ловится в
-      «эпидраздел». В таблицу замен добавить цифры (`0→о`, `3→е`, `1→и`,
-      `4→ч`), иначе `х0й` проходит.
-- [ ] OG-картинка одна на все страницы (`Seo::image()` → `og-default.png`);
-      для статьи брать `cover`, если он задан.
-- [ ] `sitemap.xml` в статике: `lastmod` из `filemtime` — меняется на каждой
-      сборке; фиксировать датой сборки или `updated_at` (низкий приоритет).
-- [ ] Калькулятор: в разметке `pages/calculator.htm` стартовые суммы зашиты
-      (`$79`), а не взяты из прайса — до первого `update()` и без JS видна
-      устаревшая цена. Отдавать `—` до выбора тарифа или цену из `plans`.
+- [x] Поиск: `Search.php` сравнивал через `str_contains` без границ слова —
+      «став» находил «доставку». Теперь форма ищется с начала слова;
+      `tools/search-check.php` добавлен в `check-php.mjs` (23.11.2026).
+- [x] Консультант: `Chat.php` — `'стать'` ловил «перестать», `'связ'` —
+      «связку». Добавлены `hasWord()` (совпадение с начала слова) и
+      `hasConnection()` (без «связк»); проверки в `tools/chat-check.php`
+      (23.11.2026).
+- [x] `TextFilter`: кириллические основы ищутся с начала слова — «пидр» больше
+      не ловится в «эпидраздел»; в таблицу замен добавлены цифры
+      (`0→о`, `3→е`, `1→и`, `4→ч`), так что `п1зд` и `3бал` отсекаются
+      (23.11.2026).
+- [x] OG-картинка: `Seo::image()` берёт `cover` статьи, если в поле путь или
+      URL изображения (`.png`, `.jpg`, `.webp`, `.gif`, `.svg`); имя иконки
+      (`graph`, `calendar`, `spark`) оставляет общий `og-default.png`
+      (23.11.2026).
+- [x] `sitemap.xml`: `lastmod` статических страниц больше не берётся из
+      `filemtime`. Дата задаётся в настройках, вкладка «SEO и аналитика»
+      (`sitemap_lastmod`, `2026-11-23` или `23.11.2026`); пусто — тег не
+      выводится, у статей и товаров остаётся `updated_at`. Адреса в карте
+      приведены к канонической форме со слэшем (23.11.2026).
+- [x] Калькулятор: стартовые суммы в `pages/calculator.htm` берутся из первого
+      тарифа (`firstPlan.price_label`) и `Money::format(0)`, зашитого `$79`
+      больше нет (23.11.2026).
 
 ### Ждут решения владельца
 
@@ -7088,10 +7700,10 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       цены конкурентов, «экономия в 3–5 раз» и «окупаемость за 2 года» —
       утверждения о чужих продуктах. Делать только на проверяемых ценах с
       датой среза; без «упущенной прибыли» из воздуха.
-- [ ] Пресеты ниш и DemoSandbox (`ELV_DEMO_SANDBOX`, сессия 24 часа, без
-      записи в БД): архитектура годная, но это слой демо-стенда, а не товар.
-      В товарный ZIP не включать; пресеты — только вместе с `elv:kit:demo`
-      (`demo/presets/*.json`), иначе `check-package` не отличит демо от товара.
+- [x] Пресеты ниш (23.11.2026): четыре файла в `demo/presets/` и
+      `elv:kit:demo --preset=…`, только в демо-архиве; товарный ZIP их не
+      содержит. DemoSandbox (`ELV_DEMO_SANDBOX`, сессия 24 часа, без записи в
+      БД) остаётся решением владельца: это слой демо-стенда, а не товар.
 - [ ] Мигратор `Elv\Importer` (WordPress WXR, Битрикс, Tilda, CSV/JSON, 7 CMS):
       отдельный продукт, не модуль Elv Kit. Драйверы через прямой доступ к
       MySQL чужой базы — риск и поддержка; начинать с WXR и CSV, 301-редиректы
@@ -7128,9 +7740,15 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
 - [x] Плашка о юрисдикции в 31, 40, 82, 95 (22.11.2026): примеры 152-ФЗ/ОРД и
       шлюзов — для РФ, для РБ и других юрисдикций — Закон № 99-З и локальные
       провайдеры.
-- [ ] Модуль записи: нет редактора сетки в админке (слоты создаются скриптом),
-      нет напоминаний «за день», SMS и графика по мастерам. Решение 22.11.2026:
-      делаем: редактор слотов, напоминания (сначала e-mail), затем SMS.
+- [x] Модуль записи: редактор сетки в админке («Elv Kit → Слоты записи»)
+      закрыт 23.11.2026 — список, создание и правка слота, проверка дублей,
+      нормализация времени, защита занятого слота от удаления. Напоминания
+      клиенту и мастеру по e-mail закрыты 23.11.2026 (`elv:kit:remind`, за
+      24 часа, один раз). Решение 22.11.2026: делаем: редактор слотов,
+      напоминания (сначала e-mail), затем SMS.
+- [ ] Запись: SMS, график по мастерам, перенос брони клиентом, депозит и
+      предоплата. Решение 22.11.2026 — делаем после e-mail-напоминаний
+      (закрыты 23.11.2026).
 - [x] `reading_time` (22.11.2026): считается из видимого текста по одному
       правилу — 180 слов в минуту, минимум 1 минута (`Post::readingMinutes()`).
       Поле в данных больше не хранится, при сиде пишется 0; на 101 статье
@@ -7224,17 +7842,19 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       таблица, владелец подставляет свои цифры.
 - [x] «Кейс под NDA: как показать работу без имени клиента» — согласование,
       обезличивание, метод замера, дисклеймер.
-- [ ] Перелинковка старых статей: по строгому счёту (ссылки из текста статьи
-      в текст другой статьи) без входящих остались `kontent-marketing`,
-      `dostupnost-sajta-a11y`, `prodvizhenie-v-socsetah`,
-      `skolko-stoit-sajt-s-onlajn-zapisyu`. Нужна одна уместная ссылка в
-      каждую из смежной статьи.
+- [x] Перелинковка старых статей: четыре материала без входящих
+      (`kontent-marketing`, `dostupnost-sajta-a11y`, `prodvizhenie-v-socsetah`,
+      `skolko-stoit-sajt-s-onlajn-zapisyu`) получили по одной уместной ссылке
+      из смежной статьи — `blog-that-sells`, `ux-ui-i-adaptivnost`,
+      `voronka-socseti-sajt-prodazha`, `zachem-biznesu-nuzhen-sajt`
+      (23.11.2026).
 
 Функции под эти статьи — допиливаем после текстов, порядок по цене и риску:
 - [ ] Telegram-уведомления о заявках и записях: бот, токен в настройках,
       очередь, без персональных данных в сообщении.
-- [ ] Редактор слотов в админке, напоминания клиенту и мастеру (сначала
-      e-mail, затем SMS).
+- [x] Редактор слотов в админке закрыт 23.11.2026; напоминания клиенту и
+      мастеру по e-mail закрыты 23.11.2026 (`elv:kit:remind`).
+- [ ] SMS о записи.
 - [ ] Депозит и предоплата в записи, перенос брони клиентом.
 - [ ] Поля доставки и складской учёт в заказах.
 - [ ] Оплата в Беларуси (ЕРИП / bePaid / WebPay) — после выбора провайдера
@@ -7300,6 +7920,9 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
   `meta`, `is_active`, `sort_order` (`updates/create_kit_tables.php`).
 - Админка: «Продукты» (`elv/kit/products`), «Цены» — версии с `valid_from` /
   `valid_to`, действующую выбирает `Classes\Prices::resolve()`.
+- [x] Создание из админки (23.11.2026): товары, рубрики и статьи заводятся
+  кнопкой «Создать», а не только демо-командой; конфиги списков и форм
+  проверяет `php tools/admin-check.php` (входит в гейт).
 - Витрина: `/kit/` и `/modules/`; в шапке «Продукты» (Elv Kit, Шаблон, Модули),
   Услуги, Цены, Демо, Блог; пункты «Продуктов» — из настроек (вкладка «Меню»).
 - Языка нет: `APP_LOCALE=en`, в теме 0 вызовов `|trans`, 1491 строка с
@@ -7313,11 +7936,10 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       Шаблон. Демо-значения ставит `elv:kit:demo`.
 - [ ] Что продаём: только October (kit / module / template) или ещё скрипты,
       десктоп-утилиты, SaaS. От этого зависит поле типа и фильтры каталога.
-- [ ] Языки: только ru + en или больше; адреса `/en/…` или поддомен; кто
-      вычитывает перевод. Машинный черновик нельзя выдавать за готовый текст
-      (правило 6).
-- [ ] Конструктор: свой блоковый (таблица в БД + partials) или RainLab Static
-      Pages. Чужой плагин уедет в товарный архив — это лишняя зависимость.
+- [x] Языки (23.11.2026): только RU. Английскую версию (`/en/` или поддомен)
+      и мультивалютность не делаем — `docs/owner-decisions.md`.
+- [x] Конструктор (23.11.2026): блоковый конструктор страниц
+      (`elv_kit_blocks`) не делаем; страницы остаются Twig-файлами темы.
 
 ### Каталог продуктов
 - [ ] `/products/` — единый каталог: карточки из `Product::active()`, фильтр
@@ -7361,8 +7983,8 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       черновик помечать в журнале.
 
 ### P2
-- [ ] `/docs/`: прямо сказать, что статическое демо — только показ, для
-      продаж нужен PHP + MySQL (правило 6).
+- [x] `/docs/` (23.11.2026): в начало добавлено предупреждение — статическое
+      демо только показывает интерфейс, формы и заказы требуют PHP + MySQL.
 - [ ] Гейты: `check-brand`, `check-plans`, `check-seo` должны работать с
       английскими строками; добавить проверку парности `hreflang`.
 
@@ -7387,18 +8009,18 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
   Кабинета, где клиент это видит, нет.
 
 ### Профиль клиента
-- [ ] `elv_kit_customers` (email unique, имя, телефон, компания, язык) и связи
-      по e-mail с заказами, лицензиями, записями, сообщениями, подпиской;
-      бэкфилл из существующих заказов при миграции.
-- [ ] Вход без пароля: одноразовая ссылка на e-mail (как `download_token`),
-      срок жизни и лимит попыток. Пароль — только если владелец настаивает.
-- [ ] `/account/`: заказы и статусы, лицензии и ключи, домены, скачивание
-      последней версии архива, история обращений.
-- [ ] `noindex` и `no-store` для `/account/` и `/tickets/`, токены одноразовые
-      (правило 9 — один адрес на страницу, приватное не индексируется).
-- [ ] До появления `/account/` убрать из оферты, FAQ и письма после оплаты
-      обещание личного кабинета (`{cabinet_url}`) или пометить «в разработке»:
-      сейчас тексты обещают то, чего нет (найдено в «Анализ opencode»).
+- [x] `elv_kit_customers` (email unique, имя, телефон, компания) и связи по
+      e-mail с заказами и лицензиями; бэкфилл из существующих заказов при
+      миграции 1.1.0 (23.11.2026). Поля языка нет — продукт только RU.
+- [x] Вход без пароля: одноразовая ссылка на e-mail, 48 символов, TTL 30 минут,
+      токен гасится при первом переходе (23.11.2026).
+- [x] `/account/`: заказы и статусы, лицензии и ключи, домены, скачивание
+      архива, отвязка домена раз в 30 дней (23.11.2026). История обращений —
+      после тикетов, отдельным пунктом ниже.
+- [x] `noindex` и `no-store` для `/account/` (23.11.2026); для `/tickets/` —
+      вместе с тикетами. Токен входа одноразовый.
+- [x] Обещание личного кабинета и `{cabinet_url}`: кабинет построен, плейсхолдера
+      в текстах нет (23.11.2026).
 
 ### Тикеты и поддержка
 - [ ] `elv_kit_tickets` (number, customer_id, order_id / license_id,
@@ -7426,12 +8048,15 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       сейчас сделано с формами.
 
 ### Решения владельца
-- [ ] Вход по ссылке или пароль.
-- [ ] Кто отвечает на тикеты: владелец, студия или бот первой линией.
-- [ ] SLA: часы работы, время первого ответа, что считается доработкой (уже
-      есть в «Этап C — клиентский сервис»).
-- [ ] Чат как канал поддержки нужен или достаточно формы и тикета (пересекается
-      с пунктом «Онлайн-чат на калькуляторе»).
+
+Утверждены 23.11.2026, полный текст — `docs/owner-decisions.md`.
+
+- [x] Вход по ссылке: Magic Link, токен 48 символов, TTL 30 минут, без паролей.
+- [x] Кто отвечает на тикеты: владелец/поддержка из админки + Telegram ChatOps.
+- [x] SLA: Пн–Пт 10:00–18:00 (Europe/Minsk), первый ответ — до 24 часов
+      в рабочее время.
+- [x] Чат как канал поддержки: остаётся, ответ оператора — через тикет и
+      Telegram ChatOps; отдельный форум не делаем.
 
 Не делать: обещать «ответ за 15 минут», если SLA нет; хранить переписку без
 политики хранения; открывать тикет по номеру без токена.
@@ -7466,6 +8091,9 @@ TCO-калькулятор и сравнение CMS, мигратор, 4 JSON �
       списка — `ItemList`. На чистой базе разметки нет.
 - [ ] Решения владельца: отвечать публично или только письмом; показывать имя
       полностью или «Имя Ф.»; можно ли отвечать без публикации вопроса.
+- [x] Форум (23.11.2026): полноценный `/forum/` не делаем; вместо него —
+      компактный премодерируемый «Вопрос-ответ» на страницах продуктов
+      (`docs/owner-decisions.md`).
 
 ### Этап 2 — форум
 - [ ] Таблицы: `elv_kit_forum_sections` (slug, title, description, sort_order,
@@ -7653,15 +8281,13 @@ Scale). Часть уже разложена по разделам выше и �
 Имена файлов — в `docs/html`.
 
 ### Продукт и продажи
-- [ ] Счётчик установок («стучалка»): `POST /api/v1/install` из плагина
-      покупателя, уникальность по `license_key` + `domain_hash`, число — только
-      по факту, без накрутки; на чистой базе не показывать. Основание:
-      «Стучалка установок…», «Как сделать стучалку…». Решение владельца: нужен
-      ли публичный счётчик — это ещё и телеметрия покупателей.
+- [x] Счётчик установок (23.11.2026): публичный счётчик не делаем;
+      `POST /api/v1/install` пишет статистику только для админки, на главной
+      её нет.
 - [ ] Промокоды: `elv_kit_promocodes` (code, percent/amount, valid_from,
       valid_to, limit, used, product_slug), поле на `/order/`, пересчёт до
-      оплаты и запись в заказ. Сейчас скидок нет, в плане была только строка
-      «Промокоды — отдельно».
+      оплаты и запись в заказ. Решение 23.11.2026: делаем; скидка процентом
+      или фиксированной суммой (`docs/owner-decisions.md`).
 - [ ] Комплект «Два в одном» (Elv Kit + шаблон): отдельный SKU или тариф, две
       выдачи и один лимит доменов. В макетах есть, в каталоге нет; Stage 79
       пометил комплект как будущий. Решение владельца: нужен ли и по какой цене.
@@ -7760,9 +8386,14 @@ Scale). Часть уже разложена по разделам выше и �
       `ratingCount`.
 
 ### Решения владельца
-- [ ] Кто модерирует и за какой срок (SLA).
+
+Утверждены 23.11.2026, полный текст — `docs/owner-decisions.md`.
+
+- [x] Кто модерирует: владелец/поддержка вручную в админке.
+- [x] Фото к отзыву: не загружаем.
+- [x] Имя: выводим как «Имя Ф.» (например, «Алексей К.»).
+- [x] `AggregateRating`: только при наличии хотя бы одного одобренного отзыва.
 - [ ] Показывать ли рейтинг на карточках в каталоге и в сравнении тарифов.
-- [ ] Разрешать ли фото к отзыву (нужен локальный WebP и модерация).
 - [ ] Публиковать ли отрицательные отзывы и в каком виде; ответ студии.
 - [ ] Отзывы по товару или по заказу (в заказе может быть несколько позиций).
 - [ ] Нужна ли отдельная `/reviews/` и ссылка в шапке/подвале.
@@ -8596,8 +9227,9 @@ Scale). Часть уже разложена по разделам выше и �
 ## P2 — прод
 
 - [ ] Реальные ключи ЮKassa/Stripe, SMTP, домен `elv-studio.by`, SSL.
-- [ ] Платёжные провайдеры для РБ: WebPay / bePaid / ЕРИП и расчёты в BYN —
-      решить, нужны ли кроме ЮKassa/Stripe (`Аудит и план улучшения … Qwen`).
+- [ ] Платёжные провайдеры для РБ: заложить bePaid / WebPay в `PaymentManager`
+      рядом с ЮKassa и Stripe (решение 23.11.2026); выбор провайдера и ключи —
+      на прод-стенде, без выдуманных комиссий.
 - [ ] Cron на хостинге: `php artisan schedule:run` каждую минуту (слоты, очередь).
 - [ ] Очередь: `QUEUE_CONNECTION=database` + `queue:work` (сейчас `sync`).
 - [ ] На cPanel прогнать `php tools/production-check.php --strict`: права
@@ -8635,15 +9267,16 @@ Scale). Часть уже разложена по разделам выше и �
   (по умолчанию; отключить — `--unstable`) подставляет фиксированные
   `nonce="static-demo"`, `meta[name=csrf-token]` и `_token` вместо
   сгенерированных на запрос, а `--manifest=<файл>` пишет sha256 каждого файла,
-  чтобы два прогона можно было сравнить. `lastmod` в `sitemap.xml` идёт из
-  `filemtime`/`updated_at`, поэтому не нормализуется.
+  чтобы два прогона можно было сравнить. `lastmod` статических страниц берётся
+  из настройки `sitemap_lastmod` (пусто — тега нет), у статей и товаров — из
+  `updated_at`; дата распаковки файлов на `lastmod` больше не влияет.
 - `D:\Elv Landing` — рабочая копия; живой библиотечный сайт `D:\October CMS` не трогаем.
 
 ===== FILE: Что доделать коротко.txt =====
 
 # Что доделать — коротко
 
-Срез: 22.11.2026. Полный план с деталями — `Что доделать.txt`,
+Срез: 23.11.2026. Полный план с деталями — `Что доделать.txt`,
 сделанное — `Что сделано.txt`. Здесь только открытые пункты.
 
 Порядок: решения владельца → кабинет → тикеты → «вопрос-ответ» → отзывы →
@@ -8654,53 +9287,26 @@ Scale). Часть уже разложена по разделам выше и �
 Источник — `docs/html/221126/elv kit full`, сверен с кодом. Детали — в
 `Что доделать.txt`.
 
-- [x] Цена: `OrderService`, `Seo::productNode()`, `llms.txt`, карточки модулей и
-      оформление заказа читают `Prices::resolve()` — один источник (23.11.2026).
-- [x] Обещания в теме, письмах и оферте: `{cabinet_url}`, BM25, REST API,
-      `/offer` — нет; «корзина» в калькуляторе заменена на «заказ»; гейт
-      `check-promises.mjs` (23.11.2026).
-- [x] RU-пометка на `/kit/`, в README и описании товара: интерфейс витрины,
-      админки и писем — только русский (23.11.2026).
-- [x] Бренд в шаблонах — из настроек: `brand_name`, `brand_subtitle`,
-      `legal_name` (23.11.2026, Вариант Б); зашитое имя ловит `check-brand`.
-- [x] Согласие с офертой: время, IP, браузер, хэш редакции оферты и ссылка
-      сохраняются в `meta` заказа; в карточке — поле «Согласие с офертой»
-      (23.11.2026).
 - [ ] Чистая установка October 4.4 — внешний стенд. Локально 23.11.2026:
       404 модуля без товара проверяется `check-empty-install.mjs`.
 - [ ] Прод: ключи, SMTP, хостинг. Локально 23.11.2026: чек-лист
       `docs/production-deploy.md`, проверки HTTPS/очереди/почты в
       `production-check.php`; `--strict` — на сервере.
-- [ ] Этап 1: пресеты, iframe-заголовки, релизы, лимит скачиваний, водяной знак.
-- [ ] Этап 2: кабинет, тикеты, Telegram ChatOps, Q&A, форум.
-- [ ] Этап 3: отзывы, промокоды, апгрейд тарифа, B2B-счёт, Team Seats.
-- [ ] Этап 4: update-сервер, конструктор страниц, EN/валюты, рефералка,
-      песочница.
-- [x] Stage 84 блок 2 закрыт 23.11.2026: защита истории прайса, валюта в
-      `Prices::current()`, техтермины в `looksBroken`, `hide_user` в
-      `widget.js`, общий `SearchConfig` для PHP и JS, `elv_blog_total` в sitemap.
-- [x] Stage 4: 11 статей из разборов ИИ написаны 23.11.2026 (Telegram,
-      почасовая аренда, школа, просадка трафика, Markdown, OG-картинки,
-      частный специалист, доставка, маркетплейсы, окупаемость, NDA). Каждая
-      с блоком «По теме» и входящей ссылкой; блог 112 статей.
-- [ ] Перелинковка: 4 старых статьи без входящих ссылок из текстов —
-      `kontent-marketing`, `dostupnost-sajta-a11y`, `prodvizhenie-v-socsetah`,
-      `skolko-stoit-sajt-s-onlajn-zapisyu`.
-- [x] Блог: 7 ложных утверждений о продукте исправлены 23.11.2026 («Elv Shop»,
-      корзина, модуль отзывов, WebP/lazy, аудит, «мультиязычности нет»).
+- [ ] Этап 2: тикеты + Telegram ChatOps, Q&A. Кабинет `/account/` закрыт
+      23.11.2026. Форум не делаем — решение 23.11.2026.
+- [ ] Этап 3: отзывы (без фото, премодерация), промокоды, апгрейд тарифа.
+      B2B-счёт и Team Seats — по отдельному решению.
+- [ ] Этап 4: update-сервер, рефералка; EN/валюты, конструктор страниц и
+      публичный счётчик — не делаем; песочница — в конце очереди.
 
 ## 1. Решения владельца (без них не начинать)
 
-- [x] «Продукты» в шапке: выпадающий список вместо «Elv Kit» и «Шаблон», пункты из настроек (21.11.2026).
+Решения по Stage 2–4 утверждены 23.11.2026 — `docs/owner-decisions.md`.
+Здесь остались только вопросы, по которым решения ещё нет.
+
 - [ ] Что продаём: только October (kit / module / template) или ещё скрипты, desktop, SaaS.
-- [ ] Языки: ru + en или больше; `/en/…` или поддомен; кто вычитывает перевод.
-- [ ] Конструктор: свой блоковый или RainLab Static Pages (чужой плагин — зависимость).
-- [ ] Кабинет: вход по ссылке или пароль; кто отвечает в тикетах и какой SLA.
-- [ ] Форум: нужен или хватает «вопрос-ответ» на страницах продуктов.
-- [ ] Отзывы: кто модерирует, фото, отрицательные, нужна ли отдельная `/reviews/`.
 - [ ] Тарифы и шаблон: упаковка, статус («в разработке» / «ранний доступ»), SKU, цена, валюта.
-- [ ] Платежи: нужны ли BYN-провайдеры (WebPay / bePaid / ЕРИП) кроме ЮKassa/Stripe.
-- [ ] Публичный счётчик установок, промокоды, комплект «Два в одном», лид-магниты.
+- [ ] B2B-счёт и Team Seats — нужны или нет (в утверждённый порядок не входят).
 - [ ] TCO-калькулятор: нужны проверяемые цены конкурентов и дата среза; «экономия в 3–5 раз» без данных не публикуется.
 - [ ] Мигратор (WordPress WXR, CSV, чужие CMS): отдельный продукт или модуль Elv Kit.
 
@@ -8711,57 +9317,36 @@ Scale). Часть уже разложена по разделам выше и �
 - [ ] Тип продукта и `compatibility`; `partials/product-cards.htm`.
 - [ ] Страница продукта: версия, changelog, требования, `demo_url` / `docs_url`, цена из `Prices`.
 - [ ] `/modules/` → 301 на `/products/?type=module` или оставить отдельной (решить).
-- [x] Предпросмотр `/preview/`: панель, устройства, iframe, `?device=`, `noindex` (21.11.2026).
-- [x] CSP: `frame-src 'self' https:`, `frame-ancestors 'self'` и `X-Frame-Options: SAMEORIGIN` (21.11.2026).
-- [x] `export-static.php`: генерирует `/preview/` и `/preview/<slug>/` (21.11.2026).
-- [x] Список демо на `/demo/`: продукты с `demo_url` + `demo_links` из настроек (21.11.2026).
 - [ ] Отзывы: `elv_kit_reviews`, токен из письма, модерация, звёзды, JSON-LD только по реальным.
 - [ ] Счётчик установок, промокоды, комплект «Два в одном», релизы в админке, лид-магниты.
-- [ ] Убрать обещания непостроенного: корзина, кабинет, BM25, REST API, чат; `/offer` → `/terms/`.
+- [ ] Убрать обещания непостроенного: корзина, BM25, REST API, чат; `/offer` → `/terms/`.
+- [ ] Запись: SMS, график по мастерам, перенос брони, депозит (e-mail-напоминания клиенту и мастеру закрыты 23.11.2026).
 
 ## 3. Кабинет и поддержка
 
-- [ ] `elv_kit_customers` + бэкфилл из заказов; вход по одноразовой ссылке.
-- [ ] `/account/`: заказы, лицензии, домены, скачивание, история обращений.
-- [ ] `noindex` и `no-store` для `/account/` и `/tickets/`.
-- [ ] До кабинета убрать из оферты, FAQ и письма обещание кабинета и `{cabinet_url}`.
-- [ ] Тикеты: таблицы, ответ из админки, шаблоны, SLA, вложения.
+- [x] `elv_kit_customers` + бэкфилл из заказов; вход по одноразовой ссылке:
+      токен 48 символов, TTL 30 минут, без паролей (23.11.2026).
+- [x] `/account/`: заказы, лицензии, домены, скачивание; отвязка домена —
+      не чаще раза в 30 дней (23.11.2026).
+- [x] `noindex` и `no-store` для `/account/` (23.11.2026); `/tickets/` — вместе
+      с тикетами.
+- [x] Обещание кабинета и `{cabinet_url}`: кабинет построен, плейсхолдера в
+      текстах нет (23.11.2026).
+- [ ] История обращений в кабинете — после тикетов.
+- [ ] Тикеты: таблицы, ответ из админки, шаблоны, вложения; SLA первого ответа —
+      24 часа в рабочее время (Пн–Пт 10:00–18:00, Europe/Minsk).
 - [ ] Форма обратной связи → тикет; чат → «передать оператору» с историей.
 - [ ] Telegram ChatOps: новое обращение и ответ реплаем.
 - [ ] «Вопрос-ответ»: вопросы/ответы, модерация, `QAPage`, пагинация.
-- [ ] Форум: таблицы, адреса, авторизация из профиля, модерация, поиск, SEO.
-- [ ] Репутация и дайджест — после MVP форума.
+- [ ] Форум не делаем (решение 23.11.2026): вместо него Q&A на страницах продуктов.
 
 ## 4. Блог и SEO
 
 - [ ] Дописать 3 темы из плана: цена поддержки, 2 кейса (только с реальными данными).
-- [x] Дополнить короткие статьи: отзывы, запись/мессенджер, неявки, напоминания, запуск (21.11.2026).
-- [x] Кластер отзывов: как просить, модерация, `Review` / `AggregateRating` (21.11.2026).
-- [x] Три статьи о продукте: что входит в Elv Kit, как выбрать модуль, Tilda/WordPress/October (21.11.2026).
-- [x] Счётчики блога: на `/blog/` и `/blog/tech/` видно 53 + 20 = 73, а не «всего 50» (21.11.2026).
 - [ ] Новые: тариф и лимит доменов, страница продукта, changelog, 3 ниши.
   Полный список кандидатов (волны 1–3) — в `Что доделать.txt`, раздел
   «Кандидаты в блог из `Что доделать коротко.txt`».
-- [x] 28 черновиков из `docs/html/211126 1/Статьи`: опубликовано 27, категории → slug, `seo_description` отдельно от `excerpt`, 5 коротких дописаны (22.11.2026).
-- [x] Один призыв на статью: 4 дубля «Следующий шаг» и защита в `Demo::posts()` (22.11.2026).
-- [x] Рубрики: 16 статей размечены, фолбэк в `engineering` больше никого не ловит (22.11.2026).
-- [x] Дубли тем разведены без 301: 82 → чек-лист интеграции в техраздел, 81 → инструкция по модулю Elv Kit, врезки у бэкапов и миграций (22.11.2026).
-- [x] Плашка о юрисдикции в 31, 40, 82, 95: примеры РФ, для РБ — Закон № 99-З, ЕРИП/bePaid/WebPay (22.11.2026).
-- [x] Плашка в 35 и 66, в 63 добавлен 99-З: теперь оговорка во всех 8 статьях с 152-ФЗ — 31, 35, 40, 63, 66, 82, 95, 101 (22.11.2026).
-- [x] Стандартный блок «Следующий шаг» во всех 7 статьях без него: 23, 25, 34, 35, 71, 72, 73; блок есть у всех 101 статьи: 66 через `<strong>`, 35 через `<h2>` (22.11.2026).
-- [x] ID 73: пустой `<h2>Честное ограничение</h2>` закрыт абзацем о цене ошибки на каждой платформе; пустых H2 в блоге 0 (22.11.2026).
-- [x] ID 35: оговорка про уведомления добавлена 22.11, затем убрана по новому правилу «целевой сценарий»; статья снова без списка недоделанного (22.11.2026).
-- [x] ID 26 разделён: «Первые часы после взлома» → отдельная ID 101 `pervye-chasy-posle-vzloma` (2 381 символ), в 26 — ссылка; статья 7 919 → 7 291 (22.11.2026).
-- [x] Дубль «Что спросить у хостинга» убран из ID 26, осталась ссылка на `kak-vybrat-hosting` (22.11.2026).
-- [x] ID 49: «Elv Kit не ведёт складской учёт», ссылка на 72 (22.11.2026).
-- [x] Выдуманные метрики убраны: «до 60%» в 34, «40–60%» и «в разы» в 30 (22.11.2026).
-- [ ] Модуль записи: сделать редактор слотов, напоминания и SMS (решение 22.11.2026 — делаем, а не оставляем ограничением).
-- [x] `reading_time`: считается из видимого текста — 180 слов/мин, минимум 1; поле не хранится, диапазон 2–6 минут (22.11.2026).
-- [x] Косметика SEO: 6 длинных H1 укорочены, 18 коротких `seo_description` доведены до 120–160 символов (22.11.2026).
-- [x] Вычитка 27 новых статей и `docs/blog-audit.md` переписан под срез 101 статьи (22.11.2026).
 - [ ] Новые статьи (11): Telegram-уведомления, почасовая аренда, онлайн-школа, трафик после редизайна, Markdown vs HTML, OG-картинки, юрист/психолог, локальная доставка, маркетплейсы, окупаемость, кейс под NDA. Правило 22.11.2026: писать как правильный сценарий, без оговорок «продукт этого не умеет»; функцию допиливаем после текста. Таблица с проверкой по коду — `exports/Гугл ИИ/08-что-доделать.md`, п. 5.
-- [x] Перелинковка: было 34 статьи без входящих и 21 без исходящих — стало 0/0; 52 новые ссылки по карте и второму проходу (22.11.2026).
-- [x] Рубрики: 89/83/84 → SEO, 32 → Практика; ID 81 → «Технологии» и `/blog/tech/`. Итог: Практика 39, Технологии 28, SEO 20, Контент 14 (22.11.2026).
 - [ ] Обновить цены, даты и ссылки на `/products/`; проверить AI-темы на 2026.
 - [ ] Внутренние ссылки October без слэша: `elv_url()` или принять 301.
 - [ ] JSON-LD прогнать в Google Rich Results и Яндекс.Вебмастере.
@@ -8775,12 +9360,13 @@ Scale). Часть уже разложена по разделам выше и �
 - [ ] Мониторинг: доступность, очередь, ошибки платежей.
 - [ ] `production-check.php --strict` на cPanel; `october:optimize`.
 - [ ] Чистый October 4.4: установка, пустые состояния, письма, mock-оплата.
-- [ ] Тема: нейтральные тексты вместо «Elv Studio» или честно продавать «как есть».
 - [ ] Сказать «только RU» в карточке, README и описании архива.
 - [ ] Модульные страницы на пустом каталоге: 404 или заглушка (решить).
-- [ ] `check-empty-install` расширить на `/modules/<slug>/`.
 
 ## 6. Демо-песочница
+
+Решение 23.11.2026: откладываем в конец очереди — после кабинета, тикетов и
+отзывов.
 
 - [ ] Флаг `ELV_DEMO_SANDBOX` + настройка, сервис, сессия на 24 часа, без записи в БД.
 - [ ] Пресеты ниш, товары, тарифы и валюта — в сессии.
@@ -8790,20 +9376,9 @@ Scale). Часть уже разложена по разделам выше и �
 - [ ] `check-sandbox.mjs`, `docs/demo-sandbox.md`, раздел в README.
 - [ ] Пресеты ниш — только в демо-слое; в товарный ZIP не попадают.
 
-## 7. Мелкие дефекты из аудита (22.11.2026)
-
-- [ ] Поиск: границы слова вместо `str_contains` в `Search.php`.
-- [ ] Консультант: `'стать'` и `'связ'` в `Chat.php` — сузить до словоформ.
-- [ ] `TextFilter`: цифры в lookalike (`0→о`, `3→е`, `1→и`) и границы слова в кириллице.
-- [ ] OG-картинка статьи — из `cover`, если задан.
-- [ ] `sitemap.xml` в статике: `lastmod` не должен прыгать на каждой сборке.
-- [ ] Калькулятор: `$79` в разметке — брать цену из прайса или `—` до выбора.
-
 ## 8. Проверки перед релизом
 
-- [ ] `node tools/gate.mjs`.
 - [ ] `node tools/check-empty-install.mjs --base=…` на чистой базе.
-- [ ] `node tools/check-perf.mjs --runs=5` после прогрева.
 - [ ] `php tools/production-check.php --strict` на хостинге.
 - [ ] Ручная проверка 360 px, Safari, клавиатура, контраст.
 - [ ] Меню «Продукты»: наведение, клик по пункту, Tab/Enter (зазор 8 px чинён 21.11.2026).

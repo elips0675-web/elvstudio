@@ -1,6 +1,6 @@
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -79,7 +79,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'стать', 'почитать'])) {
+        if (
+            static::has($text, ['найд', 'поиск', 'ищи', 'искать', 'подбер', 'материал', 'почитать'])
+            || static::hasWord($text, ['стать'])
+        ) {
             $results = static::search($message);
 
             if ($results !== []) {
@@ -191,7 +194,10 @@ class Chat
         }
 
         if (static::has($text, ['цена', 'стоим', 'сколько', 'тариф', 'прайс', 'бюджет', 'дорого', 'price'])) {
-            if (static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'связ', 'магазин'])) {
+            if (
+                static::has($text, ['booking', 'shop', 'feedback', 'блог', 'blog', 'запис', 'заказ', 'обратн', 'магазин'])
+                || static::hasConnection($text)
+            ) {
                 return static::reply(static::modulePriceText($text), ['Что входит в Kit?', 'Какие разделы есть?', 'Как оплатить?'], static::link('Разделы', '/modules/'));
             }
 
@@ -232,7 +238,7 @@ class Chat
             );
         }
 
-        if (static::has($text, ['блог', 'стат', 'новост', 'rss'])) {
+        if (static::has($text, ['блог', 'новост', 'rss']) || static::hasWord($text, ['стат'])) {
             return static::reply(
                 'Блог входит в Elv Kit: статьи, категории, подписка на новости и карта сайта. Тексты правятся в админке, у каждой статьи есть заголовок и описание для поиска.',
                 ['Что входит в Kit?', 'Сколько стоит?', 'Написать нам'],
@@ -286,7 +292,10 @@ class Chat
             );
         }
 
-        if (static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать', 'связ'])) {
+        if (
+            static::has($text, ['контакт', 'почта', 'email', 'telegram', 'телеграм', 'телефон', 'whatsapp', 'написать'])
+            || static::hasConnection($text)
+        ) {
             return static::reply(static::contactsText(), ['Сколько стоит?', 'Как установить?'], null, 'feedback');
         }
 
@@ -503,6 +512,48 @@ class Chat
         return false;
     }
 
+    /**
+     * hasWord — совпадение с начала слова, а не внутри другого.
+     *
+     * `has()` ищет подстроку: «стать» в «перестать» — не запрос про статьи.
+     * Стем проверяется от начала слова, поэтому «статьи» и «статью» находятся,
+     * а «остаться» и «перестать» — нет.
+     *
+     * @param array<int, string> $words
+     * @param array<int, string> $except продолжения слова, которые не считаются совпадением
+     */
+    protected static function hasWord(string $text, array $words, array $except = []): bool
+    {
+        $tail = '';
+
+        if ($except !== []) {
+            $tail = '(?!' . implode('|', array_map(
+                fn (string $part): string => preg_quote($part, '/'),
+                $except
+            )) . ')';
+        }
+
+        foreach ($words as $word) {
+            if ($word === '') {
+                continue;
+            }
+
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($word, '/') . $tail . '/u', $text) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * hasConnection — вопрос про связь, а не про «связку» терминов.
+     */
+    protected static function hasConnection(string $text): bool
+    {
+        return static::hasWord($text, ['связ'], ['к']);
+    }
+
     protected static function plansText(): string
     {
         $plans = Catalog::plans();
@@ -553,11 +604,15 @@ class Chat
     {
         $slug = null;
 
-        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback', 'связ' => 'feedback'] as $word => $key) {
+        foreach (['booking' => 'booking', 'shop' => 'shop', 'feedback' => 'feedback', 'блог' => 'blog', 'blog' => 'blog', 'запис' => 'booking', 'заказ' => 'shop', 'магазин' => 'shop', 'обратн' => 'feedback'] as $word => $key) {
             if (static::has($text, [$word])) {
                 $slug = $key;
                 break;
             }
+        }
+
+        if ($slug === null && static::hasConnection($text)) {
+            $slug = 'feedback';
         }
 
         if ($slug === null) {
@@ -671,9 +726,11 @@ class Chat
  * TextFilter — фильтр грубых слов в сообщениях консультанта.
  *
  * Ловит основы слов, а не конкретные формы: между буквами допускаются пробелы
- * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`)
- * и замена буквы знаком (`х*й`). Слово, где букву просто выбросили (`хй`),
- * фильтр не разгадывает — иначе подстановка любых символов ловит обычные слова.
+ * и знаки (`х у й`), повтор букв (`пиззда`), латинские похожие буквы (`xyй`),
+ * цифры вместо букв (`п1зд`, `3бал`) и замена буквы знаком (`х*й`). Слово, где
+ * букву просто выбросили (`хй`), фильтр не разгадывает — иначе подстановка
+ * любых символов ловит обычные слова. Основа ищется с начала слова, поэтому
+ * «пидр» не находится в «эпидраздел».
  * Ответ на грубость вежливый, без повтора самого слова.
  */
 class TextFilter
@@ -684,6 +741,7 @@ class TextFilter
     protected const LOOKALIKE = [
         'a' => 'а', 'b' => 'в', 'c' => 'с', 'e' => 'е', 'h' => 'н', 'k' => 'к',
         'm' => 'м', 'o' => 'о', 'p' => 'р', 't' => 'т', 'x' => 'х', 'y' => 'у',
+        '0' => 'о', '1' => 'и', '3' => 'е', '4' => 'ч',
     ];
 
     /** @var array<string, string> */
@@ -712,7 +770,7 @@ class TextFilter
         $latin = strtr($text, static::REVERSE);
 
         foreach (static::latinWords() as $stem) {
-            if (preg_match(static::pattern($stem, true), $latin)) {
+            if (preg_match(static::pattern($stem, true, true), $latin)) {
                 return $stem;
             }
         }
@@ -720,7 +778,7 @@ class TextFilter
         $cyrillic = strtr($text, static::LOOKALIKE);
 
         foreach (static::cyrillicWords() as $stem) {
-            if (preg_match(static::pattern($stem), $cyrillic)) {
+            if (preg_match(static::pattern($stem, true, false), $cyrillic)) {
                 return $stem;
             }
         }
@@ -772,10 +830,13 @@ class TextFilter
 
     /**
      * pattern — буквы основы через любые пробелы и знаки, повторы букв разрешены.
+     *
+     * $start — совпадение только с начала слова: «пидр» не находится в «эпидраздел».
+     * $end — совпадение только целым словом (для латиницы): «dick» не в «dickens».
      */
-    protected static function pattern(string $stem, bool $bounded = false): string
+    protected static function pattern(string $stem, bool $start = false, bool $end = false): string
     {
-        $key = $stem . ($bounded ? ':bounded' : '');
+        $key = $stem . ($start ? ':s' : '') . ($end ? ':e' : '');
 
         if (isset(static::$compiled[$key])) {
             return static::$compiled[$key];
@@ -796,8 +857,8 @@ class TextFilter
             $parts[] = '(?:' . $quoted . '+|[\p{P}\p{S}]+)';
         }
 
-        $prefix = $bounded ? '(?<![\p{L}\p{N}])' : '';
-        $suffix = $bounded ? '(?![\p{L}\p{N}])' : '';
+        $prefix = $start ? '(?<![\p{L}\p{N}])' : '';
+        $suffix = $end ? '(?![\p{L}\p{N}])' : '';
 
         return static::$compiled[$key] = '/' . $prefix . implode('[\s\p{P}\p{S}]*', $parts) . $suffix . '/u';
     }

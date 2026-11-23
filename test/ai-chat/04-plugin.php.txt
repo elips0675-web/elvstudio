@@ -1,6 +1,6 @@
 # Плагин: точка входа Elv.Kit
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -8,6 +8,7 @@
 
 use Elv\Kit\Classes\Blog;
 use Elv\Kit\Classes\Assets;
+use Elv\Kit\Classes\AccountService;
 use Elv\Kit\Classes\Badges;
 use Elv\Kit\Classes\Calculator;
 use Elv\Kit\Classes\Catalog;
@@ -52,6 +53,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('elv.kit.demo', \Elv\Kit\Console\DemoCommand::class);
         $this->registerConsoleCommand('elv.kit.reset', \Elv\Kit\Console\ResetCommand::class);
         $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
+        $this->registerConsoleCommand('elv.kit.remind', \Elv\Kit\Console\RemindCommand::class);
     }
 
     public function registerSettings()
@@ -113,6 +115,10 @@ class Plugin extends PluginBase
                 'label' => 'Прайс: версии цен',
                 'tab' => 'Elv Kit',
             ],
+            'elv.kit.releases' => [
+                'label' => 'Релизы архива',
+                'tab' => 'Elv Kit',
+            ],
         ];
     }
 
@@ -142,6 +148,12 @@ class Plugin extends PluginBase
                         'label' => 'Брони',
                         'icon' => 'icon-calendar-check-o',
                         'url' => \Backend::url('elv/kit/bookings'),
+                        'permissions' => ['elv.kit.bookings'],
+                    ],
+                    'slots' => [
+                        'label' => 'Слоты записи',
+                        'icon' => 'icon-clock-o',
+                        'url' => \Backend::url('elv/kit/slots'),
                         'permissions' => ['elv.kit.bookings'],
                     ],
                     'messages' => [
@@ -186,6 +198,12 @@ class Plugin extends PluginBase
                         'url' => \Backend::url('elv/kit/prices'),
                         'permissions' => ['elv.kit.prices'],
                     ],
+                    'releases' => [
+                        'label' => 'Релизы',
+                        'icon' => 'icon-archive',
+                        'url' => \Backend::url('elv/kit/releases'),
+                        'permissions' => ['elv.kit.releases'],
+                    ],
                 ],
             ],
         ];
@@ -194,6 +212,7 @@ class Plugin extends PluginBase
     public function registerSchedule($schedule)
     {
         $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
+        $schedule->command('elv:kit:remind')->hourly()->withoutOverlapping();
         $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
     }
 
@@ -223,6 +242,8 @@ class Plugin extends PluginBase
 
     public function registerMarkupTags()
     {
+        $account = new AccountService();
+
         return [
             'functions' => [
                 'elv_setting' => function ($key, $default = null) {
@@ -487,6 +508,38 @@ class Plugin extends PluginBase
                 },
                 'elv_related' => function ($post, $limit = 3) {
                     return $post instanceof Post ? Blog::related($post, (int) $limit) : collect();
+                },
+                'elv_account' => function () use ($account) {
+                    return $account->user();
+                },
+                'elv_account_orders' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->orders($customer) : collect();
+                },
+                'elv_account_licenses' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->licenses($customer) : collect();
+                },
+                'elv_account_domains' => function () use ($account) {
+                    $customer = $account->user();
+
+                    return $customer ? $account->installs($customer) : collect();
+                },
+                'elv_account_can_unbind' => function ($install) use ($account) {
+                    $customer = $account->user();
+
+                    if (!$customer || !$install instanceof \Elv\Kit\Models\Install) {
+                        return ['ok' => false, 'message' => ''];
+                    }
+
+                    return $account->canUnbind($customer, $install);
+                },
+                'elv_account_next_unbind' => function ($license) use ($account) {
+                    return $license instanceof \Elv\Kit\Models\License
+                        ? $account->nextUnbindAt($license)
+                        : null;
                 },
             ],
             'filters' => [

@@ -1,6 +1,6 @@
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 23.11.2026. Stage 84. Коммит: `ba217f2`.
+Срез: 23.11.2026. Stage 84. Коммит: `50d879a`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -180,7 +180,7 @@ class Search
         $keywords = static::normalize((string) ($item['keywords'] ?? ''));
         $meta = static::normalize((string) ($item['meta'] ?? ''));
 
-        $score = $query !== '' && str_contains($title, $query) ? 14 : 0;
+        $score = $query !== '' && preg_match('/(?<![\p{L}\p{N}])' . preg_quote($query, '/') . '/u', $title) === 1 ? 14 : 0;
         $hits = 0;
 
         foreach ($words as $word) {
@@ -319,15 +319,11 @@ class Search
     protected static function containsAny(string $text, array $forms): bool
     {
         foreach ($forms as $form) {
-            if (mb_strlen($form) < 4) {
-                if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . '(?![\p{L}\p{N}])/u', $text) === 1) {
-                    return true;
-                }
+            // Короткая форма — только целым словом, длинная — только с начала слова:
+            // «став» не должен находить «доставку», а «оплата» — «недоплату».
+            $suffix = mb_strlen($form) < 4 ? '(?![\p{L}\p{N}])' : '';
 
-                continue;
-            }
-
-            if (str_contains($text, $form)) {
+            if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($form, '/') . $suffix . '/u', $text) === 1) {
                 return true;
             }
         }
@@ -355,7 +351,7 @@ class Search
 title = "Поиск по сайту"
 url = "/search/"
 layout = "default"
-meta_title = "Поиск по сайту — Elv Kit"
+meta_title = "Поиск по сайту"
 meta_description = "Поиск по страницам сайта и статьям блога: услуги, тарифы, инструкция, онлайн-запись, оплата и SEO."
 meta_robots = "noindex, follow"
 ==
@@ -957,7 +953,7 @@ description = "Основной макет: шапка, подвал, инлай
 {% set seo_post = this.page.id == 'blog-post' ? elv_use_post(this.param.slug) : null %}
 {% set seo_product = this.page.id == 'module' ? elv_product(this.param.slug) : null %}
 {% set seo_filtered = this.page.id in ['blog', 'blog-tech'] and (elv_query('category') or elv_query('tag') or elv_query('q')) %}
-{% set seo_noindex = this.page.id in ['404', 'order-success'] or seo_filtered %}
+{% set seo_noindex = this.page.id in ['404', 'order-success', 'account'] or seo_filtered %}
 {% set seo_page_no = this.page.paginated and not seo_filtered ? elv_page_no() : 1 %}
 {% set seo_title = seo_product
     ? seo_product.name ~ ' — ' ~ elv_setting('brand_name', 'Elv Kit')
@@ -1010,6 +1006,9 @@ description = "Основной макет: шапка, подвал, инлай
     {% endif %}
     {% if this.page.id in ['blog', 'blog-tech', 'blog-post'] %}
         <link rel="stylesheet" href="{{ 'assets/css/blog.css'|theme }}?v=20261118-11">
+    {% endif %}
+    {% if this.page.id == 'account' %}
+        <link rel="stylesheet" href="{{ 'assets/css/account.css'|theme }}?v=20261123-1">
     {% endif %}
 </head>
 <body>
