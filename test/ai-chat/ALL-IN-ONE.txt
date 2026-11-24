@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки, аудит приватности, планы, поддержка, вопросы и отзывы.
@@ -305,7 +305,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 Отслеживаемые файлы (`git ls-files`), всего 692.
 `demo-static` — 173 HTML-страниц, показан не развёрнуто.
@@ -791,7 +791,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: composer.json =====
 
@@ -1440,7 +1440,7 @@ node tools/build-test-snapshot.mjs
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -2087,7 +2087,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -3704,7 +3704,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -4773,7 +4773,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -5787,7 +5787,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -8726,7 +8726,7 @@ php tools/price-check.php
 
 # Планы: что доделать
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: Что доделать.txt =====
 
@@ -9028,7 +9028,7 @@ polling вкладки). Форум не делаем. Закрыто 24.11.2026
 
 # Поддержка: обращения, SLA, вложения, polling и Telegram ChatOps
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/updates/add_ticket_support_tools.php =====
 
@@ -12353,7 +12353,7 @@ echo "OK: tickets checks passed\n";
 
 # Сообщество: вопросы с премодерацией и отзывы после оплаты
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/updates/create_kit_questions_reviews.php =====
 

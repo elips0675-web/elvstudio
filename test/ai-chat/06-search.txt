@@ -1,6 +1,6 @@
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
+Срез: 24.11.2026. Stage 86. Коммит: `6eb72a1`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
