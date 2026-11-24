@@ -1,6 +1,6 @@
 # Elv Landing — ALL-IN-ONE для AI-анализа
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 Внутри: контекст, структура, конфигурация, Консультант, поиск, карта сайта,
 проверки, доки, аудит приватности, планы, поддержка, вопросы и отзывы.
@@ -305,7 +305,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Структура репозитория Elv Landing
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 Отслеживаемые файлы (`git ls-files`), всего 692.
 `demo-static` — 173 HTML-страниц, показан не развёрнуто.
@@ -783,7 +783,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 85, собран `node tools/build-test-snapshot.mjs`)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 86, собран `node tools/build-test-snapshot.mjs`)
 
 ==============================================================================
 03-config.txt
@@ -791,7 +791,7 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 
 # Конфигурация: сборка, зависимости и тема
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: composer.json =====
 
@@ -939,6 +939,8 @@ form:
 1.4.0:
     - 'Поддержка: обратная связь и Консультант создают обращение, вложения в переписке, быстрые ответы и автозакрытие'
     - add_ticket_support_tools.php
+1.4.1:
+    - 'Установка: страница проверяет все таблицы плагина и показывает вывод команд, а не строку queue:restart'
 
 ===== FILE: README.md =====
 
@@ -956,7 +958,7 @@ form:
 этого же сайта, собирается командой `php tools/export-static.php`.
 
 Продукт версионируется отдельно: плагин — `plugins/elv/kit/updates/version.yaml`
-(сейчас 1.4.0), тема — `themes/elv-studio/version.yaml` (1.0.0).
+(сейчас 1.4.1), тема — `themes/elv-studio/version.yaml` (1.0.1).
 
 ## Что продаёт сайт
 
@@ -1263,6 +1265,29 @@ php artisan serve --port=8090
 `elv:kit:demo` наполняет каталог, статьи и слоты бронирования идемпотентно;
 `elv:kit:reset` удаляет демо-данные, `elv:kit:package` собирает ZIP поставки.
 
+### Установка на чужой сайт (без терминала)
+
+Покупатель получает `elv-kit-<версия>.zip` на чистом October CMS 4.4+ с пустой
+базой. В архиве два каталога и два файла:
+
+1. `theme/` → `themes/elv-studio/`, `plugin/` → `plugins/elv/kit/` — копируются
+   файловым менеджером хостинга. Распаковывать «в корень» нельзя: October ждёт
+   ровно эти пути.
+2. В `.env` — `ACTIVE_THEME=elv-studio` (или Front-end → Темы → Elv Studio).
+3. В админке открыть **Elv Kit → Установка** и нажать «Применить миграции»:
+   страница проверяет PHP, расширения, права на `storage` и `bootstrap/cache`,
+   подключение к базе, все 17 таблиц плагина и активную тему, а под кнопками
+   показывает вывод команд.
+4. «Загрузить демо-данные» — необязательный шаг: каталог, слоты записи и
+   настройки для примерки. Статьи блога в товарный архив не входят, поэтому
+   после установки блог пуст и наполняется своими статьями.
+5. Cron: `* * * * * cd /путь/к/сайту && php artisan schedule:run`.
+
+`/modules/` и `/docs/` — реальные каталоги October, поэтому встроенный сервер
+`php artisan serve` отдаёт на эти адреса свой 404. На Apache/nginx маршрутизацию
+делает `.htaccess`/`nginx.conf` из скелета, а для локальной проверки нужен
+`server.php` в корне (он отдаёт файлы и передаёт остальное в `index.php`).
+
 ### Пресеты ниш для демо-стенда
 
 Пресет меняет только настройки (бренд, услуги, FAQ, меню, услуги записи),
@@ -1415,7 +1440,7 @@ node tools/build-test-snapshot.mjs
 
 # Плагин: точка входа Elv.Kit
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/Plugin.php =====
 
@@ -2062,7 +2087,7 @@ class Plugin extends PluginBase
 
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -3679,7 +3704,7 @@ class ChatController extends Controller
 
 # Поиск: сервер, выдача и страница /search/
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/classes/Search.php =====
 
@@ -4748,7 +4773,7 @@ description = "Основной макет: шапка, подвал, инлай
 
 # Карта сайта и SEO-разметка
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: themes/elv-studio/pages/sitemap.htm =====
 
@@ -5762,7 +5787,7 @@ Route::prefix('api/v1')->middleware('throttle:60,1')->group(function () {
 
 # Проверки, доки и аудит приватности
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -6414,10 +6439,17 @@ const SCRIPTS = [
   'tools/community-check.php',
 ];
 
-function commandWorks(command, args) {
-  const result = spawnSync(command, args, { stdio: 'ignore' });
+const PHP_PROBE = 'echo (int) (extension_loaded("zip") && extension_loaded("mbstring") && extension_loaded("pdo_mysql"));';
 
-  return result.status === 0;
+/**
+ * Проверки запускают October и собирают ZIP, поэтому PHP без zip, mbstring
+ * или pdo_mysql не годится: gate должен падать на коде, а не на выборе
+ * бинарника. Laragon держит несколько версий — берём старшую подходящую.
+ */
+function phpSupports(requested) {
+  const probe = spawnSync(requested, ['-r', PHP_PROBE], { encoding: 'utf8', stdio: 'pipe' });
+
+  return probe.status === 0 && String(probe.stdout).trim() === '1';
 }
 
 function resolvePhp() {
@@ -6425,30 +6457,28 @@ function resolvePhp() {
     return process.env.PHP_BIN;
   }
 
-  if (commandWorks('php', ['-v'])) {
-    return 'php';
+  const candidates = ['php'];
+  const laragon = 'C:\\laragon\\bin\\php';
+
+  if (process.platform === 'win32' && fs.existsSync(laragon)) {
+    fs.readdirSync(laragon)
+      .map((name) => path.join(laragon, name, 'php.exe'))
+      .filter((file) => fs.existsSync(file))
+      .sort()
+      .reverse()
+      .forEach((file) => candidates.push(file));
   }
 
-  if (process.platform === 'win32') {
-    const laragon = 'C:\\laragon\\bin\\php';
-
-    if (fs.existsSync(laragon)) {
-      const versions = fs.readdirSync(laragon)
-        .map((name) => path.join(laragon, name, 'php.exe'))
-        .filter((file) => fs.existsSync(file))
-        .sort()
-        .reverse();
-
-      if (versions.length) {
-        return versions[0];
-      }
-    }
-  }
-
-  throw new Error('PHP not found. Set PHP_BIN to the php executable.');
+  return candidates.find(phpSupports) || '';
 }
 
 const php = resolvePhp();
+
+if (!php) {
+  console.error('PHP с расширениями zip, mbstring и pdo_mysql не найден. Укажите PHP_BIN.');
+  process.exit(1);
+}
+
 const failed = [];
 
 for (const script of SCRIPTS) {
@@ -8696,13 +8726,13 @@ php tools/price-check.php
 
 # Планы: что доделать
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: Что доделать.txt =====
 
 # Что доделать
 
-Срез: 23.11.2026 (Stage 85, плагин 1.4.0). Только открытые пункты.
+Срез: 24.11.2026 (Stage 86, плагин 1.4.1). Только открытые пункты.
 Сделанное — в `Что сделано.txt`. Краткая версия — `Что доделать коротко.txt`.
 Утверждённые решения владельца — `docs/owner-decisions.md`.
 
@@ -8720,17 +8750,18 @@ php tools/price-check.php
 `php tools/search-check.php`, `php tools/account-check.php`,
 `php tools/community-check.php`; все входят в `node tools/check-php.mjs`.
 
+Закрыто 24.11.2026 (Stage 86): чистая установка `elv-kit-1.4.1.zip` на пустом
+October 4.4.14 — установщик без терминала, 17 таблиц, пустые состояния,
+mock-оплата, выдача архива по токену, активация лицензии и лимит доменов;
+раздел «Установка на чужой сайт» добавлен в `README.md`. Тогда же проверено
+обновление 1.4.0 → 1.4.1 поверх рабочей установки: заказ, лицензия, обращение
+с вложением, запись и подписчик сохранились, версия поднялась через
+«Применить миграции» в админке.
+
 ---
 
 ## P0 — Блокеры релиза и внешние проверки
 
-- [ ] **Чистая установка October CMS 4.4 (внешний стенд).** Развернуть товарный
-      архив `elv-kit-1.4.0.zip` (без `demo/`) на свежий October 4.4 с пустой БД.
-      Проверить активацию темы, установщик без терминала, пустые состояния
-      витрины, письма в лог, mock-оплату, 404 с `noindex` на
-      `/modules/<несуществующий>/`. Прогнать
-      `node tools/check-empty-install.mjs --base=…` и дописать раздел
-      «Установка на чужой сайт» в `README.md`.
 - [ ] **Боевая инфраструктура (внешний хостинг).** Подготовить `.env` по
       чек-листу `docs/production-deploy.md`: `APP_ENV=production`,
       `APP_DEBUG=false`, HTTPS, `SESSION_SECURE_COOKIE=true`, SMTP на своём
@@ -8901,7 +8932,7 @@ php tools/price-check.php
 
 # Что доделать — коротко
 
-Срез: 23.11.2026 (Stage 85, плагин 1.4.0). Полный план с деталями —
+Срез: 24.11.2026 (Stage 86, плагин 1.4.1). Полный план с деталями —
 `Что доделать.txt`, сделанное — `Что сделано.txt`. Здесь только открытые пункты.
 
 Порядок: решения владельца и витрина → промокоды и апгрейд тарифа → песочница.
@@ -8909,12 +8940,13 @@ php tools/price-check.php
 Telegram ChatOps (1.2.0), вопросы и отзывы (1.3.0), а также весь пакет
 доработок поддержки 1.4.0 (форма обратной связи → тикет, передача диалога из
 Консультанта с историей, вложения, быстрые ответы, автозакрытие через 5 дней и
-polling вкладки). Форум не делаем.
+polling вкладки). Форум не делаем. Закрыто 24.11.2026: чистая установка
+`elv-kit-1.4.1.zip` на пустом October 4.4.14 — установщик без терминала,
+17 таблиц, пустые состояния, mock-оплата, выдача архива, активация лицензии;
+обновление 1.4.0 → 1.4.1 поверх рабочей установки — данные и вложения целы.
 
 ## 0. Блокеры релиза (внешний контур)
 
-- [ ] Чистая установка October 4.4 — развернуть `elv-kit-1.4.0.zip` на пустой
-      БД, прогнать `check-empty-install.mjs`, дописать раздел в `README.md`.
 - [ ] Прод-хостинг: ключи ЮKassa/Stripe, SMTP, Cron `schedule:run`, воркер
       очереди `database`, бэкапы, `production-check.php --strict` (0 WARN).
 - [ ] Модульные страницы на пустом каталоге: решить — оставляем 404 с
@@ -8969,7 +9001,6 @@ polling вкладки). Форум не делаем.
 - [ ] Бэкап БД и `storage/app` перед публикацией; ночной бэкап и отчёт.
 - [ ] Мониторинг: доступность, очередь, ошибки платежей.
 - [ ] `production-check.php --strict` на cPanel; `october:optimize`.
-- [ ] Чистый October 4.4: установка, пустые состояния, письма, mock-оплата.
 - [ ] Сказать «только RU» в карточке, README и описании архива.
 - [ ] Модульные страницы на пустом каталоге: 404 или заглушка (решить).
 
@@ -8997,7 +9028,7 @@ polling вкладки). Форум не делаем.
 
 # Поддержка: обращения, SLA, вложения, polling и Telegram ChatOps
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/updates/add_ticket_support_tools.php =====
 
@@ -12322,7 +12353,7 @@ echo "OK: tickets checks passed\n";
 
 # Сообщество: вопросы с премодерацией и отзывы после оплаты
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/updates/create_kit_questions_reviews.php =====
 

@@ -1,6 +1,6 @@
 # Поддержка: обращения, SLA, вложения, polling и Telegram ChatOps
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 ===== FILE: plugins/elv/kit/updates/add_ticket_support_tools.php =====
 

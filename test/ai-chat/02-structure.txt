@@ -1,6 +1,6 @@
 # Структура репозитория Elv Landing
 
-Срез: 24.11.2026. Stage 85. Коммит: `2068c5f`.
+Срез: 24.11.2026. Stage 86. Коммит: `1a403ae`.
 
 Отслеживаемые файлы (`git ls-files`), всего 692.
 `demo-static` — 173 HTML-страниц, показан не развёрнуто.
@@ -478,4 +478,4 @@
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 85, собран `node tools/build-test-snapshot.mjs`)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 86, собран `node tools/build-test-snapshot.mjs`)
