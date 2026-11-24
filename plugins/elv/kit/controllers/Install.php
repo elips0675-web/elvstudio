@@ -5,6 +5,7 @@ use BackendMenu;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * Install — установка без терминала: проверка требований, миграции и демо-данные
@@ -14,17 +15,31 @@ class Install extends Controller
 {
     public $requiredPermissions = ['elv.kit.install'];
 
+    /**
+     * Таблицы плагина: имя → подпись на странице установки.
+     *
+     * Один список и для проверки «таблицы созданы», и для счётчиков: раньше
+     * подписи жили в партиале, и новая миграция оставляла страницу зелёной
+     * при неполной базе. Сверка с миграциями — `tools/admin-check.php`.
+     */
     protected const TABLES = [
-        'elv_kit_categories',
-        'elv_kit_products',
-        'elv_kit_posts',
-        'elv_kit_orders',
-        'elv_kit_bookings',
-        'elv_kit_slots',
-        'elv_kit_messages',
-        'elv_kit_subscribers',
-        'elv_kit_licenses',
-        'elv_kit_installs',
+        'elv_kit_categories' => 'Категории статей',
+        'elv_kit_products' => 'Товары и разделы',
+        'elv_kit_posts' => 'Статьи блога',
+        'elv_kit_orders' => 'Заказы',
+        'elv_kit_bookings' => 'Записи',
+        'elv_kit_slots' => 'Свободное время',
+        'elv_kit_messages' => 'Сообщения',
+        'elv_kit_subscribers' => 'Подписчики',
+        'elv_kit_licenses' => 'Ключи',
+        'elv_kit_installs' => 'Активации',
+        'elv_kit_customers' => 'Клиенты кабинета',
+        'elv_kit_price_versions' => 'Версии цен',
+        'elv_kit_releases' => 'Сборки архива',
+        'elv_kit_questions' => 'Вопросы покупателей',
+        'elv_kit_reviews' => 'Отзывы',
+        'elv_kit_tickets' => 'Обращения',
+        'elv_kit_ticket_messages' => 'Сообщения обращений',
     ];
 
     protected const EXTENSIONS = [
@@ -49,6 +64,7 @@ class Install extends Controller
         $this->pageTitle = 'Установка Elv Kit';
         $this->vars['checks'] = $this->checks();
         $this->vars['counts'] = $this->counts();
+        $this->vars['tableLabels'] = self::TABLES;
         $this->vars['cron'] = $this->cronLine();
         $this->vars['output'] = '';
     }
@@ -104,6 +120,7 @@ class Install extends Controller
     {
         $this->vars['checks'] = $this->checks();
         $this->vars['counts'] = $this->counts();
+        $this->vars['tableLabels'] = self::TABLES;
         $this->vars['cron'] = $this->cronLine();
 
         return [
@@ -116,8 +133,11 @@ class Install extends Controller
     protected function runArtisan(string $command, array $parameters = []): string
     {
         try {
-            Artisan::call($command, $parameters);
-            $output = trim(Artisan::output());
+            // Свой буфер: сохранение настроек внутри команды вызывает
+            // queue:restart, и Artisan::output() вернул бы только его строку.
+            $buffer = new BufferedOutput();
+            Artisan::call($command, $parameters, $buffer);
+            $output = trim($buffer->fetch());
 
             return $output !== '' ? $output : 'Команда выполнена, сообщений нет.';
         } catch (\Throwable $exception) {
@@ -197,7 +217,7 @@ class Install extends Controller
         try {
             $missing = [];
 
-            foreach (self::TABLES as $table) {
+            foreach (array_keys(self::TABLES) as $table) {
                 if (!Schema::hasTable($table)) {
                     $missing[] = $table;
                 }
@@ -228,7 +248,7 @@ class Install extends Controller
     {
         $counts = [];
 
-        foreach (self::TABLES as $table) {
+        foreach (array_keys(self::TABLES) as $table) {
             try {
                 $counts[$table] = Schema::hasTable($table) ? (int) DB::table($table)->count() : null;
             } catch (\Throwable $exception) {

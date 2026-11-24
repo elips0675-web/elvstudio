@@ -115,8 +115,14 @@ if (bogusModule.status !== 404) {
 
 const blog = bodies['/blog/'] || '';
 
-if ((blog.match(/post-card/g) || []).length === 0 && !/Ничего не нашлось|Пока нет статей|Записей нет/i.test(blog)) {
-  problems.push('/blog/ — статей нет, но пустого состояния нет');
+if ((blog.match(/post-card/g) || []).length === 0) {
+  if (/Ничего не нашлось/.test(blog)) {
+    problems.push('/blog/ — статей нет, а пустое состояние говорит про поиск: «Ничего не нашлось»');
+  } else if (!/Статей пока нет|Пока нет статей/i.test(blog)) {
+    problems.push('/blog/ — статей нет, но пустого состояния нет');
+  } else {
+    notes.push('/blog/: статей нет → «Статей пока нет», без языка поиска');
+  }
 }
 
 notes.forEach((note) => console.log('· ' + note));

@@ -9,6 +9,9 @@
  * контроллеров лежат на месте. Ошибка в конфиге списка October показывает
  * 500 на всей странице раздела, поэтому проверка дешёвая и статическая.
  *
+ * Заодно сверяет `Install::TABLES` с миграциями: страница установки не должна
+ * писать «Готово», если половины таблиц плагина в базе нет.
+ *
  * Запуск: php tools/admin-check.php
  */
 
@@ -134,6 +137,34 @@ foreach ($forms as $configFile) {
     $formFile = $resolve((string) ($config['form'] ?? ''));
     $check(is_file($formFile), $name . ': файл формы не найден (' . $formFile . ')');
 }
+
+/**
+ * Страница установки: `Install::TABLES` — то, что она проверяет и считает.
+ * Новая миграция без строки в списке оставляет страницу зелёной на неполной
+ * базе, поэтому список сверяется с `Schema::create` из updates/*.php.
+ */
+$created = [];
+
+foreach (glob($pluginPath . '/updates/*.php') ?: [] as $migration) {
+    $code = (string) file_get_contents($migration);
+
+    if (preg_match_all("~Schema::create\\(\\s*'([a-z0-9_]+)'~i", $code, $matches)) {
+        foreach ($matches[1] as $table) {
+            if (str_starts_with($table, 'elv_kit_')) {
+                $created[$table] = true;
+            }
+        }
+    }
+}
+
+$installReflection = new ReflectionClass(\Elv\Kit\Controllers\Install::class);
+$listed = array_keys((array) $installReflection->getConstant('TABLES'));
+
+$notListed = array_diff(array_keys($created), $listed);
+$notCreated = array_diff($listed, array_keys($created));
+
+$check($notListed === [], 'Install::TABLES: нет таблиц ' . implode(', ', $notListed));
+$check($notCreated === [], 'Install::TABLES: таблицы без миграции ' . implode(', ', $notCreated));
 
 if ($errors !== []) {
     echo 'FAIL:' . PHP_EOL;

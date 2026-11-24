@@ -149,11 +149,21 @@ meta_description = "Статьи о сайтах простым языком: к
                         {% endif %}
                     {% else %}
                         <div class="empty">
-                            <h2>Ничего не нашлось</h2>
-                            <p>Попробуйте другой запрос или сбросьте фильтры.</p>
-                            <div class="stack-actions">
-                                <a class="btn btn--ghost" href="{{ 'blog'|page }}">Сбросить фильтры</a>
-                            </div>
+                            {% if hasFilters %}
+                                <h2>Ничего не нашлось</h2>
+                                <p>Попробуйте другой запрос или сбросьте фильтры.</p>
+                                <div class="stack-actions">
+                                    <a class="btn btn--ghost" href="{{ 'blog'|page }}">Сбросить фильтры</a>
+                                </div>
+                            {% else %}
+                                <h2>Статей пока нет</h2>
+                                <p>Опубликованные статьи появятся здесь: о сайтах для бизнеса, записи и оплате, продвижении в поиске.</p>
+                                {% if techTotal %}
+                                    <div class="stack-actions">
+                                        <a class="btn btn--ghost" href="{{ techLink }}">Технические разборы</a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
