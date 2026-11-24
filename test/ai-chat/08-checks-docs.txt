@@ -1,6 +1,6 @@
 # Проверки, доки и аудит приватности
 
-Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
+Срез: 24.11.2026. Stage 85. Коммит: `5ee9ed0`.
 
 ===== FILE: tools/chat-check.php =====
 
@@ -2364,12 +2364,15 @@ use Elv\Kit\Classes\Http\TelegramController;
 use Elv\Kit\Classes\SecurityHeaders;
 use Elv\Kit\Classes\Support;
 use Elv\Kit\Classes\Telegram;
+use Elv\Kit\Classes\TicketFiles;
 use Elv\Kit\Classes\TicketService;
 use Elv\Kit\Models\Customer;
 use Elv\Kit\Models\Settings;
 use Elv\Kit\Models\Ticket;
 use Elv\Kit\Models\TicketMessage;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -2488,6 +2491,164 @@ $emailTicket->save();
 $check($account->ticket($customer, (int) $emailTicket->id) !== null, 'ticket found by e-mail is not visible to the customer');
 $check($account->ticket($other, (int) $emailTicket->id) === null, 'ticket found by e-mail is visible to another customer');
 
+// Обращение из формы обратной связи: покупатель без входа.
+$guestEmail = 'qa-guest-' . $suffix . '@example.test';
+
+$guestTicket = $service->openGuest([
+    'email' => mb_strtoupper($guestEmail),
+    'name' => 'Гость',
+    'subject' => 'Не приходит письмо',
+    'body' => 'Оплатил заказ, письмо с архивом не пришло.',
+]);
+
+$check($guestTicket instanceof Ticket, 'guest ticket is not created');
+$guestCustomer = Customer::query()->where('email', $guestEmail)->first();
+$check($guestCustomer !== null, 'guest ticket does not create a customer for Magic Link');
+$check((int) $guestTicket->customer_id === (int) ($guestCustomer->id ?? 0), 'guest ticket is not linked to the created customer');
+$check($account->ticket($guestCustomer, (int) $guestTicket->id) !== null, 'guest ticket is not visible in the cabinet');
+$check((string) $guestTicket->email === $guestEmail, 'guest ticket e-mail is not normalized');
+$check((string) $guestTicket->source === 'feedback', 'guest ticket source is not feedback');
+$check($guestTicket->source_label === 'Форма обратной связи', 'guest ticket source label is wrong');
+$check($guestTicket->messages()->count() === 1, 'guest ticket has no first message');
+$check((string) $guestTicket->messages()->first()->author_name === 'Гость', 'guest ticket loses the author name');
+
+$linked = $service->openGuest([
+    'email' => $email,
+    'name' => 'Мария',
+    'subject' => 'Повторный вопрос',
+    'body' => 'Уточняю по тому же заказу.',
+]);
+
+$check((int) $linked->customer_id === (int) $customer->id, 'guest ticket is not linked to a known customer');
+
+// Консультант передаёт переписку оператору: история и автор «Консультант».
+$handoff = $service->handoff([
+    'email' => $email,
+    'name' => 'Мария',
+    'message' => 'Хочу уточнить по лицензии.',
+    'history' => [
+        ['role' => 'user', 'text' => 'Сколько доменов входит в тариф?'],
+        ['role' => 'bot', 'text' => 'В тарифе multi — до пяти доменов.'],
+        ['role' => 'user', 'text' => '   '],
+    ],
+]);
+
+$check((string) $handoff->source === 'chat', 'chat handoff source is not chat');
+$check((int) $handoff->customer_id === (int) $customer->id, 'chat handoff is not linked to the customer');
+$check($handoff->messages()->count() === 3, 'chat handoff keeps ' . $handoff->messages()->count() . ' messages instead of 3');
+$check(
+    $handoff->messages()->orderBy('id')->pluck('author')->all() === [Ticket::AUTHOR_CUSTOMER, Ticket::AUTHOR_BOT, Ticket::AUTHOR_CUSTOMER],
+    'chat handoff authors are wrong'
+);
+$check(str_contains((string) $handoff->subject, 'Сколько доменов'), 'chat handoff subject is not the first question');
+$check($handoff->fresh()->lastMessage !== null, 'last message accessor returns nothing');
+
+$bot = $handoff->messages()->where('author', Ticket::AUTHOR_BOT)->first();
+$check($bot !== null && $bot->author_label === 'Консультант', 'bot message has the wrong label');
+$check($bot !== null && $bot->is_bot === true, 'bot message is not flagged as bot');
+
+// Быстрые ответы оператора: «Название | Текст», мусор пропускается.
+$originalReplies = Settings::get('ticket_quick_replies');
+Settings::set('ticket_quick_replies', "Приветствие | Здравствуйте! Уже смотрим вопрос.\nБез разделителя\nСсылка | Гайд: /docs/\n");
+
+$replies = TicketService::quickReplies();
+$check(count($replies) === 2, 'quick replies parser returns ' . count($replies) . ' items instead of 2');
+$check(($replies[0]['title'] ?? '') === 'Приветствие', 'quick reply title is wrong');
+$check(($replies[1]['body'] ?? '') === 'Гайд: /docs/', 'quick reply body is wrong');
+
+Settings::set('ticket_quick_replies', (string) $originalReplies);
+
+// Вложения: белый список, случайное имя на диске, ссылка через маршрут.
+$originalAttachments = Settings::get('ticket_attachments_enabled');
+Settings::set('ticket_attachments_enabled', true);
+
+$check(TicketFiles::enabled() === true, 'attachments are not enabled by settings');
+
+Settings::set('ticket_attachments_enabled', '');
+$check(TicketFiles::enabled() === true, 'empty attachment setting must default to enabled');
+Settings::set('ticket_attachments_enabled', true);
+$check(TicketFiles::MAX_FILES === 3, 'attachment limit is not 3 files');
+$check(TicketFiles::sizeLabel(2048) === '2 КБ', 'size label for 2 KB is wrong: ' . TicketFiles::sizeLabel(2048));
+$check(TicketFiles::sizeLabel(1572864) === '1.5 МБ', 'size label for 1.5 MB is wrong: ' . TicketFiles::sizeLabel(1572864));
+
+$fileRules = TicketFiles::rules();
+$check(($fileRules['attachments'] ?? '') === 'array|max:3', 'attachment count rule is wrong');
+$check(str_contains((string) ($fileRules['attachments.*'] ?? ''), 'mimes:'), 'attachment type rule is missing');
+
+$files = new TicketFiles();
+$upload = UploadedFile::fake()->createWithContent('Скриншот ошибки.txt', str_repeat('a', 4096));
+$stored = $files->store($guestTicket, [$upload]);
+
+$check(count($stored) === 1, 'attachment is not stored');
+$check(isset($stored[0]['file']) && preg_match('/^[A-Za-z0-9]{32}\.txt$/', (string) $stored[0]['file']) === 1, 'stored attachment name is not random');
+$check(($stored[0]['name'] ?? '') === 'Скриншот ошибки.txt', 'attachment does not keep the original name');
+$check(($stored[0]['size'] ?? 0) === 4096, 'attachment size is not saved');
+$check($files->path((int) $guestTicket->id, (string) $stored[0]['file']) !== null, 'stored attachment is not found on disk');
+$check($files->path((int) $guestTicket->id, '../../evil.txt') === null, 'attachment path traversal is not blocked');
+
+$guestTicket->messages()->first()->forceFill(['attachments' => $stored])->save();
+$firstMessage = $guestTicket->fresh()->messages()->first();
+
+$check(count($firstMessage->files) === 1, 'attachment metadata is not exposed to templates');
+$check(str_contains((string) $firstMessage->files[0]['url'], '/tickets/' . $guestTicket->id . '/file/'), 'attachment url is not a guarded route');
+$check(($firstMessage->files[0]['size_label'] ?? '') === '4 КБ', 'attachment size label is wrong: ' . ($firstMessage->files[0]['size_label'] ?? ''));
+
+$rejected = $files->store($guestTicket, [UploadedFile::fake()->create('script.php', 1, 'text/x-php')]);
+$check($rejected === [], 'attachment whitelist accepts php');
+
+$mismatch = UploadedFile::fake()
+    ->createWithContent('payload.txt', '<script>alert(1)</script>')
+    ->mimeType('text/html');
+$check($files->store($guestTicket, [$mismatch]) === [], 'attachment MIME whitelist accepts text/html in a txt file');
+
+Settings::set('ticket_attachments_enabled', false);
+$check(TicketFiles::enabled() === false, 'attachments stay enabled after disabling');
+$check($files->store($guestTicket, [UploadedFile::fake()->create('ok.txt', 1, 'text/plain')]) === [], 'disabled attachments are still stored');
+
+Settings::set('ticket_attachments_enabled', (string) $originalAttachments);
+
+// Автозакрытие: только «ждём ответа», где последнее слово не за покупателем.
+DB::beginTransaction();
+
+try {
+    $stale = $service->open($customer, [
+        'subject' => 'Давно ждёт ответа',
+        'body' => 'Подскажите, пожалуйста, по установке.',
+    ]);
+    $service->supportReply($stale, 'Ответили и ждём подтверждения.', 'Иван');
+    Ticket::query()->whereKey($stale->id)->update(['updated_at' => now()->subDays(10)]);
+
+    $active = $service->open($customer, [
+        'subject' => 'Последнее слово за покупателем',
+        'body' => 'Уточняю детали перед ответом.',
+    ]);
+    $service->supportReply($active, 'Ответ поддержки.', 'Иван');
+    $service->customerReply($active->fresh(), 'Спасибо, проверю.', $customer->display_name);
+    Ticket::query()->whereKey($active->id)->update(['updated_at' => now()->subDays(10)]);
+
+    $check((new TicketService())->autocloseCount(5) >= 1, 'autoclose does not see the stale ticket');
+    $check((new TicketService())->autoclose(5) >= 1, 'autoclose closed nothing');
+    $check((string) $stale->fresh()->status === Ticket::STATUS_CLOSED, 'autoclose does not close a waiting ticket');
+    $check((string) $active->fresh()->status === Ticket::STATUS_OPEN, 'autoclose closes a ticket where the customer spoke last');
+    $check((new TicketService())->autoclose(0) === 0, 'autoclose with zero days closes tickets');
+}
+finally {
+    DB::rollBack();
+}
+
+// Маршруты поддержки: передача из чата, polling и скачивание вложения.
+$check(Route::has('elv.kit.chat.handoff'), 'chat handoff route is missing');
+$check(Route::has('elv.kit.ticket.thread'), 'ticket thread route is missing');
+$check(Route::has('elv.kit.ticket.file'), 'ticket file route is missing');
+
+$threadRoute = Route::getRoutes()->getByName('elv.kit.ticket.thread');
+$check($threadRoute !== null && str_contains($threadRoute->uri(), '{id}/thread'), 'thread route uri is wrong');
+
+$fileRoute = Route::getRoutes()->getByName('elv.kit.ticket.file');
+$check($fileRoute !== null && str_contains($fileRoute->uri(), '{id}/file/{name}'), 'file route uri is wrong');
+$check($fileRoute !== null && in_array('GET', $fileRoute->methods(), true), 'file route does not answer GET');
+
+
 $check(View::exists('elv.kit::mail.ticket-admin'), 'ticket admin mail view is missing');
 $check(View::exists('elv.kit::mail.ticket-customer'), 'ticket customer mail view is missing');
 
@@ -2578,10 +2739,24 @@ Settings::set('telegram_bot_token', (string) $originalToken);
 Settings::set('telegram_chat_id', (string) $originalChat);
 Settings::set('telegram_webhook_secret', (string) $originalSecret);
 
-$ticketIds = Ticket::query()->whereIn('email', [$email, $otherEmail])->pluck('id')->all();
+$ticketIds = Ticket::query()->whereIn('email', [$email, $otherEmail, $guestEmail])->pluck('id')->all();
 TicketMessage::query()->whereIn('ticket_id', $ticketIds)->delete();
 Ticket::query()->whereIn('id', $ticketIds)->delete();
-Customer::query()->whereIn('email', [$email, $otherEmail])->delete();
+Customer::query()->whereIn('email', [$email, $otherEmail, $guestEmail])->delete();
+
+foreach ($ticketIds as $ticketId) {
+    $dir = storage_path('app/elv-kit/tickets/' . (int) $ticketId);
+
+    if (!is_dir($dir)) {
+        continue;
+    }
+
+    foreach ((array) glob($dir . '/*') as $path) {
+        @unlink($path);
+    }
+
+    @rmdir($dir);
+}
 
 if ($errors !== []) {
     fwrite(STDERR, "tickets checks failed:\n- " . implode("\n- ", $errors) . "\n");

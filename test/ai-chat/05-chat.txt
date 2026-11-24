@@ -1,6 +1,6 @@
 # Консультант: ответы, фильтр, контроллер и виджет
 
-Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
+Срез: 24.11.2026. Stage 85. Коммит: `5ee9ed0`.
 
 ===== FILE: plugins/elv/kit/classes/Chat.php =====
 
@@ -336,7 +336,7 @@ class Chat
             'Не понял запрос. Напишите, что нужно: тарифы, установка, оплата, разделы сайта или ключи.',
             ['Сколько стоит?', 'Что входит в Kit?', 'Как установить?', 'Какие разделы есть?'],
             null,
-            'feedback',
+            null,
             [],
             true
         );
@@ -428,7 +428,7 @@ class Chat
         }
 
         return mb_strlen($word) >= 5
-            && !preg_match('/(а|я|о|е|ы|и|у|ю|ь|ый|ий|ая|ое|ие|ые|ость|ция|инг|изм|ист|ник|тель|ть|ться|ить|ать|ять|еть|ия)$/u', $word);
+            && !preg_match('/(а|я|о|е|ы|и|у|ю|ь|ый|ий|ая|ое|ие|ые|ость|ция|инг|изм|ист|ник|тель|ть|ться|ить|ать|ять|еть|ия|ил|ал|ел|ул|ол|ов|ев|ей)$/u', $word);
     }
 
     /**
@@ -661,7 +661,7 @@ class Chat
 
         if ($services === '') {
             return static::reply(
-                'Список услуг на сайте не заполнен. Напишите в форме обратной связи — ответим и подскажем, что подойдёт.',
+                'Подробно об услугах и условиях работы расскажем по запросу — напишите нам через форму обратной связи.',
                 ['Сколько стоит?', 'Написать нам']
             );
         }
@@ -868,8 +868,10 @@ class TextFilter
 
 <?php namespace Elv\Kit\Classes\Http;
 
+use Elv\Kit\Classes\AccountService;
 use Elv\Kit\Classes\AntiSpam;
 use Elv\Kit\Classes\Chat;
+use Elv\Kit\Classes\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\RateLimiter;
@@ -880,9 +882,17 @@ use Illuminate\Support\Facades\Validator;
  *
  * Внешних API нет: ответ собирается из каталога и настроек, поэтому работает
  * и на демо-контуре без ключей. Лимит запросов задан в routes.php.
+ *
+ * Переписка хранится в сессии: кнопка «Передать оператору» отправляет её в
+ * поддержку вместе с контактами, поэтому покупателю не нужно пересказывать
+ * вопрос заново. История обрезается до последних сообщений и живёт до отправки
+ * обращения.
  */
 class ChatController extends Controller
 {
+    public const HISTORY_KEY = 'elv_chat_history';
+    public const HISTORY_LIMIT = 30;
+
     public function store(Request $request)
     {
         if (AntiSpam::isBot($request)) {
@@ -925,9 +935,94 @@ class ChatController extends Controller
 
         RateLimiter::hit($key, 60);
 
-        $result = Chat::answer((string) $request->input('message'));
+        $message = (string) $request->input('message');
+        $result = Chat::answer($message);
+
+        // Отклонённые реплики (бессмыслица, грубость) в историю не попадают:
+        // оператору нужен диалог по делу, а не мусор.
+        if (empty($result['rejected']) && empty($result['hide_user'])) {
+            $this->remember('user', $message);
+            $this->remember('bot', (string) ($result['answer'] ?? ''));
+        }
 
         return AntiSpam::json(['ok' => true] + $result);
+    }
+
+    /**
+     * handoff создаёт обращение из переписки Консультанта.
+     *
+     * Ответы бота сохраняются отдельным автором: поддержка видит, что уже
+     * сказал консультант. После отправки история очищается, чтобы следующее
+     * обращение не приносило старые сообщения.
+     */
+    public function handoff(Request $request)
+    {
+        if (AntiSpam::isBot($request)) {
+            return AntiSpam::json(['ok' => true, 'number' => '', 'url' => null]);
+        }
+
+        $key = 'elv-handoff:' . $request->session()->getId();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'RATE_LIMIT',
+                'message' => 'Слишком много попыток. Подождите несколько минут.',
+            ], 429)->header('Retry-After', (string) RateLimiter::availableIn($key));
+        }
+
+        RateLimiter::hit($key, 600);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:160',
+            'email' => 'required|email|max:191',
+            'message' => 'nullable|string|max:2000',
+            'consent' => 'accepted',
+        ], [
+            'name.required' => 'Укажите имя.',
+            'email.required' => 'Укажите e-mail для ответа.',
+            'email.email' => 'Проверьте адрес электронной почты.',
+            'consent.accepted' => 'Нужно согласие на обработку персональных данных.',
+        ]);
+
+        if ($validator->fails()) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'VALIDATION',
+                'errors' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        $ticket = (new TicketService())->handoff([
+            'email' => (string) $request->input('email'),
+            'name' => AntiSpam::clean((string) $request->input('name'), 160),
+            'message' => AntiSpam::clean((string) $request->input('message', ''), 2000),
+            'history' => (array) $request->session()->get(self::HISTORY_KEY, []),
+        ]);
+
+        $request->session()->forget(self::HISTORY_KEY);
+
+        $customer = (new AccountService())->user();
+
+        return AntiSpam::json([
+            'ok' => true,
+            'number' => (string) $ticket->number,
+            'url' => $customer ? (string) $ticket->url : null,
+        ]);
+    }
+
+    protected function remember(string $role, string $text): void
+    {
+        $text = trim($text);
+
+        if ($text === '') {
+            return;
+        }
+
+        $history = (array) session()->get(self::HISTORY_KEY, []);
+        $history[] = ['role' => $role === 'bot' ? 'bot' : 'user', 'text' => mb_substr($text, 0, 2000)];
+
+        session()->put(self::HISTORY_KEY, array_slice($history, -self::HISTORY_LIMIT));
     }
 }
 
@@ -1244,6 +1339,152 @@ class ChatController extends Controller
             chatForm.addEventListener('submit', function (event) {
                 event.preventDefault();
                 ask(chatInput ? chatInput.value : '');
+            });
+        }
+
+        var handoff = chat.querySelector('[data-chat-handoff]');
+        var handoffForm = chat.querySelector('[data-chat-handoff-form]');
+        var handoffStatus = chat.querySelector('[data-chat-handoff-status]');
+        var handoffOpen = chat.querySelector('[data-chat-handoff-open]');
+        var handoffCancel = chat.querySelector('[data-chat-handoff-close]');
+        var handoffBusy = false;
+
+        var setHandoff = function (open) {
+            if (!handoff) {
+                return;
+            }
+
+            handoff.hidden = !open;
+
+            if (open) {
+                if (chatSuggest) {
+                    chatSuggest.hidden = true;
+                }
+
+                var first = doc.getElementById('elv-handoff-name');
+                if (first) {
+                    first.focus();
+                }
+            }
+        };
+
+        var fieldValue = function (name) {
+            var field = handoffForm ? handoffForm.querySelector('[name="' + name + '"]') : null;
+
+            return field ? field.value : '';
+        };
+
+        var firstError = function (data) {
+            var errors = (data && data.errors) || {};
+
+            for (var key in errors) {
+                if (Object.prototype.hasOwnProperty.call(errors, key) && errors[key] && errors[key].length) {
+                    return String(errors[key][0]);
+                }
+            }
+
+            return '';
+        };
+
+        if (handoffOpen) {
+            handoffOpen.addEventListener('click', function () {
+                showError('');
+                setHandoff(true);
+            });
+        }
+
+        if (handoffCancel) {
+            handoffCancel.addEventListener('click', function () {
+                setHandoff(false);
+            });
+        }
+
+        if (handoffForm) {
+            handoffForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                if (handoffBusy) {
+                    return;
+                }
+
+                var consent = handoffForm.querySelector('[name="consent"]');
+                var submit = handoffForm.querySelector('button[type="submit"]');
+
+                handoffBusy = true;
+                if (submit) {
+                    submit.disabled = true;
+                }
+                if (handoffStatus) {
+                    handoffStatus.hidden = true;
+                    handoffStatus.textContent = '';
+                }
+
+                fetch('/chat/handoff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrf()
+                    },
+                    body: JSON.stringify({
+                        name: fieldValue('name'),
+                        email: fieldValue('email'),
+                        message: fieldValue('message'),
+                        consent: consent && consent.checked ? 1 : 0
+                    })
+                })
+                    .then(function (response) {
+                        return response.json().catch(function () {
+                            return { ok: false };
+                        }).then(function (data) {
+                            return { status: response.status, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        if (result.status === 200 && result.data && result.data.ok) {
+                            handoffForm.hidden = true;
+
+                            if (handoffStatus) {
+                                handoffStatus.textContent = result.data.number
+                                    ? 'Обращение ' + result.data.number + ' создано. Ответ придёт на e-mail.'
+                                    : 'Обращение создано. Ответ придёт на e-mail.';
+
+                                if (result.data.url) {
+                                    var link = doc.createElement('a');
+                                    link.className = 'elv-chat__link';
+                                    link.href = result.data.url;
+                                    link.textContent = 'Открыть обращение в кабинете';
+                                    handoffStatus.appendChild(doc.createElement('br'));
+                                    handoffStatus.appendChild(link);
+                                }
+
+                                handoffStatus.hidden = false;
+                            }
+
+                            return;
+                        }
+
+                        var text = 'Не удалось отправить обращение. Напишите через форму обратной связи.';
+
+                        if (result.status === 422) {
+                            text = firstError(result.data) || 'Проверьте имя, e-mail и согласие.';
+                        }
+                        else if (result.status === 429) {
+                            text = (result.data && result.data.message) || 'Слишком много попыток. Подождите несколько минут.';
+                        }
+
+                        showError(text);
+                    })
+                    .catch(function () {
+                        showError('Сеть недоступна. Попробуйте ещё раз.');
+                    })
+                    .then(function () {
+                        handoffBusy = false;
+                        if (submit) {
+                            submit.disabled = false;
+                        }
+                    });
             });
         }
 

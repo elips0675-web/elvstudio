@@ -1,6 +1,43 @@
-# Поддержка: обращения, SLA и Telegram ChatOps
+# Поддержка: обращения, SLA, вложения, polling и Telegram ChatOps
 
-Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
+Срез: 24.11.2026. Stage 85. Коммит: `5ee9ed0`.
+
+===== FILE: plugins/elv/kit/updates/add_ticket_support_tools.php =====
+
+<?php
+
+use October\Rain\Database\Schema\Blueprint;
+use October\Rain\Database\Updates\Migration;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Поддержка: вложения в переписке обращений.
+ *
+ * `attachments` — JSON-список файлов сообщения: имя, размер, расширение и
+ * случайное имя на диске. Сами файлы лежат в `storage/app/elv-kit/tickets/`,
+ * вне публичной папки, поэтому прямой ссылки на них нет: скачивание идёт
+ * через `/tickets/{id}/file/{name}` с проверкой прав.
+ */
+return new class extends Migration
+{
+    public function up()
+    {
+        if (Schema::hasTable('elv_kit_ticket_messages') && !Schema::hasColumn('elv_kit_ticket_messages', 'attachments')) {
+            Schema::table('elv_kit_ticket_messages', function (Blueprint $table) {
+                $table->text('attachments')->nullable();
+            });
+        }
+    }
+
+    public function down()
+    {
+        if (Schema::hasTable('elv_kit_ticket_messages') && Schema::hasColumn('elv_kit_ticket_messages', 'attachments')) {
+            Schema::table('elv_kit_ticket_messages', function (Blueprint $table) {
+                $table->dropColumn('attachments');
+            });
+        }
+    }
+};
 
 ===== FILE: plugins/elv/kit/classes/Support.php =====
 
@@ -172,41 +209,137 @@ use Illuminate\Support\Facades\Mail;
  *
  * Обращение сначала сохраняется, потом ставятся письма и Telegram: если
  * внешний канал лежит, история остаётся в базе и видна в кабинете и админке.
+ *
+ * Три входа в поддержку дают одно обращение: кабинет, форма обратной связи и
+ * кнопка «Передать оператору» в Консультанте. У формы и чата покупатель может
+ * быть без входа — клиент создаётся по e-mail, чтобы обращение было видно в
+ * кабинете после входа по Magic Link.
  */
 class TicketService
 {
     /**
-     * open — новое обращение покупателя с первым сообщением.
+     * open — обращение из кабинета: покупатель уже известен.
      *
-     * @param  array{subject: string, body: string, order_id?: int|null}  $data
+     * @param  array{subject: string, body: string, order_id?: int|null, attachments?: array<int, array<string, mixed>>}  $data
      */
     public function open(Customer $customer, array $data): Ticket
     {
-        $ticket = new Ticket();
-        $ticket->fill([
+        return $this->create([
             'customer_id' => (int) $customer->id,
             'email' => (string) $customer->email,
-            'order_id' => !empty($data['order_id']) ? (int) $data['order_id'] : null,
+            'name' => (string) $customer->display_name,
             'subject' => (string) $data['subject'],
-            'status' => Ticket::STATUS_NEW,
-            'priority' => Ticket::PRIORITY_NORMAL,
-            'source' => 'account',
+            'body' => (string) $data['body'],
+            'order_id' => !empty($data['order_id']) ? (int) $data['order_id'] : null,
+            'source' => (string) ($data['source'] ?? 'account'),
+            'attachments' => (array) ($data['attachments'] ?? []),
         ]);
-        $ticket->save();
+    }
 
-        $this->addMessage($ticket, Ticket::AUTHOR_CUSTOMER, (string) $data['body'], $customer->display_name);
-        $this->notifyAdmin($ticket);
-        Telegram::notifyNew($ticket);
+    /**
+     * openGuest — обращение из формы обратной связи без входа.
+     *
+     * Клиент создаётся или находится по e-mail: покупатель входит по Magic Link
+     * на тот же адрес и видит обращение в кабинете. Существующая карточка не
+     * перезаписывается, пустое имя заполняется из формы.
+     *
+     * @param  array{email: string, name?: string, subject?: string, body: string, order_id?: int|null, attachments?: array<int, array<string, mixed>>}  $data
+     */
+    public function openGuest(array $data): Ticket
+    {
+        $email = mb_strtolower(trim((string) $data['email']));
+        $name = trim((string) ($data['name'] ?? ''));
 
-        return $ticket->fresh();
+        // Обращение с формы должно быть видно в кабинете: покупатель входит по
+        // Magic Link на этот же e-mail. Поэтому клиент создаётся, а не только
+        // ищется; существующая карточка не перезаписывается.
+        $customer = Customer::query()->firstOrCreate(['email' => $email], ['name' => $name]);
+
+        if ($name !== '' && trim((string) $customer->name) === '') {
+            $customer->forceFill(['name' => $name])->save();
+        }
+
+        return $this->create([
+            'customer_id' => (int) $customer->id,
+            'email' => $email,
+            'name' => $name,
+            'subject' => (string) ($data['subject'] ?? ''),
+            'body' => (string) $data['body'],
+            'order_id' => !empty($data['order_id']) ? (int) $data['order_id'] : null,
+            'source' => 'feedback',
+            'attachments' => (array) ($data['attachments'] ?? []),
+        ]);
+    }
+
+    /**
+     * handoff — обращение из Консультанта с историей переписки.
+     *
+     * История приходит списком `role` (`user`/`bot`) и `text`: ответы бота
+     * сохраняются отдельным автором, чтобы поддержка видела, что уже сказал
+     * консультант, и не отвечала то же самое.
+     *
+     * @param  array{email: string, name?: string, message?: string, history?: array<int, array{role?: string, text?: string}>}  $data
+     */
+    public function handoff(array $data): Ticket
+    {
+        $history = [];
+
+        foreach (array_slice((array) ($data['history'] ?? []), -30) as $item) {
+            $text = trim((string) (is_array($item) ? ($item['text'] ?? '') : ''));
+            $role = (string) (is_array($item) ? ($item['role'] ?? 'user') : 'user');
+
+            if ($text === '') {
+                continue;
+            }
+
+            $history[] = [
+                'author' => $role === 'bot' ? Ticket::AUTHOR_BOT : Ticket::AUTHOR_CUSTOMER,
+                'body' => mb_substr($text, 0, 2000),
+            ];
+        }
+
+        $message = trim((string) ($data['message'] ?? ''));
+
+        if ($message !== '') {
+            $history[] = ['author' => Ticket::AUTHOR_CUSTOMER, 'body' => mb_substr($message, 0, 2000)];
+        }
+
+        $first = '';
+
+        foreach ($history as $item) {
+            if ($item['author'] === Ticket::AUTHOR_CUSTOMER) {
+                $first = $item['body'];
+                break;
+            }
+        }
+
+        $email = mb_strtolower(trim((string) $data['email']));
+        $name = trim((string) ($data['name'] ?? ''));
+        $customer = Customer::query()->firstOrCreate(['email' => $email], ['name' => $name]);
+
+        if ($name !== '' && trim((string) $customer->name) === '') {
+            $customer->forceFill(['name' => $name])->save();
+        }
+
+        return $this->create([
+            'customer_id' => (int) $customer->id,
+            'email' => $email,
+            'name' => $name,
+            'subject' => mb_substr($first !== '' ? $first : 'Вопрос из Консультанта', 0, 120),
+            'body' => '',
+            'history' => $history,
+            'source' => 'chat',
+        ]);
     }
 
     /**
      * customerReply — сообщение покупателя в существующем обращении.
+     *
+     * @param  array<int, array<string, mixed>>  $attachments
      */
-    public function customerReply(Ticket $ticket, string $body, string $name = ''): TicketMessage
+    public function customerReply(Ticket $ticket, string $body, string $name = '', array $attachments = []): TicketMessage
     {
-        $message = $this->addMessage($ticket, Ticket::AUTHOR_CUSTOMER, $body, $name);
+        $message = $this->addMessage($ticket, Ticket::AUTHOR_CUSTOMER, $body, $name, $attachments);
 
         $ticket->status = Ticket::STATUS_OPEN;
         $ticket->closed_at = null;
@@ -241,7 +374,7 @@ class TicketService
     /**
      * close — обращение закрыто, в истории остаётся служебная запись.
      */
-    public function close(Ticket $ticket, string $authorName = 'Поддержка'): void
+    public function close(Ticket $ticket, string $authorName = 'Поддержка', string $note = 'Обращение закрыто.'): void
     {
         if ($ticket->is_closed) {
             return;
@@ -251,17 +384,174 @@ class TicketService
         $ticket->closed_at = now();
         $ticket->save();
 
-        $this->addMessage($ticket, Ticket::AUTHOR_SYSTEM, 'Обращение закрыто.', $authorName);
+        $this->addMessage($ticket, Ticket::AUTHOR_SYSTEM, $note, $authorName);
     }
 
-    protected function addMessage(Ticket $ticket, string $author, string $body, string $name = ''): TicketMessage
+    /**
+     * autoclose — закрывает обращения, где покупатель молчит после ответа.
+     *
+     * Считаются только обращения в статусе «Ждём ответа»: если последнее
+     * сообщение написал покупатель, обращение в работе и закрывать его нельзя.
+     */
+    public function autoclose(int $days): int
     {
-        $body = trim($body);
+        if ($days <= 0) {
+            return 0;
+        }
 
+        $closed = 0;
+        $threshold = now()->subDays($days);
+
+        Ticket::query()
+            ->where('status', Ticket::STATUS_WAITING)
+            ->where('updated_at', '<=', $threshold)
+            ->with('messages')
+            ->chunkById(100, function ($tickets) use (&$closed, $days) {
+                foreach ($tickets as $ticket) {
+                    $last = $ticket->messages->last();
+
+                    if ($last && (string) $last->author === Ticket::AUTHOR_CUSTOMER) {
+                        continue;
+                    }
+
+                    $this->close(
+                        $ticket,
+                        'Автозакрытие',
+                        'Обращение закрыто автоматически: нет ответа покупателя ' . $days . ' дн.'
+                    );
+
+                    $closed++;
+                }
+            });
+
+        return $closed;
+    }
+
+    /**
+     * autocloseCount — сколько обращений попадёт под автозакрытие.
+     */
+    public function autocloseCount(int $days): int
+    {
+        if ($days <= 0) {
+            return 0;
+        }
+
+        $count = 0;
+
+        Ticket::query()
+            ->where('status', Ticket::STATUS_WAITING)
+            ->where('updated_at', '<=', now()->subDays($days))
+            ->with('messages')
+            ->chunkById(100, function ($tickets) use (&$count) {
+                foreach ($tickets as $ticket) {
+                    $last = $ticket->messages->last();
+
+                    if ($last && (string) $last->author === Ticket::AUTHOR_CUSTOMER) {
+                        continue;
+                    }
+
+                    $count++;
+                }
+            });
+
+        return $count;
+    }
+
+    /**
+     * quickReplies — шаблоны ответов оператора из настроек.
+     *
+     * Формат строки — «Название | Текст». Пустая настройка означает, что
+     * шаблонов нет: кнопки в админке не показываются.
+     *
+     * @return array<int, array{title: string, body: string}>
+     */
+    public static function quickReplies(): array
+    {
+        $raw = (string) Settings::get('ticket_quick_replies', '');
+        $items = [];
+
+        foreach (preg_split('/\r\n|\r|\n/', $raw) ?: [] as $line) {
+            $line = trim($line);
+
+            if ($line === '' || !str_contains($line, '|')) {
+                continue;
+            }
+
+            [$title, $body] = array_map('trim', explode('|', $line, 2));
+
+            if ($title === '' || $body === '') {
+                continue;
+            }
+
+            $items[] = [
+                'title' => mb_substr($title, 0, 60),
+                'body' => mb_substr($body, 0, 2000),
+            ];
+        }
+
+        return array_slice($items, 0, 12);
+    }
+
+    /**
+     * create — общая запись обращения и первого сообщения.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function create(array $data): Ticket
+    {
+        $email = mb_strtolower(trim((string) ($data['email'] ?? '')));
+        $name = trim((string) ($data['name'] ?? ''));
+
+        $ticket = new Ticket();
+        $ticket->fill([
+            'customer_id' => !empty($data['customer_id']) ? (int) $data['customer_id'] : null,
+            'email' => $email,
+            'order_id' => !empty($data['order_id']) ? (int) $data['order_id'] : null,
+            'subject' => mb_substr(trim((string) ($data['subject'] ?? '')), 0, 200),
+            'status' => Ticket::STATUS_NEW,
+            'priority' => Ticket::PRIORITY_NORMAL,
+            'source' => (string) ($data['source'] ?? 'account'),
+        ]);
+        $ticket->save();
+
+        $history = (array) ($data['history'] ?? []);
+
+        if ($history === []) {
+            $this->addMessage(
+                $ticket,
+                Ticket::AUTHOR_CUSTOMER,
+                (string) ($data['body'] ?? ''),
+                $name,
+                (array) ($data['attachments'] ?? [])
+            );
+        }
+        else {
+            foreach ($history as $item) {
+                $this->addMessage(
+                    $ticket,
+                    (string) ($item['author'] ?? Ticket::AUTHOR_CUSTOMER),
+                    (string) ($item['body'] ?? ''),
+                    (string) ($item['author'] ?? '') === Ticket::AUTHOR_BOT ? 'Консультант' : $name
+                );
+            }
+        }
+
+        $this->notifyAdmin($ticket);
+        Telegram::notifyNew($ticket);
+
+        return $ticket->fresh();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $attachments
+     */
+    protected function addMessage(Ticket $ticket, string $author, string $body, string $name = '', array $attachments = []): TicketMessage
+    {
         return $ticket->messages()->create([
             'author' => $author,
             'author_name' => mb_substr($name, 0, 160),
-            'body' => $body,
+            'body' => trim($body),
+            'attachments' => $attachments !== [] ? array_values($attachments) : null,
         ]);
     }
 
@@ -301,6 +591,198 @@ class TicketService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/TicketFiles.php =====
+
+<?php namespace Elv\Kit\Classes;
+
+use Elv\Kit\Models\Settings;
+use Elv\Kit\Models\Ticket;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
+
+/**
+ * TicketFiles — вложения обращений: белый список, хранение и выдача.
+ *
+ * Файлы лежат в `storage/app/elv-kit/tickets/{id}/`, вне `public/`: прямой
+ * ссылки у них нет, скачивание идёт через маршрут с проверкой прав. Имя на
+ * диске случайное, исходное имя хранится только в метаданных, поэтому путь
+ * нельзя подделать через параметры запроса.
+ */
+class TicketFiles
+{
+    public const MAX_FILES = 3;
+    public const MAX_KB = 5120;
+
+    /** @var string[] */
+    public const ALLOWED = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'txt', 'log', 'csv', 'zip'];
+
+    /** @var string[] */
+    public const ALLOWED_MIME = [
+        'image/png', 'image/jpeg', 'image/webp', 'image/gif',
+        'application/pdf', 'text/plain', 'text/csv', 'application/csv',
+        'application/zip', 'application/x-zip-compressed',
+        'application/octet-stream',
+    ];
+
+    public static function enabled(): bool
+    {
+        $value = Settings::get('ticket_attachments_enabled');
+
+        // Пустое значение — это ещё не сохранённая настройка, а не «выключено»:
+        // поле включено по умолчанию, поэтому пусто и null читаем как true.
+        return $value === '' || $value === null ? true : (bool) $value;
+    }
+
+    /**
+     * rules — правила валидации загрузки для формы обращения.
+     *
+     * @return array<string, string>
+     */
+    public static function rules(): array
+    {
+        $mimes = implode(',', self::ALLOWED);
+
+        return [
+            'attachments' => 'array|max:' . self::MAX_FILES,
+            'attachments.*' => 'file|max:' . self::MAX_KB . '|mimes:' . $mimes,
+        ];
+    }
+
+    /**
+     * messages — человеческие тексты ошибок загрузки.
+     *
+     * @return array<string, string>
+     */
+    public static function messages(): array
+    {
+        return [
+            'attachments.max' => 'К обращению можно приложить не больше ' . self::MAX_FILES . ' файлов.',
+            'attachments.*.file' => 'Файл не загрузился. Попробуйте ещё раз.',
+            'attachments.*.max' => 'Файл больше ' . (self::MAX_KB / 1024) . ' МБ.',
+            'attachments.*.mimes' => 'Такой тип файла не принимается: ' . implode(', ', self::ALLOWED) . '.',
+        ];
+    }
+
+    /**
+     * store — сохраняет загруженные файлы и возвращает метаданные для БД.
+     *
+     * @param  array<int, UploadedFile>  $files
+     * @return array<int, array{name: string, size: int, ext: string, file: string}>
+     */
+    public function store(Ticket $ticket, array $files): array
+    {
+        if (!self::enabled() || $files === []) {
+            return [];
+        }
+
+        $dir = $this->directory((int) $ticket->id);
+
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            return [];
+        }
+
+        $saved = [];
+
+        foreach (array_slice($files, 0, self::MAX_FILES) as $file) {
+            if (!$file instanceof UploadedFile || !$file->isValid()) {
+                continue;
+            }
+
+            $ext = mb_strtolower((string) $file->getClientOriginalExtension());
+            $mime = mb_strtolower((string) $file->getMimeType());
+
+            if (
+                !in_array($ext, self::ALLOWED, true)
+                || !in_array($mime, self::ALLOWED_MIME, true)
+                || $file->getSize() > self::MAX_KB * 1024
+            ) {
+                continue;
+            }
+
+            $stored = Str::random(32) . '.' . $ext;
+            $name = $this->cleanName((string) $file->getClientOriginalName(), $ext);
+            $size = (int) $file->getSize();
+
+            if (!$file->move($dir, $stored)) {
+                continue;
+            }
+
+            $saved[] = [
+                'name' => $name,
+                'size' => $size,
+                'ext' => $ext,
+                'file' => $stored,
+            ];
+        }
+
+        return $saved;
+    }
+
+    /**
+     * path — полный путь к файлу по имени из метаданных.
+     */
+    public function path(int $ticketId, string $stored): ?string
+    {
+        $stored = basename($stored);
+
+        if (!preg_match('/^[A-Za-z0-9]{32}\.[a-z0-9]{2,5}$/', $stored)) {
+            return null;
+        }
+
+        $path = $this->directory($ticketId) . DIRECTORY_SEPARATOR . $stored;
+
+        return is_file($path) ? $path : null;
+    }
+
+    /**
+     * find — метаданные вложения по имени файла на диске.
+     *
+     * @param  array<int, array<string, mixed>>  $attachments
+     * @return array<string, mixed>|null
+     */
+    public static function find(array $attachments, string $stored): ?array
+    {
+        foreach ($attachments as $item) {
+            if (is_array($item) && (string) ($item['file'] ?? '') === $stored) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public static function sizeLabel(int $bytes): string
+    {
+        if ($bytes >= 1024 * 1024) {
+            return round($bytes / 1024 / 1024, 1) . ' МБ';
+        }
+
+        if ($bytes >= 1024) {
+            return round($bytes / 1024) . ' КБ';
+        }
+
+        return $bytes . ' Б';
+    }
+
+    protected function directory(int $ticketId): string
+    {
+        return storage_path('app/elv-kit/tickets/' . $ticketId);
+    }
+
+    protected function cleanName(string $name, string $ext): string
+    {
+        $name = basename($name);
+        $name = preg_replace('/[^\p{L}\p{N}._ -]+/u', '_', $name) ?: 'file.' . $ext;
+        $name = trim($name);
+
+        if ($name === '' || $name === '.' . $ext) {
+            $name = 'file.' . $ext;
+        }
+
+        return mb_substr($name, 0, 120);
     }
 }
 
@@ -448,7 +930,10 @@ class Telegram
 
 use Elv\Kit\Classes\AccountService;
 use Elv\Kit\Classes\AntiSpam;
+use Elv\Kit\Classes\TicketFiles;
 use Elv\Kit\Classes\TicketService;
+use Elv\Kit\Models\Ticket;
+use Elv\Kit\Models\TicketMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -484,18 +969,18 @@ class TicketController
             return $this->created($request, null);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), array_merge([
             'subject' => 'required|string|min:5|max:200',
             'body' => 'required|string|min:10|max:5000',
             'order_id' => 'nullable|integer|min:1',
             'consent' => 'accepted',
-        ], [
+        ], TicketFiles::enabled() ? TicketFiles::rules() : []), array_merge([
             'subject.required' => 'Укажите тему обращения.',
             'subject.min' => 'Тема слишком короткая.',
             'body.required' => 'Опишите вопрос.',
             'body.min' => 'Опишите вопрос подробнее — минимум 10 символов.',
             'consent.accepted' => 'Нужно согласие на обработку персональных данных.',
-        ]);
+        ], TicketFiles::messages()));
 
         if ($validator->fails()) {
             return $this->invalid($request, $validator->errors()->toArray());
@@ -517,6 +1002,8 @@ class TicketController
             'body' => AntiSpam::clean((string) $request->input('body'), 5000),
             'order_id' => $order ? (int) $order->id : null,
         ]);
+
+        $this->attachFiles($ticket, $request, $ticket->messages()->first());
 
         return $this->created($request, $ticket);
     }
@@ -544,21 +1031,24 @@ class TicketController
             return $this->replied($request, $id);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), array_merge([
             'body' => 'required|string|min:2|max:5000',
-        ], [
+        ], TicketFiles::enabled() ? TicketFiles::rules() : []), array_merge([
             'body.required' => 'Напишите сообщение.',
             'body.min' => 'Сообщение слишком короткое.',
-        ]);
+        ], TicketFiles::messages()));
 
         if ($validator->fails()) {
             return $this->invalid($request, $validator->errors()->toArray(), $id);
         }
 
+        $files = (new TicketFiles())->store($ticket, (array) $request->file('attachments', []));
+
         $this->tickets->customerReply(
             $ticket,
             AntiSpam::clean((string) $request->input('body'), 5000),
-            $customer->display_name
+            $customer->display_name,
+            $files
         );
 
         return $this->replied($request, $id);
@@ -587,6 +1077,121 @@ class TicketController
 
         return redirect(url('/tickets') . '/?id=' . (int) $ticket->id . '&closed=1#thread')
             ->with('elv_success', 'Обращение закрыто. Если понадобится, напишите снова — оно откроется.');
+    }
+
+    /**
+     * thread отдаёт новые сообщения для лёгкого polling открытой вкладки.
+     *
+     * Возвращаются только сообщения после `since`, поэтому запрос дешёвый и не
+     * перерисовывает уже прочитанное. HTML не собирается на сервере: браузер
+     * строит узлы сам, текст вставляется как текст.
+     */
+    public function thread(Request $request, int $id)
+    {
+        $customer = $this->account->user();
+
+        if (!$customer) {
+            return response()->json(['ok' => false, 'code' => 'AUTH'], 401);
+        }
+
+        $ticket = $this->account->ticket($customer, $id);
+
+        if (!$ticket) {
+            abort(404);
+        }
+
+        $since = max(0, (int) $request->query('since', 0));
+        $messages = [];
+
+        foreach ($ticket->messages as $message) {
+            if ((int) $message->id <= $since) {
+                continue;
+            }
+
+            $messages[] = [
+                'id' => (int) $message->id,
+                'author' => (string) $message->author,
+                'author_label' => (string) $message->author_label,
+                'author_name' => (string) ($message->author_name ?? ''),
+                'body' => (string) $message->body,
+                'date' => $message->created_at ? $message->created_at->format('d.m.Y H:i') : '',
+                'is_support' => (bool) $message->is_support,
+                'files' => $message->files,
+            ];
+        }
+
+        return response()->json([
+            'ok' => true,
+            'messages' => $messages,
+            'status' => (string) $ticket->status,
+            'status_label' => (string) $ticket->status_label,
+            'closed' => (bool) $ticket->is_closed,
+            'sla_label' => (string) $ticket->sla_label,
+            'sla_overdue' => (bool) $ticket->sla_overdue,
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * file отдаёт вложение обращения с проверкой прав.
+     *
+     * Покупатель видит только свои обращения; сотрудник поддержки — любое,
+     * если у него есть право `elv.kit.tickets`. Файлы лежат вне `public/`,
+     * поэтому другого пути к ним нет.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function file(Request $request, int $id, string $name)
+    {
+        $ticket = Ticket::query()->with('messages')->find($id);
+        $customer = $this->account->user();
+        $allowed = $ticket && (
+            ($customer && $this->account->ticket($customer, $id) !== null)
+            || (($user = \BackendAuth::getUser()) && $user->hasPermission('elv.kit.tickets'))
+        );
+
+        if (!$ticket || !$allowed) {
+            abort(404);
+        }
+
+        $meta = null;
+
+        foreach ($ticket->messages as $message) {
+            $meta = TicketFiles::find((array) $message->attachments, $name);
+
+            if ($meta) {
+                break;
+            }
+        }
+
+        $path = $meta ? (new TicketFiles())->path((int) $ticket->id, $name) : null;
+
+        if (!$meta || !$path) {
+            abort(404);
+        }
+
+        return response()->download($path, (string) ($meta['name'] ?? $name), [
+            'Content-Type' => 'application/octet-stream',
+        ]);
+    }
+
+    /**
+     * attachFiles — вложения первого сообщения: файл сохраняется уже после
+     * создания обращения, потому что папка называется по его номеру.
+     */
+    protected function attachFiles(Ticket $ticket, Request $request, ?TicketMessage $message): void
+    {
+        if (!$message || !TicketFiles::enabled()) {
+            return;
+        }
+
+        $files = (new TicketFiles())->store($ticket, (array) $request->file('attachments', []));
+
+        if ($files === []) {
+            return;
+        }
+
+        $message->attachments = $files;
+        $message->save();
     }
 
     protected function created(Request $request, $ticket)
@@ -659,6 +1264,168 @@ class TicketController
 
         return redirect(url('/account') . '/')
             ->with('elv_error', 'Войдите в кабинет, чтобы написать в поддержку.');
+    }
+}
+
+===== FILE: plugins/elv/kit/classes/Http/ChatController.php =====
+
+<?php namespace Elv\Kit\Classes\Http;
+
+use Elv\Kit\Classes\AccountService;
+use Elv\Kit\Classes\AntiSpam;
+use Elv\Kit\Classes\Chat;
+use Elv\Kit\Classes\TicketService;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
+
+/**
+ * ChatController — ответы Консультанта по базе знаний сайта.
+ *
+ * Внешних API нет: ответ собирается из каталога и настроек, поэтому работает
+ * и на демо-контуре без ключей. Лимит запросов задан в routes.php.
+ *
+ * Переписка хранится в сессии: кнопка «Передать оператору» отправляет её в
+ * поддержку вместе с контактами, поэтому покупателю не нужно пересказывать
+ * вопрос заново. История обрезается до последних сообщений и живёт до отправки
+ * обращения.
+ */
+class ChatController extends Controller
+{
+    public const HISTORY_KEY = 'elv_chat_history';
+    public const HISTORY_LIMIT = 30;
+
+    public function store(Request $request)
+    {
+        if (AntiSpam::isBot($request)) {
+            return AntiSpam::json([
+                'ok' => true,
+                'answer' => 'Здравствуйте! Чем помочь по Elv Kit?',
+                'chips' => ['Сколько стоит?', 'Как установить?'],
+                'link' => null,
+                'open' => null,
+                'sources' => [],
+                'rejected' => false,
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'message' => 'required|string|min:2|max:' . Chat::MAX_LENGTH,
+        ], [
+            'message.required' => 'Напишите вопрос.',
+            'message.min' => 'Напишите вопрос подробнее — от двух символов.',
+            'message.max' => 'Слишком длинный вопрос: до ' . Chat::MAX_LENGTH . ' символов.',
+        ]);
+
+        if ($validator->fails()) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'VALIDATION',
+                'errors' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        $key = 'elv-chat:' . $request->session()->getId();
+
+        if (RateLimiter::tooManyAttempts($key, 15)) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'RATE_LIMIT',
+                'message' => 'Слишком много сообщений подряд. Подождите минуту.',
+            ], 429)->header('Retry-After', (string) RateLimiter::availableIn($key));
+        }
+
+        RateLimiter::hit($key, 60);
+
+        $message = (string) $request->input('message');
+        $result = Chat::answer($message);
+
+        // Отклонённые реплики (бессмыслица, грубость) в историю не попадают:
+        // оператору нужен диалог по делу, а не мусор.
+        if (empty($result['rejected']) && empty($result['hide_user'])) {
+            $this->remember('user', $message);
+            $this->remember('bot', (string) ($result['answer'] ?? ''));
+        }
+
+        return AntiSpam::json(['ok' => true] + $result);
+    }
+
+    /**
+     * handoff создаёт обращение из переписки Консультанта.
+     *
+     * Ответы бота сохраняются отдельным автором: поддержка видит, что уже
+     * сказал консультант. После отправки история очищается, чтобы следующее
+     * обращение не приносило старые сообщения.
+     */
+    public function handoff(Request $request)
+    {
+        if (AntiSpam::isBot($request)) {
+            return AntiSpam::json(['ok' => true, 'number' => '', 'url' => null]);
+        }
+
+        $key = 'elv-handoff:' . $request->session()->getId();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'RATE_LIMIT',
+                'message' => 'Слишком много попыток. Подождите несколько минут.',
+            ], 429)->header('Retry-After', (string) RateLimiter::availableIn($key));
+        }
+
+        RateLimiter::hit($key, 600);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:160',
+            'email' => 'required|email|max:191',
+            'message' => 'nullable|string|max:2000',
+            'consent' => 'accepted',
+        ], [
+            'name.required' => 'Укажите имя.',
+            'email.required' => 'Укажите e-mail для ответа.',
+            'email.email' => 'Проверьте адрес электронной почты.',
+            'consent.accepted' => 'Нужно согласие на обработку персональных данных.',
+        ]);
+
+        if ($validator->fails()) {
+            return AntiSpam::json([
+                'ok' => false,
+                'code' => 'VALIDATION',
+                'errors' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        $ticket = (new TicketService())->handoff([
+            'email' => (string) $request->input('email'),
+            'name' => AntiSpam::clean((string) $request->input('name'), 160),
+            'message' => AntiSpam::clean((string) $request->input('message', ''), 2000),
+            'history' => (array) $request->session()->get(self::HISTORY_KEY, []),
+        ]);
+
+        $request->session()->forget(self::HISTORY_KEY);
+
+        $customer = (new AccountService())->user();
+
+        return AntiSpam::json([
+            'ok' => true,
+            'number' => (string) $ticket->number,
+            'url' => $customer ? (string) $ticket->url : null,
+        ]);
+    }
+
+    protected function remember(string $role, string $text): void
+    {
+        $text = trim($text);
+
+        if ($text === '') {
+            return;
+        }
+
+        $history = (array) session()->get(self::HISTORY_KEY, []);
+        $history[] = ['role' => $role === 'bot' ? 'bot' : 'user', 'text' => mb_substr($text, 0, 2000)];
+
+        session()->put(self::HISTORY_KEY, array_slice($history, -self::HISTORY_LIMIT));
     }
 }
 
@@ -767,6 +1534,54 @@ class TelegramController
     }
 }
 
+===== FILE: plugins/elv/kit/console/AutocloseCommand.php =====
+
+<?php namespace Elv\Kit\Console;
+
+use Elv\Kit\Classes\TicketService;
+use Elv\Kit\Models\Settings;
+use Illuminate\Console\Command;
+
+/**
+ * AutocloseCommand — закрывает обращения, где покупатель молчит после ответа.
+ *
+ * Срок берётся из настроек (`ticket_autoclose_days`, по умолчанию 5 дней,
+ * `0` — не закрывать). Обращения в работе не трогаются: если последнее слово
+ * осталось за покупателем, поддержка ещё должна ответить.
+ */
+class AutocloseCommand extends Command
+{
+    protected $signature = 'elv:kit:autoclose
+        {--days= : срок молчания покупателя в днях, перекрывает настройку}
+        {--dry : только показать, сколько обращений будет закрыто}';
+
+    protected $description = 'Закрывает обращения без ответа покупателя.';
+
+    public function handle()
+    {
+        $days = $this->option('days');
+        $days = $days === null ? (int) Settings::get('ticket_autoclose_days', 5) : (int) $days;
+
+        if ($days <= 0) {
+            $this->line('Автозакрытие выключено в настройках.');
+
+            return 0;
+        }
+
+        if ($this->option('dry')) {
+            $count = (new TicketService())->autocloseCount($days);
+            $this->info('Будет закрыто обращений: ' . $count . ' (срок ' . $days . ' дн.).');
+
+            return 0;
+        }
+
+        $closed = (new TicketService())->autoclose($days);
+        $this->info('Закрыто обращений: ' . $closed . ' (срок ' . $days . ' дн.).');
+
+        return 0;
+    }
+}
+
 ===== FILE: plugins/elv/kit/models/Ticket.php =====
 
 <?php namespace Elv\Kit\Models;
@@ -795,6 +1610,7 @@ class Ticket extends Model
     public const AUTHOR_CUSTOMER = 'customer';
     public const AUTHOR_SUPPORT = 'support';
     public const AUTHOR_SYSTEM = 'system';
+    public const AUTHOR_BOT = 'bot';
 
     public $table = 'elv_kit_tickets';
 
@@ -876,6 +1692,24 @@ class Ticket extends Model
         };
     }
 
+    public function getSourceLabelAttribute(): string
+    {
+        return match ((string) $this->source) {
+            'feedback' => 'Форма обратной связи',
+            'chat' => 'Консультант',
+            'telegram' => 'Telegram',
+            default => 'Кабинет',
+        };
+    }
+
+    /**
+     * lastMessage — последнее сообщение переписки, если она загружена.
+     */
+    public function getLastMessageAttribute(): ?TicketMessage
+    {
+        return $this->messages->last();
+    }
+
     public function getIsClosedAttribute(): bool
     {
         return (string) $this->status === self::STATUS_CLOSED;
@@ -911,6 +1745,7 @@ class Ticket extends Model
 
 <?php namespace Elv\Kit\Models;
 
+use Elv\Kit\Classes\TicketFiles;
 use Model;
 
 /**
@@ -919,19 +1754,27 @@ use Model;
  * Автор хранится строкой, а не ссылкой на пользователя: покупатель входит по
  * ссылке без учётной записи, а сотрудник поддержки может смениться. Имя
  * сохраняется на момент отправки, чтобы история не переписывалась.
+ *
+ * Вложения лежат списком в `attachments`; файл на диске открывается только
+ * через маршрут с проверкой прав, поэтому в шаблоне выводится не путь, а
+ * ссылка и исходное имя.
  */
 class TicketMessage extends Model
 {
     public $table = 'elv_kit_ticket_messages';
 
     public $fillable = [
-        'ticket_id', 'author', 'author_name', 'body',
+        'ticket_id', 'author', 'author_name', 'body', 'attachments',
     ];
 
     public $rules = [
         'ticket_id' => 'required|integer',
-        'author' => 'required|in:customer,support,system',
+        'author' => 'required|in:customer,support,system,bot',
         'body' => 'required|max:5000',
+    ];
+
+    protected $casts = [
+        'attachments' => 'array',
     ];
 
     public $belongsTo = [
@@ -943,6 +1786,7 @@ class TicketMessage extends Model
         return match ((string) $this->author) {
             Ticket::AUTHOR_SUPPORT => 'Поддержка',
             Ticket::AUTHOR_SYSTEM => 'Система',
+            Ticket::AUTHOR_BOT => 'Консультант',
             default => 'Покупатель',
         };
     }
@@ -951,7 +1795,394 @@ class TicketMessage extends Model
     {
         return (string) $this->author === Ticket::AUTHOR_SUPPORT;
     }
+
+    public function getIsBotAttribute(): bool
+    {
+        return (string) $this->author === Ticket::AUTHOR_BOT;
+    }
+
+    /**
+     * files — вложения сообщения с готовой ссылкой на скачивание.
+     *
+     * @return array<int, array{name: string, size: int, size_label: string, url: string}>
+     */
+    public function getFilesAttribute(): array
+    {
+        $files = [];
+
+        foreach ((array) $this->attachments as $item) {
+            if (!is_array($item) || empty($item['file'])) {
+                continue;
+            }
+
+            $files[] = [
+                'name' => (string) ($item['name'] ?? $item['file']),
+                'size' => (int) ($item['size'] ?? 0),
+                'size_label' => TicketFiles::sizeLabel((int) ($item['size'] ?? 0)),
+                'url' => url('/tickets') . '/' . (int) $this->ticket_id . '/file/' . rawurlencode((string) $item['file']),
+            ];
+        }
+
+        return $files;
+    }
 }
+
+===== FILE: plugins/elv/kit/models/settings/fields.yaml =====
+
+tabs:
+    fields:
+        brand_name:
+            label: 'Название продукта'
+            tab: 'Бренд'
+            span: left
+            default: 'Elv Kit'
+        brand_tagline:
+            label: 'Слоган'
+            tab: 'Бренд'
+            span: right
+            default: 'Модульный конструктор сайтов на October CMS'
+        brand_description:
+            label: 'Описание для микроразметки'
+            tab: 'Бренд'
+            type: textarea
+            size: small
+            default: 'Elv Kit — тема, модули и демо-данные для October CMS 4.x.'
+        brand_subtitle:
+            label: 'Подпись под логотипом'
+            tab: 'Бренд'
+            span: left
+            comment: 'Необязательная строка рядом с названием: например, название студии или продукта. Пусто — подписи нет.'
+        legal_name:
+            label: 'Продавец в документах'
+            tab: 'Бренд'
+            span: right
+            comment: 'Юридическое лицо или ИП для оферты, политики и контактов. Пусто — подставляется название продукта.'
+
+        menu_products_label:
+            label: 'Название раздела'
+            tab: 'Меню'
+            span: left
+            default: 'Продукты'
+            comment: 'Пункт в шапке сайта. Пусто — «Продукты».'
+        menu_products:
+            label: 'Разработки в меню'
+            tab: 'Меню'
+            type: textarea
+            size: small
+            comment: 'Название | адрес | подпись — по одной строке. Подпись необязательна, адрес может быть внешним. Пусто — в меню «Elv Kit» и «Шаблон».'
+
+        email:
+            label: 'E-mail'
+            tab: 'Контакты'
+            span: left
+            default: 'sales@example.com'
+        phone:
+            label: 'Телефон'
+            tab: 'Контакты'
+            span: right
+        telegram:
+            label: 'Telegram'
+            tab: 'Контакты'
+            comment: 'Полная ссылка https://t.me/… — иначе пусто.'
+            span: left
+        whatsapp:
+            label: 'WhatsApp'
+            tab: 'Контакты'
+            comment: 'Номер в международном формате или ссылка wa.me — пусто, если канал не нужен.'
+            span: right
+        github_url:
+            label: 'GitHub'
+            tab: 'Контакты'
+            span: left
+        docs_url:
+            label: 'Документация'
+            tab: 'Контакты'
+            span: right
+            default: '/docs/'
+        demo_url:
+            label: 'Демо-стенд'
+            tab: 'Контакты'
+            span: left
+            default: '/demo/'
+        telegram_bot_token:
+            label: 'Telegram: токен бота'
+            tab: 'Поддержка'
+            type: password
+            span: left
+            comment: 'Токен от @BotFather. Лучше хранить в .env (ELV_TELEGRAM_BOT_TOKEN). Пусто — Telegram выключен, обращения работают в кабинете и админке.'
+        telegram_chat_id:
+            label: 'Telegram: chat_id'
+            tab: 'Поддержка'
+            span: right
+            comment: 'Чат поддержки. Напишите боту, откройте getUpdates и возьмите chat.id. Можно задать в .env (ELV_TELEGRAM_CHAT_ID).'
+        telegram_webhook_secret:
+            label: 'Telegram: секрет вебхука'
+            tab: 'Поддержка'
+            type: password
+            comment: 'Строка 16–64 символа, латиница, цифры, дефис и подчёркивание. Вебхук: /telegram/webhook/<секрет>. Пусто — ChatOps выключен. Можно задать в .env (ELV_TELEGRAM_WEBHOOK_SECRET).'
+
+        chat_enabled:
+            label: 'Консультант в виджете'
+            tab: 'Виджет'
+            type: switch
+            default: true
+            comment: 'Отвечает по базе знаний сайта: тарифы, модули, установка, оплата. Внешних сервисов нет.'
+        chat_services:
+            label: 'Услуги сайта для консультанта'
+            tab: 'Виджет'
+            type: textarea
+            size: small
+            comment: 'По одной услуге в строке. Пусто — консультант не перечисляет услуги, а предлагает написать в форме обратной связи.'
+        chat_services_url:
+            label: 'Ссылка на страницу услуг'
+            tab: 'Виджет'
+            comment: 'Например, /services/. Пусто — ссылка в ответе не показывается.'
+
+        currency:
+            label: 'Валюта'
+            tab: 'Продажи'
+            type: dropdown
+            default: USD
+            options:
+                USD: USD
+                BYN: BYN
+                RUB: RUB
+        payments_mode:
+            label: 'Режим оплаты'
+            tab: 'Продажи'
+            type: dropdown
+            default: auto
+            comment: 'auto — mock вне production и только без ключей; live — только шлюз; mock — заказ помечается оплаченным сразу (запрещено в production).'
+            options:
+                auto: 'Авто (безопасно)'
+                live: 'Только шлюз'
+                mock: 'Mock (демо)'
+        plan_single_label:
+            label: 'Тариф 1: название'
+            tab: 'Продажи'
+            span: left
+            default: 'Один сайт'
+            comment: 'Ключ single — один сайт, поддержка 30 дней. Название видно на витрине, в калькуляторе и в заказе.'
+        plan_single_on:
+            label: 'Тариф 1: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
+        plan_multi_label:
+            label: 'Тариф 2: название'
+            tab: 'Продажи'
+            span: left
+            default: 'До 5 сайтов'
+            comment: 'Ключ multi — до 5 сайтов, приоритетная поддержка 90 дней.'
+        plan_multi_on:
+            label: 'Тариф 2: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
+        plan_extended_label:
+            label: 'Тариф 3: название'
+            tab: 'Продажи'
+            span: left
+            default: 'Без ограничений'
+            comment: 'Ключ extended — без ограничений по сайтам, поддержка 1 год. Выключенный тариф не показывается и не принимается в заказе; цены и лицензии по его ключу остаются.'
+        plan_extended_on:
+            label: 'Тариф 3: продаётся'
+            tab: 'Продажи'
+            type: switch
+            span: right
+            default: true
+        order_notify_email:
+            label: 'Копия заказа'
+            tab: 'Продажи'
+            comment: 'Адрес администратора для писем о заказах и бронях.'
+            default: 'sales@example.com'
+        demo_links:
+            label: 'Дополнительные демо'
+            tab: 'Продажи'
+            type: textarea
+            size: small
+            comment: 'Название | адрес демо | адрес страницы | подпись — по одной строке. Адрес демо может быть внешним, страница и подпись необязательны. Пусто — на /demo/ только продукты из каталога.'
+        download_daily_limit:
+            label: 'Скачиваний архива в сутки'
+            tab: 'Продажи'
+            default: 5
+            comment: 'Сколько раз покупатель может скачать оплаченный ZIP с одного заказа за сутки. 0 — без ограничения. Внутри архива лежит LICENSE_OWNER.txt с номером заказа.'
+        yookassa_shop_id:
+            label: 'ЮKassa: shopId'
+            tab: 'Продажи'
+            span: left
+        yookassa_secret:
+            label: 'ЮKassa: секретный ключ'
+            tab: 'Продажи'
+            type: password
+            span: right
+            comment: 'Лучше хранить в .env (YOOKASSA_SECRET). Значение в БД — запасной вариант.'
+        stripe_secret:
+            label: 'Stripe: secret key'
+            tab: 'Продажи'
+            type: password
+            span: left
+        stripe_webhook_secret:
+            label: 'Stripe: webhook secret'
+            tab: 'Продажи'
+            type: password
+            span: right
+
+        calculator_enabled:
+            label: 'Показывать калькулятор'
+            tab: 'Калькулятор'
+            type: switch
+            default: true
+            comment: 'Выключенный калькулятор остаётся страницей, но вместо мастера показывает форму брифа и ссылку на цены.'
+        prices_updated_at:
+            label: 'Дата актуальности цен (запасная)'
+            tab: 'Калькулятор'
+            default: '17.11.2026'
+            comment: 'Показывается, только если в разделе «Прайс» нет активных версий. Основная дата считается из прайса.'
+        calculator_hosting_note:
+            label: 'Пометка про хостинг'
+            tab: 'Калькулятор'
+            type: textarea
+            size: small
+            default: 'Хостинг и домен оплачиваются провайдеру напрямую. Мы не добавляем наценку и не выдаём чужой хостинг за свой.'
+        calculator_support_note:
+            label: 'Пометка про поддержку'
+            tab: 'Калькулятор'
+            type: textarea
+            size: small
+            default: 'Поддержка уже входит в тариф на указанный срок. Продление после него считается отдельно по объёму работ.'
+
+        license_api_token:
+            label: 'Токен API лицензий'
+            tab: 'Лицензии'
+            type: password
+            comment: 'Необязательный общий токен для POST /api/v1/license/activate. Пусто — проверяется только ключ.'
+        license_stats_public:
+            label: 'Показывать счётчик активаций'
+            tab: 'Лицензии'
+            type: switch
+            default: true
+
+        analytics_google:
+            label: 'Google Analytics 4 (G-…)'
+            tab: 'SEO и аналитика'
+            span: left
+            comment: 'Скрипт грузится лениво после первого взаимодействия — PageSpeed не страдает.'
+        analytics_yandex:
+            label: 'Яндекс Метрика (номер)'
+            tab: 'SEO и аналитика'
+            span: right
+        metrika_webvisor:
+            label: 'Вебвизор'
+            tab: 'SEO и аналитика'
+            type: switch
+            default: false
+        sitemap_lastmod:
+            label: 'Дата обновления контента'
+            tab: 'SEO и аналитика'
+            comment: 'Необязательная дата для lastmod статических страниц в sitemap.xml: 2026-11-23 или 23.11.2026. Пусто — lastmod у страниц не выводится, а у статей и товаров дата берётся из updated_at.'
+
+        faq_items:
+            label: 'Общий блок FAQ'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блок FAQ на главной и в тарифах не показывается.'
+        faq_calculator_items:
+            label: 'FAQ калькулятора'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице калькулятора нет.'
+        faq_services_items:
+            label: 'FAQ страницы услуг'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице услуг нет.'
+        faq_seo_items:
+            label: 'FAQ страницы SEO'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Вопрос | Ответ, по одной паре в строке. Пусто — блока на странице SEO нет.'
+        faq_post_items:
+            label: 'FAQ статей'
+            tab: 'FAQ'
+            type: textarea
+            size: large
+            comment: 'Адрес статьи | Вопрос | Ответ, по одной паре в строке. Пусто — у статей нет блока вопросов.'
+
+        booking_services:
+            label: 'Услуги для записи'
+            tab: 'Запись'
+            type: textarea
+            size: large
+            comment: 'Код | Название | Минут | Цена | Описание | Иконка — по одной услуге в строке. Код латиницей, иконка необязательна. Пусто — страница записи пишет «Запись временно недоступна» и ведёт в контакты.'
+        booking_reminder_enabled:
+            label: 'Напоминания о записи'
+            tab: 'Запись'
+            type: switch
+            default: false
+            comment: 'Письмо клиенту перед визитом. Нужен cron: `php artisan schedule:run` раз в минуту.'
+        booking_reminder_hours:
+            label: 'За сколько часов'
+            tab: 'Запись'
+            type: number
+            default: 24
+            comment: 'От 1 до 72 часов. Пусто — 24.'
+        booking_reminder_admin:
+            label: 'Напоминать мастеру'
+            tab: 'Запись'
+            type: switch
+            default: false
+            comment: 'Письмо администратору на адрес уведомлений из вкладки «Продажи». Расписание — то же, что у клиента.'
+
+        ticket_attachments_enabled:
+            label: 'Вложения в обращениях'
+            tab: 'Поддержка'
+            type: switch
+            default: true
+            comment: 'Скриншоты и логи: до 3 файлов по 5 МБ, png/jpg/gif/webp/pdf/txt/log/csv/zip. Хранятся вне публичной папки, скачиваются по проверке прав.'
+        ticket_quick_replies:
+            label: 'Быстрые ответы'
+            tab: 'Поддержка'
+            type: textarea
+            size: large
+            comment: 'Название | Текст — по одному шаблону в строке. Пусто — кнопок быстрых ответов в админке нет.'
+        ticket_autoclose_days:
+            label: 'Автозакрытие обращения'
+            tab: 'Поддержка'
+            type: number
+            default: 5
+            comment: 'Столько дней без ответа покупателя после ответа поддержки. 0 — не закрывать. Нужен cron: php artisan schedule:run.'
+
+        qa_enabled:
+            label: 'Блок «Вопрос-ответ»'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: true
+            comment: 'Форма вопроса на страницах продуктов. Вопрос публикуется только после ответа из админки.'
+        reviews_enabled:
+            label: 'Отзывы покупателей'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: true
+            comment: 'Одобренные отзывы на страницах продуктов и рейтинг в микроразметке.'
+        review_invite_enabled:
+            label: 'Приглашать к отзыву'
+            tab: 'Вопросы и отзывы'
+            type: switch
+            default: false
+            comment: 'Письмо со ссылкой на отзыв после оплаты. Нужен cron: `php artisan schedule:run` раз в минуту.'
+        review_delay_days:
+            label: 'Через сколько дней'
+            tab: 'Вопросы и отзывы'
+            type: number
+            default: 7
+            comment: 'От 1 до 90 дней после оплаты. Пусто — 7.'
 
 ===== FILE: themes/elv-studio/pages/tickets.htm =====
 
@@ -1049,12 +2280,16 @@ meta_robots = "noindex, nofollow"
                             </p>
                         </div>
                         <div class="ticket-meta">
-                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span>
+                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}" data-ticket-status>{{ ticket.status_label }}</span>
                             <span class="tiny {{ ticket.sla_overdue ? 'ticket-overdue' : 'muted' }}">{{ ticket.sla_label }}</span>
                         </div>
                     </div>
 
-                    <div class="ticket-thread mt-24">
+                    <div class="ticket-thread mt-24"
+                         data-ticket-thread
+                         data-ticket-id="{{ ticket.id }}"
+                         data-last-id="{{ ticket.messages|length ? ticket.messages|last.id : 0 }}"
+                         {% if not ticket.is_closed %}data-poll-url="{{ url('/tickets/' ~ ticket.id ~ '/thread') }}"{% endif %}>
                         {% for message in ticket.messages %}
                             <article class="ticket-message {{ message.is_support ? 'ticket-message--support' : '' }}">
                                 <header>
@@ -1063,12 +2298,22 @@ meta_robots = "noindex, nofollow"
                                     <span class="tiny muted">· {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}</span>
                                 </header>
                                 <div class="ticket-message__body">{{ message.body|elv_text|raw }}</div>
+                                {% if message.files|length %}
+                                    <ul class="ticket-files">
+                                        {% for file in message.files %}
+                                            <li>
+                                                <a href="{{ file.url }}" download>{{ file.name }}</a>
+                                                <span class="tiny muted">{{ file.size_label }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </article>
                         {% endfor %}
                     </div>
 
                     {% if not ticket.is_closed %}
-                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}">
+                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}" enctype="multipart/form-data">
                             {{ elv_csrf()|raw }}
                             <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -1076,6 +2321,14 @@ meta_robots = "noindex, nofollow"
                                 <label for="ticket-reply">Сообщение</label>
                                 <textarea class="input" id="ticket-reply" name="body" rows="5" required maxlength="5000" placeholder="Дополните вопрос или ответьте поддержке.">{{ elv_old('body') }}</textarea>
                             </div>
+
+                            {% if elv_ticket_attachments() %}
+                                <div class="field">
+                                    <label for="ticket-reply-files">Файлы <span class="hint">— до 3, по 5 МБ</span></label>
+                                    <input class="input" id="ticket-reply-files" type="file" name="attachments[]" multiple accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.log,.csv,.zip">
+                                    <p class="tiny muted mt-8 mb-0">Скриншоты и логи: png, jpg, gif, webp, pdf, txt, log, csv, zip.</p>
+                                </div>
+                            {% endif %}
 
                             <div class="stack-actions">
                                 <button class="btn btn--primary" type="submit">Отправить</button>
@@ -1104,7 +2357,7 @@ meta_robots = "noindex, nofollow"
                             Так ответ будет точнее.
                         </p>
 
-                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}">
+                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}" enctype="multipart/form-data">
                             {{ elv_csrf()|raw }}
                             <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -1131,6 +2384,14 @@ meta_robots = "noindex, nofollow"
                                 <label for="ticket-body">Сообщение</label>
                                 <textarea class="input" id="ticket-body" name="body" rows="6" required minlength="10" maxlength="5000" placeholder="Что случилось и чем помочь?">{{ elv_old('body') }}</textarea>
                             </div>
+
+                            {% if elv_ticket_attachments() %}
+                                <div class="field">
+                                    <label for="ticket-files">Файлы <span class="hint">— до 3, по 5 МБ</span></label>
+                                    <input class="input" id="ticket-files" type="file" name="attachments[]" multiple accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.log,.csv,.zip">
+                                    <p class="tiny muted mt-8 mb-0">Скриншоты и логи: png, jpg, gif, webp, pdf, txt, log, csv, zip.</p>
+                                </div>
+                            {% endif %}
 
                             <label class="check">
                                 <input type="checkbox" name="consent" value="1" required {{ elv_old('consent') ? 'checked' : '' }}>
@@ -1488,6 +2749,160 @@ meta_robots = "noindex, nofollow"
     </section>
 </main>
 
+===== FILE: themes/elv-studio/assets/js/tickets.js =====
+
+/*
+ * Поддержка: лёгкий polling открытой вкладки обращения.
+ *
+ * Раз в 12 секунд страница спрашивает только новые сообщения (`?since=`),
+ * поэтому трафик небольшой и уже прочитанное не перерисовывается. Узлы
+ * строятся через DOM, текст вставляется как текст: HTML из ответа сервера не
+ * исполняется.
+ */
+(function () {
+    'use strict';
+
+    var thread = document.querySelector('[data-ticket-thread]');
+    var url = thread ? thread.getAttribute('data-poll-url') : '';
+
+    if (!thread || !url) {
+        return;
+    }
+
+    var lastId = Number(thread.getAttribute('data-last-id')) || 0;
+    var closed = false;
+    var timer = null;
+
+    var el = function (tag, className, text) {
+        var node = document.createElement(tag);
+
+        if (className) {
+            node.className = className;
+        }
+
+        if (text !== undefined && text !== null) {
+            node.textContent = String(text);
+        }
+
+        return node;
+    };
+
+    var addMessage = function (message) {
+        var article = el('article', 'ticket-message' + (message.is_support ? ' ticket-message--support' : ''));
+        var header = el('header');
+
+        header.appendChild(el('b', '', message.author_label));
+
+        if (message.author_name) {
+            header.appendChild(el('span', 'tiny muted', ' · ' + message.author_name));
+        }
+
+        header.appendChild(el('span', 'tiny muted', ' · ' + message.date));
+        article.appendChild(header);
+        article.appendChild(el('div', 'ticket-message__body', message.body));
+
+        if (message.files && message.files.length) {
+            var list = el('ul', 'ticket-files');
+
+            message.files.forEach(function (file) {
+                var item = el('li');
+                var link = el('a', '', file.name);
+
+                link.href = file.url;
+                link.setAttribute('download', '');
+                item.appendChild(link);
+                item.appendChild(el('span', 'tiny muted', ' ' + file.size_label));
+                list.appendChild(item);
+            });
+
+            article.appendChild(list);
+        }
+
+        thread.appendChild(article);
+        lastId = Math.max(lastId, Number(message.id) || 0);
+    };
+
+    var stop = function () {
+        if (timer) {
+            window.clearInterval(timer);
+            timer = null;
+        }
+    };
+
+    var applyClosed = function (data) {
+        closed = true;
+        stop();
+
+        var badge = document.querySelector('[data-ticket-status]');
+        if (badge && data.status_label) {
+            badge.textContent = data.status_label;
+            badge.className = 'badge badge--line';
+        }
+
+        var form = document.getElementById('reply');
+        if (form) {
+            form.style.display = 'none';
+        }
+
+        var note = document.querySelector('[data-ticket-closed]');
+
+        if (!note && thread.parentNode) {
+            note = el('div', 'notice mt-24');
+            note.setAttribute('data-ticket-closed', '');
+            note.appendChild(el('p', '', 'Обращение закрыто. Новое сообщение откроет его снова.'));
+            thread.parentNode.appendChild(note);
+        }
+        else if (note) {
+            note.hidden = false;
+        }
+    };
+
+    var poll = function () {
+        if (closed || document.hidden) {
+            return;
+        }
+
+        fetch(url + '?since=' + lastId, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    return null;
+                }
+
+                return response.json().catch(function () {
+                    return null;
+                });
+            })
+            .then(function (data) {
+                if (!data || !data.ok) {
+                    return;
+                }
+
+                (data.messages || []).forEach(addMessage);
+
+                if (data.closed) {
+                    applyClosed(data);
+                }
+            })
+            .catch(function () {
+                return null;
+            });
+    };
+
+    timer = window.setInterval(poll, 12000);
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            poll();
+        }
+    });
+})();
+
 ===== FILE: tools/tickets-check.php =====
 
 <?php
@@ -1503,12 +2918,15 @@ use Elv\Kit\Classes\Http\TelegramController;
 use Elv\Kit\Classes\SecurityHeaders;
 use Elv\Kit\Classes\Support;
 use Elv\Kit\Classes\Telegram;
+use Elv\Kit\Classes\TicketFiles;
 use Elv\Kit\Classes\TicketService;
 use Elv\Kit\Models\Customer;
 use Elv\Kit\Models\Settings;
 use Elv\Kit\Models\Ticket;
 use Elv\Kit\Models\TicketMessage;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -1627,6 +3045,164 @@ $emailTicket->save();
 $check($account->ticket($customer, (int) $emailTicket->id) !== null, 'ticket found by e-mail is not visible to the customer');
 $check($account->ticket($other, (int) $emailTicket->id) === null, 'ticket found by e-mail is visible to another customer');
 
+// Обращение из формы обратной связи: покупатель без входа.
+$guestEmail = 'qa-guest-' . $suffix . '@example.test';
+
+$guestTicket = $service->openGuest([
+    'email' => mb_strtoupper($guestEmail),
+    'name' => 'Гость',
+    'subject' => 'Не приходит письмо',
+    'body' => 'Оплатил заказ, письмо с архивом не пришло.',
+]);
+
+$check($guestTicket instanceof Ticket, 'guest ticket is not created');
+$guestCustomer = Customer::query()->where('email', $guestEmail)->first();
+$check($guestCustomer !== null, 'guest ticket does not create a customer for Magic Link');
+$check((int) $guestTicket->customer_id === (int) ($guestCustomer->id ?? 0), 'guest ticket is not linked to the created customer');
+$check($account->ticket($guestCustomer, (int) $guestTicket->id) !== null, 'guest ticket is not visible in the cabinet');
+$check((string) $guestTicket->email === $guestEmail, 'guest ticket e-mail is not normalized');
+$check((string) $guestTicket->source === 'feedback', 'guest ticket source is not feedback');
+$check($guestTicket->source_label === 'Форма обратной связи', 'guest ticket source label is wrong');
+$check($guestTicket->messages()->count() === 1, 'guest ticket has no first message');
+$check((string) $guestTicket->messages()->first()->author_name === 'Гость', 'guest ticket loses the author name');
+
+$linked = $service->openGuest([
+    'email' => $email,
+    'name' => 'Мария',
+    'subject' => 'Повторный вопрос',
+    'body' => 'Уточняю по тому же заказу.',
+]);
+
+$check((int) $linked->customer_id === (int) $customer->id, 'guest ticket is not linked to a known customer');
+
+// Консультант передаёт переписку оператору: история и автор «Консультант».
+$handoff = $service->handoff([
+    'email' => $email,
+    'name' => 'Мария',
+    'message' => 'Хочу уточнить по лицензии.',
+    'history' => [
+        ['role' => 'user', 'text' => 'Сколько доменов входит в тариф?'],
+        ['role' => 'bot', 'text' => 'В тарифе multi — до пяти доменов.'],
+        ['role' => 'user', 'text' => '   '],
+    ],
+]);
+
+$check((string) $handoff->source === 'chat', 'chat handoff source is not chat');
+$check((int) $handoff->customer_id === (int) $customer->id, 'chat handoff is not linked to the customer');
+$check($handoff->messages()->count() === 3, 'chat handoff keeps ' . $handoff->messages()->count() . ' messages instead of 3');
+$check(
+    $handoff->messages()->orderBy('id')->pluck('author')->all() === [Ticket::AUTHOR_CUSTOMER, Ticket::AUTHOR_BOT, Ticket::AUTHOR_CUSTOMER],
+    'chat handoff authors are wrong'
+);
+$check(str_contains((string) $handoff->subject, 'Сколько доменов'), 'chat handoff subject is not the first question');
+$check($handoff->fresh()->lastMessage !== null, 'last message accessor returns nothing');
+
+$bot = $handoff->messages()->where('author', Ticket::AUTHOR_BOT)->first();
+$check($bot !== null && $bot->author_label === 'Консультант', 'bot message has the wrong label');
+$check($bot !== null && $bot->is_bot === true, 'bot message is not flagged as bot');
+
+// Быстрые ответы оператора: «Название | Текст», мусор пропускается.
+$originalReplies = Settings::get('ticket_quick_replies');
+Settings::set('ticket_quick_replies', "Приветствие | Здравствуйте! Уже смотрим вопрос.\nБез разделителя\nСсылка | Гайд: /docs/\n");
+
+$replies = TicketService::quickReplies();
+$check(count($replies) === 2, 'quick replies parser returns ' . count($replies) . ' items instead of 2');
+$check(($replies[0]['title'] ?? '') === 'Приветствие', 'quick reply title is wrong');
+$check(($replies[1]['body'] ?? '') === 'Гайд: /docs/', 'quick reply body is wrong');
+
+Settings::set('ticket_quick_replies', (string) $originalReplies);
+
+// Вложения: белый список, случайное имя на диске, ссылка через маршрут.
+$originalAttachments = Settings::get('ticket_attachments_enabled');
+Settings::set('ticket_attachments_enabled', true);
+
+$check(TicketFiles::enabled() === true, 'attachments are not enabled by settings');
+
+Settings::set('ticket_attachments_enabled', '');
+$check(TicketFiles::enabled() === true, 'empty attachment setting must default to enabled');
+Settings::set('ticket_attachments_enabled', true);
+$check(TicketFiles::MAX_FILES === 3, 'attachment limit is not 3 files');
+$check(TicketFiles::sizeLabel(2048) === '2 КБ', 'size label for 2 KB is wrong: ' . TicketFiles::sizeLabel(2048));
+$check(TicketFiles::sizeLabel(1572864) === '1.5 МБ', 'size label for 1.5 MB is wrong: ' . TicketFiles::sizeLabel(1572864));
+
+$fileRules = TicketFiles::rules();
+$check(($fileRules['attachments'] ?? '') === 'array|max:3', 'attachment count rule is wrong');
+$check(str_contains((string) ($fileRules['attachments.*'] ?? ''), 'mimes:'), 'attachment type rule is missing');
+
+$files = new TicketFiles();
+$upload = UploadedFile::fake()->createWithContent('Скриншот ошибки.txt', str_repeat('a', 4096));
+$stored = $files->store($guestTicket, [$upload]);
+
+$check(count($stored) === 1, 'attachment is not stored');
+$check(isset($stored[0]['file']) && preg_match('/^[A-Za-z0-9]{32}\.txt$/', (string) $stored[0]['file']) === 1, 'stored attachment name is not random');
+$check(($stored[0]['name'] ?? '') === 'Скриншот ошибки.txt', 'attachment does not keep the original name');
+$check(($stored[0]['size'] ?? 0) === 4096, 'attachment size is not saved');
+$check($files->path((int) $guestTicket->id, (string) $stored[0]['file']) !== null, 'stored attachment is not found on disk');
+$check($files->path((int) $guestTicket->id, '../../evil.txt') === null, 'attachment path traversal is not blocked');
+
+$guestTicket->messages()->first()->forceFill(['attachments' => $stored])->save();
+$firstMessage = $guestTicket->fresh()->messages()->first();
+
+$check(count($firstMessage->files) === 1, 'attachment metadata is not exposed to templates');
+$check(str_contains((string) $firstMessage->files[0]['url'], '/tickets/' . $guestTicket->id . '/file/'), 'attachment url is not a guarded route');
+$check(($firstMessage->files[0]['size_label'] ?? '') === '4 КБ', 'attachment size label is wrong: ' . ($firstMessage->files[0]['size_label'] ?? ''));
+
+$rejected = $files->store($guestTicket, [UploadedFile::fake()->create('script.php', 1, 'text/x-php')]);
+$check($rejected === [], 'attachment whitelist accepts php');
+
+$mismatch = UploadedFile::fake()
+    ->createWithContent('payload.txt', '<script>alert(1)</script>')
+    ->mimeType('text/html');
+$check($files->store($guestTicket, [$mismatch]) === [], 'attachment MIME whitelist accepts text/html in a txt file');
+
+Settings::set('ticket_attachments_enabled', false);
+$check(TicketFiles::enabled() === false, 'attachments stay enabled after disabling');
+$check($files->store($guestTicket, [UploadedFile::fake()->create('ok.txt', 1, 'text/plain')]) === [], 'disabled attachments are still stored');
+
+Settings::set('ticket_attachments_enabled', (string) $originalAttachments);
+
+// Автозакрытие: только «ждём ответа», где последнее слово не за покупателем.
+DB::beginTransaction();
+
+try {
+    $stale = $service->open($customer, [
+        'subject' => 'Давно ждёт ответа',
+        'body' => 'Подскажите, пожалуйста, по установке.',
+    ]);
+    $service->supportReply($stale, 'Ответили и ждём подтверждения.', 'Иван');
+    Ticket::query()->whereKey($stale->id)->update(['updated_at' => now()->subDays(10)]);
+
+    $active = $service->open($customer, [
+        'subject' => 'Последнее слово за покупателем',
+        'body' => 'Уточняю детали перед ответом.',
+    ]);
+    $service->supportReply($active, 'Ответ поддержки.', 'Иван');
+    $service->customerReply($active->fresh(), 'Спасибо, проверю.', $customer->display_name);
+    Ticket::query()->whereKey($active->id)->update(['updated_at' => now()->subDays(10)]);
+
+    $check((new TicketService())->autocloseCount(5) >= 1, 'autoclose does not see the stale ticket');
+    $check((new TicketService())->autoclose(5) >= 1, 'autoclose closed nothing');
+    $check((string) $stale->fresh()->status === Ticket::STATUS_CLOSED, 'autoclose does not close a waiting ticket');
+    $check((string) $active->fresh()->status === Ticket::STATUS_OPEN, 'autoclose closes a ticket where the customer spoke last');
+    $check((new TicketService())->autoclose(0) === 0, 'autoclose with zero days closes tickets');
+}
+finally {
+    DB::rollBack();
+}
+
+// Маршруты поддержки: передача из чата, polling и скачивание вложения.
+$check(Route::has('elv.kit.chat.handoff'), 'chat handoff route is missing');
+$check(Route::has('elv.kit.ticket.thread'), 'ticket thread route is missing');
+$check(Route::has('elv.kit.ticket.file'), 'ticket file route is missing');
+
+$threadRoute = Route::getRoutes()->getByName('elv.kit.ticket.thread');
+$check($threadRoute !== null && str_contains($threadRoute->uri(), '{id}/thread'), 'thread route uri is wrong');
+
+$fileRoute = Route::getRoutes()->getByName('elv.kit.ticket.file');
+$check($fileRoute !== null && str_contains($fileRoute->uri(), '{id}/file/{name}'), 'file route uri is wrong');
+$check($fileRoute !== null && in_array('GET', $fileRoute->methods(), true), 'file route does not answer GET');
+
+
 $check(View::exists('elv.kit::mail.ticket-admin'), 'ticket admin mail view is missing');
 $check(View::exists('elv.kit::mail.ticket-customer'), 'ticket customer mail view is missing');
 
@@ -1717,10 +3293,24 @@ Settings::set('telegram_bot_token', (string) $originalToken);
 Settings::set('telegram_chat_id', (string) $originalChat);
 Settings::set('telegram_webhook_secret', (string) $originalSecret);
 
-$ticketIds = Ticket::query()->whereIn('email', [$email, $otherEmail])->pluck('id')->all();
+$ticketIds = Ticket::query()->whereIn('email', [$email, $otherEmail, $guestEmail])->pluck('id')->all();
 TicketMessage::query()->whereIn('ticket_id', $ticketIds)->delete();
 Ticket::query()->whereIn('id', $ticketIds)->delete();
-Customer::query()->whereIn('email', [$email, $otherEmail])->delete();
+Customer::query()->whereIn('email', [$email, $otherEmail, $guestEmail])->delete();
+
+foreach ($ticketIds as $ticketId) {
+    $dir = storage_path('app/elv-kit/tickets/' . (int) $ticketId);
+
+    if (!is_dir($dir)) {
+        continue;
+    }
+
+    foreach ((array) glob($dir . '/*') as $path) {
+        @unlink($path);
+    }
+
+    @rmdir($dir);
+}
 
 if ($errors !== []) {
     fwrite(STDERR, "tickets checks failed:\n- " . implode("\n- ", $errors) . "\n");

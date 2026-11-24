@@ -1,8 +1,8 @@
 # Структура репозитория Elv Landing
 
-Срез: 23.11.2026. Stage 84. Коммит: `6c7acce`.
+Срез: 24.11.2026. Stage 85. Коммит: `5ee9ed0`.
 
-Отслеживаемые файлы (`git ls-files`), всего 686.
+Отслеживаемые файлы (`git ls-files`), всего 692.
 `demo-static` — 173 HTML-страниц, показан не развёрнуто.
 `vendor/`, `modules/`, `.env` и дампы БД не показаны.
 
@@ -104,6 +104,7 @@
 - `plugins/elv/kit/classes/Support.php`
 - `plugins/elv/kit/classes/Telegram.php`
 - `plugins/elv/kit/classes/TextFilter.php`
+- `plugins/elv/kit/classes/TicketFiles.php`
 - `plugins/elv/kit/classes/TicketService.php`
 - `plugins/elv/kit/composer.json`
 - `plugins/elv/kit/config/blog.php`
@@ -113,6 +114,7 @@
 - `plugins/elv/kit/config/post-faq.php`
 - `plugins/elv/kit/config/seo.php`
 - `plugins/elv/kit/config/services.php`
+- `plugins/elv/kit/console/AutocloseCommand.php`
 - `plugins/elv/kit/console/DemoCommand.php`
 - `plugins/elv/kit/console/PackageCommand.php`
 - `plugins/elv/kit/console/RemindCommand.php`
@@ -259,6 +261,7 @@
 - `plugins/elv/kit/updates/add_audience_to_posts.php`
 - `plugins/elv/kit/updates/add_booking_admin_reminder.php`
 - `plugins/elv/kit/updates/add_booking_reminder.php`
+- `plugins/elv/kit/updates/add_ticket_support_tools.php`
 - `plugins/elv/kit/updates/create_kit_customers.php`
 - `plugins/elv/kit/updates/create_kit_questions_reviews.php`
 - `plugins/elv/kit/updates/create_kit_tables.php`
@@ -300,6 +303,7 @@
 - `themes/elv-studio/assets/js/calculator.js`
 - `themes/elv-studio/assets/js/preview.js`
 - `themes/elv-studio/assets/js/search.js`
+- `themes/elv-studio/assets/js/tickets.js`
 - `themes/elv-studio/composer.json`
 - `themes/elv-studio/layouts/default.htm`
 - `themes/elv-studio/layouts/preview.htm`
@@ -474,4 +478,4 @@
 
 - `test/README.md`
 - `test/Для анализа.txt`
-- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 84, собран `node tools/build-test-snapshot.mjs`)
+- `test/ai-chat/` — снимок кода для внешнего аудита (Stage 85, собран `node tools/build-test-snapshot.mjs`)
