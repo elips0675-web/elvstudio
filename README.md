@@ -373,6 +373,26 @@ php artisan elv:kit:demo --reset-preset            # вернуть демо-з�
 Если сервер уже поднят, `админка.bat` просто откроет страницу входа.
 Порты по умолчанию: сайт `8090`, MySQL `3306`.
 
+## Бэкап витрины
+
+Штатный скрипт — `tools\backup.ps1` (аналог `stand\stand-backup.ps1` на стенде):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\backup.ps1 backup
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\backup.ps1 list
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\backup.ps1 restore -Name <имя> -Force
+```
+
+Снимок лежит в `backup\<дата>_<имя>\`: `files.zip` (тема `themes/elv-studio`
+и плагин `plugins/elv/kit`), `db.sql` (дамп `elv_studio`), `meta.json`,
+`description.txt`, `SHA256SUMS.txt`. Режим `-Scope site` добавляет остальные
+файлы сайта, кроме `vendor`, `modules`, `node_modules`, `.git`, `backup`,
+`docs`, `test`, `demo`, `demo-static`, `exports` и кэшей.
+
+Откат останавливает сервер на 8090, заменяет файлы темы и плагина, пересоздаёт
+БД и чистит кэш; перед откатом сам делает снимок `pre-restore`. Папка `backup`
+в `.gitignore`.
+
 ## Команды и проверки
 
 ```bash
