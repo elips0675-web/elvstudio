@@ -95,9 +95,37 @@
 
         <p class="elv-chat__error" data-chat-error role="alert" hidden></p>
 
+        <div class="elv-chat__handoff" data-chat-handoff hidden>
+            <form class="elv-chat__handoff-form" data-chat-handoff-form>
+                <p class="elv-chat__handoff-lead">Передадим переписку в поддержку. Ответ придёт на e-mail, первый ответ — в течение 24 рабочих часов.</p>
+
+                <label class="elv-sr" for="elv-handoff-name">Имя</label>
+                <input class="elv-chat__input" id="elv-handoff-name" type="text" name="name" maxlength="160" placeholder="Имя" autocomplete="name" required>
+
+                <label class="elv-sr" for="elv-handoff-email">E-mail</label>
+                <input class="elv-chat__input" id="elv-handoff-email" type="email" name="email" maxlength="191" placeholder="E-mail для ответа" autocomplete="email" required>
+
+                <label class="elv-sr" for="elv-handoff-message">Комментарий</label>
+                <textarea class="elv-chat__input" id="elv-handoff-message" name="message" rows="2" maxlength="2000" placeholder="Что уточнить? Необязательно"></textarea>
+
+                <label class="elv-chat__handoff-check">
+                    <input type="checkbox" name="consent" value="1" required>
+                    <span>Согласен на обработку персональных данных по <a href="{{ url('/privacy/') }}">политике конфиденциальности</a>.</span>
+                </label>
+
+                <div class="elv-chat__handoff-actions">
+                    <button class="btn btn--primary btn--sm" type="submit">Отправить в поддержку</button>
+                    <button class="elv-chat__link" type="button" data-chat-handoff-close>Отмена</button>
+                </div>
+            </form>
+
+            <p class="elv-chat__handoff-status" data-chat-handoff-status role="status" hidden></p>
+        </div>
+
         <p class="elv-chat__hint">
             Не нашли ответ?
-            <button class="elv-chat__link" type="button" data-feedback-open>Напишите нам</button>
+            <button class="elv-chat__link" type="button" data-chat-handoff-open>Передать оператору</button>
+            или <button class="elv-chat__link" type="button" data-feedback-open>напишите нам</button>
         </p>
     </div>
 

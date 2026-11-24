@@ -309,6 +309,25 @@ tabs:
             default: false
             comment: 'Письмо администратору на адрес уведомлений из вкладки «Продажи». Расписание — то же, что у клиента.'
 
+        ticket_attachments_enabled:
+            label: 'Вложения в обращениях'
+            tab: 'Поддержка'
+            type: switch
+            default: true
+            comment: 'Скриншоты и логи: до 3 файлов по 5 МБ, png/jpg/gif/webp/pdf/txt/log/csv/zip. Хранятся вне публичной папки, скачиваются по проверке прав.'
+        ticket_quick_replies:
+            label: 'Быстрые ответы'
+            tab: 'Поддержка'
+            type: textarea
+            size: large
+            comment: 'Название | Текст — по одному шаблону в строке. Пусто — кнопок быстрых ответов в админке нет.'
+        ticket_autoclose_days:
+            label: 'Автозакрытие обращения'
+            tab: 'Поддержка'
+            type: number
+            default: 5
+            comment: 'Столько дней без ответа покупателя после ответа поддержки. 0 — не закрывать. Нужен cron: php artisan schedule:run.'
+
         qa_enabled:
             label: 'Блок «Вопрос-ответ»'
             tab: 'Вопросы и отзывы'

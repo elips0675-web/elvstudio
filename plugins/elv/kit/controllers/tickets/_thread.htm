@@ -21,6 +21,16 @@
                         · {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}
                     </p>
                     <div style="white-space:pre-line">{{ message.body }}</div>
+                    {% if message.files|length %}
+                        <ul style="margin:8px 0 0;padding-left:18px">
+                            {% for file in message.files %}
+                                <li>
+                                    <a href="{{ file.url }}" download>{{ file.name }}</a>
+                                    <span class="text-muted">({{ file.size_label }})</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
@@ -32,6 +42,32 @@
         <?= Form::open(['data-request' => 'onReply', 'data-request-flash' => true]) ?>
             <?= Form::token() ?>
             <input type="hidden" name="id" value="{{ ticket.id }}">
+            {% if quickReplies|length %}
+                <div class="form-group">
+                    <label>Быстрые ответы</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px">
+                        {% for reply in quickReplies %}
+                            <button type="button" class="btn btn-default btn-sm" data-quick-reply="{{ reply.body|e('html_attr') }}">{{ reply.title }}</button>
+                        {% endfor %}
+                    </div>
+                    <p class="help-block">Шаблоны из настроек, вкладка «Поддержка». Кнопка вставляет текст в ответ, дальше его можно поправить.</p>
+                </div>
+                <script>
+                    (function () {
+                        var field = document.getElementById('ticket-reply-body');
+                        if (!field) {
+                            return;
+                        }
+                        Array.prototype.forEach.call(document.querySelectorAll('[data-quick-reply]'), function (button) {
+                            button.addEventListener('click', function () {
+                                var text = button.getAttribute('data-quick-reply') || '';
+                                field.value = field.value ? field.value.replace(/\s+$/, '') + "\n\n" + text : text;
+                                field.focus();
+                            });
+                        });
+                    })();
+                </script>
+            {% endif %}
             <div class="form-group">
                 <label for="ticket-reply-body">Ответ покупателю</label>
                 <textarea

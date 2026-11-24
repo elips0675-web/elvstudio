@@ -33,6 +33,10 @@ Route::middleware(['web', 'throttle:40,1'])->group(function () {
 });
 
 Route::middleware(['web', 'throttle:10,1'])->group(function () {
+    Route::post('chat/handoff', [ChatController::class, 'handoff'])->name('elv.kit.chat.handoff');
+});
+
+Route::middleware(['web', 'throttle:10,1'])->group(function () {
     Route::post('account/login', [AccountController::class, 'login'])->name('elv.kit.account.login');
     Route::get('account/auth/{token}', [AccountController::class, 'auth'])
         ->where('token', '[a-f0-9]{48}');
@@ -42,6 +46,13 @@ Route::middleware(['web', 'throttle:10,1'])->group(function () {
         ->name('elv.kit.account.unbind');
 
     Route::post('tickets', [TicketController::class, 'store'])->name('elv.kit.ticket.store');
+    Route::get('tickets/{id}/thread', [TicketController::class, 'thread'])
+        ->where('id', '[0-9]+')
+        ->name('elv.kit.ticket.thread');
+    Route::get('tickets/{id}/file/{name}', [TicketController::class, 'file'])
+        ->where('id', '[0-9]+')
+        ->where('name', '[A-Za-z0-9]{32}\.[a-z0-9]{2,5}')
+        ->name('elv.kit.ticket.file');
     Route::post('tickets/{id}/reply', [TicketController::class, 'reply'])
         ->where('id', '[0-9]+')
         ->name('elv.kit.ticket.reply');

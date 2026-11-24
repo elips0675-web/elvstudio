@@ -312,6 +312,152 @@
             });
         }
 
+        var handoff = chat.querySelector('[data-chat-handoff]');
+        var handoffForm = chat.querySelector('[data-chat-handoff-form]');
+        var handoffStatus = chat.querySelector('[data-chat-handoff-status]');
+        var handoffOpen = chat.querySelector('[data-chat-handoff-open]');
+        var handoffCancel = chat.querySelector('[data-chat-handoff-close]');
+        var handoffBusy = false;
+
+        var setHandoff = function (open) {
+            if (!handoff) {
+                return;
+            }
+
+            handoff.hidden = !open;
+
+            if (open) {
+                if (chatSuggest) {
+                    chatSuggest.hidden = true;
+                }
+
+                var first = doc.getElementById('elv-handoff-name');
+                if (first) {
+                    first.focus();
+                }
+            }
+        };
+
+        var fieldValue = function (name) {
+            var field = handoffForm ? handoffForm.querySelector('[name="' + name + '"]') : null;
+
+            return field ? field.value : '';
+        };
+
+        var firstError = function (data) {
+            var errors = (data && data.errors) || {};
+
+            for (var key in errors) {
+                if (Object.prototype.hasOwnProperty.call(errors, key) && errors[key] && errors[key].length) {
+                    return String(errors[key][0]);
+                }
+            }
+
+            return '';
+        };
+
+        if (handoffOpen) {
+            handoffOpen.addEventListener('click', function () {
+                showError('');
+                setHandoff(true);
+            });
+        }
+
+        if (handoffCancel) {
+            handoffCancel.addEventListener('click', function () {
+                setHandoff(false);
+            });
+        }
+
+        if (handoffForm) {
+            handoffForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                if (handoffBusy) {
+                    return;
+                }
+
+                var consent = handoffForm.querySelector('[name="consent"]');
+                var submit = handoffForm.querySelector('button[type="submit"]');
+
+                handoffBusy = true;
+                if (submit) {
+                    submit.disabled = true;
+                }
+                if (handoffStatus) {
+                    handoffStatus.hidden = true;
+                    handoffStatus.textContent = '';
+                }
+
+                fetch('/chat/handoff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrf()
+                    },
+                    body: JSON.stringify({
+                        name: fieldValue('name'),
+                        email: fieldValue('email'),
+                        message: fieldValue('message'),
+                        consent: consent && consent.checked ? 1 : 0
+                    })
+                })
+                    .then(function (response) {
+                        return response.json().catch(function () {
+                            return { ok: false };
+                        }).then(function (data) {
+                            return { status: response.status, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        if (result.status === 200 && result.data && result.data.ok) {
+                            handoffForm.hidden = true;
+
+                            if (handoffStatus) {
+                                handoffStatus.textContent = result.data.number
+                                    ? 'Обращение ' + result.data.number + ' создано. Ответ придёт на e-mail.'
+                                    : 'Обращение создано. Ответ придёт на e-mail.';
+
+                                if (result.data.url) {
+                                    var link = doc.createElement('a');
+                                    link.className = 'elv-chat__link';
+                                    link.href = result.data.url;
+                                    link.textContent = 'Открыть обращение в кабинете';
+                                    handoffStatus.appendChild(doc.createElement('br'));
+                                    handoffStatus.appendChild(link);
+                                }
+
+                                handoffStatus.hidden = false;
+                            }
+
+                            return;
+                        }
+
+                        var text = 'Не удалось отправить обращение. Напишите через форму обратной связи.';
+
+                        if (result.status === 422) {
+                            text = firstError(result.data) || 'Проверьте имя, e-mail и согласие.';
+                        }
+                        else if (result.status === 429) {
+                            text = (result.data && result.data.message) || 'Слишком много попыток. Подождите несколько минут.';
+                        }
+
+                        showError(text);
+                    })
+                    .catch(function () {
+                        showError('Сеть недоступна. Попробуйте ещё раз.');
+                    })
+                    .then(function () {
+                        handoffBusy = false;
+                        if (submit) {
+                            submit.disabled = false;
+                        }
+                    });
+            });
+        }
+
         if (chatSuggest) {
             Array.prototype.forEach.call(chatSuggest.querySelectorAll('[data-chat-q]'), function (chip) {
                 chip.addEventListener('click', function () {

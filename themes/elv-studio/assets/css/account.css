@@ -22,6 +22,9 @@
 .ticket-message header { margin-bottom: 6px; }
 .ticket-message__body { font-size: 14.5px; line-height: 1.6; overflow-wrap: anywhere; }
 .ticket-message__body a { color: var(--brand); }
+.ticket-files { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.ticket-files li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-size: 13.5px; }
+.ticket-files a { color: var(--brand); overflow-wrap: anywhere; }
 
 @media (max-width: 640px) {
     .account-head, .account-domains li { flex-direction: column; align-items: flex-start; }

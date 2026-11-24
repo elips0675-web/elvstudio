@@ -92,12 +92,16 @@ meta_robots = "noindex, nofollow"
                             </p>
                         </div>
                         <div class="ticket-meta">
-                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}">{{ ticket.status_label }}</span>
+                            <span class="badge {{ ticket.is_closed ? 'badge--line' : 'badge--accent' }}" data-ticket-status>{{ ticket.status_label }}</span>
                             <span class="tiny {{ ticket.sla_overdue ? 'ticket-overdue' : 'muted' }}">{{ ticket.sla_label }}</span>
                         </div>
                     </div>
 
-                    <div class="ticket-thread mt-24">
+                    <div class="ticket-thread mt-24"
+                         data-ticket-thread
+                         data-ticket-id="{{ ticket.id }}"
+                         data-last-id="{{ ticket.messages|length ? ticket.messages|last.id : 0 }}"
+                         {% if not ticket.is_closed %}data-poll-url="{{ url('/tickets/' ~ ticket.id ~ '/thread') }}"{% endif %}>
                         {% for message in ticket.messages %}
                             <article class="ticket-message {{ message.is_support ? 'ticket-message--support' : '' }}">
                                 <header>
@@ -106,12 +110,22 @@ meta_robots = "noindex, nofollow"
                                     <span class="tiny muted">· {{ message.created_at ? message.created_at|date('d.m.Y H:i') : '' }}</span>
                                 </header>
                                 <div class="ticket-message__body">{{ message.body|elv_text|raw }}</div>
+                                {% if message.files|length %}
+                                    <ul class="ticket-files">
+                                        {% for file in message.files %}
+                                            <li>
+                                                <a href="{{ file.url }}" download>{{ file.name }}</a>
+                                                <span class="tiny muted">{{ file.size_label }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </article>
                         {% endfor %}
                     </div>
 
                     {% if not ticket.is_closed %}
-                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}">
+                        <form class="form mt-24" id="reply" method="post" action="{{ url('/tickets/' ~ ticket.id ~ '/reply') }}" enctype="multipart/form-data">
                             {{ elv_csrf()|raw }}
                             <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -119,6 +133,14 @@ meta_robots = "noindex, nofollow"
                                 <label for="ticket-reply">Сообщение</label>
                                 <textarea class="input" id="ticket-reply" name="body" rows="5" required maxlength="5000" placeholder="Дополните вопрос или ответьте поддержке.">{{ elv_old('body') }}</textarea>
                             </div>
+
+                            {% if elv_ticket_attachments() %}
+                                <div class="field">
+                                    <label for="ticket-reply-files">Файлы <span class="hint">— до 3, по 5 МБ</span></label>
+                                    <input class="input" id="ticket-reply-files" type="file" name="attachments[]" multiple accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.log,.csv,.zip">
+                                    <p class="tiny muted mt-8 mb-0">Скриншоты и логи: png, jpg, gif, webp, pdf, txt, log, csv, zip.</p>
+                                </div>
+                            {% endif %}
 
                             <div class="stack-actions">
                                 <button class="btn btn--primary" type="submit">Отправить</button>
@@ -147,7 +169,7 @@ meta_robots = "noindex, nofollow"
                             Так ответ будет точнее.
                         </p>
 
-                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}">
+                        <form class="form mt-24" id="new-ticket" method="post" action="{{ url('/tickets') }}" enctype="multipart/form-data">
                             {{ elv_csrf()|raw }}
                             <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -174,6 +196,14 @@ meta_robots = "noindex, nofollow"
                                 <label for="ticket-body">Сообщение</label>
                                 <textarea class="input" id="ticket-body" name="body" rows="6" required minlength="10" maxlength="5000" placeholder="Что случилось и чем помочь?">{{ elv_old('body') }}</textarea>
                             </div>
+
+                            {% if elv_ticket_attachments() %}
+                                <div class="field">
+                                    <label for="ticket-files">Файлы <span class="hint">— до 3, по 5 МБ</span></label>
+                                    <input class="input" id="ticket-files" type="file" name="attachments[]" multiple accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.log,.csv,.zip">
+                                    <p class="tiny muted mt-8 mb-0">Скриншоты и логи: png, jpg, gif, webp, pdf, txt, log, csv, zip.</p>
+                                </div>
+                            {% endif %}
 
                             <label class="check">
                                 <input type="checkbox" name="consent" value="1" required {{ elv_old('consent') ? 'checked' : '' }}>

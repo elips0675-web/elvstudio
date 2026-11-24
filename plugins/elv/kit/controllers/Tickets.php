@@ -35,6 +35,13 @@ class Tickets extends Controller
         BackendMenu::setContext('Elv.Kit', 'kit', 'tickets');
     }
 
+    public function update($recordId = null, $context = null)
+    {
+        $this->vars['quickReplies'] = TicketService::quickReplies();
+
+        return parent::update($recordId, $context);
+    }
+
     public function onReply()
     {
         $ticket = $this->ticketFromRequest();

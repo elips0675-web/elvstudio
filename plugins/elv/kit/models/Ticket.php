@@ -24,6 +24,7 @@ class Ticket extends Model
     public const AUTHOR_CUSTOMER = 'customer';
     public const AUTHOR_SUPPORT = 'support';
     public const AUTHOR_SYSTEM = 'system';
+    public const AUTHOR_BOT = 'bot';
 
     public $table = 'elv_kit_tickets';
 
@@ -103,6 +104,24 @@ class Ticket extends Model
             self::PRIORITY_LOW => 'Низкий',
             default => 'Обычный',
         };
+    }
+
+    public function getSourceLabelAttribute(): string
+    {
+        return match ((string) $this->source) {
+            'feedback' => 'Форма обратной связи',
+            'chat' => 'Консультант',
+            'telegram' => 'Telegram',
+            default => 'Кабинет',
+        };
+    }
+
+    /**
+     * lastMessage — последнее сообщение переписки, если она загружена.
+     */
+    public function getLastMessageAttribute(): ?TicketMessage
+    {
+        return $this->messages->last();
     }
 
     public function getIsClosedAttribute(): bool

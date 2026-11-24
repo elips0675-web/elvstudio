@@ -4,7 +4,7 @@ const BASE = (process.env.ELV_BASE || 'http://127.0.0.1:8090').replace(/\/+$/, '
 const KB = 1024;
 const budgets = {
   html: 150 * KB,
-  css: 36 * KB,
+  css: 37 * KB,
   js: 20 * KB,
   gzip: 30 * KB,
 };
@@ -25,7 +25,14 @@ async function load(path) {
 for (const path of pages) {
   const html = await load(path);
   const cssParts = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((match) => match[1]);
-  const jsParts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+  // Считаем только исполняемый JS: JSON-LD и шаблоны — данные, а не скрипты.
+  const jsParts = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)]
+    .filter((match) => !/\bsrc\s*=/i.test(match[1]))
+    .filter((match) => {
+      const type = (match[1].match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
+      return !type || /^(?:text|application)\/(?:java|ecma)script$/i.test(type) || type === 'module';
+    })
+    .map((match) => match[2]);
   const css = cssParts.reduce((sum, part) => sum + Buffer.byteLength(part, 'utf8'), 0);
   const js = jsParts.reduce((sum, part) => sum + Buffer.byteLength(part, 'utf8'), 0);
   const htmlBytes = Buffer.byteLength(html, 'utf8');

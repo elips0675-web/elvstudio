@@ -1,18 +1,17 @@
 <?php namespace Elv\Kit\Classes\Http;
 
 use Elv\Kit\Classes\AntiSpam;
-use Elv\Kit\Classes\Mail\MessageAdmin;
+use Elv\Kit\Classes\TicketService;
 use Elv\Kit\Models\Message;
-use Elv\Kit\Models\Settings;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * FeedbackController — виджет обратной связи.
  *
- * Сообщение сначала сохраняется, потом ставится письмо: если SMTP лежит,
- * обращение не теряется, оно видно в админке.
+ * Сообщение остаётся в `elv_kit_messages` для истории админки, но работа с
+ * покупателем идёт через обращение: оно получает номер, срок ответа и видно в
+ * кабинете, если e-mail совпал с клиентом. Письмо администратору отправляет
+ * `TicketService`, поэтому дубля нет.
  */
 class FeedbackController extends FormController
 {
@@ -55,23 +54,23 @@ class FeedbackController extends FormController
         ]);
         $message->save();
 
-        $admin = (string) (Settings::get('order_notify_email') ?: Settings::get('email'));
-
-        if ($admin !== '') {
-            try {
-                Mail::to($admin)->queue(new MessageAdmin($message));
-            }
-            catch (\Throwable $e) {
-                Log::warning('Elv Kit: письмо обратной связи не отправлено', ['message' => $message->id, 'error' => $e->getMessage()]);
-            }
-        }
+        $ticket = (new TicketService())->openGuest([
+            'email' => (string) $message->email,
+            'name' => (string) $message->name,
+            'subject' => (string) ($message->subject ?: mb_substr((string) $message->message, 0, 120)),
+            'body' => (string) $message->message,
+        ]);
 
         if ($request->expectsJson()) {
-            return response()->json(['ok' => true, 'id' => $message->id], 201);
+            return response()->json([
+                'ok' => true,
+                'id' => $message->id,
+                'ticket' => (string) $ticket->number,
+            ], 201);
         }
 
         return $this->back($request, ['sent' => '1'])
-            ->with('elv_success', 'Сообщение отправлено. Ответим на ' . $message->email . '.');
+            ->with('elv_success', 'Обращение ' . $ticket->number . ' создано. Ответ придёт на ' . $message->email . '.');
     }
 
     protected function fallbackPath(): string

@@ -37,9 +37,11 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
 7. Личный кабинет: `AccountService`, `AccountController`, `Customer`,
    `themes/elv-studio/pages/account.htm` — вход по одноразовой ссылке,
    заказы, лицензии, домены и отвязка раз в 30 дней.
-8. Поддержка: `Support`, `TicketService`, `TicketController`, `Ticket`,
-   `themes/elv-studio/pages/tickets.htm`, админка `controllers/Tickets.php`,
-   `Telegram` и `TelegramController` — обращения, SLA и ChatOps.
+8. Поддержка: `Support`, `TicketService`, `TicketFiles`, `TicketController`,
+   `ChatController` (handoff), `AutocloseCommand`, `Ticket`,
+   `themes/elv-studio/pages/tickets.htm`, `assets/js/tickets.js`,
+   админка `controllers/Tickets.php`, `Telegram` и `TelegramController` —
+   обращения, SLA, вложения, polling, автозакрытие и ChatOps.
 9. Вопросы и отзывы: `Community`, `Questions`, `Reviews`, `Question`,
    `Review`, `QuestionController`, `ReviewController`,
    `partials/product-qa.htm`, `partials/product-reviews.htm`,
@@ -137,6 +139,22 @@ October своя. Витрина продаёт Elv Kit, модули, конс�
   Статусы `new/open/waiting/closed`, номер `TK-000001`; ответ покупателя
   возвращает закрытое обращение в работу. Страница закрыта `noindex` и
   `no-store`, в sitemap не входит; последние обращения видны в `/account/`.
+- Три входа дают одно обращение: кабинет, форма обратной связи и кнопка
+  «Передать оператору» в Консультанте. Форма и чат создают клиента по e-mail
+  (`TicketService::openGuest()`/`handoff()`), поэтому после входа по Magic Link
+  обращение видно в кабинете. История чата — последние 30 реплик в сессии
+  (`elv_chat_history`), ответы бота сохраняются автором `bot` с подписью
+  «Консультант», отклонённые и скрытые реплики в историю не попадают.
+- Вложения обращений: до 3 файлов по 5 МБ, `png/jpg/jpeg/gif/webp/pdf/txt/log/csv/zip`,
+  проверка расширения и MIME (`TicketFiles`). Файлы лежат в
+  `storage/app/elv-kit/tickets/{id}/` вне `public/`, имя на диске случайное,
+  скачивание — через `/tickets/{id}/file/{name}` только владельцу или
+  сотруднику с правом `elv.kit.tickets`.
+- Открытая вкладка `/tickets/` раз в 12 секунд спрашивает только новые
+  сообщения (`/tickets/{id}/thread?since=`), строит узлы через DOM и вставляет
+  текст как текст. Автозакрытие `elv:kit:autoclose` (расписание 04:10)
+  закрывает только `waiting`, где последнее слово не за покупателем; срок —
+  `ticket_autoclose_days` (по умолчанию 5, `0` — выключено).
 - Админка «Обращения»: переписка, ответ и закрытие через `TicketService`;
   SLA и просрочка видны в списке и карточке. Telegram ChatOps принимает
   `/reply TK-000001 текст`, `/close`, `/status`, `/start` только из

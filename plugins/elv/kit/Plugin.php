@@ -49,6 +49,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('elv.kit.package', \Elv\Kit\Console\PackageCommand::class);
         $this->registerConsoleCommand('elv.kit.remind', \Elv\Kit\Console\RemindCommand::class);
         $this->registerConsoleCommand('elv.kit.review', \Elv\Kit\Console\ReviewCommand::class);
+        $this->registerConsoleCommand('elv.kit.autoclose', \Elv\Kit\Console\AutocloseCommand::class);
     }
 
     public function registerSettings()
@@ -239,6 +240,7 @@ class Plugin extends PluginBase
         $schedule->command('elv:kit:demo --refresh-slots')->dailyAt('03:20')->withoutOverlapping();
         $schedule->command('elv:kit:remind')->hourly()->withoutOverlapping();
         $schedule->command('elv:kit:review')->dailyAt('10:10')->withoutOverlapping();
+        $schedule->command('elv:kit:autoclose')->dailyAt('04:10')->withoutOverlapping();
         $schedule->command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
     }
 
@@ -552,6 +554,9 @@ class Plugin extends PluginBase
                     $customer = $account->user();
 
                     return $customer ? $account->ticket($customer, (int) $id) : null;
+                },
+                'elv_ticket_attachments' => function () {
+                    return \Elv\Kit\Classes\TicketFiles::enabled();
                 },
                 'elv_account_licenses' => function () use ($account) {
                     $customer = $account->user();

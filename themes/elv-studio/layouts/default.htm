@@ -82,6 +82,9 @@ description = "Основной макет: шапка, подвал, инлай
 {% if this.page.id == 'calculator' %}
     <script src="{{ 'assets/js/calculator.js'|theme }}?v=20261117-2" defer></script>
 {% endif %}
+{% if this.page.id == 'tickets' %}
+    <script src="{{ 'assets/js/tickets.js'|theme }}?v=20261124-1" defer></script>
+{% endif %}
 <script nonce="{{ elv_csp_nonce() }}">{{ elv_kit_js()|raw }}</script>
 {% if elv_setting('analytics_google') or elv_setting('analytics_yandex') %}
     {% partial 'analytics' %}

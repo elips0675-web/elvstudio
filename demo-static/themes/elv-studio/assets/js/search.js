@@ -124,11 +124,11 @@
     }
 
     function hasForm(text, value) {
-        if (value.length < 4) {
-            return new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRegExp(value) + '($|[^\\p{L}\\p{N}])', 'u').test(text);
-        }
+        // Как в Search::containsAny(): начало слова проверяем всегда, конец —
+        // только для коротких форм, иначе «став» находил бы «доставку».
+        var suffix = value.length < 4 ? '(?![\\p{L}\\p{N}])' : '';
 
-        return text.indexOf(value) !== -1;
+        return new RegExp('(^|[^\\p{L}\\p{N}])' + escapeRegExp(value) + suffix, 'u').test(text);
     }
 
     function hasAny(text, forms) {
@@ -221,7 +221,7 @@
         });
 
         forms = forms.filter(function (form, index, all) {
-            return form.length >= 4 && all.indexOf(form) === index;
+            return form.length >= 3 && all.indexOf(form) === index;
         });
 
         if (!forms.length) {
@@ -233,19 +233,40 @@
             return b.length - a.length;
         });
 
-        var pattern = new RegExp('(' + forms.map(escapeRegExp).join('|') + ')', 'giu');
+        var longForms = forms.filter(function (form) {
+            return form.length >= 4;
+        });
+        var shortForms = forms.filter(function (form) {
+            return form.length === 3;
+        });
+        var chunks = [];
+
+        if (longForms.length) {
+            chunks.push('(' + longForms.map(escapeRegExp).join('|') + ')');
+        }
+
+        if (shortForms.length) {
+            // Короткие аббревиатуры (SEO, PHP, SSL) подсвечиваем только целым
+            // словом: иначе «api» попадёт внутрь «капитал».
+            chunks.push('(?:^|[^\\p{L}\\p{N}])(' + shortForms.map(escapeRegExp).join('|') + ')(?![\\p{L}\\p{N}])');
+        }
+
+        var pattern = new RegExp(chunks.join('|'), 'giu');
         var last = 0;
         var match;
 
         while ((match = pattern.exec(source)) !== null) {
-            if (match.index > last) {
-                node.appendChild(document.createTextNode(source.slice(last, match.index)));
+            var hit = match[1] || match[2] || '';
+            var start = match.index + (match[1] ? 0 : match[0].length - hit.length);
+
+            if (start > last) {
+                node.appendChild(document.createTextNode(source.slice(last, start)));
             }
 
             var mark = document.createElement('mark');
-            mark.textContent = match[0];
+            mark.textContent = hit;
             node.appendChild(mark);
-            last = match.index + match[0].length;
+            last = start + hit.length;
 
             if (match[0] === '') {
                 pattern.lastIndex += 1;
