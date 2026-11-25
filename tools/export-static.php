@@ -390,7 +390,7 @@ foreach (['sitemap.xml', 'robots.txt', 'llms.txt', 'rss.xml', 'search-index.json
     echo 'file: ' . $name . PHP_EOL;
 }
 
-staticCopy(dirname(__DIR__) . '/themes/elv-studio/assets', $out . '/themes/elv-studio/assets');
+staticCopy(dirname(__DIR__) . '/themes/elv-business/assets', $out . '/themes/elv-business/assets');
 
 if (!empty($options['manifest'])) {
     $manifest = [];

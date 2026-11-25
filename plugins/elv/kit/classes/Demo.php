@@ -95,7 +95,7 @@ class Demo
     {
         $defaults = [
             'email' => 'sales@example.com',
-            'chat_services' => "Хостинг и запуск\nПоддержка сайта\nМодули и плагины October CMS\nСайт с онлайн-записью\nБесплатный аудит\nSEO-продвижение",
+            'chat_services' => "Хостинг и запуск\nПоддержка сайта\nПлагины и интеграции October CMS\nСайт с онлайн-записью\nБесплатный аудит\nSEO-продвижение",
             'chat_services_url' => '/services/',
         ];
 
@@ -107,16 +107,14 @@ class Demo
     }
 
     /**
-     * menu — демонстрационный список раздела «Продукты» в шапке.
+     * menu — демонстрационный раздел «Продукт» в шапке.
      * Пустые настройки владельца не перетирает: пункты добавляются в админке.
      */
     public static function menu(): void
     {
         $defaults = [
-            'menu_products_label' => 'Продукты',
-            'menu_products' => "Elv Kit | /kit/ | Тема и плагин для October CMS\n"
-                . "Шаблон | /template/ | Готовый сайт под свой контент\n"
-                . "Модули | /modules/ | Запись, магазин, формы, блог",
+            'menu_products_label' => 'Продукт',
+            'menu_products' => 'Elv Kit | /kit/ | Тема и плагин для October CMS',
         ];
 
         foreach ($defaults as $key => $value) {
@@ -261,8 +259,8 @@ class Demo
                 'kind' => 'module',
                 'tagline' => 'Клиенты записываются сами, без звонков и переписки',
                 'description' => 'Клиент выбирает услугу, дату и свободное время. Занятое время исчезает из списка, поэтому две записи на одно время не появятся. Вы видите все записи в админке и можете отменить или перенести.',
-                'price_cents' => 4900,
-                'badge' => 'Раздел',
+                'price_cents' => 0,
+                'badge' => 'Входит в Elv Kit',
                 'icon' => 'calendar',
                 'demo_url' => '/booking/',
                 'docs_url' => '/docs/',
@@ -285,8 +283,8 @@ class Demo
                 'kind' => 'module',
                 'tagline' => 'Продажа товаров и файлов с оплатой картой',
                 'description' => 'Покупатель выбирает товар, оформляет заказ и платит на защищённой странице. После оплаты автоматически получает файл или подтверждение. Заказы и статусы видны в админке.',
-                'price_cents' => 3900,
-                'badge' => 'Раздел',
+                'price_cents' => 0,
+                'badge' => 'Входит в Elv Kit',
                 'icon' => 'cart',
                 'demo_url' => '/order/',
                 'docs_url' => '/docs/',
@@ -309,8 +307,8 @@ class Demo
                 'kind' => 'module',
                 'tagline' => 'Форма вопросов и заявок с защитой от спама',
                 'description' => 'Клиент пишет вопрос прямо на сайте. Сообщение сохраняется в админке и приходит вам на почту. Спам-боты отсекаются без капчи и лишних проверок.',
-                'price_cents' => 2900,
-                'badge' => 'Раздел',
+                'price_cents' => 0,
+                'badge' => 'Входит в Elv Kit',
                 'icon' => 'message',
                 'demo_url' => '/feedback/',
                 'docs_url' => '/docs/',
@@ -572,8 +570,8 @@ class Demo
     {
         return [
             'brand_name' => 'Elv Kit',
-            'brand_tagline' => 'Модульный конструктор сайтов на October CMS',
-            'brand_description' => 'Elv Kit — тема, модули и демо-данные для October CMS 4.x.',
+            'brand_tagline' => 'Готовый сайт для бизнеса на October CMS',
+            'brand_description' => 'Elv Kit — тема и плагин с готовыми разделами и демо-данными для October CMS 4.x.',
             'brand_subtitle' => '',
             'legal_name' => '',
             'email' => '',

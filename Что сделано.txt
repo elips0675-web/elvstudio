@@ -6,6 +6,114 @@
 
 ---
 
+(Stage 88 - 25.11.2026) - **Один продукт Elv Kit: разделы входят в тариф, `/template/` снят с продажи.**
+
+Что было: витрина продавала два продукта (Elv Kit и шаблон `/template/`) и
+отдельные модули `booking`, `shop`, `feedback`, `blog`. Меню «Продукты»
+показывало выпадающий список, калькулятор добавлял модули к тарифу, а заказ
+принимал не-kit товары и нулевые суммы.
+
+Что сделано:
+- `/template/` удалён: `pages/template.htm`, `partials/product-switch.htm`,
+  блоки «Два продукта» на главной и `/pricing/`, «Докупить» и фразы про
+  отдельную покупку разделов. 301 `/template` и `/template/` → `/kit/` в
+  `plugins/elv/kit/routes.php` и корневом `vercel.json`.
+- Меню «Продукт» — один пункт «Elv Kit» → `/kit/`: `Menu::fallback()`,
+  `Demo::menu()`, ветка прямой ссылки в `partials/header.htm`, подпись и
+  комментарий в `fields.yaml`; парсер `Menu::products()` остался универсальным.
+- Разделы входят в тариф: цены `booking`, `shop`, `feedback` в
+  `Demo::products()` — `0`; `Product::priceLabel` для `kind=module` пишет
+  «Входит в Elv Kit»; `module-cards.htm` и `module.htm` больше не показывают
+  цену и кнопку заказа раздела; `/order/?product=<раздел>` объясняет «входит
+  в Elv Kit», а `OrderController`/`OrderService` не создают заказ не-kit
+  товара и нулевого тарифа.
+- Калькулятор считает только тариф: убран шаг модулей, `selectedModules()`,
+  `modules` в URL и PDF, строки сметы и рекомендаций; `Calculator::estimate()`
+  и `recommendations()` — plan-only; `calculator-check.php` и
+  `calculator-e2e.mjs` переписаны.
+- Тексты: `Seo::llms()` и `Seo::SECTIONS`, `config/services.php`,
+  `config/calculator.php`, `Search.php`, `Chat.php`, `widget.htm`,
+  `services*.htm`, `terms.htm`, `README.md`, `AGENTS.md`, демо-статьи
+  `blog.json` (`tema-vs-plagin-v-elv-kit`, `chto-vhodit-v-elv-kit`,
+  `kak-vybrat-modul` и перелинковка).
+- Версия плагина — `1.5.0`, темы — `1.0.2`. Миграция
+  `updates/update_one_product.php`: цены модулей `0`, старые товары
+  `software/template` и `booking-script/cms-template/desktop-tool` выключены,
+  `menu_products` переписан на один Elv Kit, обновлены `faq_services_items`,
+  `brand_tagline` и `brand_description`.
+- `demo-static` пересобран: 172 страницы, каталога `template` нет, ссылок
+  `/template/` в `index.html`, `sitemap.xml`, `llms.txt` и `search-index.json`
+  нет.
+
+Чем проверено: `npm run check` — все гейты зелёные (включая
+`check-orphans`, `check-package`, `check-plans`, `check-promises`,
+`check-brand`, `check-php`, TTFB p90 109 мс); `php tools/admin-check.php`,
+`php tools/calculator-check.php` (`plans=3 modules=0`),
+`node tools/calculator-e2e.mjs` (`$79`/`$499`, PDF 69269 байт),
+`node tools/check-package.mjs` (плагин 1.5.0, тема 1.0.2). Миграция применена
+на dev-БД: `Elv.Kit v1.4.0 -> v1.5.0`, в настройках меню «Продукт», цены
+модулей `0`. `check-empty-install.mjs` на `:8091` проходит (10 страниц), но
+стенд заполнен — чистая установка ещё нужна.
+
+Что **не** проверено: обновление поверх `1.4.1` на отдельном стенде, живой
+301 `/template/` на Vercel после деплоя, чистая установка October, ручной QA
+360 px/Safari/клавиатуры и валидация JSON-LD.
+
+---
+
+Что было: путь темы зашит в плагине, гейтах и сборочных скриптах, поэтому
+переименование каталога «руками» ломало сборку архива, оферту в заказе,
+OG-картинку и проверку активной темы на странице «Установка».
+
+Что сделано:
+- `themes/elv-studio` → `themes/elv-business` (`git mv`, история файлов сохранена);
+  `theme.yaml` — `code: elv-business`, `composer.json` — `elv/elv-business`;
+  `.env` и `.env.example` — `ACTIVE_THEME=elv-business`.
+- Плагин: `DownloadService:74` (путь сборки архива и README для покупателя),
+  `OrderService:90` (оферта в письме и смете), `Seo:137,245` (`og-default`),
+  `Install:188-189` (проверка активной темы), комментарий `SearchConfig:7`.
+- Гейты и сборка: `check-package`, `check-encoding`, `check-orphans`,
+  `check-headers`, `check-plans`, `check-promises`, `community-check.php`,
+  `seo-check.php`, `export-static.php`, `build-test-snapshot.mjs`, `backup.ps1`,
+  `package.json`.
+- Документация покупателя: `pages/docs.htm` (5 мест), `pages/terms.htm`,
+  `README.md`, `AGENTS.md`, демо-статьи в `demo/blog.json`.
+- Бренд не тронут: `elv-studio.by`, `sales@elv-studio`, `Elv Studio`,
+  `elvstudio.vercel.app`. В `check-brand.mjs` заменены только пути: шаблон домена
+  записан как `/elv-studio\.by/i` (экранированная точка) и под общее правило не
+  попадал — файл правился отдельно, паттерны домена и почты остались на месте.
+- Пересобраны `elv-kit-1.4.1.zip` и `elv-kit-1.4.1-demo.zip`.
+
+Чем проверено: `node tools/gate.mjs` — все гейты зелёные (323 файла плагина и
+темы, 69 шаблонов, 28 файлов писем, 173 статические страницы, TTFB медиана
+144 мс); `php tools/production-check.php` — 17 OK, 0 ошибок; в архиве тема лежит
+в `elv-kit/theme`, README и `theme.yaml` называют `elv-business`, остатков
+`elv-studio` (кроме домена) нет. Сайт на `http://127.0.0.1:8090/` — 200, ассеты
+грузятся из `themes/elv-business`, JSON-LD-логотип и `og-default.png` отдают 200.
+
+Стенд `D:\Elv test`: корпоративный шаблон `themes/elv-business` удалён (копия —
+`elv-business-template-1.0.0.zip`, 30 файлов, сверено 0 расхождений), старая
+`themes/elv-studio` заменена продуктовой темой как `themes/elv-business`,
+`.env` — `ACTIVE_THEME=elv-business`, справка `запуск.bat` поправлена. В БД
+удалена строка `cms_theme_data` с настройками удалённой темы (`company_name`,
+`work_hours`): иначе новая тема унаследовала бы чужие поля. В перебрендированной
+копии плагина («Digital Store») поправлены только путевые ссылки — 5 файлов.
+
+Что **не** проверено:
+- гейты стенда: `check-urls` (10 битых ссылок `/products/...` и `/blog/...`),
+  `check-seo` и `check-orphans` падают из-за данных другой вертикали в БД стенда
+  (3 товара `booking-script`/`cms-template`/`desktop-tool`, 6 статей про
+  лицензии); `check-console` и `check-headers` — на стенде нет `demo-static`
+  и `vercel.json`;
+- `demo-static/` (175 файлов) и `test/ai-chat/` не пересобраны, в них ещё старые
+  пути; пересборка: `php tools/export-static.php` и
+  `node tools/build-test-snapshot.mjs`;
+- архивы 1.0.6–1.4.0 в `storage/app/kit` оставлены как есть: в их README старый
+  путь темы;
+- журналы `Что доделать.txt` и `docs/stages-01-11.md` не тронуты.
+
+---
+
 (Stage 86 - 24.11.2026) - **Обновление 1.4.0 → 1.4.1 проверено на рабочей установке.**
 
 Что было: чистая установка 1.4.1 проверена, а путь покупателя «уже стоит 1.4.0,

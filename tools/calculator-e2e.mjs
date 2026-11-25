@@ -225,27 +225,20 @@ async function main() {
 
             return {
                 plan: q('input[name="plan"]:checked').value,
-                modules: Array.from(document.querySelectorAll('input[name="modules"]:checked')).map((item) => item.value).sort(),
+                moduleInputs: document.querySelectorAll('input[name="modules"]').length,
                 launch: q('[data-total-launch]').textContent.trim(),
                 text: q('[data-recommend-text]').textContent.trim()
             };
         })()`);
 
+        assert(recommended.moduleInputs === 0, 'Calculator still renders module inputs');
         assert(recommended.plan === 'single', 'Recommended plan should be single');
-        assert(
-            JSON.stringify(recommended.modules) === JSON.stringify(['booking', 'feedback']),
-            'Recommended modules differ: ' + recommended.modules.join(',')
-        );
-        assert(recommended.launch === '$157', 'Recommended total should be $157, got ' + recommended.launch);
+        assert(recommended.launch === '$79', 'Recommended total should be $79, got ' + recommended.launch);
         assert(recommended.text.includes('Запись'), 'Recommendation text is empty or wrong');
 
         const selected = await cdp.evaluate(`(() => {
             const q = (selector) => document.querySelector(selector);
             q('input[name="plan"][value="extended"]').click();
-            document.querySelectorAll('input[name="modules"]').forEach((input) => {
-                input.checked = input.value === 'booking' || input.value === 'shop';
-            });
-            q('input[name="modules"][value="shop"]').dispatchEvent(new Event('change', { bubbles: true }));
             q('[data-calc-show-result]').click();
 
             return {
@@ -257,10 +250,10 @@ async function main() {
         })()`);
 
         assert(selected.hidden === false, 'Result block stayed hidden');
-        assert(selected.launch === '$587', 'Expected $587 for extended + booking + shop, got ' + selected.launch);
-        assert(selected.year === '$587', 'First-year total should match launch, got ' + selected.year);
+        assert(selected.launch === '$499', 'Expected $499 for extended, got ' + selected.launch);
+        assert(selected.year === '$499', 'First-year total should match launch, got ' + selected.year);
         assert(selected.pdf.includes('plan=extended'), 'PDF link has no plan');
-        assert(selected.pdf.includes('modules=booking%2Cshop') || selected.pdf.includes('modules=booking,shop'), 'PDF link has no modules');
+        assert(!selected.pdf.includes('modules='), 'PDF link still carries modules');
 
         await cdp.send('Page.navigate', {
             url: base + '/calculator/?plan=extended&modules=booking,shop&task=shop&hosting=need',
@@ -271,15 +264,16 @@ async function main() {
             const q = (selector) => document.querySelector(selector);
             return {
                 plan: q('input[name="plan"]:checked').value,
-                modules: Array.from(document.querySelectorAll('input[name="modules"]:checked')).map((item) => item.value).sort(),
+                moduleInputs: document.querySelectorAll('input[name="modules"]').length,
                 launch: q('[data-total-launch]').textContent.trim(),
                 pdf: q('[data-calc-pdf]').getAttribute('href')
             };
         })()`);
 
+        assert(fromUrl.moduleInputs === 0, 'Calculator restored module inputs from URL');
         assert(fromUrl.plan === 'extended', 'URL state did not restore plan');
-        assert(JSON.stringify(fromUrl.modules) === JSON.stringify(['booking', 'shop']), 'URL state did not restore modules');
-        assert(fromUrl.launch === '$587', 'URL state total should be $587, got ' + fromUrl.launch);
+        assert(fromUrl.launch === '$499', 'URL state total should be $499, got ' + fromUrl.launch);
+        assert(!fromUrl.pdf.includes('modules='), 'PDF link kept modules from URL');
         assert(fromUrl.pdf.includes('task=shop'), 'PDF link lost task after navigation');
         assert(fromUrl.pdf.includes('hosting=need'), 'PDF link lost hosting after navigation');
 
@@ -306,7 +300,7 @@ async function main() {
         assert(pdf.length > 20000, 'PDF is too small: ' + pdf.length);
         assert(disposition.includes('elv-quote-ELV-'), 'PDF filename has no quote number');
 
-        console.log('OK: calculator E2E default=$79 recommend=$157 result=$587 pdf=' + pdf.length + ' bytes');
+        console.log('OK: calculator E2E default=$79 recommend=$79 result=$499 pdf=' + pdf.length + ' bytes');
     } finally {
         if (cdp) {
             cdp.close();

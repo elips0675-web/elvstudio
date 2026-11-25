@@ -20,7 +20,17 @@ use Illuminate\Support\Facades\Route;
 /**
  * Маршруты Elv Kit. Формы живут под `web` (сессия + CSRF), вебхуки — без
  * сессии: подпись шлюза и есть аутентификация, а CSRF-токена у Stripe нет.
+ *
+ * `/template` — снятый с продажи второй продукт. Слэш на конце October
+ * добавляет общим обработчиком, поэтому оба адреса ведут сразу на `/kit/`.
  */
+Route::get('template', function () {
+    return redirect('/kit/', 301);
+});
+Route::get('template/', function () {
+    return redirect('/kit/', 301);
+});
+
 Route::middleware(['web', 'throttle:20,1'])->group(function () {
     Route::post('order', [OrderController::class, 'store'])->name('elv.kit.order');
     Route::post('booking', [BookingController::class, 'store'])->name('elv.kit.booking');

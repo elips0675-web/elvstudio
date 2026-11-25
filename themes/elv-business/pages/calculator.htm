@@ -2,7 +2,7 @@ title = "Калькулятор"
 url = "/calculator/"
 layout = "default"
 meta_title = "Калькулятор стоимости сайта на Elv Kit"
-meta_description = "Соберите смету за две минуты: тариф Elv Kit, модули, поддержка и хостинг. Три суммы раздельно, разбивка и дата актуальности цен. Без скрытых платежей."
+meta_description = "Соберите смету за две минуты: тариф Elv Kit, поддержка и хостинг. Три суммы раздельно, разбивка и дата актуальности цен. Без скрытых платежей."
 ==
 {% set calc = elv_calculator() %}
 {% set firstPlan = calc.plans|first %}
@@ -16,7 +16,7 @@ meta_description = "Соберите смету за две минуты: тар
             <span class="eyebrow">Калькулятор</span>
             <h1>Соберите смету за две минуты</h1>
             <p class="lead">
-                Выберите тариф и модули. Калькулятор покажет запуск, годовую часть и поддержку
+                Выберите тариф и хостинг. Калькулятор покажет запуск, годовую часть и поддержку
                 раздельно — чтобы было видно, за что вы платите, а что оплачивается провайдеру.
             </p>
             <div class="stack-actions">
@@ -51,16 +51,15 @@ meta_description = "Соберите смету за две минуты: тар
                     <div class="calc__main">
                         <div class="calc-progress" aria-label="Шаги калькулятора">
                             <button type="button" class="calc-progress__item is-active" data-calc-go="0"><span>1</span> Задача</button>
-                            <button type="button" class="calc-progress__item" data-calc-go="1"><span>2</span> Модули</button>
-                            <button type="button" class="calc-progress__item" data-calc-go="2"><span>3</span> Хостинг</button>
-                            <button type="button" class="calc-progress__item" data-calc-go="3"><span>4</span> Запуск</button>
+                            <button type="button" class="calc-progress__item" data-calc-go="1"><span>2</span> Хостинг</button>
+                            <button type="button" class="calc-progress__item" data-calc-go="2"><span>3</span> Запуск</button>
                         </div>
 
                         <div class="calc-step is-active" data-calc-step="0">
                             <div class="calc-step__head">
                                 <span class="eyebrow">Шаг 1</span>
                                 <h2>Что запускаем</h2>
-                                <p>Тип сайта помогает не забыть модули. Цену определяет тариф.</p>
+                                <p>Тип сайта помогает подобрать тариф.</p>
                             </div>
 
                             <div class="calc-fieldset">
@@ -127,51 +126,13 @@ meta_description = "Соберите смету за две минуты: тар
                             </div>
 
                             <div class="calc-actions">
-                                <button type="button" class="btn btn--primary" data-calc-next>Далее: модули</button>
+                                <button type="button" class="btn btn--primary" data-calc-next>Далее: хостинг</button>
                             </div>
                         </div>
 
                         <div class="calc-step" data-calc-step="1">
                             <div class="calc-step__head">
                                 <span class="eyebrow">Шаг 2</span>
-                                <h2>Модули</h2>
-                                <p>Блог уже входит в Elv Kit. Остальные модули можно добавить к лицензии.</p>
-                            </div>
-
-                            <div class="calc-modules">
-                                {% for module in calc.modules %}
-                                    <label class="calc-module">
-                                        <input
-                                            type="checkbox"
-                                            name="modules"
-                                            value="{{ module.slug }}"
-                                            data-price="{{ module.price }}"
-                                            data-label="{{ module.label }}">
-                                        <span class="calc-module__icon">{{ elv_icon(module.icon)|raw }}</span>
-                                        <span class="calc-module__body">
-                                            <b>{{ module.label }}</b>
-                                            <small>{{ module.tagline }}</small>
-                                        </span>
-                                        <span class="calc-module__price">{{ module.price_label }}</span>
-                                    </label>
-                                {% else %}
-                                    <div class="empty">
-                                        <p>Отдельных модулей сейчас нет — Elv Kit уже включает все разделы.</p>
-                                    </div>
-                                {% endfor %}
-                            </div>
-
-                            <p class="calc-note">Сторонние плагины в эту сумму не входят: их лицензии оплачиваются правообладателю. Поможем с установкой отдельно, если нужно.</p>
-
-                            <div class="calc-actions">
-                                <button type="button" class="btn btn--ghost" data-calc-back>Назад</button>
-                                <button type="button" class="btn btn--primary" data-calc-next>Далее: хостинг</button>
-                            </div>
-                        </div>
-
-                        <div class="calc-step" data-calc-step="2">
-                            <div class="calc-step__head">
-                                <span class="eyebrow">Шаг 3</span>
                                 <h2>Хостинг</h2>
                                 <p>Хостинг и домен студия не продаёт. Клиент платит провайдеру напрямую.</p>
                             </div>
@@ -206,9 +167,9 @@ meta_description = "Соберите смету за две минуты: тар
                             </div>
                         </div>
 
-                        <div class="calc-step" data-calc-step="3">
+                        <div class="calc-step" data-calc-step="2">
                             <div class="calc-step__head">
-                                <span class="eyebrow">Шаг 4</span>
+                                <span class="eyebrow">Шаг 3</span>
                                 <h2>Запуск и поддержка</h2>
                                 <p>Проверьте состав и покажите смету. Точная сумма фиксируется после брифа.</p>
                             </div>
@@ -218,7 +179,6 @@ meta_description = "Соберите смету за две минуты: тар
                                 <div class="calc-review__row"><span>Сайтов</span><span data-review-sites>1 сайт</span></div>
                                 <div class="calc-review__row"><span>Поддержка в тарифе</span><span data-review-support>30 дней</span></div>
                                 <div class="calc-review__row"><span>Обновления</span><span data-review-updates>12 месяцев</span></div>
-                                <div class="calc-review__row"><span>Модули</span><span data-review-modules>не выбраны</span></div>
                             </div>
 
                             <div class="calc-note">{{ calc.support_note }}</div>
@@ -365,7 +325,7 @@ meta_description = "Соберите смету за две минуты: тар
                         <span class="eyebrow">Как считается</span>
                         <h2>Без «от 100 рублей» и скрытых строк</h2>
                         <p>
-                            Запуск — это лицензия Elv Kit и выбранные модули. Годовая часть у студии равна нулю:
+                            Запуск — это лицензия Elv Kit. Годовая часть у студии равна нулю:
                             обновления уже входят в тариф, а хостинг оплачивается провайдеру. Поддержка входит
                             на срок тарифа; продление после него считается отдельно по объёму работ.
                         </p>
@@ -412,7 +372,6 @@ meta_description = "Соберите смету за две минуты: тар
             <h2>Смета Elv Kit</h2>
             <p>Дата: {{ calc.prices_updated_at }}. Смета не является офертой.</p>
             <p><b>Тариф:</b> <span data-print-plan></span></p>
-            <p><b>Модули:</b> <span data-print-modules></span></p>
             <table class="calc-breakdown">
                 <tbody data-print-breakdown></tbody>
             </table>
@@ -429,7 +388,7 @@ meta_description = "Соберите смету за две минуты: тар
         <noscript>
             <section class="section">
                 <div class="container">
-                    <div class="alert alert--warn" role="status">Для расчёта нужен JavaScript. Цены тарифов и модулей видны выше, а смету можно запросить на <a href="{{ 'contacts'|page }}">контактах</a>.</div>
+                    <div class="alert alert--warn" role="status">Для расчёта нужен JavaScript. Цены тарифов видны выше, а смету можно запросить на <a href="{{ 'contacts'|page }}">контактах</a>.</div>
                 </div>
             </section>
         </noscript>

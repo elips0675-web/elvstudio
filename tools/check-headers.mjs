@@ -90,8 +90,8 @@ if (!/<meta\s+name="robots"[^>]*noindex/i.test(previewBody)) {
 }
 
 const assets = [
-  ['/themes/elv-studio/assets/img/favicon.svg', 'image/svg+xml'],
-  ['/themes/elv-studio/assets/img/og-default.png', 'image/png'],
+  ['/themes/elv-business/assets/img/favicon.svg', 'image/svg+xml'],
+  ['/themes/elv-business/assets/img/og-default.png', 'image/png'],
 ];
 
 for (const [path, type] of assets) {

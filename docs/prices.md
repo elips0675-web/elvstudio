@@ -89,7 +89,7 @@
 | `plugins/elv/kit/models/price/columns.yaml` | колонки списка: тариф, цена, период, флаг |
 | `plugins/elv/kit/models/price/fields.yaml` | поля формы версии |
 | `plugins/elv/kit/Plugin.php` | меню «Прайс», право `elv.kit.prices`, `elv_prices_updated_at()` |
-| `themes/elv-studio/pages/pricing.htm` | дата цен через `elv_prices_updated_at()` |
+| `themes/elv-business/pages/pricing.htm` | дата цен через `elv_prices_updated_at()` |
 | `tools/price-check.php` | проверка резолвера, интеграции и конфигов админки |
 
 ## Как менять цену

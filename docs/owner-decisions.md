@@ -63,7 +63,7 @@
 
 - 23.11.2026: кабинет `/account/` закрыт — вход по Magic Link, заказы,
   лицензии, домены и отвязка раз в 30 дней (`plugins/elv/kit/classes/AccountService.php`,
-  `themes/elv-studio/pages/account.htm`, миграция 1.1.0).
+  `themes/elv-business/pages/account.htm`, миграция 1.1.0).
 - 23.11.2026: тикеты и Telegram ChatOps закрыты — миграция 1.2.0, страница
   `/tickets/`, админка «Обращения», SLA по рабочим часам
   (`Support::dueAt()`), уведомления в Telegram (`Telegram`, вебхук

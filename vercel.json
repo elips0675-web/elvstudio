@@ -4,6 +4,8 @@
   "trailingSlash": true,
   "redirects": [
     { "source": "/index.php", "destination": "/", "permanent": true },
+    { "source": "/template", "destination": "/kit/", "permanent": true },
+    { "source": "/template/", "destination": "/kit/", "permanent": true },
     { "source": "/blog/page/1/", "destination": "/blog/", "permanent": true },
     { "source": "/blog/page/5/", "destination": "/blog/page/4/", "permanent": true },
     { "source": "/blog/category/:slug/page/1/", "destination": "/blog/category/:slug/", "permanent": true },

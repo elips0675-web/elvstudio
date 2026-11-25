@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
-const roots = ['plugins/elv/kit', 'themes/elv-studio'];
+const roots = ['plugins/elv/kit', 'themes/elv-business'];
 const extensions = new Set(['.php', '.htm', '.html', '.yaml', '.yml', '.js', '.css', '.json', '.md', '.txt']);
 const invisible = [
   { code: 0xfeff, name: 'BOM (U+FEFF)' },

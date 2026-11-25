@@ -185,8 +185,8 @@ class Install extends Controller
         $checks[] = $this->tablesStatus();
 
         $checks[] = [
-            'label' => 'Тема elv-studio активна',
-            'ok' => \Cms\Classes\Theme::getActiveThemeCode() === 'elv-studio',
+            'label' => 'Тема elv-business активна',
+            'ok' => \Cms\Classes\Theme::getActiveThemeCode() === 'elv-business',
             'hint' => 'Front-end → Темы → Elv Studio → Активировать.',
         ];
 

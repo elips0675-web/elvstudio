@@ -26,7 +26,7 @@ $Root = Split-Path -Parent $PSScriptRoot
 $BackupsRoot = Join-Path $Root 'backup'
 $ServerPort = 8090
 
-$ThemePaths = @('themes\elv-studio', 'plugins\elv\kit')
+$ThemePaths = @('themes\elv-business', 'plugins\elv\kit')
 
 $SiteExcludePrefixes = @(
     'backup\',
@@ -281,8 +281,8 @@ function New-Snapshot {
         files        = $fileCount
         files_size   = (Get-Item -LiteralPath $zipPath).Length
         git_head     = $head
-        includes     = if ($Scope -eq 'site') { 'файлы сайта (без vendor, modules, node_modules, backup, docs, test, demo, demo-static, exports, кэшей) и БД' } else { 'themes/elv-studio, plugins/elv/kit и БД' }
-        excludes     = if ($Scope -eq 'site') { 'vendor, modules, node_modules, .git, backup, docs, test, demo, demo-static, exports, storage/logs, storage/framework/{cache,sessions,views,temp,testing}, bootstrap/cache' } else { 'всё, кроме themes/elv-studio и plugins/elv/kit' }
+        includes     = if ($Scope -eq 'site') { 'файлы сайта (без vendor, modules, node_modules, backup, docs, test, demo, demo-static, exports, кэшей) и БД' } else { 'themes/elv-business, plugins/elv/kit и БД' }
+        excludes     = if ($Scope -eq 'site') { 'vendor, modules, node_modules, .git, backup, docs, test, demo, demo-static, exports, storage/logs, storage/framework/{cache,sessions,views,temp,testing}, bootstrap/cache' } else { 'всё, кроме themes/elv-business и plugins/elv/kit' }
     }
 
     [IO.File]::WriteAllText((Join-Path $dir 'meta.json'), ($meta | ConvertTo-Json -Depth 3), (New-Object System.Text.UTF8Encoding($false)))

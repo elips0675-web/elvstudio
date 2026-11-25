@@ -30,6 +30,10 @@ class OrderService
 
         $amount = Prices::resolve($product, $plan);
 
+        if ($product->kind !== 'kit' || $amount <= 0) {
+            throw new \RuntimeException('Elv Kit: товар или тариф не продаётся, заказ не создаётся.');
+        }
+
         if (!empty($data['bump'])) {
             $amount += 1900;
         }
@@ -70,7 +74,7 @@ class OrderService
      * Галочку требует `OrderController::rules()` (`consent` => `accepted`), а
      * здесь фиксируется, когда она поставлена, с какого адреса и браузера и
      * какая редакция текста оферты действовала. Редакция — хэш файла
-     * `themes/elv-studio/pages/terms.htm`: покупатель правит оферту под себя,
+     * `themes/elv-business/pages/terms.htm`: покупатель правит оферту под себя,
      * и после правки хэш меняется, поэтому видно, с какой версией он соглашался.
      */
     public static function consentTrace(array $data = [], ?string $acceptedAt = null): array
@@ -87,7 +91,7 @@ class OrderService
 
     public static function termsVersion(): string
     {
-        $file = themes_path('elv-studio/pages/terms.htm');
+        $file = themes_path('elv-business/pages/terms.htm');
 
         return is_file($file) ? substr(hash_file('sha256', $file), 0, 12) : 'unknown';
     }
@@ -114,13 +118,27 @@ class OrderService
                 return $fresh;
             }
 
+            $sellable = $fresh->product
+                && $fresh->product->kind === 'kit'
+                && (int) $fresh->amount_cents > 0;
+
             $fresh->status = Order::STATUS_PAID;
             $fresh->payment_provider = $provider ?: $fresh->payment_provider;
             $fresh->payment_id = $paymentId ?: $fresh->payment_id;
             $fresh->paid_at = now();
-            $fresh->download_token = $fresh->download_token ?: bin2hex(random_bytes(24));
+
+            if ($sellable) {
+                $fresh->download_token = $fresh->download_token ?: bin2hex(random_bytes(24));
+            }
+
             $fresh->meta = array_merge((array) $fresh->meta, $meta, ['paid_by' => $provider]);
             $fresh->save();
+
+            if (!$sellable) {
+                Log::warning('Elv Kit: оплачен заказ без продаваемого товара — архив и лицензия не выданы', ['order' => $fresh->order_no]);
+
+                return $fresh;
+            }
 
             $license = $this->issueLicense($fresh);
 

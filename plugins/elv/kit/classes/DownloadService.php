@@ -71,7 +71,7 @@ class DownloadService
             throw new \RuntimeException('Не удалось открыть ZIP для записи.');
         }
 
-        $this->addDirectory($zip, base_path('themes/elv-studio'), 'elv-kit/theme', $demo);
+        $this->addDirectory($zip, base_path('themes/elv-business'), 'elv-kit/theme', $demo);
         $this->addDirectory($zip, base_path('plugins/elv/kit'), 'elv-kit/plugin', $demo);
 
         $zip->addFromString('elv-kit/README.md', $this->readme());
@@ -355,11 +355,11 @@ class DownloadService
     protected function readme(): string
     {
         return "# Elv Kit " . self::version() . "\n\n"
-            . "Тема `elv-studio` и плагин `Elv.Kit` для October CMS 4.4+.\n\n"
+            . "Тема `elv-business` и плагин `Elv.Kit` для October CMS 4.4+.\n\n"
             . "## Установка\n"
-            . "1. Скопируйте `theme/` в `themes/elv-studio/`, `plugin/` в `plugins/elv/kit/`.\n"
+            . "1. Скопируйте `theme/` в `themes/elv-business/`, `plugin/` в `plugins/elv/kit/`.\n"
             . "2. Выполните `php artisan october:migrate`.\n"
-            . "3. Включите тему: `ACTIVE_THEME=elv-studio` в `.env` или через Settings → CMS.\n"
+            . "3. Включите тему: `ACTIVE_THEME=elv-business` в `.env` или через Settings → CMS.\n"
             . "4. Настройте почту и платёжные ключи в Settings → Elv Kit.\n"
             . "5. Демо-данные (не обязательны): `php artisan elv:kit:demo` — заливает\n"
             . "   демонстрационные разделы, товары, контакты и FAQ. Статьи блога лежат\n"

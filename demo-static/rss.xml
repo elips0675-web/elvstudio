@@ -2,7 +2,7 @@
 <rss version="2.0"><channel>
     <title>Elv Kit</title>
     <link>https://elvstudio.vercel.app/blog/</link>
-    <description>Готовый сайт для бизнеса с онлайн-записью и оплатой</description>
+    <description>Готовый сайт для бизнеса на October CMS</description>
     <language>ru</language>
     <item>
       <title>Кейс под NDA: как показать работу без имени клиента</title>
@@ -96,17 +96,17 @@
       <pubDate>Sat, 21 Nov 2026 06:20:00 +0000</pubDate>
     </item>
     <item>
-      <title>Как выбрать модуль: запись, магазин, формы или блог</title>
+      <title>Как выбрать раздел: запись, магазин, формы или блог</title>
       <link>https://elvstudio.vercel.app/blog/kak-vybrat-modul</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/kak-vybrat-modul</guid>
-      <description>Четыре модуля, четыре задачи и один главный сценарий. Как выбрать первый модуль, что проверить в демо и почему не стоит включать всё сразу.</description>
+      <description>Четыре раздела, четыре задачи и один главный сценарий. Как выбрать первый раздел, что проверить в демо и почему не стоит включать всё сразу.</description>
       <pubDate>Sat, 21 Nov 2026 06:10:00 +0000</pubDate>
     </item>
     <item>
       <title>Что входит в Elv Kit и чего в нём нет</title>
       <link>https://elvstudio.vercel.app/blog/chto-vhodit-v-elv-kit</link>
       <guid isPermaLink="true">https://elvstudio.vercel.app/blog/chto-vhodit-v-elv-kit</guid>
-      <description>Тема, плагин, модули и честный список того, чего в поставке нет: кабинета, форума, мультиязычности и демо-статей. Чтобы не покупать вслепую.</description>
+      <description>Тема, плагин, встроенные разделы и честный список того, чего в поставке нет: кабинета, форума, мультиязычности и демо-статей. Чтобы не покупать вслепую.</description>
       <pubDate>Sat, 21 Nov 2026 06:00:00 +0000</pubDate>
     </item>
     <item>

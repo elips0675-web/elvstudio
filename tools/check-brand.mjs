@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
-const roots = ['plugins/elv/kit', 'themes/elv-studio'];
+const roots = ['plugins/elv/kit', 'themes/elv-business'];
 const extensions = new Set(['.php', '.htm', '.html', '.yaml', '.yml', '.js', '.css', '.json', '.md', '.txt']);
 const forbidden = [
   { pattern: /elv-studio\.by/i, hint: 'домен студии' },
@@ -71,9 +71,9 @@ roots.forEach((relative) => {
  * настроек, а не из текста файла; «Elv Kit» допустим как значение по умолчанию.
  */
 const templateRoots = [
-  'themes/elv-studio/layouts',
-  'themes/elv-studio/pages',
-  'themes/elv-studio/partials',
+  'themes/elv-business/layouts',
+  'themes/elv-business/pages',
+  'themes/elv-business/partials',
   'plugins/elv/kit/views',
 ];
 const hardBrand = /Elv Studio/;

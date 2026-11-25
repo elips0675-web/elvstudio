@@ -2,7 +2,7 @@
     Виджет Elv Kit: кнопка связи, меню контактов, форма обратной связи,
     Консультант и кнопка «наверх».
 
-    Разметка живёт в плагине, чтобы ехать вместе с ним при продаже модуля.
+    Разметка живёт в плагине, чтобы ехать вместе с продуктом.
     Стили и скрипт — assets/widget.css и assets/widget.js, вшиваются инлайном.
 #}
 {% set telegram = elv_setting('telegram') %}
@@ -76,18 +76,18 @@
             </button>
         </div>
 
-        <div class="elv-chat__log" id="elv-chat-log" role="log" aria-live="polite" data-greeting="Здравствуйте! Я консультант {{ elv_setting('brand_name', 'Elv Kit') }}. Отвечаю по базе знаний сайта: тарифы, модули, установка, оплата. Что подсказать?"></div>
+        <div class="elv-chat__log" id="elv-chat-log" role="log" aria-live="polite" data-greeting="Здравствуйте! Я консультант {{ elv_setting('brand_name', 'Elv Kit') }}. Отвечаю по базе знаний сайта: тарифы, разделы, установка, оплата. Что подсказать?"></div>
 
         <div class="elv-chat__suggest" data-chat-suggest>
             <button class="elv-chat__chip" type="button" data-chat-q="Сколько стоит {{ elv_setting('brand_name', 'Elv Kit') }}?">Сколько стоит?</button>
             <button class="elv-chat__chip" type="button" data-chat-q="Что входит в {{ elv_setting('brand_name', 'Elv Kit') }}?">Что входит?</button>
             <button class="elv-chat__chip" type="button" data-chat-q="Как установить на хостинг?">Как установить?</button>
-            <button class="elv-chat__chip" type="button" data-chat-q="Какие модули продаются отдельно?">Модули</button>
+            <button class="elv-chat__chip" type="button" data-chat-q="Какие разделы входят в {{ elv_setting('brand_name', 'Elv Kit') }}?">Разделы</button>
         </div>
 
         <form class="elv-chat__form" data-chat-form autocomplete="off">
             <label class="elv-sr" for="elv-chat-input">Сообщение</label>
-            <input class="elv-chat__input" id="elv-chat-input" type="text" name="message" maxlength="500" placeholder="Спросите про тарифы, модули, установку" autocomplete="off" required>
+            <input class="elv-chat__input" id="elv-chat-input" type="text" name="message" maxlength="500" placeholder="Спросите про тарифы, разделы, установку" autocomplete="off" required>
             <button class="elv-chat__send" type="submit" aria-label="Отправить сообщение">
                 {{ elv_icon('send')|raw }}
             </button>

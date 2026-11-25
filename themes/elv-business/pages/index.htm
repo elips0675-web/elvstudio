@@ -40,7 +40,6 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
                         <span>{{ elv_icon('check')|raw }} Данные остаются у вас</span>
                         <span>{{ elv_icon('check')|raw }} Оплата картой или через ЮKassa</span>
                     </div>
-                    <p class="hero__note"><a href="#products">Не уверены, что выбрать? Сравнить два продукта →</a></p>
                 </div>
 
                 <div>
@@ -107,24 +106,12 @@ meta_description = "Готовый сайт для бизнеса: онлайн-
         </div>
     </section>
 
-    <section class="section section--paper" id="products">
-        <div class="container">
-            <div class="section-head center">
-                <span class="eyebrow">Два продукта</span>
-                <h2>Сайт с записью или шаблон для бизнеса</h2>
-                <p>Это два разных продукта, а не один набор. Elv Kit сразу принимает записи и оплату, а шаблон — это страницы для сайта компании: главная, новости, события, услуги, каталог и контакты.</p>
-            </div>
-
-            {% partial 'product-switch' %}
-        </div>
-    </section>
-
     <section class="section" id="features">
         <div class="container">
             <div class="section-head center">
                 <span class="eyebrow">Что умеет сайт</span>
                 <h2>Всё для приёма клиентов — в одном месте</h2>
-                <p>Клиент выбирает услугу или товар, оставляет заявку и платит. Любой раздел можно взять отдельно — или весь сайт сразу.</p>
+                <p>Запись, продажа и контент — в одном сайте. Все разделы уже входят в Elv Kit: докупать их отдельно не нужно.</p>
             </div>
 
             {% set modules = elv_modules() %}

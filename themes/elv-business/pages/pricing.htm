@@ -33,18 +33,6 @@ meta_description = "Сколько стоит готовый сайт: тари�
         </div>
     </section>
 
-    <section class="section section--tight">
-        <div class="container">
-            <div class="section-head">
-                <span class="eyebrow">Два продукта</span>
-                <h2>Тарифы относятся к Elv Kit</h2>
-                <p>Шаблон для бизнеса — отдельный продукт. Он ещё в разработке, цена и дата не объявлены.</p>
-            </div>
-
-            {% partial 'product-switch' active='kit' %}
-        </div>
-    </section>
-
     <section class="section">
         <div class="container">
             {% if plans %}
@@ -94,22 +82,6 @@ meta_description = "Сколько стоит готовый сайт: тари�
             </div>
         </div>
     </section>
-
-    {% if elv_modules() %}
-        <section class="section">
-            <div class="container">
-                <div class="section-head">
-                    <span class="eyebrow">Докупить</span>
-                    <h2>Дополнительные разделы</h2>
-                    <p>Если сайт уже куплен, разделы подключаются отдельно — напишите, пришлём счёт с учётом уже купленного тарифа.</p>
-                </div>
-
-                <div class="grid grid--3">
-                    {% partial 'module-cards' modules=elv_modules() variant='price' %}
-                </div>
-            </div>
-        </section>
-    {% endif %}
 
     {% set faqItems = elv_faq() %}
     {% if faqItems|length %}

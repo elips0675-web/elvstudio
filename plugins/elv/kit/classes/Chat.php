@@ -570,11 +570,6 @@ class Chat
     protected static function modulesText(): string
     {
         $modules = Catalog::modules();
-
-        if (!count($modules)) {
-            return 'Разделы: онлайн-запись, заказы и оплата, обратная связь продаются отдельно, блог входит в Elv Kit.';
-        }
-
         $notes = [
             'booking' => 'онлайн-запись, занятое время исчезает',
             'shop' => 'заказы, оплата и выдача файла',
@@ -582,14 +577,18 @@ class Chat
             'blog' => 'статьи, категории и карта сайта',
         ];
 
-        $lines = ['Разделы продаются отдельно:'];
+        if (!count($modules)) {
+            return 'Онлайн-запись, заказы и оплата, обратная связь и блог входят в Elv Kit на любом тарифе. Отдельно разделы не продаются.';
+        }
+
+        $lines = ['Разделы входят в Elv Kit на любом тарифе:'];
 
         foreach ($modules as $module) {
             $note = $notes[$module->slug] ?? '';
-            $lines[] = '• ' . $module->name . ' — ' . $module->price_label . ($note !== '' ? ': ' . $note : '');
+            $lines[] = '• ' . $module->name . ($note !== '' ? ' — ' . $note : '');
         }
 
-        $lines[] = 'Блог входит в Elv Kit.';
+        $lines[] = 'Отдельно разделы не продаются.';
 
         return implode("\n", $lines);
     }
@@ -615,7 +614,7 @@ class Chat
 
         foreach (Catalog::modules() as $module) {
             if ($module->slug === $slug) {
-                return $module->name . ' — ' . $module->price_label . '. Продаётся отдельно от Elv Kit и подключается к сайту.';
+                return $module->name . ' входит в Elv Kit на любом тарифе и отдельно не продаётся. ' . static::plansText();
             }
         }
 

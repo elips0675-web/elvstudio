@@ -131,7 +131,7 @@ MySQL без лимита, cPanel + бесплатный SSL, почтовые �
 ### Что совпало с кодом (проверено)
 
 - Светлая тема, разгруженная шапка, системные шрифты, инлайн-SVG — уже в
-  `themes/elv-studio/assets/css/styles.css` и `partials/header.htm`.
+  `themes/elv-business/assets/css/styles.css` и `partials/header.htm`.
 - Честная плашка статической демо-версии и отключение форм — уже в
   `tools/export-static.php` (блок `#elv-demo-bar`, перехват `submit`).
 - JSON-LD, `sitemap.xml`, `robots.txt`, `llms.txt`, RSS — уже в

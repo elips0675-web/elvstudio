@@ -10,7 +10,7 @@
 
 ## Роль
 
-`D:\Elv Landing` — сайт продаж (тема `themes/elv-studio`) и сам продукт Elv Kit
+`D:\Elv Landing` — сайт продаж (тема `themes/elv-business`) и сам продукт Elv Kit
 (плагин `plugins/elv/kit`, namespace `Elv\Kit`): онлайн-запись, заказы и оплата,
 обратная связь, блог, подписка, лицензии, выдача ZIP после оплаты.
 
@@ -24,7 +24,7 @@
 
 | Путь | Что внутри |
 |---|---|
-| `themes/elv-studio/` | лендинг: `layouts/`, `pages/` (index, kit, modules, module, pricing, demo, blog, blog-tech, blog-post, docs, order, order-success, booking, feedback, contacts, terms, privacy, sitemap, 404), `partials/`, `assets/`, `content/` |
+| `themes/elv-business/` | лендинг: `layouts/`, `pages/` (index, kit, modules, module, pricing, demo, blog, blog-tech, blog-post, docs, order, order-success, booking, feedback, contacts, terms, privacy, sitemap, 404), `partials/`, `assets/`, `content/` |
 | `plugins/elv/kit/classes/` | `Catalog`, `Demo`, `Seo`, `Sitemap`, `Rss`, `DownloadService`, `LicenseService`, `OrderService`, `BookingService`, `Slots`, `Chat`, `AntiSpam`, `Http/*` |
 | `plugins/elv/kit/demo/` | `blog.json` — демо-статьи блога (38 базовых + 54 переопределения + 25 блоков перелинковки); в товарный архив не входит |
 | `plugins/elv/kit/models/` | `Product`, `Post`, `Order`, `Booking`, `Slot`, `Message`, `Subscriber`, `License`, `Install`, `Category`, `Settings` |
@@ -64,7 +64,7 @@
    старшую версию из файла, имя ZIP и README собираются из неё. Захардкоженная
    константа версии — дефект: проверка `node tools/check-package.mjs` (входит в
    `node tools/gate.mjs`) падает на расхождении и на возврате константы.
-   Тема версионируется отдельно — `themes/elv-studio/version.yaml`.
+   Тема версионируется отдельно — `themes/elv-business/version.yaml`.
 5. Секреты только в `.env`; в репозитории — `.env.example`.
 6. Витрина обязана работать на пустой базе: тарифов нет — `/pricing/` пишет
    «Прайс пока пуст» и не печатает дату цен, `/order/` объясняет, почему заказ
@@ -87,7 +87,7 @@
    `Prices::resolve()`), а не из `price_cents` и не из константы: иначе JSON-LD
    расходится с `/pricing/` и чатом. `AggregateOffer` с low/high/offerCount;
    нет продукта — узла нет.
-8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-studio`),
+8. В файлах, которые уезжают покупателю (`plugins/elv/kit`, `themes/elv-business`),
    нет нашего домена и контактов: `elv-studio.by`, `sales@elv-studio`,
    `t.me/elvstudio`. Контакты — только из Settings (`email`, `telegram`), валюта —
    `Money::currency()`, дефолт почты — `sales@example.com`. Название бренда в
@@ -162,12 +162,13 @@
     пишется 0. Проверка:
     `node tools/check-package.mjs` (товарный архив без `demo/blog.json`,
     демо-архив с ним, `Demo::posts()` совпадает с числом уникальных slug).
-15. Пункт «Продукты» в шапке — из настроек (вкладка «Меню»):
-    `menu_products_label` (по умолчанию «Продукты») и `menu_products` —
-    «Название | адрес | подпись» по строке. Пустые настройки дают «Elv Kit» и
-    «Шаблон» (`Menu::fallback()`), поэтому шапка работает на чистой установке.
-    Демо-значения ставит `elv:kit:demo` (`Demo::menu()`). Зашитый список
-    разработок в `header.htm` — дефект.
+15. Пункт «Продукт» в шапке — из настроек (вкладка «Меню»):
+    `menu_products_label` (по умолчанию «Продукт») и `menu_products` —
+    «Название | адрес | подпись» по строке. Один пункт — прямая ссылка без
+    выпадающего списка; два и больше — выпадающий список. Пустые настройки
+    дают один пункт «Elv Kit» → `/kit/` (`Menu::fallback()`), поэтому шапка
+    работает на чистой установке. Демо-значения ставит `elv:kit:demo`
+    (`Demo::menu()`). Зашитый список разработок в `header.htm` — дефект.
 16. Живой предпросмотр — `/preview/:slug?` (`layouts/preview.htm`,
     `partials/preview.htm`): без шапки и подвала, `noindex, nofollow`,
     `no-store`, вне sitemap и `llms.txt`. Фрейм по умолчанию разрешён только

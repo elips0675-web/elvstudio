@@ -67,7 +67,6 @@
 .calc-plan--featured { border-color: var(--brand); }
 .calc-plan:has(input:checked) { border-color: var(--brand); box-shadow: var(--ring); }
 .calc-plan:hover { border-color: var(--brand); }
-.calc-modules { display: grid; gap: 10px; }
 .calc-module {
     display: flex; align-items: center; gap: 12px; padding: 14px;
     border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer;

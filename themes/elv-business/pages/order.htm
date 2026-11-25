@@ -2,12 +2,11 @@ title = "Заказ"
 url = "/order/"
 layout = "default"
 meta_title = "Заказать готовый сайт Elv Kit"
-meta_description = "Заказ готового сайта и разделов: выбор тарифа, оплата картой через ЮKassa или Stripe, файлы сайта и ключ на e-mail. Поможем с установкой на ваш домен."
+meta_description = "Заказ готового сайта Elv Kit: выбор тарифа, оплата картой через ЮKassa или Stripe, файлы сайта и ключ на e-mail. Поможем с установкой на ваш домен."
 ==
 {% set requestedProduct = elv_query('product') %}
-{% set isTemplate = requestedProduct == 'template' %}
 {% set product = elv_product(requestedProduct) %}
-{% if not product and requestedProduct and not isTemplate %}
+{% if not product and requestedProduct %}
     {{ elv_not_found() }}
 {% endif %}
 {% set product = product ?: elv_kit() %}
@@ -20,7 +19,8 @@ meta_description = "Заказ готового сайта и разделов: 
     {% set selectedPlan = planKeys|first ?: 'single' %}
 {% endif %}
 {% set planLabel = elv_plan_label(selectedPlan) %}
-{% set isFree = product and product.kind != 'kit' and elv_price(product) <= 0 %}
+{% set activePlan = plans|filter(item => item.key == selectedPlan)|first %}
+{% set isIncluded = product and product.kind != 'kit' and elv_price(product) <= 0 %}
 {% set crumbs = elv_breadcrumbs() %}
 
 <main id="main">
@@ -33,23 +33,7 @@ meta_description = "Заказ готового сайта и разделов: 
         </div>
     </section>
 
-    {% if isTemplate %}
-    <section class="section">
-        <div class="container">
-            <div class="empty">
-                <h2>Шаблон ещё в разработке</h2>
-                <p>
-                    Универсальный шаблон для бизнеса пока не продаётся: цена и дата релиза не объявлены.
-                    Если нужен именно каркас для сайтов клиентов — напишите, сообщим, когда будет готов.
-                </p>
-                <div class="stack-actions">
-                    <a class="btn btn--ghost" href="{{ 'template'|page }}">О шаблоне</a>
-                    <a class="btn btn--primary" href="{{ 'feedback'|page }}">Написать нам</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    {% elseif isFree %}
+    {% if isIncluded %}
     <section class="section">
         <div class="container">
             <div class="empty">
@@ -71,19 +55,12 @@ meta_description = "Заказ готового сайта и разделов: 
             <div class="chips mb-24">
                 {% set kitProduct = elv_kit() %}
                 {% if kitProduct %}
-                    <a class="chip{% if product.slug == kitProduct.slug %} chip--active{% endif %}" href="{{ elv_order_url({ product: kitProduct.slug }) }}">
+                    <a class="chip chip--active" href="{{ elv_order_url({ product: kitProduct.slug }) }}">
                         {{ kitProduct.name }}
                     </a>
                 {% endif %}
-                {% for item in elv_modules() %}
-                    {% if elv_price(item) > 0 %}
-                        <a class="chip{% if product.slug == item.slug %} chip--active{% endif %}" href="{{ elv_order_url({ product: item.slug }) }}">
-                            {{ item.name }} — {{ elv_money(elv_price(item)) }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
             </div>
-            <p class="small muted">Оформляется Elv Kit. <a href="{{ 'template'|page }}">Шаблон для бизнеса</a> ещё в разработке — цена не объявлена.</p>
+            <p class="small muted">Все разделы — онлайн-запись, заказы, обратная связь и блог — уже входят в Elv Kit. Отдельно они не продаются.</p>
 
             {% if elv_flash('elv_error') %}
                 <div class="alert alert--err mb-24" role="alert">{{ elv_flash('elv_error') }}</div>
@@ -221,7 +198,8 @@ meta_description = "Заказ готового сайта и разделов: 
 
                     <div class="summary__total">
                         <span>Итого</span>
-                        <b data-total="{{ elv_money(product.planPrice(selectedPlan)) }}">{{ elv_money(product.planPrice(selectedPlan)) }}</b>
+                        {% set orderTotal = activePlan ? activePlan.price : elv_price(product) %}
+                        <b data-total="{{ elv_money(orderTotal) }}">{{ elv_money(orderTotal) }}</b>
                     </div>
 
                     {% partial 'check-items' items=elv_includes()|slice(0, 4) %}

@@ -94,7 +94,7 @@ const DEFAULT_LABELS = ['Один сайт', 'До 5 сайтов', 'Без ог
 const scannedLabels = [...new Set([...labels, ...DEFAULT_LABELS])];
 
 const scanRoots = [
-  { dir: path.join(root, 'themes/elv-studio'), extensions: ['.htm'], skipDirs: ['assets', 'content'] },
+  { dir: path.join(root, 'themes/elv-business'), extensions: ['.htm'], skipDirs: ['assets', 'content'] },
   { dir: path.join(root, 'plugins/elv/kit'), extensions: ['.php', '.htm', '.yaml'], skipDirs: [] },
 ];
 

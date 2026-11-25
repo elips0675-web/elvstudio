@@ -54,6 +54,10 @@ class Product extends Model
 
     public function getPriceLabelAttribute(): string
     {
+        if ($this->kind === 'module') {
+            return 'Входит в Elv Kit';
+        }
+
         $price = Prices::resolve($this, 'single');
 
         return $price > 0 ? Money::format($price) : 'Бесплатно';

@@ -3,11 +3,11 @@
 
     variant: compact (по умолчанию) — карточка-ссылка на модуль;
              full — большая карточка каталога с описанием и кнопками;
-             price — карточка с ценой и двумя кнопками (/pricing/).
+             price — карточка с составом (/pricing/).
     modules: коллекция elv_modules().
     tones:   список цветовых вариантов иконки (compact), по кругу.
     exclude: slug модуля, который не показываем (текущая страница).
-    badge:   false — без бейджа «Можно отдельно / Входит в Elv Kit» (compact).
+    badge:   false — без бейджа «Входит в Elv Kit» (compact).
     meta:    'price' — цена в нижней строке, 'more' — «Подробно» (compact).
 #}
 {% set variant = variant|default('compact') %}
@@ -24,7 +24,7 @@
                     {% if module.badge %}
                         <span class="badge badge--line">{{ module.badge }}</span>
                     {% endif %}
-                    <span class="badge">{{ elv_price(module) > 0 ? elv_money(elv_price(module)) : elv_badge('included') }}</span>
+                    <span class="badge">{{ elv_badge('included') }}</span>
                 </div>
                 <h2>{{ module.name }}</h2>
                 <p class="lead">{{ module.tagline }}</p>
@@ -42,15 +42,9 @@
                     <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">
                         Подробно {{ elv_icon('arrow-right')|raw }}
                     </a>
-                    {% if elv_price(module) > 0 %}
-                        <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug, plan: 'single' }) }}">
-                            {{ elv_icon('cart')|raw }} Подключить за {{ elv_money(elv_price(module)) }}
-                        </a>
-                    {% else %}
-                        <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
-                            {{ elv_icon('cart')|raw }} Заказать сайт
-                        </a>
-                    {% endif %}
+                    <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
+                        {{ elv_icon('cart')|raw }} Заказать сайт
+                    </a>
                 </div>
             </article>
         {% elseif variant == 'price' %}
@@ -59,14 +53,11 @@
                 <h3>{{ module.name }}</h3>
                 <p>{{ module.tagline }}</p>
                 <div class="summary__total">
-                    <span class="muted small">Цена</span>
-                    <b>{{ elv_price(module) > 0 ? elv_money(elv_price(module)) : elv_badge('included') }}</b>
+                    <span class="muted small">Состав</span>
+                    <b>{{ elv_badge('included') }}</b>
                 </div>
                 <div class="stack-actions">
                     <a class="btn btn--ghost" href="{{ 'module'|page({ slug: module.slug }) }}">Подробно</a>
-                    {% if elv_price(module) > 0 %}
-                        <a class="btn btn--primary" href="{{ elv_order_url({ product: module.slug }) }}">Подключить</a>
-                    {% endif %}
                 </div>
             </div>
         {% else %}
@@ -75,15 +66,13 @@
                 <h3>{{ module.name }}</h3>
                 {% if badge %}
                     <p class="mb-0">
-                        <span class="badge {{ elv_price(module) > 0 ? 'badge--line' : 'badge--accent' }}">{{ elv_price(module) > 0 ? elv_badge('separate') : elv_badge('included') }}</span>
+                        <span class="badge badge--accent">{{ elv_badge('included') }}</span>
                     </p>
                 {% endif %}
                 <p{% if badge %} class="mt-16"{% endif %}>{{ module.tagline }}</p>
                 <span class="card__more">
                     {% if meta == 'more' %}
                         Подробно
-                    {% elseif elv_price(module) > 0 %}
-                        {{ elv_money(elv_price(module)) }}
                     {% else %}
                         Подробнее
                     {% endif %}

@@ -54,14 +54,14 @@
 | `plugins/elv/kit/assets/widget.js` | рендер ответа и ссылок Консультанта |
 | `plugins/elv/kit/classes/Http/SeoController.php` | отдаёт `/search-index.json` с кэшем 30 минут |
 | `plugins/elv/kit/routes.php` | маршрут `search-index.json` |
-| `themes/elv-studio/pages/search.htm` | разметка страницы, форма, фильтры, кнопка «Показать ещё» |
-| `themes/elv-studio/pages/sitemap.htm` | сгруппированная карта сайта, якоря и ссылки на поиск |
+| `themes/elv-business/pages/search.htm` | разметка страницы, форма, фильтры, кнопка «Показать ещё» |
+| `themes/elv-business/pages/sitemap.htm` | сгруппированная карта сайта, якоря и ссылки на поиск |
 | `plugins/elv/kit/classes/Seo.php` | JSON-LD `WebSite`/`SearchAction`, `Organization.logo`, `FAQPage` |
 | `plugins/elv/kit/classes/Sitemap.php` | XML-sitemap без `hidden`-страниц |
-| `themes/elv-studio/assets/js/search.js` | загрузка индекса и словарей из `data-search-config`, поиск, основы, фильтр, пагинация, подсветка, `history.replaceState` |
-| `themes/elv-studio/assets/css/search.css` | стили страницы; подключается только на `/search/` |
-| `themes/elv-studio/partials/header.htm` | кнопка и `<dialog>` поиска |
-| `themes/elv-studio/assets/js/app.js` | открытие/закрытие диалога |
+| `themes/elv-business/assets/js/search.js` | загрузка индекса и словарей из `data-search-config`, поиск, основы, фильтр, пагинация, подсветка, `history.replaceState` |
+| `themes/elv-business/assets/css/search.css` | стили страницы; подключается только на `/search/` |
+| `themes/elv-business/partials/header.htm` | кнопка и `<dialog>` поиска |
+| `themes/elv-business/assets/js/app.js` | открытие/закрытие диалога |
 | `tools/export-static.php` | `search-index.json`, страница `/search/`, разрешение формы |
 
 Индекс — обычный JSON-массив. Запись статьи содержит `title`, `url`,

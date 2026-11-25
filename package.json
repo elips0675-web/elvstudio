@@ -1,8 +1,8 @@
 {
-  "name": "elv-studio-landing",
+  "name": "elv-business-landing",
   "private": true,
   "type": "module",
-  "description": "Тема elv-studio и плагин Elv Kit для October CMS: гейты и выгрузка демо-версии",
+  "description": "Тема elv-business и плагин Elv Kit для October CMS: гейты и выгрузка демо-версии",
   "scripts": {
     "check": "node tools/gate.mjs",
     "check:urls": "node tools/check-urls.mjs",

@@ -1,14 +1,14 @@
 <?php namespace Elv\Kit\Classes;
 
-use Elv\Kit\Models\Product;
 use Elv\Kit\Models\Settings;
 
 /**
  * Calculator — единый расчёт стоимости запуска на Elv Kit.
  *
  * Цены тарифов берутся из Classes\Prices (действующая версия прайса, иначе
- * карточка товара), цены модулей — из каталога. Чисел в шаблоне нет.
- * Хостинг и домен студия не продаёт: они оплачиваются провайдеру напрямую.
+ * карточка товара). Разделы входят в Elv Kit и в смету отдельными строками
+ * не попадают. Хостинг и домен студия не продаёт: они оплачиваются
+ * провайдеру напрямую.
  */
 class Calculator
 {
@@ -33,26 +33,6 @@ class Calculator
 
         $modules = [];
 
-        foreach (Catalog::modules() as $module) {
-            if (!$module instanceof Product) {
-                continue;
-            }
-
-            $modulePrice = Prices::resolve($module, 'single');
-
-            $modules[] = [
-                'slug' => (string) $module->slug,
-                'label' => (string) $module->name,
-                'tagline' => (string) $module->tagline,
-                'price' => $modulePrice,
-                'price_label' => $modulePrice > 0
-                    ? Money::format($modulePrice)
-                    : 'включён в Elv Kit',
-                'icon' => (string) ($module->icon ?: 'puzzle'),
-                'url' => (string) $module->url,
-            ];
-        }
-
         return [
             'enabled' => (bool) Settings::get('calculator_enabled', true),
             'currency' => Money::currency(),
@@ -69,12 +49,12 @@ class Calculator
     }
 
     /**
-     * recommendations — рекомендуемый набор для задачи.
+     * recommendations — рекомендуемый тариф для задачи.
      *
-     * Это не «лучший тариф», а стартовая точка: один сайт и модули, которые
-     * чаще всего нужны для выбранного типа проекта. Цены остаются из каталога.
+     * Это не «лучший тариф», а стартовая точка: разделы уже входят в Elv Kit,
+     * поэтому рекомендация ограничивается тарифом. Цены остаются из каталога.
      *
-     * @return array<string, array{plan:string, modules:array<int, string>, reason:string}>
+     * @return array<string, array{plan:string, reason:string}>
      */
     public static function recommendations(): array
     {
@@ -85,23 +65,19 @@ class Calculator
         $items = [
             'landing' => [
                 'plan' => 'single',
-                'modules' => [],
-                'reason' => 'Тариф «' . $labels['single'] . '»: блог уже включён. Если сайтов несколько — «' . $labels['multi'] . '».',
+                'reason' => 'Тариф «' . $labels['single'] . '»: все разделы уже включены. Если сайтов несколько — «' . $labels['multi'] . '».',
             ],
             'services' => [
                 'plan' => 'single',
-                'modules' => ['booking', 'feedback'],
-                'reason' => 'Запись и обратная связь для сайта услуг: «' . $labels['single'] . '». Для 2–5 сайтов — «' . $labels['multi'] . '».',
+                'reason' => 'Запись и обратная связь уже входят в «' . $labels['single'] . '». Для 2–5 сайтов — «' . $labels['multi'] . '».',
             ],
             'shop' => [
                 'plan' => 'single',
-                'modules' => ['shop', 'feedback'],
-                'reason' => 'Магазин и обратная связь. Оплата и доставка настраиваются отдельно.',
+                'reason' => 'Магазин и обратная связь уже входят в «' . $labels['single'] . '». Оплата и доставка настраиваются отдельно.',
             ],
             'booking' => [
                 'plan' => 'single',
-                'modules' => ['booking', 'feedback'],
-                'reason' => 'Онлайн-запись и обратная связь: «' . $labels['single'] . '». Для сети сайтов — «' . $labels['multi'] . '».',
+                'reason' => 'Онлайн-запись и обратная связь уже входят в «' . $labels['single'] . '». Для сети сайтов — «' . $labels['multi'] . '».',
             ],
         ];
 
@@ -177,6 +153,9 @@ class Calculator
     /**
      * estimate — формула для тестов и будущих серверных смет.
      *
+     * Разделы входят в Elv Kit, поэтому `$moduleSlugs` принимается для
+     * совместимости со старыми ссылками и не влияет на сумму.
+     *
      * @param  array<int, string>|string  $moduleSlugs
      * @return array{launch:int, annual:int, monthly:int, first_year:int, next_year:int, plan:array<string, mixed>, modules:array<int, array<string, mixed>>, breakdown:array<int, array<string, mixed>>}
      */
@@ -209,38 +188,14 @@ class Calculator
             ];
         }
 
-        if (!is_array($moduleSlugs)) {
-            $moduleSlugs = array_filter(array_map('trim', explode(',', (string) $moduleSlugs)));
-        }
-
-        $wanted = array_fill_keys(array_map('strval', $moduleSlugs), true);
-        $selected = [];
+        $launch = (int) $plan['price'];
         $breakdown = [
             [
                 'type' => 'plan',
                 'label' => $plan['label'],
-                'price' => (int) $plan['price'],
+                'price' => $launch,
             ],
         ];
-
-        foreach ($data['modules'] as $module) {
-            if (!isset($wanted[$module['slug']])) {
-                continue;
-            }
-
-            $selected[] = $module;
-            $breakdown[] = [
-                'type' => 'module',
-                'label' => $module['label'],
-                'price' => (int) $module['price'],
-            ];
-        }
-
-        $launch = (int) $plan['price'];
-
-        foreach ($selected as $module) {
-            $launch += (int) $module['price'];
-        }
 
         $annual = 0;
         $monthly = 0;
@@ -252,7 +207,7 @@ class Calculator
             'first_year' => $launch + $annual + ($monthly * 12),
             'next_year' => $annual + ($monthly * 12),
             'plan' => $plan,
-            'modules' => $selected,
+            'modules' => [],
             'breakdown' => $breakdown,
         ];
     }

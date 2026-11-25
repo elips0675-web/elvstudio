@@ -16,7 +16,6 @@ class Seo
 {
     public const SECTIONS = [
         'kit' => 'Возможности',
-        'template' => 'Шаблон',
         'modules' => 'Разделы',
         'services' => 'Услуги',
         'calculator' => 'Калькулятор',
@@ -134,7 +133,7 @@ class Seo
 
     public static function image($page = null): string
     {
-        $fallback = static::base() . '/themes/elv-studio/assets/img/og-default.png';
+        $fallback = static::base() . '/themes/elv-business/assets/img/og-default.png';
         $cover = static::$post ? trim((string) static::$post->cover) : '';
 
         // Обложка статьи — имя иконки (graph, calendar, spark), а не картинка.
@@ -242,7 +241,7 @@ class Seo
                 '@id' => $base . '/#organization',
                 'name' => static::siteName(),
                 'url' => $base . '/',
-                'logo' => $base . '/themes/elv-studio/assets/img/og-default.png',
+                'logo' => $base . '/themes/elv-business/assets/img/og-default.png',
                 'email' => (string) Settings::get('email'),
                 'sameAs' => array_values(array_filter([
                     (string) Settings::get('telegram'),
@@ -565,9 +564,9 @@ class Seo
             '',
             '## Что это',
             '- [Elv Kit](' . static::base() . '/kit/): готовый сайт для бизнеса — услуги, онлайн-запись, заказы и оплата, блог и админка' . ($kitPrice > 0 ? '; цена от ' . Money::format($kitPrice) : '') . '.',
-            '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Разделы можно купить отдельно.',
-            '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог.',
-            '- [Калькулятор](' . static::base() . '/calculator/): лицензия и модули, три суммы и разбивка без скрытых платежей.',
+            '- [Цены](' . static::base() . '/pricing/): один сайт, до 5 сайтов, без ограничений. Все разделы входят в Elv Kit.',
+            '- [Разделы](' . static::base() . '/modules/): онлайн-запись, заказы и оплата, обратная связь, блог — уже в составе Elv Kit.',
+            '- [Калькулятор](' . static::base() . '/calculator/): цена тарифа, три суммы и разбивка без скрытых платежей.',
             '- [Услуги](' . static::base() . '/services/): хостинг, поддержка, плагины, онлайн-запись, SEO и бесплатный аудит.',
             '- [SEO-продвижение](' . static::base() . '/services/seo/): техническая база, структура, контент и аналитика без обещаний «топ-1».',
             '',

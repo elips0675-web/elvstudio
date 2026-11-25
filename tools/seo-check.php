@@ -34,7 +34,7 @@ $robots = Seo::robots();
 $check(str_contains($robots, 'Clean-param: q&category&tag'), 'robots.txt misses the global Clean-param');
 $check(!str_contains($robots, 'Clean-param: q&category&tag /blog/'), 'robots.txt still scopes Clean-param to /blog/');
 
-$defaultImage = Seo::base() . '/themes/elv-studio/assets/img/og-default.png';
+$defaultImage = Seo::base() . '/themes/elv-business/assets/img/og-default.png';
 Seo::setPost(null);
 $check(Seo::image() === $defaultImage, 'og:image is not the default without an article');
 

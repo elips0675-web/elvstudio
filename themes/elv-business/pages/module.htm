@@ -16,20 +16,14 @@ layout = "default"
                 {% if product.badge %}
                     <span class="badge badge--line">{{ product.badge }}</span>
                 {% endif %}
-                <span class="badge">{{ elv_price(product) > 0 ? elv_money(elv_price(product)) : elv_badge('included') }}</span>
+                <span class="badge">{{ elv_badge('included') }}</span>
             </div>
             <h1>{{ product.name }}</h1>
             <p class="lead">{{ product.tagline }}</p>
             <div class="stack-actions">
-                {% if elv_price(product) > 0 %}
-                    <a class="btn btn--primary" href="{{ elv_order_url({ product: product.slug, plan: 'single' }) }}">
-                        {{ elv_icon('cart')|raw }} Подключить раздел
-                    </a>
-                {% else %}
-                    <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
-                        {{ elv_icon('cart')|raw }} Заказать сайт
-                    </a>
-                {% endif %}
+                <a class="btn btn--primary" href="{{ elv_order_url({ product: 'elv-kit' }) }}">
+                    {{ elv_icon('cart')|raw }} Заказать Elv Kit
+                </a>
                 <a class="btn btn--ghost" href="{{ 'demo'|page }}">
                     {{ elv_icon('play')|raw }} Посмотреть на демо
                 </a>
@@ -55,8 +49,8 @@ layout = "default"
                 <div class="card">
                     <h3>Коротко</h3>
                     <ul class="specs mt-24">
-                        <li><span>Что это</span><span>{{ product.kind == 'kit' ? 'Готовый сайт' : 'Дополнительный раздел' }}</span></li>
-                        <li><span>Цена</span><span>{{ elv_price(product) > 0 ? elv_money(elv_price(product)) : elv_badge('included') }}</span></li>
+                        <li><span>Что это</span><span>{{ product.kind == 'kit' ? 'Готовый сайт' : 'Раздел в составе Elv Kit' }}</span></li>
+                        <li><span>В тарифе</span><span>{{ elv_badge('included') }}</span></li>
                         <li><span>Запуск</span><span>1–3 рабочих дня</span></li>
                         <li><span>Поддержка</span><span>По выбранному тарифу</span></li>
                         <li><span>Где работает</span><span>На вашем домене</span></li>
@@ -87,7 +81,7 @@ layout = "default"
             <div class="section-head">
                 <span class="eyebrow">Подключение</span>
                 <h2>Четыре шага до работы</h2>
-                <p>Раздел не нужно устанавливать отдельно: он подключается к вашему сайту и сразу появляется в меню.</p>
+                <p>Раздел уже входит в Elv Kit: отдельно устанавливать и докупать его не нужно. Показываем, как он работает на вашем сайте.</p>
             </div>
 
             <div class="grid grid--2">
@@ -98,8 +92,8 @@ layout = "default"
                 </div>
                 <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('download')|raw }}</div>
-                    <h3>2. Подключаем</h3>
-                    <p>Добавляем раздел на ваш сайт и оформляем под ваш бренд.</p>
+                    <h3>2. Включаем в сайт</h3>
+                    <p>Раздел уже в составе Elv Kit — включаем его на вашем домене и оформляем под ваш бренд.</p>
                 </div>
                 <div class="card card--center">
                     <div class="card__icon">{{ elv_icon('refresh')|raw }}</div>

@@ -1,7 +1,7 @@
 /*
  * Elv Studio — оформление панели управления October CMS.
  *
- * Палитра совпадает с лендингом: themes/elv-studio/assets/css/styles.css:3-20
+ * Палитра совпадает с лендингом: themes/elv-business/assets/css/styles.css:3-20
  * (brand #1c5cf0, brand-2 #0f3fb8, accent #16c2a3).
  * Файл подключается из config/backend.php -> brand.stylesheet_path.
  * Он не переопределяет Bootstrap целиком, только переменные темы.

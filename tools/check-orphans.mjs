@@ -3,7 +3,7 @@ import { join, relative, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const THEME = join(ROOT, 'themes', 'elv-studio');
+const THEME = join(ROOT, 'themes', 'elv-business');
 const PLUGIN = join(ROOT, 'plugins', 'elv', 'kit');
 const BASE = (process.env.ELV_BASE || 'http://127.0.0.1:8090').replace(/\/+$/, '');
 const errors = [];

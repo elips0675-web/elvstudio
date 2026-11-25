@@ -1,4 +1,4 @@
-/* Калькулятор Elv Kit: мастер из 4 шагов, смета и печать. */
+/* Калькулятор Elv Kit: мастер из 3 шагов, смета и печать. */
 (function () {
     'use strict';
 
@@ -11,7 +11,6 @@
     var steps = Array.prototype.slice.call(root.querySelectorAll('[data-calc-step]'));
     var progress = Array.prototype.slice.call(root.querySelectorAll('[data-calc-go]'));
     var planInputs = Array.prototype.slice.call(root.querySelectorAll('input[name="plan"]'));
-    var moduleInputs = Array.prototype.slice.call(root.querySelectorAll('input[name="modules"]'));
     var result = document.getElementById('calculator-result');
     var requestForm = document.querySelector('[data-calc-request]');
 
@@ -54,18 +53,6 @@
         return planInputs[0];
     }
 
-    function selectedModules() {
-        return moduleInputs.filter(function (input) {
-            return input.checked;
-        }).map(function (input) {
-            return {
-                slug: input.value,
-                label: input.getAttribute('data-label') || input.value,
-                price: parseInt(input.getAttribute('data-price'), 10) || 0
-            };
-        });
-    }
-
     function checkedValue(name, fallback) {
         var input = root.querySelector('input[name="' + name + '"]:checked');
 
@@ -86,16 +73,6 @@
         return key;
     }
 
-    function moduleLabel(slug) {
-        for (var i = 0; i < moduleInputs.length; i += 1) {
-            if (moduleInputs[i].value === slug) {
-                return moduleInputs[i].getAttribute('data-label') || slug;
-            }
-        }
-
-        return slug;
-    }
-
     function renderRecommendation() {
         var recommendation = currentRecommendation();
 
@@ -111,8 +88,7 @@
             return;
         }
 
-        var labels = (recommendation.modules || []).map(moduleLabel);
-        var composition = planLabel(recommendation.plan) + (labels.length ? ' + ' + labels.join(', ') : ' без платных модулей');
+        var composition = planLabel(recommendation.plan);
 
         recommendText.textContent = composition + '. ' + (recommendation.reason || '');
 
@@ -138,16 +114,11 @@
             planInputs[0].checked = true;
         }
 
-        moduleInputs.forEach(function (input) {
-            input.checked = (recommendation.modules || []).indexOf(input.value) !== -1;
-        });
-
         touched = true;
         update();
         track('calculator_recommend', {
             task: checkedValue('task', 'landing'),
-            plan: recommendation.plan,
-            modules: (recommendation.modules || []).join(',')
+            plan: recommendation.plan
         });
     }
 
@@ -163,10 +134,8 @@
         }
 
         var params = new URLSearchParams(window.location.search);
+        params.delete('modules');
         params.set('plan', plan.value);
-        params.set('modules', selectedModules().map(function (module) {
-            return module.slug;
-        }).join(','));
         params.set('task', checkedValue('task', 'landing'));
         params.set('hosting', checkedValue('hosting', 'own'));
         pdfLink.href = quoteUrl + '?' + params.toString();
@@ -229,14 +198,6 @@
             }
         }
 
-        if (params.has('modules')) {
-            var wanted = params.get('modules').split(',').filter(Boolean);
-
-            moduleInputs.forEach(function (input) {
-                input.checked = wanted.indexOf(input.value) !== -1;
-            });
-        }
-
         if (task) {
             Array.prototype.slice.call(root.querySelectorAll('input[name="task"]')).forEach(function (input) {
                 if (input.value === task) {
@@ -266,10 +227,8 @@
         }
 
         var params = new URLSearchParams(window.location.search);
+        params.delete('modules');
         params.set('plan', plan.value);
-        params.set('modules', selectedModules().map(function (module) {
-            return module.slug;
-        }).join(','));
         params.set('task', checkedValue('task', 'landing'));
         params.set('hosting', checkedValue('hosting', 'own'));
         window.history.replaceState(null, '', window.location.pathname + '?' + params.toString() + window.location.hash);
@@ -281,25 +240,19 @@
         });
     }
 
-    function breakdownRows(plan, modules) {
-        var rows = [{
+    function breakdownRows(plan) {
+        return [{
             label: plan.getAttribute('data-label') || 'Elv Kit',
             price: parseInt(plan.getAttribute('data-price'), 10) || 0
         }];
-
-        modules.forEach(function (module) {
-            rows.push({ label: module.label, price: module.price });
-        });
-
-        return rows;
     }
 
-    function renderRows(plan, modules) {
+    function renderRows(plan) {
         var list = document.querySelector('[data-breakdown]');
 
         if (list) {
             list.innerHTML = '';
-            breakdownRows(plan, modules).forEach(function (row) {
+            breakdownRows(plan).forEach(function (row) {
                 var tr = document.createElement('tr');
                 var name = document.createElement('td');
                 var price = document.createElement('td');
@@ -315,7 +268,7 @@
 
         if (printList) {
             printList.innerHTML = '';
-            breakdownRows(plan, modules).forEach(function (row) {
+            breakdownRows(plan).forEach(function (row) {
                 var tr = document.createElement('tr');
                 var name = document.createElement('td');
                 var price = document.createElement('td');
@@ -328,7 +281,7 @@
         }
     }
 
-    function buildMessage(plan, modules, totals) {
+    function buildMessage(plan, totals) {
         var taskLabels = {
             landing: 'Лендинг',
             services: 'Сайт услуг',
@@ -357,9 +310,6 @@
             'Тариф: ' + (plan.getAttribute('data-label') || '') + ' — ' + money(plan.getAttribute('data-price')),
             'Сайтов: ' + (plan.getAttribute('data-sites') || ''),
             'Тип сайта: ' + (taskLabels[task] || task),
-            'Модули: ' + (modules.length ? modules.map(function (module) {
-                return module.label + ' — ' + money(module.price);
-            }).join('; ') : 'не выбраны'),
             'Хостинг: ' + (hostingLabels[hosting] || hosting),
             'Запуск: ' + money(totals.launch),
             'Хостинг и лицензии, в год: 0 (у студии; хостинг и домен — провайдеру)',
@@ -378,21 +328,12 @@
 
     function update() {
         var plan = checkedPlan();
-        var modules = selectedModules();
         var launch = parseInt(plan.getAttribute('data-price'), 10) || 0;
-
-        modules.forEach(function (module) {
-            launch += module.price;
-        });
-
         var year = launch;
         var planLabel = plan.getAttribute('data-label') || '';
         var planSites = plan.getAttribute('data-sites') || '';
         var planSupport = plan.getAttribute('data-support') || '';
         var planUpdates = plan.getAttribute('data-updates') || '';
-        var moduleNames = modules.length ? modules.map(function (module) {
-            return module.label;
-        }).join(', ') : 'не выбраны';
 
         setText('[data-total-launch]', money(launch));
         setText('[data-total-annual]', money(0));
@@ -410,23 +351,21 @@
         setText('[data-review-sites]', planSites);
         setText('[data-review-support]', planSupport);
         setText('[data-review-updates]', planUpdates);
-        setText('[data-review-modules]', moduleNames);
 
         setText('[data-print-plan]', planLabel);
-        setText('[data-print-modules]', moduleNames);
         setText('[data-print-launch]', money(launch));
         setText('[data-print-annual]', money(0));
         setText('[data-print-monthly]', money(0));
         setText('[data-print-year]', money(year));
         setText('[data-print-next]', money(0));
 
-        renderRows(plan, modules);
+        renderRows(plan);
 
         if (requestForm) {
             var message = requestForm.querySelector('#calc-message');
 
             if (message) {
-                message.value = buildMessage(plan, modules, { launch: launch, year: year });
+                message.value = buildMessage(plan, { launch: launch, year: year });
             }
         }
 
@@ -436,7 +375,7 @@
 
         syncPdfLink();
 
-        return { plan: plan, modules: modules, launch: launch, year: year };
+        return { plan: plan, launch: launch, year: year };
     }
 
     function go(step) {
@@ -486,7 +425,7 @@
     root.addEventListener('change', function (event) {
         var target = event.target;
 
-        if (['plan', 'modules', 'task', 'hosting'].indexOf(target.name) === -1) {
+        if (['plan', 'task', 'hosting'].indexOf(target.name) === -1) {
             return;
         }
 
@@ -497,12 +436,7 @@
             track('calculator_plan', { plan: target.value, price: target.getAttribute('data-price') });
         }
 
-        if (target.name === 'modules') {
-            update();
-            track('calculator_module', { module: target.value, selected: target.checked });
-        }
-
-        if (target.name !== 'plan' && target.name !== 'modules') {
+        if (target.name !== 'plan') {
             update();
         }
 

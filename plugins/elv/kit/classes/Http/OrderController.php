@@ -5,6 +5,7 @@ use Elv\Kit\Classes\Catalog;
 use Elv\Kit\Classes\OrderService;
 use Elv\Kit\Classes\Payment\PaymentManager;
 use Elv\Kit\Classes\PaymentUnavailableException;
+use Elv\Kit\Classes\Prices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -58,8 +59,16 @@ class OrderController extends FormController
             return $this->invalid($request, ['product' => ['Товар не найден.']]);
         }
 
-        if ($product->kind === 'kit' && !in_array((string) $data['plan'], Catalog::planKeys(), true)) {
+        if ($product->kind !== 'kit') {
+            return $this->invalid($request, ['product' => ['Этот раздел входит в Elv Kit и отдельно не продаётся.']]);
+        }
+
+        if (!in_array((string) $data['plan'], Catalog::planKeys(), true)) {
             return $this->invalid($request, ['plan' => ['Этот тариф больше не продаётся. Выберите другой.']]);
+        }
+
+        if (Prices::resolve($product, (string) $data['plan']) <= 0) {
+            return $this->invalid($request, ['plan' => ['Этот тариф сейчас не продаётся. Выберите другой.']]);
         }
 
         $data['ip'] = AntiSpam::ip($request);

@@ -51,7 +51,7 @@ const readJson = (relative) => {
 
 const expected = [
   ['plugins/elv/kit/composer.json', 'october-plugin', 'elv/kit'],
-  ['themes/elv-studio/composer.json', 'october-theme', 'elv/elv-studio'],
+  ['themes/elv-business/composer.json', 'october-theme', 'elv/elv-business'],
 ];
 
 for (const [relative, type, name] of expected) {
@@ -82,21 +82,21 @@ for (const [relative, type, name] of expected) {
   }
 }
 
-const screenshot = path.join(root, 'themes/elv-studio/screenshot.png');
+const screenshot = path.join(root, 'themes/elv-business/screenshot.png');
 
 if (!fs.existsSync(screenshot)) {
-  problems.push('themes/elv-studio/screenshot.png — файла нет');
+  problems.push('themes/elv-business/screenshot.png — файла нет');
 } else {
   const head = fs.readFileSync(screenshot).subarray(0, 24);
 
   if (head.toString('ascii', 1, 4) !== 'PNG') {
-    problems.push('themes/elv-studio/screenshot.png — не PNG');
+    problems.push('themes/elv-business/screenshot.png — не PNG');
   } else {
     const width = head.readUInt32BE(16);
     const height = head.readUInt32BE(20);
 
     if (width < 600 || height < 400) {
-      problems.push('themes/elv-studio/screenshot.png — ' + width + 'x' + height + ', мелкий для карточки темы');
+      problems.push('themes/elv-business/screenshot.png — ' + width + 'x' + height + ', мелкий для карточки темы');
     }
   }
 }
@@ -115,14 +115,14 @@ const versions = (relative) => {
 };
 
 const pluginVersions = versions('plugins/elv/kit/updates/version.yaml');
-const themeVersions = versions('themes/elv-studio/version.yaml');
+const themeVersions = versions('themes/elv-business/version.yaml');
 
 if (!pluginVersions) {
   problems.push('plugins/elv/kit/updates/version.yaml — нет ни одной версии');
 }
 
 if (!themeVersions) {
-  problems.push('themes/elv-studio/version.yaml — нет ни одной версии');
+  problems.push('themes/elv-business/version.yaml — нет ни одной версии');
 }
 
 function inspectArchives(php) {
@@ -255,7 +255,7 @@ if (pluginVersions && themeVersions) {
     }
 
     if (!product.hasScreenshot) {
-      problems.push('в товарном архиве нет themes/elv-studio/screenshot.png');
+      problems.push('в товарном архиве нет themes/elv-business/screenshot.png');
     }
 
     const presetFiles = Array.isArray(product.presets) ? product.presets : null;

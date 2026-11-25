@@ -14,15 +14,12 @@ if ($data['plans'] === []) {
     exit(1);
 }
 
-$plan = $data['plans'][0];
-$modules = [];
-
-foreach ($data['modules'] as $module) {
-    if ($module['price'] > 0) {
-        $modules[$module['slug']] = $module;
-    }
+if ($data['modules'] !== []) {
+    fwrite(STDERR, "FAIL: calculator must not expose separately sold modules\n");
+    exit(1);
 }
 
+$plan = $data['plans'][0];
 $base = Calculator::estimate($plan['key'], []);
 
 if ($base['launch'] !== $plan['price']) {
@@ -35,27 +32,25 @@ if ($base['annual'] !== 0 || $base['monthly'] !== 0 || $base['first_year'] !== $
     exit(1);
 }
 
-$slugs = array_slice(array_keys($modules), 0, 2);
-$with = Calculator::estimate($plan['key'], $slugs);
-$expected = $plan['price'];
-
-foreach ($slugs as $slug) {
-    $expected += $modules[$slug]['price'];
-}
-
-if ($with['launch'] !== $expected) {
-    fwrite(STDERR, "FAIL: modules are not added to launch\n");
+if (count($base['breakdown']) !== 1 || $base['breakdown'][0]['type'] !== 'plan') {
+    fwrite(STDERR, "FAIL: breakdown must contain the plan row only\n");
     exit(1);
 }
 
-if (count($with['breakdown']) !== count($slugs) + 1) {
-    fwrite(STDERR, "FAIL: breakdown must include plan and selected modules\n");
+if ($base['modules'] !== []) {
+    fwrite(STDERR, "FAIL: estimate must not return modules\n");
     exit(1);
 }
 
-$unknown = Calculator::estimate($plan['key'], ['missing-module']);
-if ($unknown['launch'] !== $plan['price']) {
-    fwrite(STDERR, "FAIL: unknown module changed the total\n");
+$legacy = Calculator::estimate($plan['key'], ['booking', 'shop', 'missing-module']);
+
+if ($legacy['launch'] !== $plan['price']) {
+    fwrite(STDERR, "FAIL: legacy module slugs changed the total\n");
+    exit(1);
+}
+
+if ($legacy['modules'] !== [] || count($legacy['breakdown']) !== 1) {
+    fwrite(STDERR, "FAIL: legacy module slugs leaked into estimate\n");
     exit(1);
 }
 
@@ -67,23 +62,31 @@ foreach ($data['recommendations'] as $task => $recommendation) {
         exit(1);
     }
 
-    foreach ($recommendation['modules'] as $slug) {
-        if (!isset($modules[$slug])) {
-            fwrite(STDERR, "FAIL: recommendation {$task} points to a missing paid module\n");
-            exit(1);
-        }
+    if (!empty($recommendation['modules'])) {
+        fwrite(STDERR, "FAIL: recommendation {$task} still recommends separately sold modules\n");
+        exit(1);
     }
 }
 
-$quote = Calculator::quote($plan['key'], $slugs, 'services', 'own');
+$quote = Calculator::quote($plan['key'], ['booking', 'shop'], 'services', 'own');
 
 if (!preg_match('/^ELV-\d{8}-[A-F0-9]{6}$/', $quote['number'])) {
     fwrite(STDERR, "FAIL: quote number format\n");
     exit(1);
 }
 
-if ($quote['launch'] !== $expected || $quote['first_year'] !== $expected) {
-    fwrite(STDERR, "FAIL: quote total differs from estimate\n");
+if ($quote['launch'] !== $plan['price'] || $quote['first_year'] !== $plan['price']) {
+    fwrite(STDERR, "FAIL: quote total differs from plan price\n");
+    exit(1);
+}
+
+if ($quote['modules'] !== []) {
+    fwrite(STDERR, "FAIL: quote must not list separately sold modules\n");
+    exit(1);
+}
+
+if (count($quote['breakdown']) !== 1) {
+    fwrite(STDERR, "FAIL: quote breakdown must contain the plan row only\n");
     exit(1);
 }
 
@@ -92,7 +95,7 @@ if ($quote['valid_days'] !== 14 || $quote['is_offer'] !== false) {
     exit(1);
 }
 
-$quoteRepeat = Calculator::quote($plan['key'], $slugs, 'services', 'own');
+$quoteRepeat = Calculator::quote($plan['key'], [], 'services', 'own');
 
 if ($quoteRepeat['number'] === $quote['number']) {
     fwrite(STDERR, "FAIL: quote number is not unique per issue\n");
@@ -117,6 +120,5 @@ echo "OK: calculator plans=" . count($data['plans'])
     . " modules=" . count($data['modules'])
     . " recommendations=" . count($data['recommendations'])
     . " base=" . $base['launch']
-    . " with=" . $with['launch']
     . " quote=" . $quote['number']
     . "\n";

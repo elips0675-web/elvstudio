@@ -230,7 +230,7 @@ $check(str_contains(Seo::robots(), 'Disallow: /review/'), 'robots.txt does not d
 $check(str_contains(Seo::robots(), 'Disallow: /tickets/'), 'robots.txt lost the tickets rule');
 
 // Шаблоны темы.
-$themePath = themes_path('elv-studio');
+$themePath = themes_path('elv-business');
 $check(is_file($themePath . '/partials/product-qa.htm'), 'product-qa partial is missing');
 $check(is_file($themePath . '/partials/product-reviews.htm'), 'product-reviews partial is missing');
 $check(is_file($themePath . '/pages/review.htm'), 'review page is missing');

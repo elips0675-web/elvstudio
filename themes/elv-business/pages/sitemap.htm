@@ -20,7 +20,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
             <nav class="chips mt-24" aria-label="Разделы карты сайта">
                 <a class="chip" href="#sitemap-site">Сайт</a>
                 <a class="chip" href="#sitemap-services">Услуги</a>
-                <a class="chip" href="#sitemap-modules">Модули</a>
+                <a class="chip" href="#sitemap-modules">Разделы</a>
                 <a class="chip" href="#sitemap-buy">Купить и связаться</a>
                 <a class="chip" href="#sitemap-legal">Правовое</a>
                 <a class="chip" href="#sitemap-blog">Блог</a>
@@ -36,8 +36,7 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                     <ul class="mt-24">
                         <li><a href="{{ 'index'|page }}">Главная</a></li>
                         <li><a href="{{ 'kit'|page }}">Возможности Elv Kit</a></li>
-                        <li><a href="{{ 'template'|page }}">Универсальный шаблон для бизнеса</a></li>
-                        <li><a href="{{ 'modules'|page }}">Модули Elv Kit</a></li>
+                        <li><a href="{{ 'modules'|page }}">Разделы Elv Kit</a></li>
                         <li><a href="{{ 'calculator'|page }}">Калькулятор стоимости</a></li>
                         <li><a href="{{ 'pricing'|page }}">Цены и тарифы</a></li>
                         <li><a href="{{ 'demo'|page }}">Демо</a></li>
@@ -60,15 +59,15 @@ meta_description = "Все разделы сайта Elv Kit: возможнос
                 </div>
 
                 <div class="card">
-                    <h2 id="sitemap-modules">Модули Elv Kit</h2>
+                    <h2 id="sitemap-modules">Разделы Elv Kit</h2>
                     <ul class="mt-24">
                         {% for product in elv_modules() %}
                             <li><a href="{{ 'module'|page({ slug: product.slug }) }}/">{{ product.name }}</a></li>
                         {% else %}
-                            <li class="muted">Модули пока не заполнены.</li>
+                            <li class="muted">Разделы пока не заполнены.</li>
                         {% endfor %}
                     </ul>
-                    <p class="muted small mt-24">Онлайн-запись, заказы и оплата, обратная связь и блог подключаются к сайту отдельно.</p>
+                    <p class="muted small mt-24">Все разделы уже входят в Elv Kit и работают в одной админке. Отдельно они не продаются.</p>
                 </div>
             </div>
 

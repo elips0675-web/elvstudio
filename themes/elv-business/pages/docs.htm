@@ -58,7 +58,7 @@ meta_description = "Пошаговый запуск сайта на вашем �
                         <li>{{ elv_icon('check')|raw }} MySQL 8.0+ или MariaDB 10.6+, кодировка <code>utf8mb4</code></li>
                         <li>{{ elv_icon('check')|raw }} 512 МБ памяти PHP и 1 ГБ диска</li>
                         <li>{{ elv_icon('check')|raw }} HTTPS-сертификат (обычно включается в панели одним переключателем)</li>
-                        <li>{{ elv_icon('check')|raw }} Архив <strong>Elv Kit</strong> с папками <code>themes/elv-studio</code> и <code>plugins/elv/kit</code></li>
+                        <li>{{ elv_icon('check')|raw }} Архив <strong>Elv Kit</strong> с папками <code>themes/elv-business</code> и <code>plugins/elv/kit</code></li>
                     </ul>
                     <div class="notice mt-24">
                         {{ elv_icon('info')|raw }}
@@ -96,7 +96,7 @@ meta_description = "Пошаговый запуск сайта на вашем �
 config/
 modules/
 plugins/elv/kit/
-themes/elv-studio/
+themes/elv-business/
 storage/</code></pre>
 
                     <h3>Способ В. Официальный установщик October CMS</h3>
@@ -116,7 +116,7 @@ storage/</code></pre>
                         <li>Загрузите архив Elv Kit и распакуйте его <strong>в корень</strong>. После распаковки
                         проверьте две папки:
                             <ul>
-                                <li><code>themes/elv-studio</code> — тема оформления;</li>
+                                <li><code>themes/elv-business</code> — тема оформления;</li>
                                 <li><code>plugins/elv/kit</code> — плагин с каталогом, блогом, бронями и оплатой.</li>
                             </ul>
                         </li>
@@ -140,7 +140,7 @@ storage/</code></pre>
                     <h2 id="theme">6. Активация темы</h2>
                     <p>В админке: <strong>Front-end → Темы</strong>. В списке появится <strong>Elv Kit — витрина продаж</strong>.
                     Нажмите <strong>Активировать</strong>. Если тема не видна — проверьте, что папка
-                    <code>themes/elv-studio</code> лежит в корне сайта, а не внутри другой папки.</p>
+                    <code>themes/elv-business</code> лежит в корне сайта, а не внутри другой папки.</p>
                     <p>После активации откройте главную страницу: должна загрузиться оболочка сайта Elv Kit.
                     Наполнение (товары, статьи, свободное время) появится после шага 7.</p>
 
@@ -243,7 +243,7 @@ storage/</code></pre>
 
                     <h2 id="update">12. Обновление</h2>
                     <ol>
-                        <li>Сделайте резервную копию базы и папок <code>themes/elv-studio</code>,
+                        <li>Сделайте резервную копию базы и папок <code>themes/elv-business</code>,
                         <code>plugins/elv/kit</code> и <code>storage</code> (кнопка «Бэкап» в панели хостинга).</li>
                         <li>Загрузите новый архив и распакуйте поверх, не удаляя <code>.env</code> и <code>storage/</code>.</li>
                         <li>Откройте <strong>Elv Kit → Установка</strong> и нажмите <strong>Применить миграции</strong>,

@@ -16,8 +16,8 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 
 const roots = [
-  'themes/elv-studio/pages',
-  'themes/elv-studio/partials',
+  'themes/elv-business/pages',
+  'themes/elv-business/partials',
   'plugins/elv/kit/classes',
   'plugins/elv/kit/views',
   'plugins/elv/kit/models',
